@@ -2,15 +2,21 @@
  * Enrich raw pericopes → public/data/pericopes.json
  *
  * Modes:
- *   --local          heuristic PT titles + didactic templates (default, no API)
- *   --openai         call OpenAI (needs OPENAI_API_KEY)
- *   --livro=Gênesis  filter by book
- *   --limit=N        process at most N items
+ *   --local              heuristic PT titles + didactic templates (default)
+ *   --openrouter         OpenRouter API (needs OPENROUTER_API_KEY)
+ *   --livro=Gênesis      filter by book
+ *   --limit=N            process at most N pending items
+ *   --force              re-enrich even non-stub caches
+ *   --concurrency=N      parallel OpenRouter calls (default 5)
+ *   --commit-every=N     git commit+push every N enriched (default 0 = off)
+ *   --no-push            commit without push
+ *   --skip-git           never commit/push
  *
  * Usage: npx tsx scripts/enrich-pericopes.ts --local
- *        npx tsx scripts/enrich-pericopes.ts --openai --livro=Gênesis
+ *        npm run enrich:all
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Pericope, RawPericope } from '../src/lib/types.ts'
@@ -372,7 +378,13 @@ ${raw.texto_naa}`
       ],
     }),
   })
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${await res.text()}`)
+  if (!res.ok) {
+    const err = new Error(`OpenRouter ${res.status}: ${await res.text()}`) as Error & {
+      status?: number
+    }
+    err.status = res.status
+    throw err
+  }
   const data = (await res.json()) as {
     id?: string
     choices: { message: { content: string } }[]
@@ -423,21 +435,163 @@ function merge(raw: RawPericope, ai: AiPartial): Pericope {
   }
 }
 
+const STUB_PATTERNS = [
+  /forma uma unidade narrativa/i,
+  /Antes de ler /i,
+  /Resuma mentalmente o que ocorreu/i,
+  /Leia-o como um bloco contínuo/i,
+  /o detalhe do que acontece virá na leitura e na resenha/i,
+]
+
+function isStub(p: Pick<Pericope, 'contexto_historico_literario' | 'resenha'>): boolean {
+  const t = `${p.contexto_historico_literario}\n${p.resenha}`
+  return STUB_PATTERNS.some((r) => r.test(t))
+}
+
+function cachePath(ordem: number) {
+  return join(enrichedDir, `${ordem}.json`)
+}
+
+function readCached(ordem: number): Pericope | null {
+  const f = cachePath(ordem)
+  if (!existsSync(f)) return null
+  const cached = JSON.parse(readFileSync(f, 'utf8')) as Pericope & {
+    comentario_narrador?: string
+  }
+  if (!cached.resenha && cached.comentario_narrador) {
+    cached.resenha = cached.comentario_narrador
+    delete cached.comentario_narrador
+  }
+  return cached
+}
+
+function needsEnrich(raw: RawPericope, force: boolean): boolean {
+  if (force) return true
+  const cached = readCached(raw.ordem)
+  if (!cached) return true
+  return isStub(cached)
+}
+
+function refLabel(raw: RawPericope) {
+  return `${raw.livro} ${raw.capitulo_inicio}:${raw.versiculo_inicio}–${raw.capitulo_fim}:${raw.versiculo_fim}`
+}
+
+function fmtDuration(sec: number): string {
+  if (!Number.isFinite(sec) || sec < 0) return '?'
+  const s = Math.round(sec)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const r = s % 60
+  if (h > 0) return `${h}h${String(m).padStart(2, '0')}m`
+  if (m > 0) return `${m}m${String(r).padStart(2, '0')}s`
+  return `${r}s`
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+function runGit(args: string[]) {
+  const res = spawnSync('git', args, { cwd: root, encoding: 'utf8' })
+  if (res.status !== 0) {
+    const msg = (res.stderr || res.stdout || '').trim() || `git ${args.join(' ')} failed`
+    throw new Error(msg)
+  }
+  return res
+}
+
 function parseArgs(argv: string[]) {
   const opts = {
     mode: 'local' as 'local' | 'openrouter',
     livro: '' as string,
     limit: Infinity,
     force: false,
+    concurrency: 5,
+    commitEvery: 0,
+    noPush: false,
+    skipGit: false,
   }
   for (const a of argv) {
     if (a === '--openrouter' || a === '--openai') opts.mode = 'openrouter'
     if (a === '--local') opts.mode = 'local'
     if (a === '--force') opts.force = true
+    if (a === '--no-push') opts.noPush = true
+    if (a === '--skip-git') opts.skipGit = true
     if (a.startsWith('--livro=')) opts.livro = a.slice('--livro='.length)
     if (a.startsWith('--limit=')) opts.limit = Number(a.slice('--limit='.length))
+    if (a.startsWith('--concurrency='))
+      opts.concurrency = Math.max(1, Number(a.slice('--concurrency='.length)))
+    if (a.startsWith('--commit-every='))
+      opts.commitEvery = Math.max(0, Number(a.slice('--commit-every='.length)))
   }
   return opts
+}
+
+function assembleCatalog(allRaw: RawPericope[]): Pericope[] {
+  const catalog: Pericope[] = []
+  for (const raw of allRaw) {
+    const cached = readCached(raw.ordem)
+    catalog.push(cached ?? merge(raw, localEnrich(raw)))
+  }
+  catalog.sort((a, b) => a.ordem - b.ordem)
+  writeFileSync(outPath, JSON.stringify(catalog))
+  return catalog
+}
+
+function gitPublish(ordems: number[], push: boolean) {
+  const a = Math.min(...ordems)
+  const b = Math.max(...ordems)
+  const msg = `enrich: ${ordems.length} perícopes via OpenRouter (${a}–${b})`
+  runGit(['add', 'public/data/pericopes.json', 'data/cost-run.json'])
+  const staged = spawnSync('git', ['diff', '--cached', '--quiet'], { cwd: root })
+  if (staged.status === 0) {
+    console.log('  etapa: git → nada a commitar')
+    return
+  }
+  console.log('  etapa: git commit…')
+  runGit(['commit', '-m', msg])
+  if (push) {
+    console.log('  etapa: git push…')
+    runGit(['push', 'origin', 'main'])
+  }
+}
+
+async function mapPool<T>(items: T[], concurrency: number, fn: (item: T) => Promise<void>) {
+  let i = 0
+  const workers = Array.from({ length: Math.min(concurrency, items.length || 1) }, async () => {
+    while (true) {
+      const idx = i++
+      if (idx >= items.length) return
+      await fn(items[idx])
+    }
+  })
+  await Promise.all(workers)
+}
+
+async function openRouterWithRetry(
+  raw: RawPericope,
+  onRateLimit: () => void,
+): Promise<{ ai: AiPartial; usage: Usage }> {
+  let last: unknown
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      return await openRouterEnrich(raw)
+    } catch (e) {
+      last = e
+      const status = (e as { status?: number }).status
+      if (status === 429) {
+        onRateLimit()
+        await sleep(2000 * (attempt + 1) ** 2)
+        continue
+      }
+      if (attempt === 0) {
+        console.warn(`  retry ordem ${raw.ordem}…`)
+        await sleep(1000)
+        continue
+      }
+    }
+  }
+  throw last
 }
 
 async function main() {
@@ -446,9 +600,26 @@ async function main() {
   mkdirSync(dirname(outPath), { recursive: true })
 
   const rawLines = readFileSync(rawPath, 'utf8').trim().split('\n')
-  let raws = rawLines.map((l) => JSON.parse(l) as RawPericope)
-  if (opts.livro) raws = raws.filter((r) => r.livro === opts.livro)
-  if (Number.isFinite(opts.limit)) raws = raws.slice(0, opts.limit)
+  const allRaw = rawLines.map((l) => JSON.parse(l) as RawPericope)
+  let candidates = allRaw.filter((r) => needsEnrich(r, opts.force))
+  if (opts.livro) candidates = candidates.filter((r) => r.livro === opts.livro)
+  if (Number.isFinite(opts.limit)) candidates = candidates.slice(0, opts.limit)
+
+  const AVG_COST_HINT = 0.0038088
+  const AVG_SEC_HINT = 11
+  let concurrency = opts.concurrency
+  const estimatedCost = candidates.length * AVG_COST_HINT
+  const estimatedSec = (candidates.length * AVG_SEC_HINT) / concurrency
+
+  console.log('--- Estimativa ---')
+  console.log(`pendentes: ${candidates.length} / catálogo ${allRaw.length}`)
+  console.log(
+    `modo: ${opts.mode} · concurrency: ${concurrency} · commit-every: ${opts.commitEvery || 'off'}`,
+  )
+  console.log(
+    `custo ~$${estimatedCost.toFixed(2)} (~R$${(estimatedCost * 5.5).toFixed(2)} @5.5) · ETA ~${fmtDuration(estimatedSec)}`,
+  )
+  console.log('------------------\n')
 
   const state: { done: number[]; mode: string } = existsSync(statePath)
     ? JSON.parse(readFileSync(statePath, 'utf8'))
@@ -461,102 +632,146 @@ async function main() {
     usage: Usage
   }> = []
 
-  let processed = 0
-  for (const raw of raws) {
-    const cacheFile = join(enrichedDir, `${raw.ordem}.json`)
-    if (existsSync(cacheFile) && !opts.force) {
-      processed++
-      continue
-    }
-    let ai: AiPartial
-    if (opts.mode === 'openrouter') {
-      try {
-        const r = await openRouterEnrich(raw)
-        ai = r.ai
-        costLog.push({
-          ordem: raw.ordem,
-          titulo_en: raw.titulo_en,
-          chars_texto: raw.texto_naa.length,
-          usage: r.usage,
-        })
-        console.log(
-          `ordem ${raw.ordem}: $${r.usage.cost_usd.toFixed(6)} · in ${r.usage.prompt_tokens} out ${r.usage.completion_tokens}`,
-        )
-      } catch (e) {
-        console.warn(`ordem ${raw.ordem} falhou, retry…`, e)
-        const r = await openRouterEnrich(raw)
-        ai = r.ai
-        costLog.push({
-          ordem: raw.ordem,
-          titulo_en: raw.titulo_en,
-          chars_texto: raw.texto_naa.length,
-          usage: r.usage,
-        })
-      }
-    } else {
-      ai = localEnrich(raw)
-    }
-    const full = merge(raw, ai)
-    writeFileSync(cacheFile, JSON.stringify(full, null, 2))
-    state.done.push(raw.ordem)
-    state.mode = opts.mode
-    writeFileSync(statePath, JSON.stringify(state))
-    processed++
-    if (processed % 50 === 0) console.log(`… ${processed}/${raws.length}`)
+  let completed = 0
+  let failedStreak = 0
+  const runStarted = Date.now()
+  const commitBatch: number[] = []
+
+  const writeCostRun = () => {
+    const n = costLog.length
+    const totalCost = costLog.reduce((s, x) => s + x.usage.cost_usd, 0)
+    const avg = n ? totalCost / n : AVG_COST_HINT
+    const elapsed = (Date.now() - runStarted) / 1000
+    const throughput = n ? n / elapsed : 0
+    const remaining = candidates.length - completed
+    writeFileSync(
+      join(root, 'data/cost-run.json'),
+      JSON.stringify(
+        {
+          model: process.env.OPENROUTER_MODEL || 'google/gemini-3.7-flash',
+          concurrency,
+          done: n,
+          pending_total: candidates.length,
+          sample_cost_usd: totalCost,
+          avg_cost_usd: avg,
+          estimate_remaining_usd: avg * remaining,
+          estimate_full_run_usd: avg * candidates.length,
+          elapsed_sec: elapsed,
+          throughput_per_sec: throughput,
+          eta_sec: throughput > 0 ? remaining / throughput : (remaining * AVG_SEC_HINT) / concurrency,
+          catalog_total: allRaw.length,
+          items: costLog,
+        },
+        null,
+        2,
+      ),
+    )
   }
 
-  // Assemble full catalog from all enriched + fill missing from raw with local
-  const allRaw = rawLines.map((l) => JSON.parse(l) as RawPericope)
-  const catalog: Pericope[] = []
-  for (const raw of allRaw) {
-    const cacheFile = join(enrichedDir, `${raw.ordem}.json`)
-    if (existsSync(cacheFile)) {
-      const cached = JSON.parse(readFileSync(cacheFile, 'utf8')) as Pericope & {
-        comentario_narrador?: string
-      }
-      if (!cached.resenha && cached.comentario_narrador) {
-        cached.resenha = cached.comentario_narrador
-        delete cached.comentario_narrador
-      }
-      catalog.push(cached)
-    } else {
-      catalog.push(merge(raw, localEnrich(raw)))
-    }
+  const publishBatch = () => {
+    if (opts.skipGit || opts.commitEvery <= 0 || commitBatch.length === 0) return
+    console.log(`\n  etapa: catalog + git (lote ${commitBatch.length})`)
+    assembleCatalog(allRaw)
+    writeCostRun()
+    gitPublish([...commitBatch], !opts.noPush)
+    commitBatch.length = 0
+    console.log('')
   }
-  catalog.sort((a, b) => a.ordem - b.ordem)
-  writeFileSync(outPath, JSON.stringify(catalog))
+
+  const chunkSize = opts.commitEvery > 0 ? opts.commitEvery : candidates.length || 1
+  for (let offset = 0; offset < candidates.length; ) {
+    const chunk = candidates.slice(offset, offset + chunkSize)
+    offset += chunk.length
+
+    await mapPool(chunk, concurrency, async (raw) => {
+      const titleShort = raw.titulo_en.slice(0, 48)
+      const t0 = Date.now()
+      try {
+        let ai: AiPartial
+        let usage: Usage | null = null
+        const label = () => `[${completed + 1}/${candidates.length}]`
+        if (opts.mode === 'openrouter') {
+          console.log(
+            `${label()} ordem ${raw.ordem} · ${refLabel(raw)} · ${titleShort} · workers ${concurrency}`,
+          )
+          console.log(`  etapa: openrouter…`)
+          const r = await openRouterWithRetry(raw, () => {
+            if (concurrency > 1) {
+              concurrency = Math.max(1, concurrency - 1)
+              console.warn(`  rate limit → concurrency agora ${concurrency}`)
+            }
+          })
+          ai = r.ai
+          usage = r.usage
+          costLog.push({
+            ordem: raw.ordem,
+            titulo_en: raw.titulo_en,
+            chars_texto: raw.texto_naa.length,
+            usage: r.usage,
+          })
+        } else {
+          console.log(`${label()} ordem ${raw.ordem} · ${refLabel(raw)} · local`)
+          ai = localEnrich(raw)
+        }
+
+        const full = merge(raw, ai)
+        writeFileSync(cachePath(raw.ordem), JSON.stringify(full, null, 2))
+        state.done.push(raw.ordem)
+        state.mode = opts.mode
+        writeFileSync(statePath, JSON.stringify(state))
+
+        completed++
+        commitBatch.push(raw.ordem)
+        failedStreak = 0
+
+        const elapsedItem = (Date.now() - t0) / 1000
+        const elapsedRun = (Date.now() - runStarted) / 1000
+        const throughput = completed / elapsedRun
+        const remaining = candidates.length - completed
+        const eta = throughput > 0 ? remaining / throughput : (remaining * AVG_SEC_HINT) / concurrency
+        const acum = costLog.reduce((s, x) => s + x.usage.cost_usd, 0)
+        const avgCost = costLog.length ? acum / costLog.length : AVG_COST_HINT
+
+        if (usage) {
+          console.log(`  etapa: openrouter → ok`)
+          console.log(
+            `  custo $${usage.cost_usd.toFixed(4)} (acum $${acum.toFixed(2)}) · in ${usage.prompt_tokens} out ${usage.completion_tokens} · ${elapsedItem.toFixed(1)}s · throughput ${throughput.toFixed(2)}/s · ETA ${fmtDuration(eta)} · faltam ${remaining} · est. restante $${(avgCost * remaining).toFixed(2)}`,
+          )
+        } else {
+          console.log(`  etapa: local → ok · faltam ${remaining}`)
+        }
+      } catch (e) {
+        failedStreak++
+        console.error(`  etapa: falhou ordem ${raw.ordem}`, e)
+        if (failedStreak >= 8) throw new Error(`Abortando: ${failedStreak} falhas seguidas`)
+      }
+    })
+
+    if (opts.commitEvery > 0 && !opts.skipGit) publishBatch()
+  }
+
+  const catalog = assembleCatalog(allRaw)
+  writeCostRun()
+  if (!opts.skipGit && opts.commitEvery > 0 && commitBatch.length) {
+    console.log(`\n  etapa: catalog + git (lote final ${commitBatch.length})`)
+    gitPublish(commitBatch, !opts.noPush)
+  }
 
   if (costLog.length) {
     const totalCost = costLog.reduce((s, x) => s + x.usage.cost_usd, 0)
-    const totalIn = costLog.reduce((s, x) => s + x.usage.prompt_tokens, 0)
-    const totalOut = costLog.reduce((s, x) => s + x.usage.completion_tokens, 0)
     const n = costLog.length
     const avg = totalCost / n
-    const estimate = {
-      model: process.env.OPENROUTER_MODEL || 'google/gemini-3.7-flash',
-      sample_n: n,
-      sample_cost_usd: totalCost,
-      avg_cost_usd: avg,
-      total_prompt_tokens: totalIn,
-      total_completion_tokens: totalOut,
-      avg_prompt_tokens: totalIn / n,
-      avg_completion_tokens: totalOut / n,
-      catalog_total: allRaw.length,
-      estimate_full_usd: avg * allRaw.length,
-      estimate_full_brl_approx: avg * allRaw.length * 5.5,
-      items: costLog,
-    }
-    const costPath = join(root, 'data/cost-sample.json')
-    writeFileSync(costPath, JSON.stringify(estimate, null, 2))
-    console.log('\n--- Custo amostra ---')
+    const elapsed = (Date.now() - runStarted) / 1000
+    console.log('\n--- Custo run ---')
     console.log(`n=${n}  total=$${totalCost.toFixed(6)}  média=$${avg.toFixed(6)}`)
-    console.log(
-      `Estimativa ${allRaw.length} perícopes: $${estimate.estimate_full_usd.toFixed(2)} (~R$${estimate.estimate_full_brl_approx.toFixed(2)} @5.5)`,
-    )
-    console.log(`Relatório → ${costPath}`)
+    console.log(`tempo ${fmtDuration(elapsed)} · throughput ${(n / elapsed).toFixed(2)}/s`)
+    console.log(`Relatório → data/cost-run.json`)
   }
 
-  console.log(`OK: ${catalog.length} perícopes → ${outPath} (processados nesta run: ${processed}, modo=${opts.mode})`)
+  const stubsLeft = catalog.filter(isStub).length
+  console.log(
+    `OK: ${catalog.length} perícopes → ${outPath} (enriquecidos nesta run: ${completed}, stubs restantes: ${stubsLeft}, modo=${opts.mode})`,
+  )
 }
 
 main().catch((e) => {

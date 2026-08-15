@@ -14,6 +14,7 @@
     "enrich:openrouter": "tsx scripts/enrich-pericopes.ts --openrouter --force",
     "enrich:sample5": "tsx scripts/enrich-pericopes.ts --openrouter --force --limit=5",
     "enrich:genesis": "tsx scripts/enrich-pericopes.ts --openrouter --force --livro=Gênesis",
+    "enrich:all": "tsx scripts/enrich-pericopes.ts --openrouter --concurrency=5 --commit-every=100",
     "pipeline": "npm run etl && npm run enrich"
   },
   "dependencies": {

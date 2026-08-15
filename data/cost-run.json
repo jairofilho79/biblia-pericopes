@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 2600,
+  "done": 2640,
   "pending_total": 2640,
-  "sample_cost_usd": 8.311147499999992,
-  "avg_cost_usd": 0.0031965951923076893,
-  "estimate_remaining_usd": 0.12786380769230757,
-  "estimate_full_run_usd": 8.439011307692299,
-  "elapsed_sec": 5862.334,
-  "throughput_per_sec": 0.4435093599238802,
-  "eta_sec": 90.18975384615383,
+  "sample_cost_usd": 8.428061249999988,
+  "avg_cost_usd": 0.003192447443181814,
+  "estimate_remaining_usd": 0,
+  "estimate_full_run_usd": 8.428061249999988,
+  "elapsed_sec": 5950.831,
+  "throughput_per_sec": 0.4436355191400999,
+  "eta_sec": 0,
   "catalog_total": 2647,
   "items": [
     {
@@ -31210,6 +31210,486 @@
         "total_tokens": 3211,
         "cost_usd": 0.003899625,
         "generation_id": "gen-1786832916-5lmpfFGipWoBNR3qjGVI"
+      }
+    },
+    {
+      "ordem": 2611,
+      "titulo_en": "The War in Heaven",
+      "chars_texto": 936,
+      "usage": {
+        "prompt_tokens": 1230,
+        "completion_tokens": 1346,
+        "total_tokens": 2576,
+        "cost_usd": 0.002985,
+        "generation_id": "gen-1786832932-9QRF9jAZhnO7OUiyFhTZ"
+      }
+    },
+    {
+      "ordem": 2607,
+      "titulo_en": "The Angel and the Small Scroll",
+      "chars_texto": 1564,
+      "usage": {
+        "prompt_tokens": 1417,
+        "completion_tokens": 1575,
+        "total_tokens": 2992,
+        "cost_usd": 0.0034845,
+        "generation_id": "gen-1786832932-dNAhMJyiL2yWN7kFYX64"
+      }
+    },
+    {
+      "ordem": 2610,
+      "titulo_en": "The Woman, the Dragon, and the Child",
+      "chars_texto": 862,
+      "usage": {
+        "prompt_tokens": 1209,
+        "completion_tokens": 1464,
+        "total_tokens": 2673,
+        "cost_usd": 0.003198375,
+        "generation_id": "gen-1786832932-NeDQkZzi4GYiWeiVAWsw"
+      }
+    },
+    {
+      "ordem": 2609,
+      "titulo_en": "The Seventh Trumpet",
+      "chars_texto": 931,
+      "usage": {
+        "prompt_tokens": 1232,
+        "completion_tokens": 1547,
+        "total_tokens": 2779,
+        "cost_usd": 0.003362625,
+        "generation_id": "gen-1786832932-AFpMixymf3DYJTq3lOLb"
+      }
+    },
+    {
+      "ordem": 2608,
+      "titulo_en": "The Two Witnesses",
+      "chars_texto": 2256,
+      "usage": {
+        "prompt_tokens": 1563,
+        "completion_tokens": 1636,
+        "total_tokens": 3199,
+        "cost_usd": 0.003653625,
+        "generation_id": "gen-1786832932-TXkL8rK7tsdBKaqeSbgy"
+      }
+    },
+    {
+      "ordem": 2614,
+      "titulo_en": "The Beast from the Earth",
+      "chars_texto": 798,
+      "usage": {
+        "prompt_tokens": 1160,
+        "completion_tokens": 554,
+        "total_tokens": 1714,
+        "cost_usd": 0.00147375,
+        "generation_id": "gen-1786832943-3jUIc0unFnTi8VagZhhu"
+      }
+    },
+    {
+      "ordem": 2615,
+      "titulo_en": "The Mark of the Beast",
+      "chars_texto": 435,
+      "usage": {
+        "prompt_tokens": 1076,
+        "completion_tokens": 808,
+        "total_tokens": 1884,
+        "cost_usd": 0.0019185,
+        "generation_id": "gen-1786832944-rTRq2oM2LRHThW6whfpN"
+      }
+    },
+    {
+      "ordem": 2613,
+      "titulo_en": "The Beast from the Sea",
+      "chars_texto": 1407,
+      "usage": {
+        "prompt_tokens": 1356,
+        "completion_tokens": 994,
+        "total_tokens": 2350,
+        "cost_usd": 0.00237225,
+        "generation_id": "gen-1786832943-GJUAZmlntIjKFNHvIGsJ"
+      }
+    },
+    {
+      "ordem": 2612,
+      "titulo_en": "The Woman Persecuted",
+      "chars_texto": 738,
+      "usage": {
+        "prompt_tokens": 1166,
+        "completion_tokens": 1574,
+        "total_tokens": 2740,
+        "cost_usd": 0.0033885,
+        "generation_id": "gen-1786832942-SIMhPUMho0PzsMMcSSaS"
+      }
+    },
+    {
+      "ordem": 2616,
+      "titulo_en": "The Lamb and the 144,000",
+      "chars_texto": 799,
+      "usage": {
+        "prompt_tokens": 1186,
+        "completion_tokens": 1665,
+        "total_tokens": 2851,
+        "cost_usd": 0.003566625,
+        "generation_id": "gen-1786832945-uiVVO9M1qN4rVYoRm3pE"
+      }
+    },
+    {
+      "ordem": 2617,
+      "titulo_en": "The Three Angels and Babylon's Fall",
+      "chars_texto": 1315,
+      "usage": {
+        "prompt_tokens": 1339,
+        "completion_tokens": 1272,
+        "total_tokens": 2611,
+        "cost_usd": 0.002887125,
+        "generation_id": "gen-1786832948-k7A0xycW0ihLMvXMg4Cs"
+      }
+    },
+    {
+      "ordem": 2619,
+      "titulo_en": "The Song of Moses and the Lamb",
+      "chars_texto": 764,
+      "usage": {
+        "prompt_tokens": 1179,
+        "completion_tokens": 1170,
+        "total_tokens": 2349,
+        "cost_usd": 0.002635875,
+        "generation_id": "gen-1786832952-U9KLIndvR1D1NLHtW8A6"
+      }
+    },
+    {
+      "ordem": 2621,
+      "titulo_en": "The First Bowl: Sores",
+      "chars_texto": 308,
+      "usage": {
+        "prompt_tokens": 1050,
+        "completion_tokens": 700,
+        "total_tokens": 1750,
+        "cost_usd": 0.00170625,
+        "generation_id": "gen-1786832956-GAPnWQOWYz3jHUZdVfqW"
+      }
+    },
+    {
+      "ordem": 2618,
+      "titulo_en": "The Harvest of the Earth",
+      "chars_texto": 1098,
+      "usage": {
+        "prompt_tokens": 1276,
+        "completion_tokens": 1667,
+        "total_tokens": 2943,
+        "cost_usd": 0.003604125,
+        "generation_id": "gen-1786832951-F4wzt5geIAXSMegEXPu9"
+      }
+    },
+    {
+      "ordem": 2620,
+      "titulo_en": "Preparation for Judgment",
+      "chars_texto": 553,
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 1662,
+        "total_tokens": 2779,
+        "cost_usd": 0.003535125,
+        "generation_id": "gen-1786832953-v9zUSNdkvKoWdV25HWCr"
+      }
+    },
+    {
+      "ordem": 2624,
+      "titulo_en": "The Fourth Bowl: Fire",
+      "chars_texto": 283,
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 689,
+        "total_tokens": 1726,
+        "cost_usd": 0.00168075,
+        "generation_id": "gen-1786832962-NwPp6i3uUkYuzQIUNeCH"
+      }
+    },
+    {
+      "ordem": 2622,
+      "titulo_en": "The Second Bowl: Sea to Blood",
+      "chars_texto": 149,
+      "usage": {
+        "prompt_tokens": 1004,
+        "completion_tokens": 1393,
+        "total_tokens": 2397,
+        "cost_usd": 0.002988375,
+        "generation_id": "gen-1786832958-chVaOoWbTBKtKfPYDtyA"
+      }
+    },
+    {
+      "ordem": 2623,
+      "titulo_en": "The Third Bowl: Rivers to Blood",
+      "chars_texto": 455,
+      "usage": {
+        "prompt_tokens": 1096,
+        "completion_tokens": 1575,
+        "total_tokens": 2671,
+        "cost_usd": 0.003364125,
+        "generation_id": "gen-1786832960-y21mQ6HKjOrhyAoBvc3V"
+      }
+    },
+    {
+      "ordem": 2625,
+      "titulo_en": "The Fifth Bowl: Darkness",
+      "chars_texto": 296,
+      "usage": {
+        "prompt_tokens": 1047,
+        "completion_tokens": 1334,
+        "total_tokens": 2381,
+        "cost_usd": 0.002893875,
+        "generation_id": "gen-1786832963-lHk5XP4eSkyznj3EPInH"
+      }
+    },
+    {
+      "ordem": 2628,
+      "titulo_en": "The Woman on the Beast",
+      "chars_texto": 791,
+      "usage": {
+        "prompt_tokens": 1188,
+        "completion_tokens": 821,
+        "total_tokens": 2009,
+        "cost_usd": 0.001984875,
+        "generation_id": "gen-1786832969-Tzr3ETIPkNsOFWsSiCrt"
+      }
+    },
+    {
+      "ordem": 2626,
+      "titulo_en": "The Sixth Bowl: Battle of Armageddon",
+      "chars_texto": 667,
+      "usage": {
+        "prompt_tokens": 1160,
+        "completion_tokens": 1630,
+        "total_tokens": 2790,
+        "cost_usd": 0.00349125,
+        "generation_id": "gen-1786832965-jeFKohnhTtWkHxtps3kW"
+      }
+    },
+    {
+      "ordem": 2627,
+      "titulo_en": "The Seventh Bowl: Earthquake and Hail",
+      "chars_texto": 780,
+      "usage": {
+        "prompt_tokens": 1183,
+        "completion_tokens": 1511,
+        "total_tokens": 2694,
+        "cost_usd": 0.00327675,
+        "generation_id": "gen-1786832968-ZHyCqZTCo6XkOnxsDz24"
+      }
+    },
+    {
+      "ordem": 2631,
+      "titulo_en": "Babylon is Fallen",
+      "chars_texto": 1282,
+      "usage": {
+        "prompt_tokens": 1320,
+        "completion_tokens": 522,
+        "total_tokens": 1842,
+        "cost_usd": 0.00147375,
+        "generation_id": "gen-1786832976-9ALAXbVmwBeYQGYQbSxd"
+      }
+    },
+    {
+      "ordem": 2630,
+      "titulo_en": "The Victory of the Lamb",
+      "chars_texto": 716,
+      "usage": {
+        "prompt_tokens": 1169,
+        "completion_tokens": 1310,
+        "total_tokens": 2479,
+        "cost_usd": 0.002894625,
+        "generation_id": "gen-1786832973-52K2GEggy6EcSFOrCppW"
+      }
+    },
+    {
+      "ordem": 2629,
+      "titulo_en": "The Mystery Explained",
+      "chars_texto": 1190,
+      "usage": {
+        "prompt_tokens": 1288,
+        "completion_tokens": 1794,
+        "total_tokens": 3082,
+        "cost_usd": 0.00384675,
+        "generation_id": "gen-1786832972-GOvk2J47v26h8fXdDMcy"
+      }
+    },
+    {
+      "ordem": 2633,
+      "titulo_en": "The Doom of Babylon",
+      "chars_texto": 780,
+      "usage": {
+        "prompt_tokens": 1177,
+        "completion_tokens": 1239,
+        "total_tokens": 2416,
+        "cost_usd": 0.0027645,
+        "generation_id": "gen-1786832979-LLxNULuBiuOXKi1ca2pK"
+      }
+    },
+    {
+      "ordem": 2634,
+      "titulo_en": "Rejoicing in Heaven",
+      "chars_texto": 708,
+      "usage": {
+        "prompt_tokens": 1163,
+        "completion_tokens": 1201,
+        "total_tokens": 2364,
+        "cost_usd": 0.002688,
+        "generation_id": "gen-1786832981-zKZJBmqLUNcmEKqsVYHm"
+      }
+    },
+    {
+      "ordem": 2632,
+      "titulo_en": "Lament over Babylon",
+      "chars_texto": 1940,
+      "usage": {
+        "prompt_tokens": 1535,
+        "completion_tokens": 1560,
+        "total_tokens": 3095,
+        "cost_usd": 0.003500625,
+        "generation_id": "gen-1786832979-HkuXUqC8muOWCm6WOqOe"
+      }
+    },
+    {
+      "ordem": 2635,
+      "titulo_en": "The Marriage of the Lamb",
+      "chars_texto": 877,
+      "usage": {
+        "prompt_tokens": 1214,
+        "completion_tokens": 1410,
+        "total_tokens": 2624,
+        "cost_usd": 0.003099,
+        "generation_id": "gen-1786832983-palQ3n7ppfq3q4uZcGLl"
+      }
+    },
+    {
+      "ordem": 2636,
+      "titulo_en": "The Rider on the White Horse",
+      "chars_texto": 736,
+      "usage": {
+        "prompt_tokens": 1182,
+        "completion_tokens": 1394,
+        "total_tokens": 2576,
+        "cost_usd": 0.003057,
+        "generation_id": "gen-1786832984-BScJZdSRuo8OCDKTWSbC"
+      }
+    },
+    {
+      "ordem": 2637,
+      "titulo_en": "Defeat of the Beast and False Prophet",
+      "chars_texto": 913,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1318,
+        "total_tokens": 2528,
+        "cost_usd": 0.002925,
+        "generation_id": "gen-1786832989-Z1ri8j5TuxSY2UR17uRT"
+      }
+    },
+    {
+      "ordem": 2638,
+      "titulo_en": "Satan Bound",
+      "chars_texto": 387,
+      "usage": {
+        "prompt_tokens": 1072,
+        "completion_tokens": 1314,
+        "total_tokens": 2386,
+        "cost_usd": 0.00286575,
+        "generation_id": "gen-1786832991-cUbLhBrGuDAow6jsHAIX"
+      }
+    },
+    {
+      "ordem": 2639,
+      "titulo_en": "The First Resurrection and Reign",
+      "chars_texto": 678,
+      "usage": {
+        "prompt_tokens": 1132,
+        "completion_tokens": 1178,
+        "total_tokens": 2310,
+        "cost_usd": 0.00263325,
+        "generation_id": "gen-1786832991-R54lfUVT9B7bxj211sO3"
+      }
+    },
+    {
+      "ordem": 2640,
+      "titulo_en": "Satan's Release and Defeat",
+      "chars_texto": 573,
+      "usage": {
+        "prompt_tokens": 1125,
+        "completion_tokens": 1625,
+        "total_tokens": 2750,
+        "cost_usd": 0.00346875,
+        "generation_id": "gen-1786832994-Tb9qw9zMqgcVbJYGwimb"
+      }
+    },
+    {
+      "ordem": 2641,
+      "titulo_en": "The Great White Throne Judgment",
+      "chars_texto": 749,
+      "usage": {
+        "prompt_tokens": 1161,
+        "completion_tokens": 1556,
+        "total_tokens": 2717,
+        "cost_usd": 0.003352875,
+        "generation_id": "gen-1786832995-q2yrp3w9vEGlRFaSIeak"
+      }
+    },
+    {
+      "ordem": 2644,
+      "titulo_en": "The River of Life",
+      "chars_texto": 652,
+      "usage": {
+        "prompt_tokens": 1143,
+        "completion_tokens": 453,
+        "total_tokens": 1596,
+        "cost_usd": 0.001278,
+        "generation_id": "gen-1786833002-FrAeBTxsikKFMkPymJnE"
+      }
+    },
+    {
+      "ordem": 2642,
+      "titulo_en": "A New Heaven and a New Earth",
+      "chars_texto": 1237,
+      "usage": {
+        "prompt_tokens": 1311,
+        "completion_tokens": 1571,
+        "total_tokens": 2882,
+        "cost_usd": 0.00343725,
+        "generation_id": "gen-1786832999-SP1R5EA0w1KFVPzubqBs"
+      }
+    },
+    {
+      "ordem": 2643,
+      "titulo_en": "The New Jerusalem",
+      "chars_texto": 2436,
+      "usage": {
+        "prompt_tokens": 1689,
+        "completion_tokens": 1887,
+        "total_tokens": 3576,
+        "cost_usd": 0.0041715,
+        "generation_id": "gen-1786833001-3u5FdYSyfJ0gBkGcmlO9"
+      }
+    },
+    {
+      "ordem": 2646,
+      "titulo_en": "Nothing May Be Added or Removed",
+      "chars_texto": 513,
+      "usage": {
+        "prompt_tokens": 1093,
+        "completion_tokens": 1340,
+        "total_tokens": 2433,
+        "cost_usd": 0.002922375,
+        "generation_id": "gen-1786833007-q0lJUZbEemwydS90iGUE"
+      }
+    },
+    {
+      "ordem": 2645,
+      "titulo_en": "Jesus is Coming",
+      "chars_texto": 1618,
+      "usage": {
+        "prompt_tokens": 1420,
+        "completion_tokens": 1360,
+        "total_tokens": 2780,
+        "cost_usd": 0.0030825,
+        "generation_id": "gen-1786833007-XW8VELIxBhMr1MFZ3lMx"
       }
     }
   ]

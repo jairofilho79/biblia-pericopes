@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 1300,
+  "done": 1400,
   "pending_total": 2640,
-  "sample_cost_usd": 4.309070625000002,
-  "avg_cost_usd": 0.0033146697115384633,
-  "estimate_remaining_usd": 4.441657413461541,
-  "estimate_full_run_usd": 8.750728038461544,
-  "elapsed_sec": 2993.789,
-  "throughput_per_sec": 0.4342323390192161,
-  "eta_sec": 3085.9055846153847,
+  "sample_cost_usd": 4.647349500000001,
+  "avg_cost_usd": 0.0033195353571428576,
+  "estimate_remaining_usd": 4.116223842857144,
+  "estimate_full_run_usd": 8.763573342857145,
+  "elapsed_sec": 3224.324,
+  "throughput_per_sec": 0.4341995407409429,
+  "eta_sec": 2855.8298285714286,
   "catalog_total": 2647,
   "items": [
     {
@@ -15610,6 +15610,1206 @@
         "total_tokens": 3292,
         "cost_usd": 0.0037845,
         "generation_id": "gen-1786830047-0lACI1oM8sJcjrBNdcZ3"
+      }
+    },
+    {
+      "ordem": 1311,
+      "titulo_en": "Judgment on the Ammonites",
+      "chars_texto": 1112,
+      "usage": {
+        "prompt_tokens": 1276,
+        "completion_tokens": 1548,
+        "total_tokens": 2824,
+        "cost_usd": 0.003381,
+        "generation_id": "gen-1786830063-Pr4oIl8R0WJvgb9s2eEr"
+      }
+    },
+    {
+      "ordem": 1308,
+      "titulo_en": "Judgment on Egypt",
+      "chars_texto": 4313,
+      "usage": {
+        "prompt_tokens": 2258,
+        "completion_tokens": 1488,
+        "total_tokens": 3746,
+        "cost_usd": 0.00363675,
+        "generation_id": "gen-1786830063-YTt2QSisGxSCJFtyUTpX"
+      }
+    },
+    {
+      "ordem": 1310,
+      "titulo_en": "Judgement on Moab",
+      "chars_texto": 6052,
+      "usage": {
+        "prompt_tokens": 2775,
+        "completion_tokens": 1630,
+        "total_tokens": 4405,
+        "cost_usd": 0.004096875,
+        "generation_id": "gen-1786830063-noXeDyqr8CQVuy0nUheH"
+      }
+    },
+    {
+      "ordem": 1309,
+      "titulo_en": "Judgment on the Philistines",
+      "chars_texto": 1130,
+      "usage": {
+        "prompt_tokens": 1279,
+        "completion_tokens": 1655,
+        "total_tokens": 2934,
+        "cost_usd": 0.00358275,
+        "generation_id": "gen-1786830063-0cath5opKnR8xlICXnXr"
+      }
+    },
+    {
+      "ordem": 1307,
+      "titulo_en": "Jeremiah's Message to Baruch",
+      "chars_texto": 766,
+      "usage": {
+        "prompt_tokens": 1167,
+        "completion_tokens": 1789,
+        "total_tokens": 2956,
+        "cost_usd": 0.003792,
+        "generation_id": "gen-1786830063-RkVuGnOcQ7ds1qHipT4d"
+      }
+    },
+    {
+      "ordem": 1313,
+      "titulo_en": "Judgment on Damascus",
+      "chars_texto": 628,
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 1426,
+        "total_tokens": 2568,
+        "cost_usd": 0.003102,
+        "generation_id": "gen-1786830074-FDPhIperxfpbbvMPL6Sc"
+      }
+    },
+    {
+      "ordem": 1314,
+      "titulo_en": "Judgment on Kedar and Hazor",
+      "chars_texto": 1082,
+      "usage": {
+        "prompt_tokens": 1297,
+        "completion_tokens": 1323,
+        "total_tokens": 2620,
+        "cost_usd": 0.002967,
+        "generation_id": "gen-1786830076-4SoKv6RLW0MW8zGNLWzE"
+      }
+    },
+    {
+      "ordem": 1312,
+      "titulo_en": "Judgement on Edom",
+      "chars_texto": 2645,
+      "usage": {
+        "prompt_tokens": 1721,
+        "completion_tokens": 1611,
+        "total_tokens": 3332,
+        "cost_usd": 0.003666,
+        "generation_id": "gen-1786830074-tYucGOoZBXRHplkBFTP3"
+      }
+    },
+    {
+      "ordem": 1315,
+      "titulo_en": "Judgment on Elam",
+      "chars_texto": 781,
+      "usage": {
+        "prompt_tokens": 1194,
+        "completion_tokens": 1461,
+        "total_tokens": 2655,
+        "cost_usd": 0.003187125,
+        "generation_id": "gen-1786830076-m3HjuEbUWxD7XRePs1cs"
+      }
+    },
+    {
+      "ordem": 1316,
+      "titulo_en": "A Prophecy against Babylon",
+      "chars_texto": 528,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 1328,
+        "total_tokens": 2435,
+        "cost_usd": 0.002905125,
+        "generation_id": "gen-1786830077-StiBBUOf0i8kT8CYSXbT"
+      }
+    },
+    {
+      "ordem": 1317,
+      "titulo_en": "Hope for Israel and Judah",
+      "chars_texto": 1188,
+      "usage": {
+        "prompt_tokens": 1294,
+        "completion_tokens": 1598,
+        "total_tokens": 2892,
+        "cost_usd": 0.0034815,
+        "generation_id": "gen-1786830085-zDCniWB1pbaWi0ZTWa2S"
+      }
+    },
+    {
+      "ordem": 1318,
+      "titulo_en": "Babylon's Fall Is Certain",
+      "chars_texto": 1061,
+      "usage": {
+        "prompt_tokens": 1270,
+        "completion_tokens": 1521,
+        "total_tokens": 2791,
+        "cost_usd": 0.003328125,
+        "generation_id": "gen-1786830085-NhZvK9twwSy8Et1tow5Z"
+      }
+    },
+    {
+      "ordem": 1319,
+      "titulo_en": "Redemption for God's People",
+      "chars_texto": 683,
+      "usage": {
+        "prompt_tokens": 1168,
+        "completion_tokens": 1652,
+        "total_tokens": 2820,
+        "cost_usd": 0.0035355,
+        "generation_id": "gen-1786830086-GHa7HdojWuaJOxDHpJYq"
+      }
+    },
+    {
+      "ordem": 1321,
+      "titulo_en": "Praise to the God of Jacob",
+      "chars_texto": 768,
+      "usage": {
+        "prompt_tokens": 1182,
+        "completion_tokens": 1669,
+        "total_tokens": 2851,
+        "cost_usd": 0.003572625,
+        "generation_id": "gen-1786830088-zpkyHKe1ru8rhdhj8DY8"
+      }
+    },
+    {
+      "ordem": 1320,
+      "titulo_en": "The Destruction of Babylon",
+      "chars_texto": 6328,
+      "usage": {
+        "prompt_tokens": 2789,
+        "completion_tokens": 1787,
+        "total_tokens": 4576,
+        "cost_usd": 0.0043965,
+        "generation_id": "gen-1786830088-dRCNERP4dMCV4WG1gQNQ"
+      }
+    },
+    {
+      "ordem": 1323,
+      "titulo_en": "Jeremiah's Prophecy to Seraiah",
+      "chars_texto": 940,
+      "usage": {
+        "prompt_tokens": 1226,
+        "completion_tokens": 536,
+        "total_tokens": 1762,
+        "cost_usd": 0.00146475,
+        "generation_id": "gen-1786830098-zdVLHWOWFcwxnQSPKuEY"
+      }
+    },
+    {
+      "ordem": 1326,
+      "titulo_en": "Captives Carried to Babylon",
+      "chars_texto": 1011,
+      "usage": {
+        "prompt_tokens": 1256,
+        "completion_tokens": 484,
+        "total_tokens": 1740,
+        "cost_usd": 0.0013785,
+        "generation_id": "gen-1786830101-SOtdJ46tnaVZOXpSiGmT"
+      }
+    },
+    {
+      "ordem": 1324,
+      "titulo_en": "Nebuchadnezzar Sieges Jerusalem",
+      "chars_texto": 1643,
+      "usage": {
+        "prompt_tokens": 1425,
+        "completion_tokens": 1386,
+        "total_tokens": 2811,
+        "cost_usd": 0.003133125,
+        "generation_id": "gen-1786830098-cjeQCQWi5S4aG9elGGJL"
+      }
+    },
+    {
+      "ordem": 1322,
+      "titulo_en": "Babylon's Punishment",
+      "chars_texto": 5857,
+      "usage": {
+        "prompt_tokens": 2679,
+        "completion_tokens": 1853,
+        "total_tokens": 4532,
+        "cost_usd": 0.004479,
+        "generation_id": "gen-1786830096-PlHC3QbliCP6bL4LuJBa"
+      }
+    },
+    {
+      "ordem": 1325,
+      "titulo_en": "The Temple Destroyed",
+      "chars_texto": 1957,
+      "usage": {
+        "prompt_tokens": 1507,
+        "completion_tokens": 1587,
+        "total_tokens": 3094,
+        "cost_usd": 0.00354075,
+        "generation_id": "gen-1786830100-AQ7LJSY5LhrhjIqzgGC2"
+      }
+    },
+    {
+      "ordem": 1327,
+      "titulo_en": "Evil-merodach Releases Jehoiachin",
+      "chars_texto": 641,
+      "usage": {
+        "prompt_tokens": 1149,
+        "completion_tokens": 1436,
+        "total_tokens": 2585,
+        "cost_usd": 0.003123375,
+        "generation_id": "gen-1786830103-bBUU8XyEdHboDE86jAMl"
+      }
+    },
+    {
+      "ordem": 1328,
+      "titulo_en": "The Sorrows of Zion",
+      "chars_texto": 4430,
+      "usage": {
+        "prompt_tokens": 2193,
+        "completion_tokens": 1526,
+        "total_tokens": 3719,
+        "cost_usd": 0.003683625,
+        "generation_id": "gen-1786830107-OgdHcjJwTTIykzeYdRKg"
+      }
+    },
+    {
+      "ordem": 1329,
+      "titulo_en": "God's Anger over Jerusalem",
+      "chars_texto": 4487,
+      "usage": {
+        "prompt_tokens": 2260,
+        "completion_tokens": 1798,
+        "total_tokens": 4058,
+        "cost_usd": 0.00421875,
+        "generation_id": "gen-1786830108-o49ExqybEGpXyyBjzWcl"
+      }
+    },
+    {
+      "ordem": 1330,
+      "titulo_en": "The Prophet's Affliction",
+      "chars_texto": 1309,
+      "usage": {
+        "prompt_tokens": 1375,
+        "completion_tokens": 1681,
+        "total_tokens": 3056,
+        "cost_usd": 0.0036675,
+        "generation_id": "gen-1786830109-EWgsFu4AIeEvZor1xjPG"
+      }
+    },
+    {
+      "ordem": 1331,
+      "titulo_en": "The Prophet's Hope",
+      "chars_texto": 1273,
+      "usage": {
+        "prompt_tokens": 1337,
+        "completion_tokens": 1573,
+        "total_tokens": 2910,
+        "cost_usd": 0.00345075,
+        "generation_id": "gen-1786830113-paD81lqIW0eqoFb0V27x"
+      }
+    },
+    {
+      "ordem": 1332,
+      "titulo_en": "God's Justice",
+      "chars_texto": 2176,
+      "usage": {
+        "prompt_tokens": 1637,
+        "completion_tokens": 1807,
+        "total_tokens": 3444,
+        "cost_usd": 0.004002,
+        "generation_id": "gen-1786830113-Kn3OI48s8mFNaZsmKCvE"
+      }
+    },
+    {
+      "ordem": 1333,
+      "titulo_en": "The Siege of Jerusalem",
+      "chars_texto": 3374,
+      "usage": {
+        "prompt_tokens": 1912,
+        "completion_tokens": 1602,
+        "total_tokens": 3514,
+        "cost_usd": 0.00372075,
+        "generation_id": "gen-1786830119-U5EoHsfCIFjoK0JdYVdS"
+      }
+    },
+    {
+      "ordem": 1334,
+      "titulo_en": "A Prayer for Restoration",
+      "chars_texto": 1785,
+      "usage": {
+        "prompt_tokens": 1472,
+        "completion_tokens": 1790,
+        "total_tokens": 3262,
+        "cost_usd": 0.00390825,
+        "generation_id": "gen-1786830120-T1S0fHoRPZFiK81T3YCl"
+      }
+    },
+    {
+      "ordem": 1335,
+      "titulo_en": "Appearance of the Glory of the LORD",
+      "chars_texto": 4075,
+      "usage": {
+        "prompt_tokens": 2053,
+        "completion_tokens": 1779,
+        "total_tokens": 3832,
+        "cost_usd": 0.0041055,
+        "generation_id": "gen-1786830122-Z2EYG6jEUFaNNOJRiGgr"
+      }
+    },
+    {
+      "ordem": 1336,
+      "titulo_en": "Ezekiel the Prophet",
+      "chars_texto": 3283,
+      "usage": {
+        "prompt_tokens": 1880,
+        "completion_tokens": 1653,
+        "total_tokens": 3533,
+        "cost_usd": 0.003804375,
+        "generation_id": "gen-1786830124-xRK29oy35fE8iB1MzALG"
+      }
+    },
+    {
+      "ordem": 1337,
+      "titulo_en": "Ezekiel the Watchman",
+      "chars_texto": 1874,
+      "usage": {
+        "prompt_tokens": 1494,
+        "completion_tokens": 1678,
+        "total_tokens": 3172,
+        "cost_usd": 0.0037065,
+        "generation_id": "gen-1786830126-i0v8mScwPvhwiIemNxM9"
+      }
+    },
+    {
+      "ordem": 1338,
+      "titulo_en": "A Sign of Jerusalem's Siege",
+      "chars_texto": 2506,
+      "usage": {
+        "prompt_tokens": 1661,
+        "completion_tokens": 1673,
+        "total_tokens": 3334,
+        "cost_usd": 0.00375975,
+        "generation_id": "gen-1786830131-NEnSGILDHX8Qkh9AH7GY"
+      }
+    },
+    {
+      "ordem": 1339,
+      "titulo_en": "The Razor of Judgment",
+      "chars_texto": 3055,
+      "usage": {
+        "prompt_tokens": 1792,
+        "completion_tokens": 1810,
+        "total_tokens": 3602,
+        "cost_usd": 0.00406575,
+        "generation_id": "gen-1786830133-ALRFSmVy32BpgeyaDBKC"
+      }
+    },
+    {
+      "ordem": 1340,
+      "titulo_en": "Judgment against Idolatry",
+      "chars_texto": 1006,
+      "usage": {
+        "prompt_tokens": 1230,
+        "completion_tokens": 1639,
+        "total_tokens": 2869,
+        "cost_usd": 0.003534375,
+        "generation_id": "gen-1786830136-uvxkvBDL1qAKvgPUOGG0"
+      }
+    },
+    {
+      "ordem": 1341,
+      "titulo_en": "A Remnant to Be Blessed",
+      "chars_texto": 1417,
+      "usage": {
+        "prompt_tokens": 1351,
+        "completion_tokens": 1438,
+        "total_tokens": 2789,
+        "cost_usd": 0.003202875,
+        "generation_id": "gen-1786830136-fDyIY4S1M3yzXOFgdqC7"
+      }
+    },
+    {
+      "ordem": 1342,
+      "titulo_en": "Desolation of the Land of Israel",
+      "chars_texto": 3769,
+      "usage": {
+        "prompt_tokens": 2031,
+        "completion_tokens": 1828,
+        "total_tokens": 3859,
+        "cost_usd": 0.004189125,
+        "generation_id": "gen-1786830138-x5yQmpskWdBhQyXjTxLr"
+      }
+    },
+    {
+      "ordem": 1345,
+      "titulo_en": "God's Glory Exits the Temple",
+      "chars_texto": 3073,
+      "usage": {
+        "prompt_tokens": 1805,
+        "completion_tokens": 777,
+        "total_tokens": 2582,
+        "cost_usd": 0.00213375,
+        "generation_id": "gen-1786830148-Xg3X0wtU76zzZZ6biVhi"
+      }
+    },
+    {
+      "ordem": 1346,
+      "titulo_en": "Evil in High Places",
+      "chars_texto": 1592,
+      "usage": {
+        "prompt_tokens": 1402,
+        "completion_tokens": 866,
+        "total_tokens": 2268,
+        "cost_usd": 0.0021495,
+        "generation_id": "gen-1786830148-oXvrR6KanMXMYTzpg7ss"
+      }
+    },
+    {
+      "ordem": 1343,
+      "titulo_en": "The Vision of Idolatry in the Temple",
+      "chars_texto": 2988,
+      "usage": {
+        "prompt_tokens": 1785,
+        "completion_tokens": 1881,
+        "total_tokens": 3666,
+        "cost_usd": 0.00419625,
+        "generation_id": "gen-1786830143-LB3KmAj3qt9P3XfBghPG"
+      }
+    },
+    {
+      "ordem": 1347,
+      "titulo_en": "A Promise of Restoration",
+      "chars_texto": 1387,
+      "usage": {
+        "prompt_tokens": 1365,
+        "completion_tokens": 729,
+        "total_tokens": 2094,
+        "cost_usd": 0.00187875,
+        "generation_id": "gen-1786830151-XcYsVpnYp2SPJqkRw92S"
+      }
+    },
+    {
+      "ordem": 1344,
+      "titulo_en": "Execution of the Idolaters",
+      "chars_texto": 1972,
+      "usage": {
+        "prompt_tokens": 1496,
+        "completion_tokens": 1746,
+        "total_tokens": 3242,
+        "cost_usd": 0.00383475,
+        "generation_id": "gen-1786830145-nCb2IODmwlgjsFFqWWxo"
+      }
+    },
+    {
+      "ordem": 1351,
+      "titulo_en": "A Presumptuous Proverb",
+      "chars_texto": 1032,
+      "usage": {
+        "prompt_tokens": 1264,
+        "completion_tokens": 855,
+        "total_tokens": 2119,
+        "cost_usd": 0.002077125,
+        "generation_id": "gen-1786830158-Iptlooq2DhVsSkZZCvNA"
+      }
+    },
+    {
+      "ordem": 1350,
+      "titulo_en": "Eat Your Bread with Trembling",
+      "chars_texto": 581,
+      "usage": {
+        "prompt_tokens": 1125,
+        "completion_tokens": 1357,
+        "total_tokens": 2482,
+        "cost_usd": 0.00296625,
+        "generation_id": "gen-1786830156-LvgtDPwENamN9SZXPU7k"
+      }
+    },
+    {
+      "ordem": 1348,
+      "titulo_en": "God's Glory Leaves Jerusalem",
+      "chars_texto": 477,
+      "usage": {
+        "prompt_tokens": 1098,
+        "completion_tokens": 1723,
+        "total_tokens": 2821,
+        "cost_usd": 0.003642375,
+        "generation_id": "gen-1786830154-ZwnYIRQg4SZsupPEV20U"
+      }
+    },
+    {
+      "ordem": 1349,
+      "titulo_en": "Ezekiel's Baggage",
+      "chars_texto": 2253,
+      "usage": {
+        "prompt_tokens": 1604,
+        "completion_tokens": 1706,
+        "total_tokens": 3310,
+        "cost_usd": 0.00380025,
+        "generation_id": "gen-1786830155-io7NfmYoBJ5oz77MwwnW"
+      }
+    },
+    {
+      "ordem": 1352,
+      "titulo_en": "Reproof of False Prophets",
+      "chars_texto": 3767,
+      "usage": {
+        "prompt_tokens": 2010,
+        "completion_tokens": 1599,
+        "total_tokens": 3609,
+        "cost_usd": 0.003751875,
+        "generation_id": "gen-1786830158-hP4m0B2nYIwyF5NYtvvW"
+      }
+    },
+    {
+      "ordem": 1353,
+      "titulo_en": "Idolatrous Elders Condemned",
+      "chars_texto": 1801,
+      "usage": {
+        "prompt_tokens": 1443,
+        "completion_tokens": 1418,
+        "total_tokens": 2861,
+        "cost_usd": 0.003199875,
+        "generation_id": "gen-1786830165-UOCPDYgbVA6PgQ7ukiDa"
+      }
+    },
+    {
+      "ordem": 1355,
+      "titulo_en": "Jerusalem the Useless Vine",
+      "chars_texto": 1020,
+      "usage": {
+        "prompt_tokens": 1223,
+        "completion_tokens": 1695,
+        "total_tokens": 2918,
+        "cost_usd": 0.00363675,
+        "generation_id": "gen-1786830167-0Ci42G4rSmFr2bX4Epg9"
+      }
+    },
+    {
+      "ordem": 1354,
+      "titulo_en": "Four Dire Judgments",
+      "chars_texto": 2053,
+      "usage": {
+        "prompt_tokens": 1509,
+        "completion_tokens": 1840,
+        "total_tokens": 3349,
+        "cost_usd": 0.004015875,
+        "generation_id": "gen-1786830167-dn99xO1iAZe10Xw8mj27"
+      }
+    },
+    {
+      "ordem": 1356,
+      "titulo_en": "Jerusalem as a Rebellious Wife",
+      "chars_texto": 9625,
+      "usage": {
+        "prompt_tokens": 3623,
+        "completion_tokens": 1935,
+        "total_tokens": 5558,
+        "cost_usd": 0.00498675,
+        "generation_id": "gen-1786830168-S7Cqc2MZgDkIJrvgGP4g"
+      }
+    },
+    {
+      "ordem": 1357,
+      "titulo_en": "The Parable of Two Eagles and a Vine",
+      "chars_texto": 3860,
+      "usage": {
+        "prompt_tokens": 2043,
+        "completion_tokens": 1855,
+        "total_tokens": 3898,
+        "cost_usd": 0.00424425,
+        "generation_id": "gen-1786830170-LW5BEJojobAqFUlCWmGY"
+      }
+    },
+    {
+      "ordem": 1358,
+      "titulo_en": "The Soul Who Sins Will Die",
+      "chars_texto": 4687,
+      "usage": {
+        "prompt_tokens": 2249,
+        "completion_tokens": 1559,
+        "total_tokens": 3808,
+        "cost_usd": 0.0037665,
+        "generation_id": "gen-1786830176-UNcYAOyjpXNFDi9qyMHu"
+      }
+    },
+    {
+      "ordem": 1359,
+      "titulo_en": "A Lament for the Princes of Israel",
+      "chars_texto": 1775,
+      "usage": {
+        "prompt_tokens": 1482,
+        "completion_tokens": 911,
+        "total_tokens": 2393,
+        "cost_usd": 0.002263875,
+        "generation_id": "gen-1786830179-b8tOlme2VP1XyJDFM2rU"
+      }
+    },
+    {
+      "ordem": 1362,
+      "titulo_en": "Israel's Rebellion in the Land",
+      "chars_texto": 1197,
+      "usage": {
+        "prompt_tokens": 1292,
+        "completion_tokens": 810,
+        "total_tokens": 2102,
+        "cost_usd": 0.00200325,
+        "generation_id": "gen-1786830184-sDetBAjdBirtL01jvVAY"
+      }
+    },
+    {
+      "ordem": 1360,
+      "titulo_en": "Israel's Rebellion in Egypt",
+      "chars_texto": 2693,
+      "usage": {
+        "prompt_tokens": 1725,
+        "completion_tokens": 1437,
+        "total_tokens": 3162,
+        "cost_usd": 0.00334125,
+        "generation_id": "gen-1786830180-PERZgDex6O1v8IQIOPD1"
+      }
+    },
+    {
+      "ordem": 1361,
+      "titulo_en": "Israel's Rebellion in the Wilderness",
+      "chars_texto": 1393,
+      "usage": {
+        "prompt_tokens": 1361,
+        "completion_tokens": 1426,
+        "total_tokens": 2787,
+        "cost_usd": 0.003184125,
+        "generation_id": "gen-1786830182-U6L2oUspR0H6WugL3HhM"
+      }
+    },
+    {
+      "ordem": 1363,
+      "titulo_en": "Judgment and Restoration",
+      "chars_texto": 1971,
+      "usage": {
+        "prompt_tokens": 1503,
+        "completion_tokens": 1431,
+        "total_tokens": 2934,
+        "cost_usd": 0.00324675,
+        "generation_id": "gen-1786830186-dR5QGOUdUU1nEs3ziNXe"
+      }
+    },
+    {
+      "ordem": 1364,
+      "titulo_en": "A Prophecy against the South",
+      "chars_texto": 588,
+      "usage": {
+        "prompt_tokens": 1136,
+        "completion_tokens": 1527,
+        "total_tokens": 2663,
+        "cost_usd": 0.003289125,
+        "generation_id": "gen-1786830186-QBpiCA0Des4NkKw4Dc91"
+      }
+    },
+    {
+      "ordem": 1367,
+      "titulo_en": "The Two Adulterous Sisters: Jerusalem and Samaria",
+      "chars_texto": 6936,
+      "usage": {
+        "prompt_tokens": 2918,
+        "completion_tokens": 990,
+        "total_tokens": 3908,
+        "cost_usd": 0.0029505,
+        "generation_id": "gen-1786830193-vK9ZojKdUO6nt4cnOgvq"
+      }
+    },
+    {
+      "ordem": 1365,
+      "titulo_en": "God's Sword of Judgment",
+      "chars_texto": 4713,
+      "usage": {
+        "prompt_tokens": 2294,
+        "completion_tokens": 1686,
+        "total_tokens": 3980,
+        "cost_usd": 0.0040215,
+        "generation_id": "gen-1786830191-cXorccrM2rcIV0DoxNpH"
+      }
+    },
+    {
+      "ordem": 1366,
+      "titulo_en": "The Sin of Jerusalem",
+      "chars_texto": 4305,
+      "usage": {
+        "prompt_tokens": 2177,
+        "completion_tokens": 1773,
+        "total_tokens": 3950,
+        "cost_usd": 0.00414075,
+        "generation_id": "gen-1786830192-KiN9gutThvd0W0LV72xi"
+      }
+    },
+    {
+      "ordem": 1368,
+      "titulo_en": "The Parable of the Cooking Pot",
+      "chars_texto": 1878,
+      "usage": {
+        "prompt_tokens": 1506,
+        "completion_tokens": 897,
+        "total_tokens": 2403,
+        "cost_usd": 0.002246625,
+        "generation_id": "gen-1786830198-R03Tsev6QY86kVQAClTN"
+      }
+    },
+    {
+      "ordem": 1370,
+      "titulo_en": "A Prophecy against Ammon",
+      "chars_texto": 1080,
+      "usage": {
+        "prompt_tokens": 1266,
+        "completion_tokens": 513,
+        "total_tokens": 1779,
+        "cost_usd": 0.001436625,
+        "generation_id": "gen-1786830201-Pk9HLxxBXfBpiPeNXXST"
+      }
+    },
+    {
+      "ordem": 1369,
+      "titulo_en": "Ezekiel's Wife Dies",
+      "chars_texto": 1755,
+      "usage": {
+        "prompt_tokens": 1459,
+        "completion_tokens": 1861,
+        "total_tokens": 3320,
+        "cost_usd": 0.0040365,
+        "generation_id": "gen-1786830198-a6T0QpF3QPeVNaBgrrFN"
+      }
+    },
+    {
+      "ordem": 1373,
+      "titulo_en": "A Prophecy against the Philistines",
+      "chars_texto": 466,
+      "usage": {
+        "prompt_tokens": 1092,
+        "completion_tokens": 718,
+        "total_tokens": 1810,
+        "cost_usd": 0.00175575,
+        "generation_id": "gen-1786830206-HzzY1Mko33eYASas6ofO"
+      }
+    },
+    {
+      "ordem": 1371,
+      "titulo_en": "A Prophecy against Moab",
+      "chars_texto": 497,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 1538,
+        "total_tokens": 2645,
+        "cost_usd": 0.003298875,
+        "generation_id": "gen-1786830204-kSqeeoUaLcKYtkzD9sYj"
+      }
+    },
+    {
+      "ordem": 1372,
+      "titulo_en": "A Prophecy against Edom",
+      "chars_texto": 516,
+      "usage": {
+        "prompt_tokens": 1110,
+        "completion_tokens": 1476,
+        "total_tokens": 2586,
+        "cost_usd": 0.00318375,
+        "generation_id": "gen-1786830205-w4heAVdOYmUt2Eypxclq"
+      }
+    },
+    {
+      "ordem": 1374,
+      "titulo_en": "Proud Tyre to Fall",
+      "chars_texto": 3480,
+      "usage": {
+        "prompt_tokens": 1942,
+        "completion_tokens": 1646,
+        "total_tokens": 3588,
+        "cost_usd": 0.0038145,
+        "generation_id": "gen-1786830207-GBq8rxoWemuuz8phlgSj"
+      }
+    },
+    {
+      "ordem": 1377,
+      "titulo_en": "A Lament for the King of Tyre",
+      "chars_texto": 1519,
+      "usage": {
+        "prompt_tokens": 1393,
+        "completion_tokens": 1202,
+        "total_tokens": 2595,
+        "cost_usd": 0.002776125,
+        "generation_id": "gen-1786830215-WbCoCkW0B6Mq4CfJsoWc"
+      }
+    },
+    {
+      "ordem": 1375,
+      "titulo_en": "A Lament for Tyre",
+      "chars_texto": 4809,
+      "usage": {
+        "prompt_tokens": 2335,
+        "completion_tokens": 1607,
+        "total_tokens": 3942,
+        "cost_usd": 0.00388875,
+        "generation_id": "gen-1786830212-fc3CCyY5hN2zrUiAc5AU"
+      }
+    },
+    {
+      "ordem": 1376,
+      "titulo_en": "A Prophecy against the Ruler of Tyre",
+      "chars_texto": 1388,
+      "usage": {
+        "prompt_tokens": 1329,
+        "completion_tokens": 1661,
+        "total_tokens": 2990,
+        "cost_usd": 0.00361275,
+        "generation_id": "gen-1786830212-WfLnIxE3aIXWHRk3s4SD"
+      }
+    },
+    {
+      "ordem": 1378,
+      "titulo_en": "A Prophecy against Sidon",
+      "chars_texto": 665,
+      "usage": {
+        "prompt_tokens": 1156,
+        "completion_tokens": 1479,
+        "total_tokens": 2635,
+        "cost_usd": 0.003206625,
+        "generation_id": "gen-1786830217-lH6uxoSkcd4mvA0t8vDr"
+      }
+    },
+    {
+      "ordem": 1379,
+      "titulo_en": "The Restoration of Israel",
+      "chars_texto": 441,
+      "usage": {
+        "prompt_tokens": 1079,
+        "completion_tokens": 1526,
+        "total_tokens": 2605,
+        "cost_usd": 0.003265875,
+        "generation_id": "gen-1786830219-9HaqjK5afo0X5wChgbI0"
+      }
+    },
+    {
+      "ordem": 1380,
+      "titulo_en": "A Prophecy against Pharaoh",
+      "chars_texto": 1103,
+      "usage": {
+        "prompt_tokens": 1291,
+        "completion_tokens": 1671,
+        "total_tokens": 2962,
+        "cost_usd": 0.00361725,
+        "generation_id": "gen-1786830224-TiaHxjZdMUBKpeDctFy1"
+      }
+    },
+    {
+      "ordem": 1381,
+      "titulo_en": "The Desolation of Egypt",
+      "chars_texto": 1394,
+      "usage": {
+        "prompt_tokens": 1354,
+        "completion_tokens": 1633,
+        "total_tokens": 2987,
+        "cost_usd": 0.003569625,
+        "generation_id": "gen-1786830225-BibZauKaD8f8nbxAiS5d"
+      }
+    },
+    {
+      "ordem": 1382,
+      "titulo_en": "Egypt the Reward of Nebuchadnezzar",
+      "chars_texto": 896,
+      "usage": {
+        "prompt_tokens": 1221,
+        "completion_tokens": 1745,
+        "total_tokens": 2966,
+        "cost_usd": 0.00372975,
+        "generation_id": "gen-1786830225-fl9XhOIIEX9NtQQy59IM"
+      }
+    },
+    {
+      "ordem": 1386,
+      "titulo_en": "A Lament for Pharaoh King of Egypt",
+      "chars_texto": 2257,
+      "usage": {
+        "prompt_tokens": 1619,
+        "completion_tokens": 566,
+        "total_tokens": 2185,
+        "cost_usd": 0.001668375,
+        "generation_id": "gen-1786830237-Gj9GdVCc2MwPMyvY4gws"
+      }
+    },
+    {
+      "ordem": 1383,
+      "titulo_en": "A Lament for Egypt",
+      "chars_texto": 2366,
+      "usage": {
+        "prompt_tokens": 1687,
+        "completion_tokens": 1798,
+        "total_tokens": 3485,
+        "cost_usd": 0.004003875,
+        "generation_id": "gen-1786830229-luKsI0Gcu7q1Rnruklae"
+      }
+    },
+    {
+      "ordem": 1384,
+      "titulo_en": "Pharaoh's Power Broken",
+      "chars_texto": 1095,
+      "usage": {
+        "prompt_tokens": 1286,
+        "completion_tokens": 1541,
+        "total_tokens": 2827,
+        "cost_usd": 0.003371625,
+        "generation_id": "gen-1786830231-UnoCCwAUC2t0XkksCCRn"
+      }
+    },
+    {
+      "ordem": 1385,
+      "titulo_en": "Egypt Will Fall like Assyria",
+      "chars_texto": 3406,
+      "usage": {
+        "prompt_tokens": 1887,
+        "completion_tokens": 1616,
+        "total_tokens": 3503,
+        "cost_usd": 0.003737625,
+        "generation_id": "gen-1786830236-Pzo1fxGMNZWIUoYxpR38"
+      }
+    },
+    {
+      "ordem": 1387,
+      "titulo_en": "Egypt Cast into the Pit",
+      "chars_texto": 2974,
+      "usage": {
+        "prompt_tokens": 1821,
+        "completion_tokens": 1479,
+        "total_tokens": 3300,
+        "cost_usd": 0.003456,
+        "generation_id": "gen-1786830238-jTCdkmXwSIoS3Ev3ELaR"
+      }
+    },
+    {
+      "ordem": 1390,
+      "titulo_en": "Against Israel's Shepherds",
+      "chars_texto": 1524,
+      "usage": {
+        "prompt_tokens": 1405,
+        "completion_tokens": 1542,
+        "total_tokens": 2947,
+        "cost_usd": 0.003418125,
+        "generation_id": "gen-1786830243-7H0DqyNe9fsfsnMtot2v"
+      }
+    },
+    {
+      "ordem": 1388,
+      "titulo_en": "Ezekiel's the Watchman for Israel",
+      "chars_texto": 3118,
+      "usage": {
+        "prompt_tokens": 1831,
+        "completion_tokens": 1696,
+        "total_tokens": 3527,
+        "cost_usd": 0.003866625,
+        "generation_id": "gen-1786830242-i7xp6k7Dlr1dJJeEW0GX"
+      }
+    },
+    {
+      "ordem": 1389,
+      "titulo_en": "Word of Jerusalem's Fall",
+      "chars_texto": 2246,
+      "usage": {
+        "prompt_tokens": 1573,
+        "completion_tokens": 1801,
+        "total_tokens": 3374,
+        "cost_usd": 0.00396675,
+        "generation_id": "gen-1786830243-ESIIGvWW4qOZ3CL5WirQ"
+      }
+    },
+    {
+      "ordem": 1391,
+      "titulo_en": "The Good Shepherd",
+      "chars_texto": 1974,
+      "usage": {
+        "prompt_tokens": 1557,
+        "completion_tokens": 1505,
+        "total_tokens": 3062,
+        "cost_usd": 0.00340575,
+        "generation_id": "gen-1786830248-l2keKK60WlN4qRAfGyPL"
+      }
+    },
+    {
+      "ordem": 1392,
+      "titulo_en": "The Covenant of Peace",
+      "chars_texto": 1057,
+      "usage": {
+        "prompt_tokens": 1273,
+        "completion_tokens": 1606,
+        "total_tokens": 2879,
+        "cost_usd": 0.003488625,
+        "generation_id": "gen-1786830249-wFFxGmZFwiOOjk8tu33o"
+      }
+    },
+    {
+      "ordem": 1393,
+      "titulo_en": "A Prophecy against Mount Seir",
+      "chars_texto": 1998,
+      "usage": {
+        "prompt_tokens": 1523,
+        "completion_tokens": 1788,
+        "total_tokens": 3311,
+        "cost_usd": 0.003923625,
+        "generation_id": "gen-1786830254-Vz3B6FkH0v3ey2KqUoXH"
+      }
+    },
+    {
+      "ordem": 1394,
+      "titulo_en": "A Prophecy to the Mountains of Israel",
+      "chars_texto": 2606,
+      "usage": {
+        "prompt_tokens": 1669,
+        "completion_tokens": 1622,
+        "total_tokens": 3291,
+        "cost_usd": 0.003667125,
+        "generation_id": "gen-1786830255-aTlEiqZ4NSqYbvEu5Spr"
+      }
+    },
+    {
+      "ordem": 1395,
+      "titulo_en": "A New Heart and a New Spirit",
+      "chars_texto": 3479,
+      "usage": {
+        "prompt_tokens": 1919,
+        "completion_tokens": 1572,
+        "total_tokens": 3491,
+        "cost_usd": 0.003667125,
+        "generation_id": "gen-1786830256-wK9siUmFRfwXTo4Imtsw"
+      }
+    },
+    {
+      "ordem": 1396,
+      "titulo_en": "The Valley of Dry Bones Restored",
+      "chars_texto": 2039,
+      "usage": {
+        "prompt_tokens": 1555,
+        "completion_tokens": 1588,
+        "total_tokens": 3143,
+        "cost_usd": 0.003560625,
+        "generation_id": "gen-1786830259-J4iNK5p4GSf8qYtiBQpC"
+      }
+    },
+    {
+      "ordem": 1397,
+      "titulo_en": "One Nation with One King",
+      "chars_texto": 2236,
+      "usage": {
+        "prompt_tokens": 1597,
+        "completion_tokens": 1514,
+        "total_tokens": 3111,
+        "cost_usd": 0.003437625,
+        "generation_id": "gen-1786830261-eTb1qu3A6cWo8JhOeEKU"
+      }
+    },
+    {
+      "ordem": 1402,
+      "titulo_en": "The East Gate",
+      "chars_texto": 1830,
+      "usage": {
+        "prompt_tokens": 1453,
+        "completion_tokens": 748,
+        "total_tokens": 2201,
+        "cost_usd": 0.001947375,
+        "generation_id": "gen-1786830272-6DpRERHI2aWkcy0429bp"
+      }
+    },
+    {
+      "ordem": 1398,
+      "titulo_en": "A Prophecy against Gog",
+      "chars_texto": 3811,
+      "usage": {
+        "prompt_tokens": 2022,
+        "completion_tokens": 1591,
+        "total_tokens": 3613,
+        "cost_usd": 0.003741375,
+        "generation_id": "gen-1786830267-xNM8gZZ4gfEcr7nNDZJC"
+      }
+    },
+    {
+      "ordem": 1400,
+      "titulo_en": "Israel to Be Restored",
+      "chars_texto": 1373,
+      "usage": {
+        "prompt_tokens": 1343,
+        "completion_tokens": 1556,
+        "total_tokens": 2899,
+        "cost_usd": 0.003421125,
+        "generation_id": "gen-1786830268-GPXB76J2xWESeSQrOjny"
+      }
+    },
+    {
+      "ordem": 1399,
+      "titulo_en": "The Slaughter of Gog's Army",
+      "chars_texto": 2929,
+      "usage": {
+        "prompt_tokens": 1801,
+        "completion_tokens": 1798,
+        "total_tokens": 3599,
+        "cost_usd": 0.004046625,
+        "generation_id": "gen-1786830267-8oURPfZe8aYXEePDgqPr"
+      }
+    },
+    {
+      "ordem": 1401,
+      "titulo_en": "The Man with a Measuring Rod",
+      "chars_texto": 758,
+      "usage": {
+        "prompt_tokens": 1163,
+        "completion_tokens": 1482,
+        "total_tokens": 2645,
+        "cost_usd": 0.003214875,
+        "generation_id": "gen-1786830270-zUSaxbiI9kvKOjew4Wbj"
+      }
+    },
+    {
+      "ordem": 1403,
+      "titulo_en": "The Outer Court",
+      "chars_texto": 415,
+      "usage": {
+        "prompt_tokens": 1062,
+        "completion_tokens": 1291,
+        "total_tokens": 2353,
+        "cost_usd": 0.002818875,
+        "generation_id": "gen-1786830278-9QZ5WmQrdbW9bicAyE5l"
+      }
+    },
+    {
+      "ordem": 1404,
+      "titulo_en": "The North Gate",
+      "chars_texto": 695,
+      "usage": {
+        "prompt_tokens": 1151,
+        "completion_tokens": 1316,
+        "total_tokens": 2467,
+        "cost_usd": 0.002899125,
+        "generation_id": "gen-1786830279-SsQE0St3MekUSPidWrc7"
+      }
+    },
+    {
+      "ordem": 1406,
+      "titulo_en": "The Gates of the Inner Court",
+      "chars_texto": 1521,
+      "usage": {
+        "prompt_tokens": 1395,
+        "completion_tokens": 1508,
+        "total_tokens": 2903,
+        "cost_usd": 0.003350625,
+        "generation_id": "gen-1786830280-ifvV5H7pCiZHvbDC6vLv"
+      }
+    },
+    {
+      "ordem": 1405,
+      "titulo_en": "The South Gate",
+      "chars_texto": 638,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1515,
+        "total_tokens": 2654,
+        "cost_usd": 0.00326775,
+        "generation_id": "gen-1786830280-oD9UYPD2YZlUkrnS9e5r"
       }
     }
   ]

@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 2100,
+  "done": 2200,
   "pending_total": 2640,
-  "sample_cost_usd": 6.793705124999997,
-  "avg_cost_usd": 0.003235097678571427,
-  "estimate_remaining_usd": 1.7469527464285706,
-  "estimate_full_run_usd": 8.540657871428568,
-  "elapsed_sec": 4763.461,
-  "throughput_per_sec": 0.4408559238755182,
-  "eta_sec": 1224.8899714285715,
+  "sample_cost_usd": 7.113209999999996,
+  "avg_cost_usd": 0.003233277272727271,
+  "estimate_remaining_usd": 1.4226419999999993,
+  "estimate_full_run_usd": 8.535851999999995,
+  "elapsed_sec": 4991.858,
+  "throughput_per_sec": 0.4407176646451081,
+  "eta_sec": 998.3716000000001,
   "catalog_total": 2647,
   "items": [
     {
@@ -25210,6 +25210,1206 @@
         "total_tokens": 2835,
         "cost_usd": 0.003470625,
         "generation_id": "gen-1786831819-SaFznc4nCLQ7V9Rwr4X0"
+      }
+    },
+    {
+      "ordem": 2107,
+      "titulo_en": "The Call of Abraham",
+      "chars_texto": 1081,
+      "usage": {
+        "prompt_tokens": 1270,
+        "completion_tokens": 1338,
+        "total_tokens": 2608,
+        "cost_usd": 0.002985,
+        "generation_id": "gen-1786831833-RFuFDDMbgucdKD7zkOym"
+      }
+    },
+    {
+      "ordem": 2110,
+      "titulo_en": "The Birth and Adoption of Moses",
+      "chars_texto": 318,
+      "usage": {
+        "prompt_tokens": 1045,
+        "completion_tokens": 1565,
+        "total_tokens": 2610,
+        "cost_usd": 0.00332625,
+        "generation_id": "gen-1786831835-Rkx0li9MXjpWlEXnLWPe"
+      }
+    },
+    {
+      "ordem": 2109,
+      "titulo_en": "Israel Oppressed in Egypt",
+      "chars_texto": 587,
+      "usage": {
+        "prompt_tokens": 1126,
+        "completion_tokens": 1645,
+        "total_tokens": 2771,
+        "cost_usd": 0.003506625,
+        "generation_id": "gen-1786831833-8EanBQRJ29WpzRbbcWCH"
+      }
+    },
+    {
+      "ordem": 2108,
+      "titulo_en": "Joseph Sold into Egypt",
+      "chars_texto": 707,
+      "usage": {
+        "prompt_tokens": 1161,
+        "completion_tokens": 1582,
+        "total_tokens": 2743,
+        "cost_usd": 0.003401625,
+        "generation_id": "gen-1786831833-1MQTJsQU6ocxtpIw0Gmz"
+      }
+    },
+    {
+      "ordem": 2111,
+      "titulo_en": "The Rejection and Flight of Moses",
+      "chars_texto": 771,
+      "usage": {
+        "prompt_tokens": 1185,
+        "completion_tokens": 2030,
+        "total_tokens": 3215,
+        "cost_usd": 0.004250625,
+        "generation_id": "gen-1786831833-8XylZM1bbsJ4Z3efFf9w"
+      }
+    },
+    {
+      "ordem": 2112,
+      "titulo_en": "The Call of Moses",
+      "chars_texto": 1274,
+      "usage": {
+        "prompt_tokens": 1329,
+        "completion_tokens": 1501,
+        "total_tokens": 2830,
+        "cost_usd": 0.00331275,
+        "generation_id": "gen-1786831844-1imF33eD55gUQygRP1RU"
+      }
+    },
+    {
+      "ordem": 2114,
+      "titulo_en": "The Tabernacle of the Testimony",
+      "chars_texto": 781,
+      "usage": {
+        "prompt_tokens": 1174,
+        "completion_tokens": 1455,
+        "total_tokens": 2629,
+        "cost_usd": 0.003168375,
+        "generation_id": "gen-1786831845-9EnzeanASMr7YmCgzXG3"
+      }
+    },
+    {
+      "ordem": 2113,
+      "titulo_en": "The Rebellion of Israel",
+      "chars_texto": 827,
+      "usage": {
+        "prompt_tokens": 1192,
+        "completion_tokens": 1403,
+        "total_tokens": 2595,
+        "cost_usd": 0.003077625,
+        "generation_id": "gen-1786831845-CKAbXWf42k9uBZJmTV73"
+      }
+    },
+    {
+      "ordem": 2116,
+      "titulo_en": "The Stoning of Stephen",
+      "chars_texto": 746,
+      "usage": {
+        "prompt_tokens": 1184,
+        "completion_tokens": 1412,
+        "total_tokens": 2596,
+        "cost_usd": 0.0030915,
+        "generation_id": "gen-1786831847-d5jfE5IGMcZmVt8AQOju"
+      }
+    },
+    {
+      "ordem": 2115,
+      "titulo_en": "The Accused becomes the Accuser",
+      "chars_texto": 416,
+      "usage": {
+        "prompt_tokens": 1066,
+        "completion_tokens": 1709,
+        "total_tokens": 2775,
+        "cost_usd": 0.003604125,
+        "generation_id": "gen-1786831846-yAoi5J8tBOc1t8M2jEhn"
+      }
+    },
+    {
+      "ordem": 2120,
+      "titulo_en": "Philip and the Ethiopian",
+      "chars_texto": 1895,
+      "usage": {
+        "prompt_tokens": 1516,
+        "completion_tokens": 891,
+        "total_tokens": 2407,
+        "cost_usd": 0.002239125,
+        "generation_id": "gen-1786831857-dBCAMrP0GQISGHRJ6OEr"
+      }
+    },
+    {
+      "ordem": 2117,
+      "titulo_en": "Saul Persecutes the Church",
+      "chars_texto": 408,
+      "usage": {
+        "prompt_tokens": 1066,
+        "completion_tokens": 1295,
+        "total_tokens": 2361,
+        "cost_usd": 0.002827875,
+        "generation_id": "gen-1786831855-CeZCjWnxm1MNNSbmzKaP"
+      }
+    },
+    {
+      "ordem": 2119,
+      "titulo_en": "Simon the Sorcerer",
+      "chars_texto": 2018,
+      "usage": {
+        "prompt_tokens": 1493,
+        "completion_tokens": 1375,
+        "total_tokens": 2868,
+        "cost_usd": 0.003138,
+        "generation_id": "gen-1786831856-O47QW28FHquZBa3DAi2t"
+      }
+    },
+    {
+      "ordem": 2118,
+      "titulo_en": "Philip Goes to Samaria",
+      "chars_texto": 451,
+      "usage": {
+        "prompt_tokens": 1076,
+        "completion_tokens": 1320,
+        "total_tokens": 2396,
+        "cost_usd": 0.0028785,
+        "generation_id": "gen-1786831856-InUk5rU0rpzVcsj4b2DE"
+      }
+    },
+    {
+      "ordem": 2121,
+      "titulo_en": "The Road to Damascus",
+      "chars_texto": 934,
+      "usage": {
+        "prompt_tokens": 1224,
+        "completion_tokens": 1485,
+        "total_tokens": 2709,
+        "cost_usd": 0.003243375,
+        "generation_id": "gen-1786831859-2R1ar0jaUfeQsp4EQtiw"
+      }
+    },
+    {
+      "ordem": 2122,
+      "titulo_en": "Ananias Baptizes Saul",
+      "chars_texto": 1371,
+      "usage": {
+        "prompt_tokens": 1338,
+        "completion_tokens": 1649,
+        "total_tokens": 2987,
+        "cost_usd": 0.003593625,
+        "generation_id": "gen-1786831864-jzZ6aoWNs5EL3fjk3uS1"
+      }
+    },
+    {
+      "ordem": 2123,
+      "titulo_en": "Saul Preaches at Damascus",
+      "chars_texto": 425,
+      "usage": {
+        "prompt_tokens": 1075,
+        "completion_tokens": 1559,
+        "total_tokens": 2634,
+        "cost_usd": 0.00332625,
+        "generation_id": "gen-1786831865-OKkOH0GA2o2VwTnnEXTQ"
+      }
+    },
+    {
+      "ordem": 2124,
+      "titulo_en": "The Escape from Damascus",
+      "chars_texto": 279,
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 1417,
+        "total_tokens": 2454,
+        "cost_usd": 0.00304575,
+        "generation_id": "gen-1786831866-wPKHpYrBF3hUqKKDmvJ7"
+      }
+    },
+    {
+      "ordem": 2125,
+      "titulo_en": "Saul in Jerusalem",
+      "chars_texto": 669,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1563,
+        "total_tokens": 2702,
+        "cost_usd": 0.00335775,
+        "generation_id": "gen-1786831866-hdsw1ApFRxq5SJpXPVxO"
+      }
+    },
+    {
+      "ordem": 2126,
+      "titulo_en": "The Healing of Aeneas",
+      "chars_texto": 573,
+      "usage": {
+        "prompt_tokens": 1119,
+        "completion_tokens": 1322,
+        "total_tokens": 2441,
+        "cost_usd": 0.002898375,
+        "generation_id": "gen-1786831870-Hx1OqwOJnm7waebPJ4Qb"
+      }
+    },
+    {
+      "ordem": 2128,
+      "titulo_en": "Cornelius Sends for Peter",
+      "chars_texto": 922,
+      "usage": {
+        "prompt_tokens": 1213,
+        "completion_tokens": 1215,
+        "total_tokens": 2428,
+        "cost_usd": 0.002733,
+        "generation_id": "gen-1786831876-m87EF5LBJstpof6Tr6bd"
+      }
+    },
+    {
+      "ordem": 2127,
+      "titulo_en": "The Raising of Tabitha",
+      "chars_texto": 1095,
+      "usage": {
+        "prompt_tokens": 1280,
+        "completion_tokens": 1598,
+        "total_tokens": 2878,
+        "cost_usd": 0.00347625,
+        "generation_id": "gen-1786831876-MaGO1Tp6nlwzJXQKS8DW"
+      }
+    },
+    {
+      "ordem": 2130,
+      "titulo_en": "Peter Called to Caesarea",
+      "chars_texto": 964,
+      "usage": {
+        "prompt_tokens": 1221,
+        "completion_tokens": 1427,
+        "total_tokens": 2648,
+        "cost_usd": 0.0031335,
+        "generation_id": "gen-1786831877-KYk9gxygfE97eeVXCiwu"
+      }
+    },
+    {
+      "ordem": 2129,
+      "titulo_en": "Peter's Vision",
+      "chars_texto": 803,
+      "usage": {
+        "prompt_tokens": 1197,
+        "completion_tokens": 1605,
+        "total_tokens": 2802,
+        "cost_usd": 0.00345825,
+        "generation_id": "gen-1786831877-tZr32YB7DVseogeKPKsE"
+      }
+    },
+    {
+      "ordem": 2131,
+      "titulo_en": "Peter Visits Cornelius",
+      "chars_texto": 1346,
+      "usage": {
+        "prompt_tokens": 1329,
+        "completion_tokens": 1106,
+        "total_tokens": 2435,
+        "cost_usd": 0.002572125,
+        "generation_id": "gen-1786831882-DdtTjSXcDgVRX5NfYsjj"
+      }
+    },
+    {
+      "ordem": 2133,
+      "titulo_en": "The Gentiles Receive the Holy Spirit",
+      "chars_texto": 597,
+      "usage": {
+        "prompt_tokens": 1114,
+        "completion_tokens": 703,
+        "total_tokens": 1817,
+        "cost_usd": 0.001735875,
+        "generation_id": "gen-1786831887-X9wNrhuFJsysQVtfmDLb"
+      }
+    },
+    {
+      "ordem": 2132,
+      "titulo_en": "Good News for Gentiles",
+      "chars_texto": 1268,
+      "usage": {
+        "prompt_tokens": 1302,
+        "completion_tokens": 1212,
+        "total_tokens": 2514,
+        "cost_usd": 0.00276075,
+        "generation_id": "gen-1786831885-ji7RlBxSdS6nuREXc2LR"
+      }
+    },
+    {
+      "ordem": 2134,
+      "titulo_en": "Peter's Report at Jerusalem",
+      "chars_texto": 2055,
+      "usage": {
+        "prompt_tokens": 1520,
+        "completion_tokens": 1527,
+        "total_tokens": 3047,
+        "cost_usd": 0.003433125,
+        "generation_id": "gen-1786831889-LAJV0c0PBYacZubCju2y"
+      }
+    },
+    {
+      "ordem": 2136,
+      "titulo_en": "James Killed, Peter Imprisoned",
+      "chars_texto": 447,
+      "usage": {
+        "prompt_tokens": 1088,
+        "completion_tokens": 1257,
+        "total_tokens": 2345,
+        "cost_usd": 0.002764875,
+        "generation_id": "gen-1786831891-L2QZvTS6t3zF1JjcEGmT"
+      }
+    },
+    {
+      "ordem": 2135,
+      "titulo_en": "The Church at Antioch",
+      "chars_texto": 1480,
+      "usage": {
+        "prompt_tokens": 1368,
+        "completion_tokens": 1601,
+        "total_tokens": 2969,
+        "cost_usd": 0.003514875,
+        "generation_id": "gen-1786831889-OMZwN6z6Z0XFkS9HTxog"
+      }
+    },
+    {
+      "ordem": 2137,
+      "titulo_en": "The Rescue of Peter",
+      "chars_texto": 2226,
+      "usage": {
+        "prompt_tokens": 1583,
+        "completion_tokens": 1056,
+        "total_tokens": 2639,
+        "cost_usd": 0.002573625,
+        "generation_id": "gen-1786831893-TG5Lbz1nKHhV6PXiUbKU"
+      }
+    },
+    {
+      "ordem": 2138,
+      "titulo_en": "The Death of Herod",
+      "chars_texto": 726,
+      "usage": {
+        "prompt_tokens": 1164,
+        "completion_tokens": 1431,
+        "total_tokens": 2595,
+        "cost_usd": 0.003119625,
+        "generation_id": "gen-1786831895-SSOpobdnrZTcWquiBwDz"
+      }
+    },
+    {
+      "ordem": 2142,
+      "titulo_en": "At Iconium",
+      "chars_texto": 819,
+      "usage": {
+        "prompt_tokens": 1183,
+        "completion_tokens": 1166,
+        "total_tokens": 2349,
+        "cost_usd": 0.002629875,
+        "generation_id": "gen-1786831902-gONPqzodahIntV60OgMg"
+      }
+    },
+    {
+      "ordem": 2139,
+      "titulo_en": "The Journey Begins",
+      "chars_texto": 400,
+      "usage": {
+        "prompt_tokens": 1079,
+        "completion_tokens": 1686,
+        "total_tokens": 2765,
+        "cost_usd": 0.003565875,
+        "generation_id": "gen-1786831900-cKGOwff2pRxGEI8EtUz9"
+      }
+    },
+    {
+      "ordem": 2141,
+      "titulo_en": "In Pisidian Antioch",
+      "chars_texto": 4939,
+      "usage": {
+        "prompt_tokens": 2330,
+        "completion_tokens": 1590,
+        "total_tokens": 3920,
+        "cost_usd": 0.003855,
+        "generation_id": "gen-1786831902-hyHMzETNDrXERjYJyNLU"
+      }
+    },
+    {
+      "ordem": 2140,
+      "titulo_en": "On Cyprus",
+      "chars_texto": 1206,
+      "usage": {
+        "prompt_tokens": 1295,
+        "completion_tokens": 1572,
+        "total_tokens": 2867,
+        "cost_usd": 0.003433125,
+        "generation_id": "gen-1786831901-0EDrH9nNM4lQ7992leFe"
+      }
+    },
+    {
+      "ordem": 2143,
+      "titulo_en": "In Lystra and Derbe",
+      "chars_texto": 1790,
+      "usage": {
+        "prompt_tokens": 1451,
+        "completion_tokens": 1861,
+        "total_tokens": 3312,
+        "cost_usd": 0.0040335,
+        "generation_id": "gen-1786831905-uoratM80QwkcRjniuAjU"
+      }
+    },
+    {
+      "ordem": 2147,
+      "titulo_en": "Peter, Barnabas, and Paul Make Their Arguments",
+      "chars_texto": 822,
+      "usage": {
+        "prompt_tokens": 1182,
+        "completion_tokens": 545,
+        "total_tokens": 1727,
+        "cost_usd": 0.001465125,
+        "generation_id": "gen-1786831914-gibjublrPdikhQxfIhDx"
+      }
+    },
+    {
+      "ordem": 2144,
+      "titulo_en": "The Return to Pisidian Antioch",
+      "chars_texto": 580,
+      "usage": {
+        "prompt_tokens": 1130,
+        "completion_tokens": 1372,
+        "total_tokens": 2502,
+        "cost_usd": 0.00299625,
+        "generation_id": "gen-1786831911-ckB0Uo12M2ann9nGBO3K"
+      }
+    },
+    {
+      "ordem": 2146,
+      "titulo_en": "The Dispute over Circumcision",
+      "chars_texto": 924,
+      "usage": {
+        "prompt_tokens": 1204,
+        "completion_tokens": 1237,
+        "total_tokens": 2441,
+        "cost_usd": 0.002770875,
+        "generation_id": "gen-1786831914-3WexgwX8UtJB1iJ5kFFr"
+      }
+    },
+    {
+      "ordem": 2145,
+      "titulo_en": "The Report to the Church at Antioch",
+      "chars_texto": 328,
+      "usage": {
+        "prompt_tokens": 1044,
+        "completion_tokens": 1576,
+        "total_tokens": 2620,
+        "cost_usd": 0.0033465,
+        "generation_id": "gen-1786831913-2TJ0YHxy7C4NBtPk88ks"
+      }
+    },
+    {
+      "ordem": 2148,
+      "titulo_en": "The Fallen Tent of David",
+      "chars_texto": 627,
+      "usage": {
+        "prompt_tokens": 1129,
+        "completion_tokens": 882,
+        "total_tokens": 2011,
+        "cost_usd": 0.002077125,
+        "generation_id": "gen-1786831918-zP3tgnU9XaStAf99YJpE"
+      }
+    },
+    {
+      "ordem": 2150,
+      "titulo_en": "The Letter to the Gentile Believers",
+      "chars_texto": 1141,
+      "usage": {
+        "prompt_tokens": 1271,
+        "completion_tokens": 926,
+        "total_tokens": 2197,
+        "cost_usd": 0.002212875,
+        "generation_id": "gen-1786831921-wPlKjmulvSE2jV9HnG5a"
+      }
+    },
+    {
+      "ordem": 2149,
+      "titulo_en": "The Four Things",
+      "chars_texto": 374,
+      "usage": {
+        "prompt_tokens": 1066,
+        "completion_tokens": 1666,
+        "total_tokens": 2732,
+        "cost_usd": 0.0035235,
+        "generation_id": "gen-1786831920-wBTohGfnpUkfkLzC9SpU"
+      }
+    },
+    {
+      "ordem": 2152,
+      "titulo_en": "Division between Paul and Barnabas",
+      "chars_texto": 618,
+      "usage": {
+        "prompt_tokens": 1125,
+        "completion_tokens": 1264,
+        "total_tokens": 2389,
+        "cost_usd": 0.002791875,
+        "generation_id": "gen-1786831925-gAFgESsAbm24jcBh0UeJ"
+      }
+    },
+    {
+      "ordem": 2151,
+      "titulo_en": "The Believers at Antioch Rejoice",
+      "chars_texto": 536,
+      "usage": {
+        "prompt_tokens": 1109,
+        "completion_tokens": 1612,
+        "total_tokens": 2721,
+        "cost_usd": 0.003438375,
+        "generation_id": "gen-1786831924-hGvNbWXuXiWQturgUd8l"
+      }
+    },
+    {
+      "ordem": 2153,
+      "titulo_en": "Timothy Joins Paul and Silas",
+      "chars_texto": 574,
+      "usage": {
+        "prompt_tokens": 1118,
+        "completion_tokens": 1544,
+        "total_tokens": 2662,
+        "cost_usd": 0.00331425,
+        "generation_id": "gen-1786831926-Mz9tIURrtL55aZgTF4Ru"
+      }
+    },
+    {
+      "ordem": 2154,
+      "titulo_en": "Paul's Vision of the Macedonian",
+      "chars_texto": 559,
+      "usage": {
+        "prompt_tokens": 1116,
+        "completion_tokens": 1524,
+        "total_tokens": 2640,
+        "cost_usd": 0.003276,
+        "generation_id": "gen-1786831929-11BGSrVRlgaqONa2ev3V"
+      }
+    },
+    {
+      "ordem": 2155,
+      "titulo_en": "Lydia's Conversion in Philippi",
+      "chars_texto": 744,
+      "usage": {
+        "prompt_tokens": 1177,
+        "completion_tokens": 1511,
+        "total_tokens": 2688,
+        "cost_usd": 0.0032745,
+        "generation_id": "gen-1786831932-RZ8OozKYq4K5yEAHTnOA"
+      }
+    },
+    {
+      "ordem": 2157,
+      "titulo_en": "Paul and Silas Imprisoned",
+      "chars_texto": 362,
+      "usage": {
+        "prompt_tokens": 1067,
+        "completion_tokens": 1406,
+        "total_tokens": 2473,
+        "cost_usd": 0.003036375,
+        "generation_id": "gen-1786831936-5BAtJuSXN14sKjXA7UxC"
+      }
+    },
+    {
+      "ordem": 2156,
+      "titulo_en": "The Girl with a Spirit of Divination",
+      "chars_texto": 848,
+      "usage": {
+        "prompt_tokens": 1197,
+        "completion_tokens": 1766,
+        "total_tokens": 2963,
+        "cost_usd": 0.003760125,
+        "generation_id": "gen-1786831935-pxqejogXw4Jp8THqWdZY"
+      }
+    },
+    {
+      "ordem": 2158,
+      "titulo_en": "The Conversion of the Jailer",
+      "chars_texto": 1186,
+      "usage": {
+        "prompt_tokens": 1299,
+        "completion_tokens": 1486,
+        "total_tokens": 2785,
+        "cost_usd": 0.003273375,
+        "generation_id": "gen-1786831938-JC2yqGP579WJzvZHeIIa"
+      }
+    },
+    {
+      "ordem": 2159,
+      "titulo_en": "An Official Apology",
+      "chars_texto": 983,
+      "usage": {
+        "prompt_tokens": 1217,
+        "completion_tokens": 1502,
+        "total_tokens": 2719,
+        "cost_usd": 0.003272625,
+        "generation_id": "gen-1786831941-ci6Ema1rcTZ8VxAQs5dF"
+      }
+    },
+    {
+      "ordem": 2160,
+      "titulo_en": "The Uproar in Thessalonica",
+      "chars_texto": 1277,
+      "usage": {
+        "prompt_tokens": 1286,
+        "completion_tokens": 1409,
+        "total_tokens": 2695,
+        "cost_usd": 0.003124125,
+        "generation_id": "gen-1786831943-eclkN40e99IUXvEFdP2t"
+      }
+    },
+    {
+      "ordem": 2163,
+      "titulo_en": "Paul's Address in the Areopagus",
+      "chars_texto": 1882,
+      "usage": {
+        "prompt_tokens": 1460,
+        "completion_tokens": 1540,
+        "total_tokens": 3000,
+        "cost_usd": 0.003435,
+        "generation_id": "gen-1786831948-6gWPChNFmEpanjyrHcho"
+      }
+    },
+    {
+      "ordem": 2162,
+      "titulo_en": "The Epicurean and Stoic Philosophers",
+      "chars_texto": 838,
+      "usage": {
+        "prompt_tokens": 1190,
+        "completion_tokens": 1667,
+        "total_tokens": 2857,
+        "cost_usd": 0.003571875,
+        "generation_id": "gen-1786831948-l9JmoKKEHXtMMnA2uXl5"
+      }
+    },
+    {
+      "ordem": 2161,
+      "titulo_en": "The Character of the Bereans",
+      "chars_texto": 850,
+      "usage": {
+        "prompt_tokens": 1187,
+        "completion_tokens": 1584,
+        "total_tokens": 2771,
+        "cost_usd": 0.003415125,
+        "generation_id": "gen-1786831948-HKgALV9Wr7vvBIkqNj6m"
+      }
+    },
+    {
+      "ordem": 2164,
+      "titulo_en": "In Corinth",
+      "chars_texto": 1390,
+      "usage": {
+        "prompt_tokens": 1340,
+        "completion_tokens": 1320,
+        "total_tokens": 2660,
+        "cost_usd": 0.0029775,
+        "generation_id": "gen-1786831952-gV2umA2jCGXubYLnwaQS"
+      }
+    },
+    {
+      "ordem": 2165,
+      "titulo_en": "Paul before Gallio",
+      "chars_texto": 740,
+      "usage": {
+        "prompt_tokens": 1164,
+        "completion_tokens": 1398,
+        "total_tokens": 2562,
+        "cost_usd": 0.00305775,
+        "generation_id": "gen-1786831953-U7XDaMAa5jV3FKChrwBi"
+      }
+    },
+    {
+      "ordem": 2166,
+      "titulo_en": "Paul Returns to Antioch",
+      "chars_texto": 618,
+      "usage": {
+        "prompt_tokens": 1145,
+        "completion_tokens": 1353,
+        "total_tokens": 2498,
+        "cost_usd": 0.00296625,
+        "generation_id": "gen-1786831959-LbcZZyJi8bEwsQrTT553"
+      }
+    },
+    {
+      "ordem": 2168,
+      "titulo_en": "The Holy Spirit Received",
+      "chars_texto": 771,
+      "usage": {
+        "prompt_tokens": 1163,
+        "completion_tokens": 1379,
+        "total_tokens": 2542,
+        "cost_usd": 0.00302175,
+        "generation_id": "gen-1786831960-scePARe8gPfLiSbvMzFc"
+      }
+    },
+    {
+      "ordem": 2167,
+      "titulo_en": "Apollos",
+      "chars_texto": 921,
+      "usage": {
+        "prompt_tokens": 1208,
+        "completion_tokens": 1445,
+        "total_tokens": 2653,
+        "cost_usd": 0.003162375,
+        "generation_id": "gen-1786831960-LmEREMnwGRz6EjRfXsqy"
+      }
+    },
+    {
+      "ordem": 2169,
+      "titulo_en": "Paul Ministers",
+      "chars_texto": 726,
+      "usage": {
+        "prompt_tokens": 1141,
+        "completion_tokens": 1331,
+        "total_tokens": 2472,
+        "cost_usd": 0.0029235,
+        "generation_id": "gen-1786831962-7a3XUN4PEsbzLEjrY7e8"
+      }
+    },
+    {
+      "ordem": 2170,
+      "titulo_en": "The Sons of Sceva",
+      "chars_texto": 1055,
+      "usage": {
+        "prompt_tokens": 1238,
+        "completion_tokens": 1459,
+        "total_tokens": 2697,
+        "cost_usd": 0.003199875,
+        "generation_id": "gen-1786831964-DlNIUkdU6LfNwk4UXDyT"
+      }
+    },
+    {
+      "ordem": 2173,
+      "titulo_en": "Eutychus Revived at Troas",
+      "chars_texto": 754,
+      "usage": {
+        "prompt_tokens": 1172,
+        "completion_tokens": 1514,
+        "total_tokens": 2686,
+        "cost_usd": 0.00327825,
+        "generation_id": "gen-1786831971-ziPjHZNvSRmPft2KzFUm"
+      }
+    },
+    {
+      "ordem": 2171,
+      "titulo_en": "The Riot",
+      "chars_texto": 2914,
+      "usage": {
+        "prompt_tokens": 1761,
+        "completion_tokens": 1506,
+        "total_tokens": 3267,
+        "cost_usd": 0.003484125,
+        "generation_id": "gen-1786831970-bewfJVEGDVja8z7Ut7jc"
+      }
+    },
+    {
+      "ordem": 2172,
+      "titulo_en": "Paul in Macedonia and Greece",
+      "chars_texto": 770,
+      "usage": {
+        "prompt_tokens": 1181,
+        "completion_tokens": 1697,
+        "total_tokens": 2878,
+        "cost_usd": 0.00362475,
+        "generation_id": "gen-1786831971-egbns2whqGx5XpyFnxHX"
+      }
+    },
+    {
+      "ordem": 2174,
+      "titulo_en": "From Troas to Miletus",
+      "chars_texto": 579,
+      "usage": {
+        "prompt_tokens": 1122,
+        "completion_tokens": 1631,
+        "total_tokens": 2753,
+        "cost_usd": 0.003478875,
+        "generation_id": "gen-1786831974-7Gkyi3jl7vQlyMZC4VA7"
+      }
+    },
+    {
+      "ordem": 2175,
+      "titulo_en": "Paul's Farewell to the Ephesians",
+      "chars_texto": 2607,
+      "usage": {
+        "prompt_tokens": 1654,
+        "completion_tokens": 1556,
+        "total_tokens": 3210,
+        "cost_usd": 0.00353775,
+        "generation_id": "gen-1786831979-7EcDYzMqaqJob2VPynaz"
+      }
+    },
+    {
+      "ordem": 2176,
+      "titulo_en": "The Journey to Jerusalem",
+      "chars_texto": 906,
+      "usage": {
+        "prompt_tokens": 1207,
+        "completion_tokens": 1520,
+        "total_tokens": 2727,
+        "cost_usd": 0.003302625,
+        "generation_id": "gen-1786831982-25pSPBlxizRc2UjruSoP"
+      }
+    },
+    {
+      "ordem": 2177,
+      "titulo_en": "Paul Visits Philip the Evangelist",
+      "chars_texto": 1139,
+      "usage": {
+        "prompt_tokens": 1269,
+        "completion_tokens": 1829,
+        "total_tokens": 3098,
+        "cost_usd": 0.00390525,
+        "generation_id": "gen-1786831983-szwdsQjIX7FzYMKxWBLA"
+      }
+    },
+    {
+      "ordem": 2178,
+      "titulo_en": "Paul's Arrival at Jerusalem",
+      "chars_texto": 1446,
+      "usage": {
+        "prompt_tokens": 1340,
+        "completion_tokens": 1596,
+        "total_tokens": 2936,
+        "cost_usd": 0.003495,
+        "generation_id": "gen-1786831983-JX3AcUS5E12BgDLXRwgd"
+      }
+    },
+    {
+      "ordem": 2179,
+      "titulo_en": "Paul Seized at the Temple",
+      "chars_texto": 1446,
+      "usage": {
+        "prompt_tokens": 1347,
+        "completion_tokens": 1636,
+        "total_tokens": 2983,
+        "cost_usd": 0.003572625,
+        "generation_id": "gen-1786831987-VjU8jhO8fiOR2d3HrMMG"
+      }
+    },
+    {
+      "ordem": 2180,
+      "titulo_en": "Permission to Speak",
+      "chars_texto": 580,
+      "usage": {
+        "prompt_tokens": 1119,
+        "completion_tokens": 1535,
+        "total_tokens": 2654,
+        "cost_usd": 0.00329775,
+        "generation_id": "gen-1786831991-GWEC4H87GAbQCw2zsWQf"
+      }
+    },
+    {
+      "ordem": 2182,
+      "titulo_en": "Paul the Roman Citizen",
+      "chars_texto": 1414,
+      "usage": {
+        "prompt_tokens": 1332,
+        "completion_tokens": 1300,
+        "total_tokens": 2632,
+        "cost_usd": 0.002937,
+        "generation_id": "gen-1786831995-UTUsvhLqUjfrJdNASXGW"
+      }
+    },
+    {
+      "ordem": 2181,
+      "titulo_en": "Paul's Defense to the Crowd",
+      "chars_texto": 2599,
+      "usage": {
+        "prompt_tokens": 1707,
+        "completion_tokens": 1849,
+        "total_tokens": 3556,
+        "cost_usd": 0.004107,
+        "generation_id": "gen-1786831994-lh7ev5OrLUrAuvoODbLo"
+      }
+    },
+    {
+      "ordem": 2183,
+      "titulo_en": "On Trial for the Hope in the Resurrection of the Dead",
+      "chars_texto": 1691,
+      "usage": {
+        "prompt_tokens": 1428,
+        "completion_tokens": 1745,
+        "total_tokens": 3173,
+        "cost_usd": 0.003807375,
+        "generation_id": "gen-1786831995-6AesklThHtnY9jR7QE40"
+      }
+    },
+    {
+      "ordem": 2184,
+      "titulo_en": "The Plot to Kill Paul",
+      "chars_texto": 1656,
+      "usage": {
+        "prompt_tokens": 1407,
+        "completion_tokens": 1373,
+        "total_tokens": 2780,
+        "cost_usd": 0.003102,
+        "generation_id": "gen-1786831999-sm2FR7TUbCiIbHEnRz0d"
+      }
+    },
+    {
+      "ordem": 2185,
+      "titulo_en": "Paul Sent to Felix",
+      "chars_texto": 1520,
+      "usage": {
+        "prompt_tokens": 1368,
+        "completion_tokens": 1354,
+        "total_tokens": 2722,
+        "cost_usd": 0.00305175,
+        "generation_id": "gen-1786832004-gjRyoGFNGUwmN0YMyePl"
+      }
+    },
+    {
+      "ordem": 2186,
+      "titulo_en": "Tertullus Prosecutes Paul",
+      "chars_texto": 1245,
+      "usage": {
+        "prompt_tokens": 1271,
+        "completion_tokens": 1772,
+        "total_tokens": 3043,
+        "cost_usd": 0.003799125,
+        "generation_id": "gen-1786832004-QLLYK4zWtQPdt7xR84MK"
+      }
+    },
+    {
+      "ordem": 2187,
+      "titulo_en": "Paul's Defense to Felix",
+      "chars_texto": 1479,
+      "usage": {
+        "prompt_tokens": 1347,
+        "completion_tokens": 1452,
+        "total_tokens": 2799,
+        "cost_usd": 0.003227625,
+        "generation_id": "gen-1786832008-3TOj4BPraOKNVLmJA8EM"
+      }
+    },
+    {
+      "ordem": 2189,
+      "titulo_en": "Paul's Trial",
+      "chars_texto": 1230,
+      "usage": {
+        "prompt_tokens": 1282,
+        "completion_tokens": 1476,
+        "total_tokens": 2758,
+        "cost_usd": 0.00324825,
+        "generation_id": "gen-1786832009-aBDltJMYMOKXsbrZPp0j"
+      }
+    },
+    {
+      "ordem": 2190,
+      "titulo_en": "Paul Appeals to Caesar",
+      "chars_texto": 471,
+      "usage": {
+        "prompt_tokens": 1083,
+        "completion_tokens": 672,
+        "total_tokens": 1755,
+        "cost_usd": 0.001666125,
+        "generation_id": "gen-1786832014-8lMT2dIqVl9PO3zhteiy"
+      }
+    },
+    {
+      "ordem": 2188,
+      "titulo_en": "The Verdict Postposed",
+      "chars_texto": 956,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1580,
+        "total_tokens": 2790,
+        "cost_usd": 0.00341625,
+        "generation_id": "gen-1786832008-zNunZZx1nQQ0sZUlQ9PQ"
+      }
+    },
+    {
+      "ordem": 2191,
+      "titulo_en": "Festus Consults Agrippa",
+      "chars_texto": 1338,
+      "usage": {
+        "prompt_tokens": 1314,
+        "completion_tokens": 1271,
+        "total_tokens": 2585,
+        "cost_usd": 0.002875875,
+        "generation_id": "gen-1786832017-gDDT6RnaFK6M8SEWQTtR"
+      }
+    },
+    {
+      "ordem": 2194,
+      "titulo_en": "Festus Interrupts Paul's Defense",
+      "chars_texto": 1197,
+      "usage": {
+        "prompt_tokens": 1299,
+        "completion_tokens": 968,
+        "total_tokens": 2267,
+        "cost_usd": 0.002302125,
+        "generation_id": "gen-1786832020-o32bsnsxW7lyeU9SfswQ"
+      }
+    },
+    {
+      "ordem": 2195,
+      "titulo_en": "Sailing to Rome",
+      "chars_texto": 1686,
+      "usage": {
+        "prompt_tokens": 1410,
+        "completion_tokens": 1301,
+        "total_tokens": 2711,
+        "cost_usd": 0.002968125,
+        "generation_id": "gen-1786832020-BghXbsblcmc18mB1tZdY"
+      }
+    },
+    {
+      "ordem": 2193,
+      "titulo_en": "Paul's Testimony to Agrippa",
+      "chars_texto": 3324,
+      "usage": {
+        "prompt_tokens": 1871,
+        "completion_tokens": 1625,
+        "total_tokens": 3496,
+        "cost_usd": 0.0037485,
+        "generation_id": "gen-1786832020-n38upHDCBd6uHsibV7ix"
+      }
+    },
+    {
+      "ordem": 2192,
+      "titulo_en": "Agrippa and Bernice Arrive",
+      "chars_texto": 971,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1739,
+        "total_tokens": 2949,
+        "cost_usd": 0.003714375,
+        "generation_id": "gen-1786832018-4k0rb6MQELwEL7q9ySUz"
+      }
+    },
+    {
+      "ordem": 2196,
+      "titulo_en": "The Storm at Sea",
+      "chars_texto": 1736,
+      "usage": {
+        "prompt_tokens": 1442,
+        "completion_tokens": 1522,
+        "total_tokens": 2964,
+        "cost_usd": 0.0033945,
+        "generation_id": "gen-1786832027-cQrx4jwwuxzlqnGe1fM2"
+      }
+    },
+    {
+      "ordem": 2197,
+      "titulo_en": "The Shipwreck",
+      "chars_texto": 2338,
+      "usage": {
+        "prompt_tokens": 1630,
+        "completion_tokens": 1434,
+        "total_tokens": 3064,
+        "cost_usd": 0.0033,
+        "generation_id": "gen-1786832028-FFCaDuobRrY1INcHMlqS"
+      }
+    },
+    {
+      "ordem": 2198,
+      "titulo_en": "Ashore on Malta",
+      "chars_texto": 1292,
+      "usage": {
+        "prompt_tokens": 1322,
+        "completion_tokens": 1406,
+        "total_tokens": 2728,
+        "cost_usd": 0.003132,
+        "generation_id": "gen-1786832030-0fbZCJg9Ict1HmJrUCdf"
+      }
+    },
+    {
+      "ordem": 2199,
+      "titulo_en": "Paul Arrives in Italy",
+      "chars_texto": 644,
+      "usage": {
+        "prompt_tokens": 1146,
+        "completion_tokens": 1517,
+        "total_tokens": 2663,
+        "cost_usd": 0.003274125,
+        "generation_id": "gen-1786832031-B1AJc9sk4fKzvKn4ouuk"
+      }
+    },
+    {
+      "ordem": 2200,
+      "titulo_en": "Paul Preaches at Rome",
+      "chars_texto": 2448,
+      "usage": {
+        "prompt_tokens": 1592,
+        "completion_tokens": 1616,
+        "total_tokens": 3208,
+        "cost_usd": 0.003627,
+        "generation_id": "gen-1786832031-8Qh37HUKNmbgkB61P4zY"
+      }
+    },
+    {
+      "ordem": 2201,
+      "titulo_en": "Paul Greets the Saints in Rome",
+      "chars_texto": 800,
+      "usage": {
+        "prompt_tokens": 1163,
+        "completion_tokens": 1552,
+        "total_tokens": 2715,
+        "cost_usd": 0.003346125,
+        "generation_id": "gen-1786832038-sDov43sYDYjSMJjBSv30"
+      }
+    },
+    {
+      "ordem": 2202,
+      "titulo_en": "Unashamed of the Gospel",
+      "chars_texto": 1287,
+      "usage": {
+        "prompt_tokens": 1301,
+        "completion_tokens": 1692,
+        "total_tokens": 2993,
+        "cost_usd": 0.003660375,
+        "generation_id": "gen-1786832039-whtFB8rSFh2jkY7AiyaX"
+      }
+    },
+    {
+      "ordem": 2203,
+      "titulo_en": "Unrighteous Nations",
+      "chars_texto": 2154,
+      "usage": {
+        "prompt_tokens": 1534,
+        "completion_tokens": 1668,
+        "total_tokens": 3202,
+        "cost_usd": 0.00370275,
+        "generation_id": "gen-1786832041-S37pVO1mxam1aAambgu3"
+      }
+    },
+    {
+      "ordem": 2204,
+      "titulo_en": "God's Righteous Judgment",
+      "chars_texto": 1916,
+      "usage": {
+        "prompt_tokens": 1479,
+        "completion_tokens": 1499,
+        "total_tokens": 2978,
+        "cost_usd": 0.00336525,
+        "generation_id": "gen-1786832043-iDx36fIWiVTIfq0bD1wK"
+      }
+    },
+    {
+      "ordem": 2205,
+      "titulo_en": "The Jews and the Law",
+      "chars_texto": 1417,
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1437,
+        "total_tokens": 2804,
+        "cost_usd": 0.003207,
+        "generation_id": "gen-1786832043-Vci8RmahtnKnOUisdGgp"
+      }
+    },
+    {
+      "ordem": 2206,
+      "titulo_en": "God Remains Faithful",
+      "chars_texto": 938,
+      "usage": {
+        "prompt_tokens": 1211,
+        "completion_tokens": 1249,
+        "total_tokens": 2460,
+        "cost_usd": 0.002796,
+        "generation_id": "gen-1786832049-cSQvjbuidRTWVG7D4iIV"
       }
     }
   ]

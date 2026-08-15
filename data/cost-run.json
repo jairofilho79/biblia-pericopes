@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 900,
+  "done": 1000,
   "pending_total": 2640,
-  "sample_cost_usd": 2.9511179999999984,
-  "avg_cost_usd": 0.0032790199999999984,
-  "estimate_remaining_usd": 5.705494799999997,
-  "estimate_full_run_usd": 8.656612799999996,
-  "elapsed_sec": 2068.866,
-  "throughput_per_sec": 0.4350209245064688,
-  "eta_sec": 3999.8075999999996,
+  "sample_cost_usd": 3.269172,
+  "avg_cost_usd": 0.0032691720000000003,
+  "estimate_remaining_usd": 5.361442080000001,
+  "estimate_full_run_usd": 8.63061408,
+  "elapsed_sec": 2291.638,
+  "throughput_per_sec": 0.436369094944315,
+  "eta_sec": 3758.2863199999997,
   "catalog_total": 2647,
   "items": [
     {
@@ -10810,6 +10810,1206 @@
         "total_tokens": 3361,
         "cost_usd": 0.003705375,
         "generation_id": "gen-1786829122-NtKqahuqpYjo6sPI4JDb"
+      }
+    },
+    {
+      "ordem": 908,
+      "titulo_en": "Rehoboam Succeeds Solomon",
+      "chars_texto": 114,
+      "usage": {
+        "prompt_tokens": 997,
+        "completion_tokens": 1263,
+        "total_tokens": 2260,
+        "cost_usd": 0.002742,
+        "generation_id": "gen-1786829138-MX3XCUahkcgPKdW4OyNe"
+      }
+    },
+    {
+      "ordem": 911,
+      "titulo_en": "Rehoboam the Evil King",
+      "chars_texto": 652,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1313,
+        "total_tokens": 2453,
+        "cost_usd": 0.002889375,
+        "generation_id": "gen-1786829138-bDWCvPNivSspUSE42U70"
+      }
+    },
+    {
+      "ordem": 907,
+      "titulo_en": "Solomon's Reign",
+      "chars_texto": 331,
+      "usage": {
+        "prompt_tokens": 1056,
+        "completion_tokens": 1687,
+        "total_tokens": 2743,
+        "cost_usd": 0.003559125,
+        "generation_id": "gen-1786829138-QFXW0Ut6aWpS5PDcWRmH"
+      }
+    },
+    {
+      "ordem": 909,
+      "titulo_en": "Rebellion against Rehoboam",
+      "chars_texto": 2136,
+      "usage": {
+        "prompt_tokens": 1569,
+        "completion_tokens": 1750,
+        "total_tokens": 3319,
+        "cost_usd": 0.003869625,
+        "generation_id": "gen-1786829138-3Zk94Drozh2kDaxDtapO"
+      }
+    },
+    {
+      "ordem": 910,
+      "titulo_en": "The Kingdom Divided",
+      "chars_texto": 5183,
+      "usage": {
+        "prompt_tokens": 2476,
+        "completion_tokens": 1703,
+        "total_tokens": 4179,
+        "cost_usd": 0.004121625,
+        "generation_id": "gen-1786829138-gynC2vxtXvenHUQlox6W"
+      }
+    },
+    {
+      "ordem": 912,
+      "titulo_en": "Abijah Succeeded Rehoboam",
+      "chars_texto": 104,
+      "usage": {
+        "prompt_tokens": 999,
+        "completion_tokens": 1302,
+        "total_tokens": 2301,
+        "cost_usd": 0.002815875,
+        "generation_id": "gen-1786829147-GhhED773RnVDdBsJ1jHQ"
+      }
+    },
+    {
+      "ordem": 913,
+      "titulo_en": "Abijah Reigns in Judah",
+      "chars_texto": 461,
+      "usage": {
+        "prompt_tokens": 1089,
+        "completion_tokens": 1424,
+        "total_tokens": 2513,
+        "cost_usd": 0.003078375,
+        "generation_id": "gen-1786829148-q9VGxTw9WZxhZVYuDs8b"
+      }
+    },
+    {
+      "ordem": 914,
+      "titulo_en": "Civil War against Jeroboam",
+      "chars_texto": 3122,
+      "usage": {
+        "prompt_tokens": 1844,
+        "completion_tokens": 1815,
+        "total_tokens": 3659,
+        "cost_usd": 0.004094625,
+        "generation_id": "gen-1786829150-o2padGbaXih7wIHStgcM"
+      }
+    },
+    {
+      "ordem": 915,
+      "titulo_en": "Good King Asa",
+      "chars_texto": 2338,
+      "usage": {
+        "prompt_tokens": 1625,
+        "completion_tokens": 1747,
+        "total_tokens": 3372,
+        "cost_usd": 0.003885,
+        "generation_id": "gen-1786829150-YYfFeFmCMWc9Sgnnz52L"
+      }
+    },
+    {
+      "ordem": 916,
+      "titulo_en": "Asa's Reforms",
+      "chars_texto": 2640,
+      "usage": {
+        "prompt_tokens": 1703,
+        "completion_tokens": 1751,
+        "total_tokens": 3454,
+        "cost_usd": 0.00392175,
+        "generation_id": "gen-1786829152-cYcyuAZXcfSBzKXjczDE"
+      }
+    },
+    {
+      "ordem": 918,
+      "titulo_en": "Asa's Death and Burial",
+      "chars_texto": 637,
+      "usage": {
+        "prompt_tokens": 1131,
+        "completion_tokens": 779,
+        "total_tokens": 1910,
+        "cost_usd": 0.00188475,
+        "generation_id": "gen-1786829158-159cnYUMvLU5ZXEZFh8E"
+      }
+    },
+    {
+      "ordem": 917,
+      "titulo_en": "War between Asa and Baasha",
+      "chars_texto": 1770,
+      "usage": {
+        "prompt_tokens": 1463,
+        "completion_tokens": 1423,
+        "total_tokens": 2886,
+        "cost_usd": 0.00321675,
+        "generation_id": "gen-1786829156-1LhieoljSkqfsNPLSXEz"
+      }
+    },
+    {
+      "ordem": 919,
+      "titulo_en": "Good King Jehoshaphat",
+      "chars_texto": 2355,
+      "usage": {
+        "prompt_tokens": 1658,
+        "completion_tokens": 1710,
+        "total_tokens": 3368,
+        "cost_usd": 0.003828,
+        "generation_id": "gen-1786829162-P3ybMQdWnNcTOX99oATJ"
+      }
+    },
+    {
+      "ordem": 922,
+      "titulo_en": "Ahab's Defeat and Death",
+      "chars_texto": 1124,
+      "usage": {
+        "prompt_tokens": 1292,
+        "completion_tokens": 1143,
+        "total_tokens": 2435,
+        "cost_usd": 0.002627625,
+        "generation_id": "gen-1786829166-GeyCIXyrH3e9jOPFGJi4"
+      }
+    },
+    {
+      "ordem": 920,
+      "titulo_en": "Jehoshaphat Allies with Ahab",
+      "chars_texto": 1720,
+      "usage": {
+        "prompt_tokens": 1477,
+        "completion_tokens": 1717,
+        "total_tokens": 3194,
+        "cost_usd": 0.00377325,
+        "generation_id": "gen-1786829163-s03kT0aT1atS6bGLnA6C"
+      }
+    },
+    {
+      "ordem": 921,
+      "titulo_en": "Micaiah Prophesies against Ahab",
+      "chars_texto": 2368,
+      "usage": {
+        "prompt_tokens": 1647,
+        "completion_tokens": 1778,
+        "total_tokens": 3425,
+        "cost_usd": 0.003951375,
+        "generation_id": "gen-1786829164-0bbkj9d5G3SvmMTp6Do2"
+      }
+    },
+    {
+      "ordem": 923,
+      "titulo_en": "Jehoshaphat's Reforms",
+      "chars_texto": 1977,
+      "usage": {
+        "prompt_tokens": 1504,
+        "completion_tokens": 1714,
+        "total_tokens": 3218,
+        "cost_usd": 0.00377775,
+        "generation_id": "gen-1786829167-qKvcDCQubaf4fSX1WAKB"
+      }
+    },
+    {
+      "ordem": 925,
+      "titulo_en": "Jehoram Succeeds Jehoshaphat",
+      "chars_texto": 454,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 945,
+        "total_tokens": 2052,
+        "cost_usd": 0.002187,
+        "generation_id": "gen-1786829175-0lwEJZn1z6v4pLrrXaR1"
+      }
+    },
+    {
+      "ordem": 927,
+      "titulo_en": "Jehoram's Disease and Death",
+      "chars_texto": 857,
+      "usage": {
+        "prompt_tokens": 1206,
+        "completion_tokens": 1067,
+        "total_tokens": 2273,
+        "cost_usd": 0.002452875,
+        "generation_id": "gen-1786829177-GN5VRMgWWHsQF47t4CLN"
+      }
+    },
+    {
+      "ordem": 924,
+      "titulo_en": "War against Jehoshaphat",
+      "chars_texto": 6034,
+      "usage": {
+        "prompt_tokens": 2670,
+        "completion_tokens": 1645,
+        "total_tokens": 4315,
+        "cost_usd": 0.004085625,
+        "generation_id": "gen-1786829174-Dh9AbAHuv65XGfDe7oiW"
+      }
+    },
+    {
+      "ordem": 926,
+      "titulo_en": "Jehoram the Evil King",
+      "chars_texto": 2010,
+      "usage": {
+        "prompt_tokens": 1505,
+        "completion_tokens": 1740,
+        "total_tokens": 3245,
+        "cost_usd": 0.003826875,
+        "generation_id": "gen-1786829175-pbJnq3tlbImkJ1dCFjUK"
+      }
+    },
+    {
+      "ordem": 929,
+      "titulo_en": "Jehu Kills Ahaziah",
+      "chars_texto": 465,
+      "usage": {
+        "prompt_tokens": 1098,
+        "completion_tokens": 647,
+        "total_tokens": 1745,
+        "cost_usd": 0.001624875,
+        "generation_id": "gen-1786829183-M1sYFQsepUZHtKDtUCi2"
+      }
+    },
+    {
+      "ordem": 928,
+      "titulo_en": "Ahaziah the Evil King",
+      "chars_texto": 1328,
+      "usage": {
+        "prompt_tokens": 1353,
+        "completion_tokens": 1751,
+        "total_tokens": 3104,
+        "cost_usd": 0.0037905,
+        "generation_id": "gen-1786829179-Dhk7GPJYLcCR3hz8VthK"
+      }
+    },
+    {
+      "ordem": 930,
+      "titulo_en": "Joash Hidden from Athaliah",
+      "chars_texto": 537,
+      "usage": {
+        "prompt_tokens": 1130,
+        "completion_tokens": 1506,
+        "total_tokens": 2636,
+        "cost_usd": 0.0032475,
+        "generation_id": "gen-1786829186-h6dKxhDffeOemcWEY60W"
+      }
+    },
+    {
+      "ordem": 931,
+      "titulo_en": "Joash Anointed King of Judah",
+      "chars_texto": 1962,
+      "usage": {
+        "prompt_tokens": 1508,
+        "completion_tokens": 1554,
+        "total_tokens": 3062,
+        "cost_usd": 0.00347925,
+        "generation_id": "gen-1786829186-7Kk0ByzUfCmiW4TkAjJm"
+      }
+    },
+    {
+      "ordem": 932,
+      "titulo_en": "The Death of Athaliah",
+      "chars_texto": 812,
+      "usage": {
+        "prompt_tokens": 1194,
+        "completion_tokens": 1429,
+        "total_tokens": 2623,
+        "cost_usd": 0.003127125,
+        "generation_id": "gen-1786829188-SPd29W8dgD7RBdq9JJKu"
+      }
+    },
+    {
+      "ordem": 933,
+      "titulo_en": "Jehoiada the Priest Restores the Worship of the LORD",
+      "chars_texto": 1018,
+      "usage": {
+        "prompt_tokens": 1241,
+        "completion_tokens": 2179,
+        "total_tokens": 3420,
+        "cost_usd": 0.004551,
+        "generation_id": "gen-1786829189-cyI9uaHpfK4IBj01UZQM"
+      }
+    },
+    {
+      "ordem": 936,
+      "titulo_en": "The Wickedness of Joash",
+      "chars_texto": 986,
+      "usage": {
+        "prompt_tokens": 1252,
+        "completion_tokens": 1125,
+        "total_tokens": 2377,
+        "cost_usd": 0.002578875,
+        "generation_id": "gen-1786829197-zJJpWNoQqdMeiCYiVxgq"
+      }
+    },
+    {
+      "ordem": 934,
+      "titulo_en": "Joash Repairs the Temple",
+      "chars_texto": 2333,
+      "usage": {
+        "prompt_tokens": 1614,
+        "completion_tokens": 1723,
+        "total_tokens": 3337,
+        "cost_usd": 0.003835875,
+        "generation_id": "gen-1786829193-JDsSpLHIq6GUH9QRKjaS"
+      }
+    },
+    {
+      "ordem": 935,
+      "titulo_en": "Jehoiada the Priest's Death and Burial",
+      "chars_texto": 223,
+      "usage": {
+        "prompt_tokens": 1030,
+        "completion_tokens": 1315,
+        "total_tokens": 2345,
+        "cost_usd": 0.002851875,
+        "generation_id": "gen-1786829197-ApXEHbJrfCbLBefauyFO"
+      }
+    },
+    {
+      "ordem": 937,
+      "titulo_en": "The Death of Joash",
+      "chars_texto": 986,
+      "usage": {
+        "prompt_tokens": 1242,
+        "completion_tokens": 1739,
+        "total_tokens": 2981,
+        "cost_usd": 0.003726375,
+        "generation_id": "gen-1786829199-gabyxGIbnylNumFzUznO"
+      }
+    },
+    {
+      "ordem": 938,
+      "titulo_en": "Good King Amaziah",
+      "chars_texto": 629,
+      "usage": {
+        "prompt_tokens": 1123,
+        "completion_tokens": 1303,
+        "total_tokens": 2426,
+        "cost_usd": 0.00286425,
+        "generation_id": "gen-1786829204-1Kyb7hMn545Ono9h6pXI"
+      }
+    },
+    {
+      "ordem": 940,
+      "titulo_en": "Amaziah Rebuked for Idolatry",
+      "chars_texto": 609,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1309,
+        "total_tokens": 2448,
+        "cost_usd": 0.0028815,
+        "generation_id": "gen-1786829205-o4PZBIyiuSj9qROGsFhU"
+      }
+    },
+    {
+      "ordem": 939,
+      "titulo_en": "Amaziah's Victories",
+      "chars_texto": 1630,
+      "usage": {
+        "prompt_tokens": 1400,
+        "completion_tokens": 1437,
+        "total_tokens": 2837,
+        "cost_usd": 0.003219375,
+        "generation_id": "gen-1786829205-FBghnyjvZMDJBdxkiCSq"
+      }
+    },
+    {
+      "ordem": 941,
+      "titulo_en": "Jehoash of Israel Defeats Amaziah",
+      "chars_texto": 1432,
+      "usage": {
+        "prompt_tokens": 1410,
+        "completion_tokens": 1553,
+        "total_tokens": 2963,
+        "cost_usd": 0.003440625,
+        "generation_id": "gen-1786829206-KCQJJgu1c54An3Vbl6t6"
+      }
+    },
+    {
+      "ordem": 942,
+      "titulo_en": "The Death of Amaziah",
+      "chars_texto": 526,
+      "usage": {
+        "prompt_tokens": 1112,
+        "completion_tokens": 1604,
+        "total_tokens": 2716,
+        "cost_usd": 0.0034245,
+        "generation_id": "gen-1786829211-fJSaETDeINY02TN8r7e7"
+      }
+    },
+    {
+      "ordem": 944,
+      "titulo_en": "Uzziah's Victories",
+      "chars_texto": 1637,
+      "usage": {
+        "prompt_tokens": 1417,
+        "completion_tokens": 1123,
+        "total_tokens": 2540,
+        "cost_usd": 0.002637,
+        "generation_id": "gen-1786829215-ckmVCuzBDl6gmiGr2eTl"
+      }
+    },
+    {
+      "ordem": 943,
+      "titulo_en": "Good King Uzziah",
+      "chars_texto": 596,
+      "usage": {
+        "prompt_tokens": 1134,
+        "completion_tokens": 1265,
+        "total_tokens": 2399,
+        "cost_usd": 0.002797125,
+        "generation_id": "gen-1786829215-RpqPvOfnT892qi5NrJj4"
+      }
+    },
+    {
+      "ordem": 946,
+      "titulo_en": "Jotham",
+      "chars_texto": 1272,
+      "usage": {
+        "prompt_tokens": 1299,
+        "completion_tokens": 1437,
+        "total_tokens": 2736,
+        "cost_usd": 0.0031815,
+        "generation_id": "gen-1786829217-VaA74bODRCa3jaZmmf7K"
+      }
+    },
+    {
+      "ordem": 945,
+      "titulo_en": "Uzziah's Pride, Punishment, and Death",
+      "chars_texto": 1641,
+      "usage": {
+        "prompt_tokens": 1421,
+        "completion_tokens": 1443,
+        "total_tokens": 2864,
+        "cost_usd": 0.0032385,
+        "generation_id": "gen-1786829216-HgoBhkEQojqIpT8Gq4hH"
+      }
+    },
+    {
+      "ordem": 947,
+      "titulo_en": "Ahaz the Evil King",
+      "chars_texto": 543,
+      "usage": {
+        "prompt_tokens": 1105,
+        "completion_tokens": 1281,
+        "total_tokens": 2386,
+        "cost_usd": 0.00281625,
+        "generation_id": "gen-1786829222-IPgMvj48iRp8Nt2ri3dZ"
+      }
+    },
+    {
+      "ordem": 948,
+      "titulo_en": "Aram Defeats Ahaz",
+      "chars_texto": 2257,
+      "usage": {
+        "prompt_tokens": 1593,
+        "completion_tokens": 1719,
+        "total_tokens": 3312,
+        "cost_usd": 0.0038205,
+        "generation_id": "gen-1786829224-Y15630exkTqD5dshoptl"
+      }
+    },
+    {
+      "ordem": 951,
+      "titulo_en": "Hezekiah Restores the Temple",
+      "chars_texto": 2944,
+      "usage": {
+        "prompt_tokens": 1784,
+        "completion_tokens": 1333,
+        "total_tokens": 3117,
+        "cost_usd": 0.003168375,
+        "generation_id": "gen-1786829227-QfsiYaPG94LsfEYK3Hei"
+      }
+    },
+    {
+      "ordem": 949,
+      "titulo_en": "The Idolatry of Ahaz",
+      "chars_texto": 1746,
+      "usage": {
+        "prompt_tokens": 1490,
+        "completion_tokens": 1345,
+        "total_tokens": 2835,
+        "cost_usd": 0.003080625,
+        "generation_id": "gen-1786829225-zelJfgdyrywDirUbH7ce"
+      }
+    },
+    {
+      "ordem": 950,
+      "titulo_en": "Hezekiah Cleanses the Temple",
+      "chars_texto": 2909,
+      "usage": {
+        "prompt_tokens": 1802,
+        "completion_tokens": 1438,
+        "total_tokens": 3240,
+        "cost_usd": 0.003372,
+        "generation_id": "gen-1786829227-HSHSEhWBSTGtRRjcolCM"
+      }
+    },
+    {
+      "ordem": 952,
+      "titulo_en": "Hezekiah Proclaims a Passover in Israel and Judah",
+      "chars_texto": 2149,
+      "usage": {
+        "prompt_tokens": 1571,
+        "completion_tokens": 1610,
+        "total_tokens": 3181,
+        "cost_usd": 0.003607875,
+        "generation_id": "gen-1786829232-rTYTXktNFJAlAeEH2IRK"
+      }
+    },
+    {
+      "ordem": 954,
+      "titulo_en": "The Destruction of Idols",
+      "chars_texto": 611,
+      "usage": {
+        "prompt_tokens": 1121,
+        "completion_tokens": 1338,
+        "total_tokens": 2459,
+        "cost_usd": 0.002929125,
+        "generation_id": "gen-1786829237-tGpAbaO9FH2QOrb3HwNV"
+      }
+    },
+    {
+      "ordem": 956,
+      "titulo_en": "Hezekiah Organizes the Priests",
+      "chars_texto": 1985,
+      "usage": {
+        "prompt_tokens": 1502,
+        "completion_tokens": 1346,
+        "total_tokens": 2848,
+        "cost_usd": 0.003087,
+        "generation_id": "gen-1786829237-7TvNZIM3HwXSxKs0EoNQ"
+      }
+    },
+    {
+      "ordem": 955,
+      "titulo_en": "Contributions for Worship",
+      "chars_texto": 1406,
+      "usage": {
+        "prompt_tokens": 1340,
+        "completion_tokens": 1678,
+        "total_tokens": 3018,
+        "cost_usd": 0.00364875,
+        "generation_id": "gen-1786829237-FOLYAY0YZVDE998eA0CS"
+      }
+    },
+    {
+      "ordem": 953,
+      "titulo_en": "Hezekiah Celebrates the Passover",
+      "chars_texto": 2589,
+      "usage": {
+        "prompt_tokens": 1678,
+        "completion_tokens": 1694,
+        "total_tokens": 3372,
+        "cost_usd": 0.0038055,
+        "generation_id": "gen-1786829237-bAbdZjhfLGKCKllvrHbr"
+      }
+    },
+    {
+      "ordem": 957,
+      "titulo_en": "Sennacherib King of Assyria Threatens Jerusalem",
+      "chars_texto": 3298,
+      "usage": {
+        "prompt_tokens": 1870,
+        "completion_tokens": 449,
+        "total_tokens": 2319,
+        "cost_usd": 0.001543125,
+        "generation_id": "gen-1786829244-YrHc3XbanXgPXkMAcnJp"
+      }
+    },
+    {
+      "ordem": 962,
+      "titulo_en": "Manasseh's Repentance and Restoration",
+      "chars_texto": 1759,
+      "usage": {
+        "prompt_tokens": 1468,
+        "completion_tokens": 873,
+        "total_tokens": 2341,
+        "cost_usd": 0.002187375,
+        "generation_id": "gen-1786829249-NMwAcIKln26i9LewTW9j"
+      }
+    },
+    {
+      "ordem": 958,
+      "titulo_en": "Jerusalem Delivered from the Assyrians",
+      "chars_texto": 728,
+      "usage": {
+        "prompt_tokens": 1175,
+        "completion_tokens": 1574,
+        "total_tokens": 2749,
+        "cost_usd": 0.003391875,
+        "generation_id": "gen-1786829247-p8at5PfeGt5EloaGrmUd"
+      }
+    },
+    {
+      "ordem": 960,
+      "titulo_en": "Hezekiah's Death",
+      "chars_texto": 404,
+      "usage": {
+        "prompt_tokens": 1080,
+        "completion_tokens": 1371,
+        "total_tokens": 2451,
+        "cost_usd": 0.002975625,
+        "generation_id": "gen-1786829249-QKghIidbIAKNvUFFhON4"
+      }
+    },
+    {
+      "ordem": 959,
+      "titulo_en": "Hezekiah's Illness and Recovery",
+      "chars_texto": 1267,
+      "usage": {
+        "prompt_tokens": 1315,
+        "completion_tokens": 1633,
+        "total_tokens": 2948,
+        "cost_usd": 0.003555,
+        "generation_id": "gen-1786829247-RUCWnUymHWQTagZR2uOL"
+      }
+    },
+    {
+      "ordem": 961,
+      "titulo_en": "Manasseh the Evil King",
+      "chars_texto": 1556,
+      "usage": {
+        "prompt_tokens": 1386,
+        "completion_tokens": 1433,
+        "total_tokens": 2819,
+        "cost_usd": 0.003206625,
+        "generation_id": "gen-1786829249-InqW1sioA5BZGFy53D6n"
+      }
+    },
+    {
+      "ordem": 966,
+      "titulo_en": "Josiah Repairs the Temple",
+      "chars_texto": 3875,
+      "usage": {
+        "prompt_tokens": 2042,
+        "completion_tokens": 779,
+        "total_tokens": 2821,
+        "cost_usd": 0.002226375,
+        "generation_id": "gen-1786829260-qqZbS8Cc557jeg3Stm57"
+      }
+    },
+    {
+      "ordem": 963,
+      "titulo_en": "Amon",
+      "chars_texto": 633,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1597,
+        "total_tokens": 2736,
+        "cost_usd": 0.0034215,
+        "generation_id": "gen-1786829256-LZJvE49X97I9sqRcnnnS"
+      }
+    },
+    {
+      "ordem": 964,
+      "titulo_en": "Good King Josiah",
+      "chars_texto": 252,
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 1479,
+        "total_tokens": 2508,
+        "cost_usd": 0.003159,
+        "generation_id": "gen-1786829258-4Ii6hsnBAPiUsKs3eMSK"
+      }
+    },
+    {
+      "ordem": 967,
+      "titulo_en": "Josiah Renews the Covenant",
+      "chars_texto": 1040,
+      "usage": {
+        "prompt_tokens": 1240,
+        "completion_tokens": 1595,
+        "total_tokens": 2835,
+        "cost_usd": 0.003455625,
+        "generation_id": "gen-1786829260-ydusMBYUa0Vpbwth4BIb"
+      }
+    },
+    {
+      "ordem": 965,
+      "titulo_en": "Josiah Destroys Idolatry",
+      "chars_texto": 980,
+      "usage": {
+        "prompt_tokens": 1243,
+        "completion_tokens": 1661,
+        "total_tokens": 2904,
+        "cost_usd": 0.0035805,
+        "generation_id": "gen-1786829259-JiG8aBELGXucX8jJsk5r"
+      }
+    },
+    {
+      "ordem": 972,
+      "titulo_en": "Jehoiachin Reigns in Judah",
+      "chars_texto": 364,
+      "usage": {
+        "prompt_tokens": 1066,
+        "completion_tokens": 491,
+        "total_tokens": 1557,
+        "cost_usd": 0.001320375,
+        "generation_id": "gen-1786829272-zbzyW5SljJZ7mk1zT924"
+      }
+    },
+    {
+      "ordem": 969,
+      "titulo_en": "The Death of Josiah",
+      "chars_texto": 1358,
+      "usage": {
+        "prompt_tokens": 1337,
+        "completion_tokens": 1490,
+        "total_tokens": 2827,
+        "cost_usd": 0.003295125,
+        "generation_id": "gen-1786829268-8rqdJc0Z14NO5V8uW4Wl"
+      }
+    },
+    {
+      "ordem": 968,
+      "titulo_en": "Josiah Restores the Passover",
+      "chars_texto": 3498,
+      "usage": {
+        "prompt_tokens": 1926,
+        "completion_tokens": 1845,
+        "total_tokens": 3771,
+        "cost_usd": 0.004181625,
+        "generation_id": "gen-1786829266-kXDC2JL7psQ2cuzXWB2q"
+      }
+    },
+    {
+      "ordem": 970,
+      "titulo_en": "Jehoahaz Succeeds Josiah",
+      "chars_texto": 530,
+      "usage": {
+        "prompt_tokens": 1125,
+        "completion_tokens": 1640,
+        "total_tokens": 2765,
+        "cost_usd": 0.003496875,
+        "generation_id": "gen-1786829269-RxPeJFWQVDvRNX5F7qfP"
+      }
+    },
+    {
+      "ordem": 971,
+      "titulo_en": "Jehoiakim Reigns in Judah",
+      "chars_texto": 604,
+      "usage": {
+        "prompt_tokens": 1138,
+        "completion_tokens": 1611,
+        "total_tokens": 2749,
+        "cost_usd": 0.003447375,
+        "generation_id": "gen-1786829272-GSEXEpv3IdDBhsO2xiyV"
+      }
+    },
+    {
+      "ordem": 975,
+      "titulo_en": "The Promise of Restoration",
+      "chars_texto": 544,
+      "usage": {
+        "prompt_tokens": 1119,
+        "completion_tokens": 845,
+        "total_tokens": 1964,
+        "cost_usd": 0.002004,
+        "generation_id": "gen-1786829279-VUH8o170usHR5vagi0Ta"
+      }
+    },
+    {
+      "ordem": 973,
+      "titulo_en": "Zedekiah Reigns in Judah",
+      "chars_texto": 651,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1113,
+        "total_tokens": 2253,
+        "cost_usd": 0.002514375,
+        "generation_id": "gen-1786829277-xb6Rb3vXylKg0g6dfsoe"
+      }
+    },
+    {
+      "ordem": 976,
+      "titulo_en": "The Proclamation of Cyrus",
+      "chars_texto": 1177,
+      "usage": {
+        "prompt_tokens": 1280,
+        "completion_tokens": 1222,
+        "total_tokens": 2502,
+        "cost_usd": 0.00277125,
+        "generation_id": "gen-1786829280-qrt3FBmNn4cUIWli14Df"
+      }
+    },
+    {
+      "ordem": 974,
+      "titulo_en": "The Babylonian Exile",
+      "chars_texto": 1283,
+      "usage": {
+        "prompt_tokens": 1320,
+        "completion_tokens": 1760,
+        "total_tokens": 3080,
+        "cost_usd": 0.003795,
+        "generation_id": "gen-1786829279-6pr57kpfpAVWAZYDFhEl"
+      }
+    },
+    {
+      "ordem": 977,
+      "titulo_en": "Cyrus Restores the Holy Vessels",
+      "chars_texto": 650,
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 1509,
+        "total_tokens": 2651,
+        "cost_usd": 0.003257625,
+        "generation_id": "gen-1786829284-Wy8kmDrbWlBe7cpy6kjg"
+      }
+    },
+    {
+      "ordem": 979,
+      "titulo_en": "Building an Altar",
+      "chars_texto": 565,
+      "usage": {
+        "prompt_tokens": 1103,
+        "completion_tokens": 1397,
+        "total_tokens": 2500,
+        "cost_usd": 0.003033,
+        "generation_id": "gen-1786829287-89tTwscoiz57kzGMbOCO"
+      }
+    },
+    {
+      "ordem": 978,
+      "titulo_en": "List of Returning Exiles",
+      "chars_texto": 5385,
+      "usage": {
+        "prompt_tokens": 2663,
+        "completion_tokens": 1460,
+        "total_tokens": 4123,
+        "cost_usd": 0.003736125,
+        "generation_id": "gen-1786829286-2iTlGX1uoCGRlQuKuAjY"
+      }
+    },
+    {
+      "ordem": 981,
+      "titulo_en": "Temple Rebuilding Begins",
+      "chars_texto": 1557,
+      "usage": {
+        "prompt_tokens": 1373,
+        "completion_tokens": 1322,
+        "total_tokens": 2695,
+        "cost_usd": 0.002993625,
+        "generation_id": "gen-1786829291-P56us9UGMc7tI4JWstKl"
+      }
+    },
+    {
+      "ordem": 980,
+      "titulo_en": "The Feast of Tabernacles Observed",
+      "chars_texto": 741,
+      "usage": {
+        "prompt_tokens": 1156,
+        "completion_tokens": 1710,
+        "total_tokens": 2866,
+        "cost_usd": 0.00363975,
+        "generation_id": "gen-1786829289-gRmPF27hA3U7FdPBjRMU"
+      }
+    },
+    {
+      "ordem": 982,
+      "titulo_en": "Opposition under Cyrus",
+      "chars_texto": 942,
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 764,
+        "total_tokens": 1976,
+        "cost_usd": 0.001887,
+        "generation_id": "gen-1786829296-CKwkm1t5xzFKMSwrBFCZ"
+      }
+    },
+    {
+      "ordem": 983,
+      "titulo_en": "Opposition under Xerxes",
+      "chars_texto": 114,
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 1207,
+        "total_tokens": 2191,
+        "cost_usd": 0.002632125,
+        "generation_id": "gen-1786829297-ILwiPLvyvgdtpCAZXCeQ"
+      }
+    },
+    {
+      "ordem": 984,
+      "titulo_en": "Opposition under Artaxerxes",
+      "chars_texto": 2837,
+      "usage": {
+        "prompt_tokens": 1753,
+        "completion_tokens": 1615,
+        "total_tokens": 3368,
+        "cost_usd": 0.0036855,
+        "generation_id": "gen-1786829297-qssqowfkRZ1MOg2AlQVg"
+      }
+    },
+    {
+      "ordem": 986,
+      "titulo_en": "Tettenai's Letter to Darius",
+      "chars_texto": 2156,
+      "usage": {
+        "prompt_tokens": 1533,
+        "completion_tokens": 1684,
+        "total_tokens": 3217,
+        "cost_usd": 0.003732375,
+        "generation_id": "gen-1786829301-JDbEy9YtGxCRvZyrqjrN"
+      }
+    },
+    {
+      "ordem": 985,
+      "titulo_en": "Temple Rebuilding Resumes",
+      "chars_texto": 861,
+      "usage": {
+        "prompt_tokens": 1185,
+        "completion_tokens": 1795,
+        "total_tokens": 2980,
+        "cost_usd": 0.00381,
+        "generation_id": "gen-1786829301-c4yHgeToIpMb30IZbJ1g"
+      }
+    },
+    {
+      "ordem": 987,
+      "titulo_en": "The Decree of Darius",
+      "chars_texto": 2414,
+      "usage": {
+        "prompt_tokens": 1595,
+        "completion_tokens": 1698,
+        "total_tokens": 3293,
+        "cost_usd": 0.003781875,
+        "generation_id": "gen-1786829302-bvF5Yaiqzk14J9dieqqO"
+      }
+    },
+    {
+      "ordem": 988,
+      "titulo_en": "The Temple Completed",
+      "chars_texto": 576,
+      "usage": {
+        "prompt_tokens": 1112,
+        "completion_tokens": 1611,
+        "total_tokens": 2723,
+        "cost_usd": 0.003437625,
+        "generation_id": "gen-1786829307-Iwc3tbmRubUDx7GxXnpH"
+      }
+    },
+    {
+      "ordem": 989,
+      "titulo_en": "Dedication of the Temple",
+      "chars_texto": 503,
+      "usage": {
+        "prompt_tokens": 1088,
+        "completion_tokens": 1486,
+        "total_tokens": 2574,
+        "cost_usd": 0.00319425,
+        "generation_id": "gen-1786829309-d2IUM3i8fKHzjL3esAKQ"
+      }
+    },
+    {
+      "ordem": 991,
+      "titulo_en": "Ezra Arrives at Jerusalem",
+      "chars_texto": 1153,
+      "usage": {
+        "prompt_tokens": 1289,
+        "completion_tokens": 1600,
+        "total_tokens": 2889,
+        "cost_usd": 0.003483375,
+        "generation_id": "gen-1786829314-NvWKGY62BpbZeSybZdF7"
+      }
+    },
+    {
+      "ordem": 992,
+      "titulo_en": "Atraxerxes' Letter for Ezra",
+      "chars_texto": 2667,
+      "usage": {
+        "prompt_tokens": 1685,
+        "completion_tokens": 1541,
+        "total_tokens": 3226,
+        "cost_usd": 0.00352125,
+        "generation_id": "gen-1786829315-m3FjNaLK7FGAPOZn5VAL"
+      }
+    },
+    {
+      "ordem": 990,
+      "titulo_en": "The Returned Exiles Keep the Passover",
+      "chars_texto": 763,
+      "usage": {
+        "prompt_tokens": 1172,
+        "completion_tokens": 1634,
+        "total_tokens": 2806,
+        "cost_usd": 0.00350325,
+        "generation_id": "gen-1786829314-pR0CeTae63X8uJXvQvx9"
+      }
+    },
+    {
+      "ordem": 994,
+      "titulo_en": "The Exiles Who Returned with Ezra",
+      "chars_texto": 1271,
+      "usage": {
+        "prompt_tokens": 1374,
+        "completion_tokens": 1469,
+        "total_tokens": 2843,
+        "cost_usd": 0.003269625,
+        "generation_id": "gen-1786829320-vIEl4ET727Tp12C7EcE3"
+      }
+    },
+    {
+      "ordem": 993,
+      "titulo_en": "Ezra Blesses God",
+      "chars_texto": 392,
+      "usage": {
+        "prompt_tokens": 1066,
+        "completion_tokens": 1677,
+        "total_tokens": 2743,
+        "cost_usd": 0.003544125,
+        "generation_id": "gen-1786829320-5JrE8oUZADFYLEheLqqL"
+      }
+    },
+    {
+      "ordem": 996,
+      "titulo_en": "Fasting for Protection",
+      "chars_texto": 544,
+      "usage": {
+        "prompt_tokens": 1108,
+        "completion_tokens": 786,
+        "total_tokens": 1894,
+        "cost_usd": 0.00188925,
+        "generation_id": "gen-1786829326-HEWkeCaVYdp8SZKq92dz"
+      }
+    },
+    {
+      "ordem": 997,
+      "titulo_en": "Priests to Guard the Offerings",
+      "chars_texto": 1049,
+      "usage": {
+        "prompt_tokens": 1250,
+        "completion_tokens": 1441,
+        "total_tokens": 2691,
+        "cost_usd": 0.003170625,
+        "generation_id": "gen-1786829326-4sIGS7BTxlBvgt3Pptji"
+      }
+    },
+    {
+      "ordem": 998,
+      "titulo_en": "Arrival in Jerusalem",
+      "chars_texto": 977,
+      "usage": {
+        "prompt_tokens": 1228,
+        "completion_tokens": 754,
+        "total_tokens": 1982,
+        "cost_usd": 0.00187425,
+        "generation_id": "gen-1786829331-z5m6c6Z4kEPfQvFwYtta"
+      }
+    },
+    {
+      "ordem": 995,
+      "titulo_en": "Ezra Sends for the Levites",
+      "chars_texto": 1021,
+      "usage": {
+        "prompt_tokens": 1262,
+        "completion_tokens": 1614,
+        "total_tokens": 2876,
+        "cost_usd": 0.0034995,
+        "generation_id": "gen-1786829326-ttztWfWxPvEqHiKjHs4M"
+      }
+    },
+    {
+      "ordem": 1000,
+      "titulo_en": "Ezra's Prayer of Confession",
+      "chars_texto": 2594,
+      "usage": {
+        "prompt_tokens": 1626,
+        "completion_tokens": 543,
+        "total_tokens": 2169,
+        "cost_usd": 0.001627875,
+        "generation_id": "gen-1786829333-0hKlEaAiJGxQF0QBkMVs"
+      }
+    },
+    {
+      "ordem": 999,
+      "titulo_en": "Intermarriage with Neighboring Peoples",
+      "chars_texto": 878,
+      "usage": {
+        "prompt_tokens": 1191,
+        "completion_tokens": 1610,
+        "total_tokens": 2801,
+        "cost_usd": 0.003465375,
+        "generation_id": "gen-1786829331-DwE3mWgOQ4qa9zk1AAF5"
+      }
+    },
+    {
+      "ordem": 1003,
+      "titulo_en": "Those Guilty of Intermarriage",
+      "chars_texto": 1820,
+      "usage": {
+        "prompt_tokens": 1613,
+        "completion_tokens": 1034,
+        "total_tokens": 2647,
+        "cost_usd": 0.002543625,
+        "generation_id": "gen-1786829337-den7Iq9urAEQlFNHdyvJ"
+      }
+    },
+    {
+      "ordem": 1004,
+      "titulo_en": "News of Jerusalem's Wall",
+      "chars_texto": 663,
+      "usage": {
+        "prompt_tokens": 1144,
+        "completion_tokens": 1222,
+        "total_tokens": 2366,
+        "cost_usd": 0.00272025,
+        "generation_id": "gen-1786829338-Gpu1TToFF0fQsGNSUoR5"
+      }
+    },
+    {
+      "ordem": 1001,
+      "titulo_en": "Shecaniah Encourages Ezra",
+      "chars_texto": 941,
+      "usage": {
+        "prompt_tokens": 1206,
+        "completion_tokens": 1598,
+        "total_tokens": 2804,
+        "cost_usd": 0.0034485,
+        "generation_id": "gen-1786829336-bV3NUbckAsgv0q4dnIjb"
+      }
+    },
+    {
+      "ordem": 1002,
+      "titulo_en": "The People's Confession of Sin",
+      "chars_texto": 2141,
+      "usage": {
+        "prompt_tokens": 1538,
+        "completion_tokens": 1761,
+        "total_tokens": 3299,
+        "cost_usd": 0.003878625,
+        "generation_id": "gen-1786829337-yt6d7uNGrVSRyQGWBiws"
+      }
+    },
+    {
+      "ordem": 1005,
+      "titulo_en": "Nehemiah's Prayer",
+      "chars_texto": 1372,
+      "usage": {
+        "prompt_tokens": 1333,
+        "completion_tokens": 971,
+        "total_tokens": 2304,
+        "cost_usd": 0.0023205,
+        "generation_id": "gen-1786829343-knFoo26uBXR3vhn29C3J"
+      }
+    },
+    {
+      "ordem": 1006,
+      "titulo_en": "Nehemiah Sent to Jerusalem",
+      "chars_texto": 1786,
+      "usage": {
+        "prompt_tokens": 1446,
+        "completion_tokens": 1589,
+        "total_tokens": 3035,
+        "cost_usd": 0.003521625,
+        "generation_id": "gen-1786829345-2MMDYzCbYIW80dpmkrr7"
       }
     }
   ]

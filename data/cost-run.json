@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 500,
+  "done": 600,
   "pending_total": 2640,
-  "sample_cost_usd": 1.6528811249999993,
-  "avg_cost_usd": 0.0033057622499999984,
-  "estimate_remaining_usd": 7.074331214999996,
-  "estimate_full_run_usd": 8.727212339999996,
-  "elapsed_sec": 1162.643,
-  "throughput_per_sec": 0.4300546255385359,
-  "eta_sec": 4976.11204,
+  "sample_cost_usd": 1.9972380000000003,
+  "avg_cost_usd": 0.0033287300000000007,
+  "estimate_remaining_usd": 6.790609200000001,
+  "estimate_full_run_usd": 8.787847200000002,
+  "elapsed_sec": 1403.564,
+  "throughput_per_sec": 0.4274831785369245,
+  "eta_sec": 4772.1176000000005,
   "catalog_total": 2647,
   "items": [
     {
@@ -6010,6 +6010,1206 @@
         "total_tokens": 3006,
         "cost_usd": 0.00337425,
         "generation_id": "gen-1786828217-dymR6Mb8VtBpt9ATl0On"
+      }
+    },
+    {
+      "ordem": 508,
+      "titulo_en": "The Philistines Capture the Ark",
+      "chars_texto": 1774,
+      "usage": {
+        "prompt_tokens": 1470,
+        "completion_tokens": 1612,
+        "total_tokens": 3082,
+        "cost_usd": 0.00357375,
+        "generation_id": "gen-1786828232-9s9kUiQxnre90bq9bY1v"
+      }
+    },
+    {
+      "ordem": 510,
+      "titulo_en": "The Ark Afflicts the Philistines",
+      "chars_texto": 2109,
+      "usage": {
+        "prompt_tokens": 1552,
+        "completion_tokens": 1639,
+        "total_tokens": 3191,
+        "cost_usd": 0.003655125,
+        "generation_id": "gen-1786828232-BeK32PAbT3xyXtuAle9n"
+      }
+    },
+    {
+      "ordem": 509,
+      "titulo_en": "The Death of Eli",
+      "chars_texto": 1796,
+      "usage": {
+        "prompt_tokens": 1470,
+        "completion_tokens": 1656,
+        "total_tokens": 3126,
+        "cost_usd": 0.00365625,
+        "generation_id": "gen-1786828232-VfRclusNxl33TJpPcD3x"
+      }
+    },
+    {
+      "ordem": 511,
+      "titulo_en": "The Ark Returned to Israel",
+      "chars_texto": 4176,
+      "usage": {
+        "prompt_tokens": 2131,
+        "completion_tokens": 1725,
+        "total_tokens": 3856,
+        "cost_usd": 0.0040335,
+        "generation_id": "gen-1786828232-BFLhladMfBGB0zGcZx13"
+      }
+    },
+    {
+      "ordem": 507,
+      "titulo_en": "Samuel Shares the Vision with Eli",
+      "chars_texto": 865,
+      "usage": {
+        "prompt_tokens": 1199,
+        "completion_tokens": 1802,
+        "total_tokens": 3001,
+        "cost_usd": 0.003828375,
+        "generation_id": "gen-1786828232-6GYI0vEDCuqviG099iqS"
+      }
+    },
+    {
+      "ordem": 516,
+      "titulo_en": "Saul Chosen as King",
+      "chars_texto": 4650,
+      "usage": {
+        "prompt_tokens": 2221,
+        "completion_tokens": 771,
+        "total_tokens": 2992,
+        "cost_usd": 0.0022785,
+        "generation_id": "gen-1786828246-RvFH1GX681qcyeV8OKAQ"
+      }
+    },
+    {
+      "ordem": 513,
+      "titulo_en": "Israel Demands a King",
+      "chars_texto": 1205,
+      "usage": {
+        "prompt_tokens": 1287,
+        "completion_tokens": 1590,
+        "total_tokens": 2877,
+        "cost_usd": 0.003463875,
+        "generation_id": "gen-1786828244-8TEtD13KJOgdKwweTA1I"
+      }
+    },
+    {
+      "ordem": 514,
+      "titulo_en": "Samuel's Warning",
+      "chars_texto": 1112,
+      "usage": {
+        "prompt_tokens": 1261,
+        "completion_tokens": 1448,
+        "total_tokens": 2709,
+        "cost_usd": 0.003187875,
+        "generation_id": "gen-1786828246-pvQ4rZqp531gXO2N8E2f"
+      }
+    },
+    {
+      "ordem": 512,
+      "titulo_en": "Samuel Subdues the Philistines",
+      "chars_texto": 2266,
+      "usage": {
+        "prompt_tokens": 1580,
+        "completion_tokens": 1878,
+        "total_tokens": 3458,
+        "cost_usd": 0.00411375,
+        "generation_id": "gen-1786828244-SDcRdvqNBxBPhPMKcdZZ"
+      }
+    },
+    {
+      "ordem": 515,
+      "titulo_en": "God Grants the Request",
+      "chars_texto": 460,
+      "usage": {
+        "prompt_tokens": 1082,
+        "completion_tokens": 1419,
+        "total_tokens": 2501,
+        "cost_usd": 0.003066375,
+        "generation_id": "gen-1786828246-IZvcLizcI3J6SciSVZYR"
+      }
+    },
+    {
+      "ordem": 517,
+      "titulo_en": "Samuel Anoints Saul",
+      "chars_texto": 2551,
+      "usage": {
+        "prompt_tokens": 1652,
+        "completion_tokens": 1589,
+        "total_tokens": 3241,
+        "cost_usd": 0.003598875,
+        "generation_id": "gen-1786828253-ufQ5tEGryexMCTOqVIvK"
+      }
+    },
+    {
+      "ordem": 518,
+      "titulo_en": "Saul Proclaimed King",
+      "chars_texto": 1658,
+      "usage": {
+        "prompt_tokens": 1425,
+        "completion_tokens": 1306,
+        "total_tokens": 2731,
+        "cost_usd": 0.002983125,
+        "generation_id": "gen-1786828255-7jMRqNa2urzxVWA2G2db"
+      }
+    },
+    {
+      "ordem": 519,
+      "titulo_en": "Saul Defeats the Ammonites",
+      "chars_texto": 1900,
+      "usage": {
+        "prompt_tokens": 1503,
+        "completion_tokens": 1410,
+        "total_tokens": 2913,
+        "cost_usd": 0.003207375,
+        "generation_id": "gen-1786828256-L1dP4OWcu82S46W5M94D"
+      }
+    },
+    {
+      "ordem": 520,
+      "titulo_en": "Saul Confirmed as King",
+      "chars_texto": 516,
+      "usage": {
+        "prompt_tokens": 1103,
+        "completion_tokens": 1412,
+        "total_tokens": 2515,
+        "cost_usd": 0.003061125,
+        "generation_id": "gen-1786828257-fSfqFvV6oJcC53fv9bz5"
+      }
+    },
+    {
+      "ordem": 521,
+      "titulo_en": "Samuel's Farewell Address",
+      "chars_texto": 3928,
+      "usage": {
+        "prompt_tokens": 2076,
+        "completion_tokens": 1410,
+        "total_tokens": 3486,
+        "cost_usd": 0.00342225,
+        "generation_id": "gen-1786828257-J7i7aBRIJEuFospN76tz"
+      }
+    },
+    {
+      "ordem": 523,
+      "titulo_en": "Saul's Unlawful Sacrifice",
+      "chars_texto": 1257,
+      "usage": {
+        "prompt_tokens": 1303,
+        "completion_tokens": 516,
+        "total_tokens": 1819,
+        "cost_usd": 0.001456125,
+        "generation_id": "gen-1786828266-N5ZNcidriCX8FpBJMVsX"
+      }
+    },
+    {
+      "ordem": 522,
+      "titulo_en": "War with the Philistines",
+      "chars_texto": 1251,
+      "usage": {
+        "prompt_tokens": 1308,
+        "completion_tokens": 1617,
+        "total_tokens": 2925,
+        "cost_usd": 0.003522375,
+        "generation_id": "gen-1786828265-8VhtJc4b348msFcpoLEk"
+      }
+    },
+    {
+      "ordem": 524,
+      "titulo_en": "Israel without Weapons",
+      "chars_texto": 1065,
+      "usage": {
+        "prompt_tokens": 1271,
+        "completion_tokens": 1305,
+        "total_tokens": 2576,
+        "cost_usd": 0.0029235,
+        "generation_id": "gen-1786828267-yA4U1w0IXyMBj2j8NO2d"
+      }
+    },
+    {
+      "ordem": 525,
+      "titulo_en": "Jonathan's Victory over the Philistines",
+      "chars_texto": 3418,
+      "usage": {
+        "prompt_tokens": 1938,
+        "completion_tokens": 1508,
+        "total_tokens": 3446,
+        "cost_usd": 0.00355425,
+        "generation_id": "gen-1786828267-3jRHQkbszOy4V2OVPEhQ"
+      }
+    },
+    {
+      "ordem": 526,
+      "titulo_en": "Jonathan Eats the Honey",
+      "chars_texto": 2116,
+      "usage": {
+        "prompt_tokens": 1557,
+        "completion_tokens": 1564,
+        "total_tokens": 3121,
+        "cost_usd": 0.003516375,
+        "generation_id": "gen-1786828268-1vOMzFu7vubcBbeQhtTG"
+      }
+    },
+    {
+      "ordem": 527,
+      "titulo_en": "The People Save Jonathan",
+      "chars_texto": 1567,
+      "usage": {
+        "prompt_tokens": 1405,
+        "completion_tokens": 1650,
+        "total_tokens": 3055,
+        "cost_usd": 0.003620625,
+        "generation_id": "gen-1786828271-PIo1cufhAoPuCPEiq5pu"
+      }
+    },
+    {
+      "ordem": 528,
+      "titulo_en": "Saul's Victories",
+      "chars_texto": 799,
+      "usage": {
+        "prompt_tokens": 1200,
+        "completion_tokens": 1673,
+        "total_tokens": 2873,
+        "cost_usd": 0.003586875,
+        "generation_id": "gen-1786828276-Xy97xNmiWQlozXpA3rbP"
+      }
+    },
+    {
+      "ordem": 531,
+      "titulo_en": "Saul's Confession",
+      "chars_texto": 933,
+      "usage": {
+        "prompt_tokens": 1225,
+        "completion_tokens": 716,
+        "total_tokens": 1941,
+        "cost_usd": 0.001801875,
+        "generation_id": "gen-1786828281-v0QnB7aK0gz36hHrnOiG"
+      }
+    },
+    {
+      "ordem": 529,
+      "titulo_en": "Saul's Disobedience",
+      "chars_texto": 1356,
+      "usage": {
+        "prompt_tokens": 1339,
+        "completion_tokens": 1534,
+        "total_tokens": 2873,
+        "cost_usd": 0.003378375,
+        "generation_id": "gen-1786828277-IJQBPbYd3PwbpucP8akN"
+      }
+    },
+    {
+      "ordem": 530,
+      "titulo_en": "Samuel Denounces Saul",
+      "chars_texto": 2165,
+      "usage": {
+        "prompt_tokens": 1561,
+        "completion_tokens": 1585,
+        "total_tokens": 3146,
+        "cost_usd": 0.00355725,
+        "generation_id": "gen-1786828279-y941VDulNEMyniOCDR3P"
+      }
+    },
+    {
+      "ordem": 532,
+      "titulo_en": "Samuel and Agag",
+      "chars_texto": 559,
+      "usage": {
+        "prompt_tokens": 1114,
+        "completion_tokens": 1506,
+        "total_tokens": 2620,
+        "cost_usd": 0.0032415,
+        "generation_id": "gen-1786828283-TawNPcIHr3emGVB7rMea"
+      }
+    },
+    {
+      "ordem": 535,
+      "titulo_en": "Goliath's Challenge",
+      "chars_texto": 1386,
+      "usage": {
+        "prompt_tokens": 1348,
+        "completion_tokens": 1297,
+        "total_tokens": 2645,
+        "cost_usd": 0.002937375,
+        "generation_id": "gen-1786828288-RIrjJee6svnB0jDduuKT"
+      }
+    },
+    {
+      "ordem": 533,
+      "titulo_en": "Samuel Anoints David",
+      "chars_texto": 2112,
+      "usage": {
+        "prompt_tokens": 1578,
+        "completion_tokens": 1276,
+        "total_tokens": 2854,
+        "cost_usd": 0.00298425,
+        "generation_id": "gen-1786828288-TxdI2R9W1ejePvBV6CTE"
+      }
+    },
+    {
+      "ordem": 534,
+      "titulo_en": "David Serves Saul",
+      "chars_texto": 1401,
+      "usage": {
+        "prompt_tokens": 1377,
+        "completion_tokens": 1700,
+        "total_tokens": 3077,
+        "cost_usd": 0.003703875,
+        "generation_id": "gen-1786828288-z3Vd4SW8y9c9kuK9KmFT"
+      }
+    },
+    {
+      "ordem": 536,
+      "titulo_en": "David Accepts the Challenge",
+      "chars_texto": 3813,
+      "usage": {
+        "prompt_tokens": 2042,
+        "completion_tokens": 1737,
+        "total_tokens": 3779,
+        "cost_usd": 0.004022625,
+        "generation_id": "gen-1786828291-0o62jsxBRvsU2wCoTaXV"
+      }
+    },
+    {
+      "ordem": 538,
+      "titulo_en": "Jonathan Befriends David",
+      "chars_texto": 444,
+      "usage": {
+        "prompt_tokens": 1096,
+        "completion_tokens": 1283,
+        "total_tokens": 2379,
+        "cost_usd": 0.002816625,
+        "generation_id": "gen-1786828298-Htkrpax4kFF2U7J7P6G2"
+      }
+    },
+    {
+      "ordem": 537,
+      "titulo_en": "David Slays Goliath",
+      "chars_texto": 3199,
+      "usage": {
+        "prompt_tokens": 1921,
+        "completion_tokens": 1584,
+        "total_tokens": 3505,
+        "cost_usd": 0.003690375,
+        "generation_id": "gen-1786828295-XvvVSVcEEXs60HTEpPIH"
+      }
+    },
+    {
+      "ordem": 541,
+      "titulo_en": "Saul Tries to Kill David",
+      "chars_texto": 3557,
+      "usage": {
+        "prompt_tokens": 1992,
+        "completion_tokens": 491,
+        "total_tokens": 2483,
+        "cost_usd": 0.001667625,
+        "generation_id": "gen-1786828304-6qVFOyC1fB3cVJkoho6n"
+      }
+    },
+    {
+      "ordem": 539,
+      "titulo_en": "Saul Envies David",
+      "chars_texto": 1577,
+      "usage": {
+        "prompt_tokens": 1395,
+        "completion_tokens": 1703,
+        "total_tokens": 3098,
+        "cost_usd": 0.00371625,
+        "generation_id": "gen-1786828299-CPkEK06McyVz1nzMrMP7"
+      }
+    },
+    {
+      "ordem": 540,
+      "titulo_en": "David Marries Michal",
+      "chars_texto": 2210,
+      "usage": {
+        "prompt_tokens": 1590,
+        "completion_tokens": 1496,
+        "total_tokens": 3086,
+        "cost_usd": 0.00340125,
+        "generation_id": "gen-1786828302-Oe0jgq3YD6cx4gJAYwtN"
+      }
+    },
+    {
+      "ordem": 542,
+      "titulo_en": "Jonathan Helps David",
+      "chars_texto": 1656,
+      "usage": {
+        "prompt_tokens": 1412,
+        "completion_tokens": 1566,
+        "total_tokens": 2978,
+        "cost_usd": 0.00346575,
+        "generation_id": "gen-1786828307-JKMspOTkIDhLcCkzQ8FP"
+      }
+    },
+    {
+      "ordem": 543,
+      "titulo_en": "Jonathan and David Renew Their Covenant",
+      "chars_texto": 2808,
+      "usage": {
+        "prompt_tokens": 1794,
+        "completion_tokens": 1657,
+        "total_tokens": 3451,
+        "cost_usd": 0.003779625,
+        "generation_id": "gen-1786828308-L66WLzM1ZcdfpNeUJBQ8"
+      }
+    },
+    {
+      "ordem": 544,
+      "titulo_en": "Saul Seeks to Kill Jonathan",
+      "chars_texto": 1895,
+      "usage": {
+        "prompt_tokens": 1507,
+        "completion_tokens": 1757,
+        "total_tokens": 3264,
+        "cost_usd": 0.0038595,
+        "generation_id": "gen-1786828309-zc5BzaqoHFgOMJfQoxYw"
+      }
+    },
+    {
+      "ordem": 545,
+      "titulo_en": "David Takes the Consecrated Bread",
+      "chars_texto": 1206,
+      "usage": {
+        "prompt_tokens": 1294,
+        "completion_tokens": 1525,
+        "total_tokens": 2819,
+        "cost_usd": 0.003344625,
+        "generation_id": "gen-1786828312-DxZFStZhhhGghrCYUoh5"
+      }
+    },
+    {
+      "ordem": 546,
+      "titulo_en": "David Flees to Gath",
+      "chars_texto": 1254,
+      "usage": {
+        "prompt_tokens": 1310,
+        "completion_tokens": 1420,
+        "total_tokens": 2730,
+        "cost_usd": 0.00315375,
+        "generation_id": "gen-1786828314-Yicxq4w97e7630Qpt9NQ"
+      }
+    },
+    {
+      "ordem": 547,
+      "titulo_en": "David Flees to Adullah and Mizpeh",
+      "chars_texto": 787,
+      "usage": {
+        "prompt_tokens": 1186,
+        "completion_tokens": 1641,
+        "total_tokens": 2827,
+        "cost_usd": 0.003521625,
+        "generation_id": "gen-1786828319-tNCXeDnNkAF0vob9X4Hm"
+      }
+    },
+    {
+      "ordem": 548,
+      "titulo_en": "Saul Slays the Priests of Nob",
+      "chars_texto": 3074,
+      "usage": {
+        "prompt_tokens": 1835,
+        "completion_tokens": 1569,
+        "total_tokens": 3404,
+        "cost_usd": 0.00363,
+        "generation_id": "gen-1786828321-AFePTfH7ZeDWfBEcgUEw"
+      }
+    },
+    {
+      "ordem": 549,
+      "titulo_en": "David Delivers Keilah",
+      "chars_texto": 854,
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 1689,
+        "total_tokens": 2901,
+        "cost_usd": 0.003621375,
+        "generation_id": "gen-1786828321-IqlfhnEy98qwAc2BsMbO"
+      }
+    },
+    {
+      "ordem": 550,
+      "titulo_en": "Saul Pursues David",
+      "chars_texto": 3381,
+      "usage": {
+        "prompt_tokens": 1937,
+        "completion_tokens": 1689,
+        "total_tokens": 3626,
+        "cost_usd": 0.00389325,
+        "generation_id": "gen-1786828323-eqtRDDjzw4GcKa6Hxip0"
+      }
+    },
+    {
+      "ordem": 551,
+      "titulo_en": "David Spares Saul",
+      "chars_texto": 2409,
+      "usage": {
+        "prompt_tokens": 1649,
+        "completion_tokens": 1612,
+        "total_tokens": 3261,
+        "cost_usd": 0.003640875,
+        "generation_id": "gen-1786828325-kGLlKo59hbnHKmw1mLpO"
+      }
+    },
+    {
+      "ordem": 552,
+      "titulo_en": "David's Oath to Saul",
+      "chars_texto": 828,
+      "usage": {
+        "prompt_tokens": 1194,
+        "completion_tokens": 1182,
+        "total_tokens": 2376,
+        "cost_usd": 0.002664,
+        "generation_id": "gen-1786828330-jXwUMYJitHd6SOCCaO5p"
+      }
+    },
+    {
+      "ordem": 553,
+      "titulo_en": "The Death of Samuel",
+      "chars_texto": 164,
+      "usage": {
+        "prompt_tokens": 1009,
+        "completion_tokens": 1368,
+        "total_tokens": 2377,
+        "cost_usd": 0.002943375,
+        "generation_id": "gen-1786828332-faKaHw22Hvhmk2DEbw7d"
+      }
+    },
+    {
+      "ordem": 554,
+      "titulo_en": "Nabal Refuses David",
+      "chars_texto": 2521,
+      "usage": {
+        "prompt_tokens": 1668,
+        "completion_tokens": 1442,
+        "total_tokens": 3110,
+        "cost_usd": 0.00332925,
+        "generation_id": "gen-1786828333-x82FXyCyRvzQ3PhMmS8V"
+      }
+    },
+    {
+      "ordem": 555,
+      "titulo_en": "Abigail Intercedes for Nabal",
+      "chars_texto": 3607,
+      "usage": {
+        "prompt_tokens": 1954,
+        "completion_tokens": 1748,
+        "total_tokens": 3702,
+        "cost_usd": 0.00401025,
+        "generation_id": "gen-1786828335-gUxdbzvFBYkPQ4HqbHB8"
+      }
+    },
+    {
+      "ordem": 556,
+      "titulo_en": "David Marries Abigail",
+      "chars_texto": 972,
+      "usage": {
+        "prompt_tokens": 1241,
+        "completion_tokens": 1511,
+        "total_tokens": 2752,
+        "cost_usd": 0.0032985,
+        "generation_id": "gen-1786828337-Zt3OxcI62GBB21Vu5f3i"
+      }
+    },
+    {
+      "ordem": 557,
+      "titulo_en": "David Again Spares Saul",
+      "chars_texto": 4274,
+      "usage": {
+        "prompt_tokens": 2180,
+        "completion_tokens": 1622,
+        "total_tokens": 3802,
+        "cost_usd": 0.00385875,
+        "generation_id": "gen-1786828339-QXlFrNZTQuNNjNdLR63v"
+      }
+    },
+    {
+      "ordem": 558,
+      "titulo_en": "David and the Philistines",
+      "chars_texto": 2000,
+      "usage": {
+        "prompt_tokens": 1538,
+        "completion_tokens": 1641,
+        "total_tokens": 3179,
+        "cost_usd": 0.003653625,
+        "generation_id": "gen-1786828342-fC3vumU44hoJGI8DpBuU"
+      }
+    },
+    {
+      "ordem": 559,
+      "titulo_en": "The Philistines Gather against Israel",
+      "chars_texto": 862,
+      "usage": {
+        "prompt_tokens": 1205,
+        "completion_tokens": 1750,
+        "total_tokens": 2955,
+        "cost_usd": 0.003733125,
+        "generation_id": "gen-1786828344-r0iPRr7GNhHnR8xvu8hF"
+      }
+    },
+    {
+      "ordem": 560,
+      "titulo_en": "Saul and the Medium of Endor",
+      "chars_texto": 3161,
+      "usage": {
+        "prompt_tokens": 1835,
+        "completion_tokens": 1528,
+        "total_tokens": 3363,
+        "cost_usd": 0.003553125,
+        "generation_id": "gen-1786828348-eR9GTfNwX9U1yRGbEORS"
+      }
+    },
+    {
+      "ordem": 561,
+      "titulo_en": "The Philistines Reject David",
+      "chars_texto": 2109,
+      "usage": {
+        "prompt_tokens": 1519,
+        "completion_tokens": 1519,
+        "total_tokens": 3038,
+        "cost_usd": 0.00341775,
+        "generation_id": "gen-1786828349-BBU7e8qB2WPZSEfxo8Nl"
+      }
+    },
+    {
+      "ordem": 562,
+      "titulo_en": "David Destroys the Amalekites at Ziklag",
+      "chars_texto": 4468,
+      "usage": {
+        "prompt_tokens": 2279,
+        "completion_tokens": 2048,
+        "total_tokens": 4327,
+        "cost_usd": 0.004694625,
+        "generation_id": "gen-1786828351-7bVmWlMaX5NC99QvHGOv"
+      }
+    },
+    {
+      "ordem": 564,
+      "titulo_en": "Saul's Death Reported to David",
+      "chars_texto": 2017,
+      "usage": {
+        "prompt_tokens": 1546,
+        "completion_tokens": 1643,
+        "total_tokens": 3189,
+        "cost_usd": 0.003660375,
+        "generation_id": "gen-1786828357-o6dNTPHKgDG1SpVPrtUt"
+      }
+    },
+    {
+      "ordem": 563,
+      "titulo_en": "Saul's Overthrow and Death",
+      "chars_texto": 1909,
+      "usage": {
+        "prompt_tokens": 1494,
+        "completion_tokens": 1746,
+        "total_tokens": 3240,
+        "cost_usd": 0.003834,
+        "generation_id": "gen-1786828356-Ldf4QxEKjAsJ2PKff28w"
+      }
+    },
+    {
+      "ordem": 565,
+      "titulo_en": "David's Song for Saul and Jonathan",
+      "chars_texto": 1326,
+      "usage": {
+        "prompt_tokens": 1346,
+        "completion_tokens": 1534,
+        "total_tokens": 2880,
+        "cost_usd": 0.003381,
+        "generation_id": "gen-1786828360-ohtVc0I5u05ybmNts0TS"
+      }
+    },
+    {
+      "ordem": 566,
+      "titulo_en": "David Anointed King of Judah",
+      "chars_texto": 1064,
+      "usage": {
+        "prompt_tokens": 1268,
+        "completion_tokens": 1473,
+        "total_tokens": 2741,
+        "cost_usd": 0.003237375,
+        "generation_id": "gen-1786828360-5idoyD18jgwrvMKH9An0"
+      }
+    },
+    {
+      "ordem": 570,
+      "titulo_en": "Abner Joins David",
+      "chars_texto": 2357,
+      "usage": {
+        "prompt_tokens": 1640,
+        "completion_tokens": 786,
+        "total_tokens": 2426,
+        "cost_usd": 0.00208875,
+        "generation_id": "gen-1786828371-vBfYiCtz42JBLnXZ04cI"
+      }
+    },
+    {
+      "ordem": 567,
+      "titulo_en": "Ish-bosheth Made King of Israel",
+      "chars_texto": 457,
+      "usage": {
+        "prompt_tokens": 1098,
+        "completion_tokens": 1698,
+        "total_tokens": 2796,
+        "cost_usd": 0.0035955,
+        "generation_id": "gen-1786828365-D4Br0EnCaV7DFv0W3qEI"
+      }
+    },
+    {
+      "ordem": 568,
+      "titulo_en": "Civil War",
+      "chars_texto": 3121,
+      "usage": {
+        "prompt_tokens": 1869,
+        "completion_tokens": 1552,
+        "total_tokens": 3421,
+        "cost_usd": 0.003610875,
+        "generation_id": "gen-1786828368-90ngn6mPGdy8gosnLRKw"
+      }
+    },
+    {
+      "ordem": 569,
+      "titulo_en": "David's Sons in Hebron",
+      "chars_texto": 403,
+      "usage": {
+        "prompt_tokens": 1096,
+        "completion_tokens": 1527,
+        "total_tokens": 2623,
+        "cost_usd": 0.003274125,
+        "generation_id": "gen-1786828370-sSa1BCMrqbwImsCpl7kH"
+      }
+    },
+    {
+      "ordem": 571,
+      "titulo_en": "Joab Murders Abner",
+      "chars_texto": 1516,
+      "usage": {
+        "prompt_tokens": 1398,
+        "completion_tokens": 1491,
+        "total_tokens": 2889,
+        "cost_usd": 0.003319875,
+        "generation_id": "gen-1786828372-6WtyeFy2Af2YTRHF69XJ"
+      }
+    },
+    {
+      "ordem": 572,
+      "titulo_en": "David Mourns Abner",
+      "chars_texto": 1275,
+      "usage": {
+        "prompt_tokens": 1322,
+        "completion_tokens": 1670,
+        "total_tokens": 2992,
+        "cost_usd": 0.003627,
+        "generation_id": "gen-1786828377-gQxTmnLnOLsswSJqKSu9"
+      }
+    },
+    {
+      "ordem": 573,
+      "titulo_en": "The Murder of Ish-bosheth",
+      "chars_texto": 2248,
+      "usage": {
+        "prompt_tokens": 1604,
+        "completion_tokens": 1708,
+        "total_tokens": 3312,
+        "cost_usd": 0.003804,
+        "generation_id": "gen-1786828377-dfqNGZ3j5k7SmqouVa2n"
+      }
+    },
+    {
+      "ordem": 574,
+      "titulo_en": "David Anointed of All Israel",
+      "chars_texto": 736,
+      "usage": {
+        "prompt_tokens": 1159,
+        "completion_tokens": 1401,
+        "total_tokens": 2560,
+        "cost_usd": 0.0030615,
+        "generation_id": "gen-1786828380-gGThsDL81lFnyNUDcyPi"
+      }
+    },
+    {
+      "ordem": 575,
+      "titulo_en": "David Conquers Jerusalem",
+      "chars_texto": 1065,
+      "usage": {
+        "prompt_tokens": 1266,
+        "completion_tokens": 1561,
+        "total_tokens": 2827,
+        "cost_usd": 0.003401625,
+        "generation_id": "gen-1786828380-RVHoMAtbK3tEMWD9Mpkj"
+      }
+    },
+    {
+      "ordem": 576,
+      "titulo_en": "David's Sons in Jerusalem",
+      "chars_texto": 299,
+      "usage": {
+        "prompt_tokens": 1059,
+        "completion_tokens": 1547,
+        "total_tokens": 2606,
+        "cost_usd": 0.00329775,
+        "generation_id": "gen-1786828386-R3FZKI50c6k1ZWgAZHJe"
+      }
+    },
+    {
+      "ordem": 577,
+      "titulo_en": "David's victories over the Philistines",
+      "chars_texto": 1172,
+      "usage": {
+        "prompt_tokens": 1303,
+        "completion_tokens": 1566,
+        "total_tokens": 2869,
+        "cost_usd": 0.003424875,
+        "generation_id": "gen-1786828389-D1pm1kDAKvFK0X8GSDPC"
+      }
+    },
+    {
+      "ordem": 578,
+      "titulo_en": "David Fetches the Ark",
+      "chars_texto": 580,
+      "usage": {
+        "prompt_tokens": 1138,
+        "completion_tokens": 1569,
+        "total_tokens": 2707,
+        "cost_usd": 0.003368625,
+        "generation_id": "gen-1786828390-AGvTlB5Fk8VsTmdnvEVS"
+      }
+    },
+    {
+      "ordem": 579,
+      "titulo_en": "Uzzah Touches the Ark",
+      "chars_texto": 900,
+      "usage": {
+        "prompt_tokens": 1242,
+        "completion_tokens": 1559,
+        "total_tokens": 2801,
+        "cost_usd": 0.003388875,
+        "generation_id": "gen-1786828391-SCQgdh5TOzsQl9maSt3q"
+      }
+    },
+    {
+      "ordem": 580,
+      "titulo_en": "The Ark Brought to Jerusalem",
+      "chars_texto": 542,
+      "usage": {
+        "prompt_tokens": 1130,
+        "completion_tokens": 1586,
+        "total_tokens": 2716,
+        "cost_usd": 0.0033975,
+        "generation_id": "gen-1786828392-fbBgMMh6oxzbLFt88ua7"
+      }
+    },
+    {
+      "ordem": 581,
+      "titulo_en": "Michal's Contempt for David",
+      "chars_texto": 1385,
+      "usage": {
+        "prompt_tokens": 1358,
+        "completion_tokens": 1254,
+        "total_tokens": 2612,
+        "cost_usd": 0.0028605,
+        "generation_id": "gen-1786828398-olLy2p3CLvBnxh5LTiT0"
+      }
+    },
+    {
+      "ordem": 582,
+      "titulo_en": "David Plans a Temple",
+      "chars_texto": 376,
+      "usage": {
+        "prompt_tokens": 1060,
+        "completion_tokens": 1273,
+        "total_tokens": 2333,
+        "cost_usd": 0.002784375,
+        "generation_id": "gen-1786828401-op6Xa2O31IjyDOaNwA5L"
+      }
+    },
+    {
+      "ordem": 584,
+      "titulo_en": "David's Prayer of Thanksgiving",
+      "chars_texto": 1944,
+      "usage": {
+        "prompt_tokens": 1507,
+        "completion_tokens": 1339,
+        "total_tokens": 2846,
+        "cost_usd": 0.00307575,
+        "generation_id": "gen-1786828402-wtfZ7lXjo9CDBSGkXUth"
+      }
+    },
+    {
+      "ordem": 583,
+      "titulo_en": "God's Covenant with David",
+      "chars_texto": 2063,
+      "usage": {
+        "prompt_tokens": 1508,
+        "completion_tokens": 1665,
+        "total_tokens": 3173,
+        "cost_usd": 0.003687375,
+        "generation_id": "gen-1786828401-VyInDTwsIePeqrY4zgUc"
+      }
+    },
+    {
+      "ordem": 585,
+      "titulo_en": "David's Triumphs",
+      "chars_texto": 2369,
+      "usage": {
+        "prompt_tokens": 1670,
+        "completion_tokens": 1767,
+        "total_tokens": 3437,
+        "cost_usd": 0.003939375,
+        "generation_id": "gen-1786828403-df8iP1RVbqiS1gfQOugu"
+      }
+    },
+    {
+      "ordem": 587,
+      "titulo_en": "David's Messengers Disgraced",
+      "chars_texto": 1441,
+      "usage": {
+        "prompt_tokens": 1376,
+        "completion_tokens": 1484,
+        "total_tokens": 2860,
+        "cost_usd": 0.0032985,
+        "generation_id": "gen-1786828410-QTY8jDYaDbBVQ0FjPc4n"
+      }
+    },
+    {
+      "ordem": 588,
+      "titulo_en": "David Defeats Ammon and Aram",
+      "chars_texto": 1729,
+      "usage": {
+        "prompt_tokens": 1438,
+        "completion_tokens": 1446,
+        "total_tokens": 2884,
+        "cost_usd": 0.0032505,
+        "generation_id": "gen-1786828411-hvQLjSPFENHzpZ9mNVxk"
+      }
+    },
+    {
+      "ordem": 586,
+      "titulo_en": "David and Mephibosheth",
+      "chars_texto": 2044,
+      "usage": {
+        "prompt_tokens": 1563,
+        "completion_tokens": 1622,
+        "total_tokens": 3185,
+        "cost_usd": 0.003627375,
+        "generation_id": "gen-1786828408-lTkbchMvzqUPEwOu5lxs"
+      }
+    },
+    {
+      "ordem": 589,
+      "titulo_en": "David and Bethsheba",
+      "chars_texto": 1889,
+      "usage": {
+        "prompt_tokens": 1527,
+        "completion_tokens": 1858,
+        "total_tokens": 3385,
+        "cost_usd": 0.004056375,
+        "generation_id": "gen-1786828413-auPXAiz7kgtvdF0x1QB0"
+      }
+    },
+    {
+      "ordem": 590,
+      "titulo_en": "David Arranges Uriah's Death",
+      "chars_texto": 1714,
+      "usage": {
+        "prompt_tokens": 1447,
+        "completion_tokens": 1574,
+        "total_tokens": 3021,
+        "cost_usd": 0.003493875,
+        "generation_id": "gen-1786828416-9Y5buI3EnitDUxVgxhXe"
+      }
+    },
+    {
+      "ordem": 594,
+      "titulo_en": "The Birth of Solomon",
+      "chars_texto": 249,
+      "usage": {
+        "prompt_tokens": 1042,
+        "completion_tokens": 479,
+        "total_tokens": 1521,
+        "cost_usd": 0.001288875,
+        "generation_id": "gen-1786828427-akPFnTwMIl7Q3Fza8u6g"
+      }
+    },
+    {
+      "ordem": 591,
+      "titulo_en": "David Marries Bathsheba",
+      "chars_texto": 270,
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 1740,
+        "total_tokens": 2781,
+        "cost_usd": 0.003652875,
+        "generation_id": "gen-1786828420-altvyVFJoQ8UMPzj5X7e"
+      }
+    },
+    {
+      "ordem": 592,
+      "titulo_en": "Nathan Rebukes David",
+      "chars_texto": 1930,
+      "usage": {
+        "prompt_tokens": 1494,
+        "completion_tokens": 1515,
+        "total_tokens": 3009,
+        "cost_usd": 0.003400875,
+        "generation_id": "gen-1786828422-WuZmN56vlHla9DGCBw0a"
+      }
+    },
+    {
+      "ordem": 593,
+      "titulo_en": "David's Loss and Repentance",
+      "chars_texto": 1736,
+      "usage": {
+        "prompt_tokens": 1473,
+        "completion_tokens": 1640,
+        "total_tokens": 3113,
+        "cost_usd": 0.003627375,
+        "generation_id": "gen-1786828423-f9uVsuQdAFLqiGhYCbSS"
+      }
+    },
+    {
+      "ordem": 595,
+      "titulo_en": "The Capture of Rabbah",
+      "chars_texto": 843,
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 1566,
+        "total_tokens": 2778,
+        "cost_usd": 0.00339075,
+        "generation_id": "gen-1786828428-wyRzk57urYIfRQ9hvEdL"
+      }
+    },
+    {
+      "ordem": 597,
+      "titulo_en": "Absalom's Revenge on Amnon",
+      "chars_texto": 1806,
+      "usage": {
+        "prompt_tokens": 1479,
+        "completion_tokens": 1787,
+        "total_tokens": 3266,
+        "cost_usd": 0.00390525,
+        "generation_id": "gen-1786828432-646se0Jt8wIyB0faEp4T"
+      }
+    },
+    {
+      "ordem": 596,
+      "titulo_en": "The Rape of Tamar",
+      "chars_texto": 3382,
+      "usage": {
+        "prompt_tokens": 1933,
+        "completion_tokens": 1759,
+        "total_tokens": 3692,
+        "cost_usd": 0.004023,
+        "generation_id": "gen-1786828432-SstOzJrcEYiZYmzLL6zH"
+      }
+    },
+    {
+      "ordem": 598,
+      "titulo_en": "Absalom Flees to Geshur",
+      "chars_texto": 730,
+      "usage": {
+        "prompt_tokens": 1174,
+        "completion_tokens": 1795,
+        "total_tokens": 2969,
+        "cost_usd": 0.003805875,
+        "generation_id": "gen-1786828434-1SYvmjjDcgWqb3soRUrh"
+      }
+    },
+    {
+      "ordem": 600,
+      "titulo_en": "Absalom Reconciled to David",
+      "chars_texto": 942,
+      "usage": {
+        "prompt_tokens": 1248,
+        "completion_tokens": 1399,
+        "total_tokens": 2647,
+        "cost_usd": 0.003091125,
+        "generation_id": "gen-1786828439-tRjAsSMGW82Hvr141uKl"
+      }
+    },
+    {
+      "ordem": 599,
+      "titulo_en": "Joab Brings Absalom to Jerusalem",
+      "chars_texto": 4336,
+      "usage": {
+        "prompt_tokens": 2186,
+        "completion_tokens": 1884,
+        "total_tokens": 4070,
+        "cost_usd": 0.00435225,
+        "generation_id": "gen-1786828436-Q9dNdD8FjOa9pgqD6ezs"
+      }
+    },
+    {
+      "ordem": 601,
+      "titulo_en": "The Rebellion of Absalom",
+      "chars_texto": 26363,
+      "usage": {
+        "prompt_tokens": 8556,
+        "completion_tokens": 1682,
+        "total_tokens": 10238,
+        "cost_usd": 0.00636225,
+        "generation_id": "gen-1786828445-YFhg9iD769zBg2bFvabs"
+      }
+    },
+    {
+      "ordem": 602,
+      "titulo_en": "The Rebellion of Sheba",
+      "chars_texto": 4190,
+      "usage": {
+        "prompt_tokens": 2187,
+        "completion_tokens": 1964,
+        "total_tokens": 4151,
+        "cost_usd": 0.004502625,
+        "generation_id": "gen-1786828445-pWkgxb37A7B1B0CXLB5u"
+      }
+    },
+    {
+      "ordem": 603,
+      "titulo_en": "David Avenges the Gibeonites",
+      "chars_texto": 2634,
+      "usage": {
+        "prompt_tokens": 1733,
+        "completion_tokens": 1779,
+        "total_tokens": 3512,
+        "cost_usd": 0.0039855,
+        "generation_id": "gen-1786828448-NdwFnaA0QObuOlaO9cgq"
+      }
+    },
+    {
+      "ordem": 604,
+      "titulo_en": "Four Battles against the Philistines",
+      "chars_texto": 1226,
+      "usage": {
+        "prompt_tokens": 1314,
+        "completion_tokens": 1733,
+        "total_tokens": 3047,
+        "cost_usd": 0.003742125,
+        "generation_id": "gen-1786828449-lUF0gPxUXPi6daWnXv7q"
+      }
+    },
+    {
+      "ordem": 605,
+      "titulo_en": "David's Song of Deliverance",
+      "chars_texto": 4475,
+      "usage": {
+        "prompt_tokens": 2334,
+        "completion_tokens": 1512,
+        "total_tokens": 3846,
+        "cost_usd": 0.00371025,
+        "generation_id": "gen-1786828449-ZqDe8FFDF1leqJSddRgE"
+      }
+    },
+    {
+      "ordem": 606,
+      "titulo_en": "David's Last Song",
+      "chars_texto": 941,
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 1556,
+        "total_tokens": 2768,
+        "cost_usd": 0.003372,
+        "generation_id": "gen-1786828458-DU1gYUlL9AYHQmFEnAXV"
       }
     }
   ]

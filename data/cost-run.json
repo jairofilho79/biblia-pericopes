@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 2200,
+  "done": 2300,
   "pending_total": 2640,
-  "sample_cost_usd": 7.113209999999996,
-  "avg_cost_usd": 0.003233277272727271,
-  "estimate_remaining_usd": 1.4226419999999993,
-  "estimate_full_run_usd": 8.535851999999995,
-  "elapsed_sec": 4991.858,
-  "throughput_per_sec": 0.4407176646451081,
-  "eta_sec": 998.3716000000001,
+  "sample_cost_usd": 7.422124124999997,
+  "avg_cost_usd": 0.0032270104891304334,
+  "estimate_remaining_usd": 1.0971835663043474,
+  "estimate_full_run_usd": 8.519307691304345,
+  "elapsed_sec": 5217.554,
+  "throughput_per_sec": 0.44081958710920865,
+  "eta_sec": 771.2905913043478,
   "catalog_total": 2647,
   "items": [
     {
@@ -26410,6 +26410,1206 @@
         "total_tokens": 2460,
         "cost_usd": 0.002796,
         "generation_id": "gen-1786832049-cSQvjbuidRTWVG7D4iIV"
+      }
+    },
+    {
+      "ordem": 2209,
+      "titulo_en": "Justification by Faith",
+      "chars_texto": 1570,
+      "usage": {
+        "prompt_tokens": 1379,
+        "completion_tokens": 1029,
+        "total_tokens": 2408,
+        "cost_usd": 0.0024465,
+        "generation_id": "gen-1786832062-EMVHToRj2GRIu5PQ9xNo"
+      }
+    },
+    {
+      "ordem": 2208,
+      "titulo_en": "Righteousness through Faith in Christ",
+      "chars_texto": 1275,
+      "usage": {
+        "prompt_tokens": 1306,
+        "completion_tokens": 1344,
+        "total_tokens": 2650,
+        "cost_usd": 0.00300975,
+        "generation_id": "gen-1786832062-ydJHqDQjVdXLbqTEvKjc"
+      }
+    },
+    {
+      "ordem": 2210,
+      "titulo_en": "Abraham Receives the Promise",
+      "chars_texto": 1657,
+      "usage": {
+        "prompt_tokens": 1410,
+        "completion_tokens": 1495,
+        "total_tokens": 2905,
+        "cost_usd": 0.003331875,
+        "generation_id": "gen-1786832062-ugUxmxTdpLErl5xRXlVu"
+      }
+    },
+    {
+      "ordem": 2207,
+      "titulo_en": "There is No One Righteous",
+      "chars_texto": 969,
+      "usage": {
+        "prompt_tokens": 1234,
+        "completion_tokens": 1494,
+        "total_tokens": 2728,
+        "cost_usd": 0.003264,
+        "generation_id": "gen-1786832062-vbampHNoZtvwz8IwycZT"
+      }
+    },
+    {
+      "ordem": 2211,
+      "titulo_en": "The Triumph of Faith",
+      "chars_texto": 554,
+      "usage": {
+        "prompt_tokens": 1093,
+        "completion_tokens": 1482,
+        "total_tokens": 2575,
+        "cost_usd": 0.003188625,
+        "generation_id": "gen-1786832062-wpnNaBj76XkmXJ0ayQyz"
+      }
+    },
+    {
+      "ordem": 2213,
+      "titulo_en": "Death in Adam, Life in Christ",
+      "chars_texto": 1655,
+      "usage": {
+        "prompt_tokens": 1399,
+        "completion_tokens": 1414,
+        "total_tokens": 2813,
+        "cost_usd": 0.003175875,
+        "generation_id": "gen-1786832072-kxZ7FDzQ13Lz4jtwksgx"
+      }
+    },
+    {
+      "ordem": 2212,
+      "titulo_en": "Christ's Sacrifice for the Ungodly",
+      "chars_texto": 726,
+      "usage": {
+        "prompt_tokens": 1143,
+        "completion_tokens": 1604,
+        "total_tokens": 2747,
+        "cost_usd": 0.003436125,
+        "generation_id": "gen-1786832071-0lVgtkmoOWawVg5cM3Vb"
+      }
+    },
+    {
+      "ordem": 2215,
+      "titulo_en": "The Wages of Sin",
+      "chars_texto": 1250,
+      "usage": {
+        "prompt_tokens": 1283,
+        "completion_tokens": 1488,
+        "total_tokens": 2771,
+        "cost_usd": 0.003271125,
+        "generation_id": "gen-1786832073-KEz7bmaS7RTFRzcN1JUD"
+      }
+    },
+    {
+      "ordem": 2214,
+      "titulo_en": "Dead to Sin, Alive to God",
+      "chars_texto": 1618,
+      "usage": {
+        "prompt_tokens": 1379,
+        "completion_tokens": 1580,
+        "total_tokens": 2959,
+        "cost_usd": 0.003479625,
+        "generation_id": "gen-1786832073-igIik5tI4SKNRZAJUErT"
+      }
+    },
+    {
+      "ordem": 2216,
+      "titulo_en": "Function of the Law",
+      "chars_texto": 3186,
+      "usage": {
+        "prompt_tokens": 1824,
+        "completion_tokens": 1683,
+        "total_tokens": 3507,
+        "cost_usd": 0.003839625,
+        "generation_id": "gen-1786832073-MO0mI6zEubq5ZikHzSkq"
+      }
+    },
+    {
+      "ordem": 2219,
+      "titulo_en": "Future Glory",
+      "chars_texto": 1196,
+      "usage": {
+        "prompt_tokens": 1263,
+        "completion_tokens": 755,
+        "total_tokens": 2018,
+        "cost_usd": 0.00188925,
+        "generation_id": "gen-1786832084-w98bhbJHdjyUQHYw0f7t"
+      }
+    },
+    {
+      "ordem": 2218,
+      "titulo_en": "Heirs with Christ",
+      "chars_texto": 743,
+      "usage": {
+        "prompt_tokens": 1154,
+        "completion_tokens": 1410,
+        "total_tokens": 2564,
+        "cost_usd": 0.0030765,
+        "generation_id": "gen-1786832082-WwRJuAgT72ZALXfBw52n"
+      }
+    },
+    {
+      "ordem": 2217,
+      "titulo_en": "Flesh vs. Spirit",
+      "chars_texto": 1435,
+      "usage": {
+        "prompt_tokens": 1329,
+        "completion_tokens": 1475,
+        "total_tokens": 2804,
+        "cost_usd": 0.003264,
+        "generation_id": "gen-1786832082-sSzfeQtyDbKUU50GRKii"
+      }
+    },
+    {
+      "ordem": 2221,
+      "titulo_en": "More than Conquerors",
+      "chars_texto": 664,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1508,
+        "total_tokens": 2648,
+        "cost_usd": 0.003255,
+        "generation_id": "gen-1786832086-7siTzUZLtgxWwzuoMCUt"
+      }
+    },
+    {
+      "ordem": 2220,
+      "titulo_en": "God Works in All Things",
+      "chars_texto": 891,
+      "usage": {
+        "prompt_tokens": 1196,
+        "completion_tokens": 1609,
+        "total_tokens": 2805,
+        "cost_usd": 0.003465375,
+        "generation_id": "gen-1786832085-ELMgmamFPY6sYGjtWBGs"
+      }
+    },
+    {
+      "ordem": 2223,
+      "titulo_en": "God's Sovereign Choice",
+      "chars_texto": 2734,
+      "usage": {
+        "prompt_tokens": 1723,
+        "completion_tokens": 680,
+        "total_tokens": 2403,
+        "cost_usd": 0.001921125,
+        "generation_id": "gen-1786832093-ky7CoDbhb8SKFRqQAkRS"
+      }
+    },
+    {
+      "ordem": 2224,
+      "titulo_en": "Israel's Unbelief",
+      "chars_texto": 452,
+      "usage": {
+        "prompt_tokens": 1098,
+        "completion_tokens": 1130,
+        "total_tokens": 2228,
+        "cost_usd": 0.0025305,
+        "generation_id": "gen-1786832093-uBzww045Je11TY7ezrQL"
+      }
+    },
+    {
+      "ordem": 2222,
+      "titulo_en": "Paul's Concern for the Jews",
+      "chars_texto": 553,
+      "usage": {
+        "prompt_tokens": 1105,
+        "completion_tokens": 1341,
+        "total_tokens": 2446,
+        "cost_usd": 0.00292875,
+        "generation_id": "gen-1786832091-tLBL0Mq7uo9t5kk16C7p"
+      }
+    },
+    {
+      "ordem": 2225,
+      "titulo_en": "Israel in the Present",
+      "chars_texto": 2350,
+      "usage": {
+        "prompt_tokens": 1621,
+        "completion_tokens": 1368,
+        "total_tokens": 2989,
+        "cost_usd": 0.003172875,
+        "generation_id": "gen-1786832097-cXFZR87bW5IrwPwLzKKd"
+      }
+    },
+    {
+      "ordem": 2226,
+      "titulo_en": "A Remnant Chosen by Grace",
+      "chars_texto": 1211,
+      "usage": {
+        "prompt_tokens": 1297,
+        "completion_tokens": 1516,
+        "total_tokens": 2813,
+        "cost_usd": 0.003328875,
+        "generation_id": "gen-1786832098-BsK2OoYUajPH4jwdKGz2"
+      }
+    },
+    {
+      "ordem": 2227,
+      "titulo_en": "The Ingrafting of the Gentiles",
+      "chars_texto": 1976,
+      "usage": {
+        "prompt_tokens": 1514,
+        "completion_tokens": 1573,
+        "total_tokens": 3087,
+        "cost_usd": 0.003517125,
+        "generation_id": "gen-1786832099-4oqYxTXwKTL1tEsbKH7A"
+      }
+    },
+    {
+      "ordem": 2229,
+      "titulo_en": "A Hymn of Praise",
+      "chars_texto": 427,
+      "usage": {
+        "prompt_tokens": 1079,
+        "completion_tokens": 1427,
+        "total_tokens": 2506,
+        "cost_usd": 0.00308025,
+        "generation_id": "gen-1786832102-49iTHCRCBuzj9WjCaG8C"
+      }
+    },
+    {
+      "ordem": 2228,
+      "titulo_en": "All Israel Will Be Saved",
+      "chars_texto": 924,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1506,
+        "total_tokens": 2716,
+        "cost_usd": 0.0032775,
+        "generation_id": "gen-1786832101-em05LlvXDXNtPo4nQEmQ"
+      }
+    },
+    {
+      "ordem": 2230,
+      "titulo_en": "Living Sacrifices",
+      "chars_texto": 1085,
+      "usage": {
+        "prompt_tokens": 1235,
+        "completion_tokens": 972,
+        "total_tokens": 2207,
+        "cost_usd": 0.002285625,
+        "generation_id": "gen-1786832108-ZIBf6rHEar2X0CLJ4Fey"
+      }
+    },
+    {
+      "ordem": 2234,
+      "titulo_en": "Love Fulfills the Law",
+      "chars_texto": 421,
+      "usage": {
+        "prompt_tokens": 1076,
+        "completion_tokens": 1344,
+        "total_tokens": 2420,
+        "cost_usd": 0.0029235,
+        "generation_id": "gen-1786832112-9e07F04wrbbLT9j8WmQt"
+      }
+    },
+    {
+      "ordem": 2233,
+      "titulo_en": "Submission to Authorities",
+      "chars_texto": 1097,
+      "usage": {
+        "prompt_tokens": 1233,
+        "completion_tokens": 1322,
+        "total_tokens": 2555,
+        "cost_usd": 0.002941125,
+        "generation_id": "gen-1786832112-jUmnwvrJOtrpAY4Wzlcp"
+      }
+    },
+    {
+      "ordem": 2232,
+      "titulo_en": "Forgiveness",
+      "chars_texto": 862,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1430,
+        "total_tokens": 2640,
+        "cost_usd": 0.003135,
+        "generation_id": "gen-1786832111-FDN2MoymKsFisp28X2pl"
+      }
+    },
+    {
+      "ordem": 2235,
+      "titulo_en": "The Day is Near",
+      "chars_texto": 521,
+      "usage": {
+        "prompt_tokens": 1111,
+        "completion_tokens": 1449,
+        "total_tokens": 2560,
+        "cost_usd": 0.0031335,
+        "generation_id": "gen-1786832116-qVBHfEHriAtoNXdkdjOR"
+      }
+    },
+    {
+      "ordem": 2238,
+      "titulo_en": "Accept One Another",
+      "chars_texto": 712,
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 845,
+        "total_tokens": 1987,
+        "cost_usd": 0.002012625,
+        "generation_id": "gen-1786832122-BHGr8YmgdoCoTCmchBf0"
+      }
+    },
+    {
+      "ordem": 2236,
+      "titulo_en": "The Law of Liberty",
+      "chars_texto": 1494,
+      "usage": {
+        "prompt_tokens": 1355,
+        "completion_tokens": 1335,
+        "total_tokens": 2690,
+        "cost_usd": 0.00301125,
+        "generation_id": "gen-1786832122-bC6qztXWyLj09CfB4oaa"
+      }
+    },
+    {
+      "ordem": 2231,
+      "titulo_en": "Love, Zeal, Hope, Hospitality",
+      "chars_texto": 417,
+      "usage": {
+        "prompt_tokens": 1081,
+        "completion_tokens": 1429,
+        "total_tokens": 2510,
+        "cost_usd": 0.00308475,
+        "generation_id": "gen-1786832122-fwbcJ5Eek211hNYLxO9a"
+      }
+    },
+    {
+      "ordem": 2237,
+      "titulo_en": "The Law of Love",
+      "chars_texto": 1330,
+      "usage": {
+        "prompt_tokens": 1321,
+        "completion_tokens": 1525,
+        "total_tokens": 2846,
+        "cost_usd": 0.00335475,
+        "generation_id": "gen-1786832122-HVwzEyhtBxl7Xzb5islT"
+      }
+    },
+    {
+      "ordem": 2239,
+      "titulo_en": "Christ the Servant of Jews and Gentiles",
+      "chars_texto": 825,
+      "usage": {
+        "prompt_tokens": 1191,
+        "completion_tokens": 1364,
+        "total_tokens": 2555,
+        "cost_usd": 0.003004125,
+        "generation_id": "gen-1786832128-rY5tb4HFQ9JGFbgv5N2h"
+      }
+    },
+    {
+      "ordem": 2241,
+      "titulo_en": "Paul's Travel Plans",
+      "chars_texto": 1313,
+      "usage": {
+        "prompt_tokens": 1310,
+        "completion_tokens": 1298,
+        "total_tokens": 2608,
+        "cost_usd": 0.002925,
+        "generation_id": "gen-1786832132-V3l8t2CiIQfbx2t3m5XC"
+      }
+    },
+    {
+      "ordem": 2240,
+      "titulo_en": "Paul the Minister to the Gentiles",
+      "chars_texto": 1278,
+      "usage": {
+        "prompt_tokens": 1296,
+        "completion_tokens": 1768,
+        "total_tokens": 3064,
+        "cost_usd": 0.003801,
+        "generation_id": "gen-1786832130-XOTFB24e8Pf5WLLlGaUY"
+      }
+    },
+    {
+      "ordem": 2243,
+      "titulo_en": "Avoid Divisions",
+      "chars_texto": 610,
+      "usage": {
+        "prompt_tokens": 1121,
+        "completion_tokens": 1635,
+        "total_tokens": 2756,
+        "cost_usd": 0.003486,
+        "generation_id": "gen-1786832134-G9mlaGNRpD4PAj2bCNNd"
+      }
+    },
+    {
+      "ordem": 2245,
+      "titulo_en": "Doxology",
+      "chars_texto": 468,
+      "usage": {
+        "prompt_tokens": 1080,
+        "completion_tokens": 492,
+        "total_tokens": 1572,
+        "cost_usd": 0.0013275,
+        "generation_id": "gen-1786832143-uLYO8eHcYFXETcKHj0P8"
+      }
+    },
+    {
+      "ordem": 2242,
+      "titulo_en": "Personal Greetings and Love",
+      "chars_texto": 1562,
+      "usage": {
+        "prompt_tokens": 1427,
+        "completion_tokens": 1386,
+        "total_tokens": 2813,
+        "cost_usd": 0.003133875,
+        "generation_id": "gen-1786832136-IyXB5ALZx6P522dYZEFf"
+      }
+    },
+    {
+      "ordem": 2246,
+      "titulo_en": "Greetings from Paul and Sosthenes",
+      "chars_texto": 393,
+      "usage": {
+        "prompt_tokens": 1059,
+        "completion_tokens": 983,
+        "total_tokens": 2042,
+        "cost_usd": 0.00224025,
+        "generation_id": "gen-1786832143-dRykjzsNyHZOpgolsUNt"
+      }
+    },
+    {
+      "ordem": 2244,
+      "titulo_en": "Greetings from Paul's Fellow Workers",
+      "chars_texto": 307,
+      "usage": {
+        "prompt_tokens": 1061,
+        "completion_tokens": 1435,
+        "total_tokens": 2496,
+        "cost_usd": 0.0030885,
+        "generation_id": "gen-1786832140-DZDsAIZUKkJhhYvajQTM"
+      }
+    },
+    {
+      "ordem": 2249,
+      "titulo_en": "The Message of the Cross",
+      "chars_texto": 921,
+      "usage": {
+        "prompt_tokens": 1230,
+        "completion_tokens": 1200,
+        "total_tokens": 2430,
+        "cost_usd": 0.00271125,
+        "generation_id": "gen-1786832148-ZFhGXTLyWFkzTkda2cz8"
+      }
+    },
+    {
+      "ordem": 2248,
+      "titulo_en": "Is Christ Divided?",
+      "chars_texto": 993,
+      "usage": {
+        "prompt_tokens": 1227,
+        "completion_tokens": 1459,
+        "total_tokens": 2686,
+        "cost_usd": 0.00319575,
+        "generation_id": "gen-1786832147-g9Y4ojqtjmDSWBeYBxiq"
+      }
+    },
+    {
+      "ordem": 2247,
+      "titulo_en": "Thanksgiving",
+      "chars_texto": 590,
+      "usage": {
+        "prompt_tokens": 1097,
+        "completion_tokens": 1619,
+        "total_tokens": 2716,
+        "cost_usd": 0.003447,
+        "generation_id": "gen-1786832146-HUzEHvp4Ia0cZ26DCbKQ"
+      }
+    },
+    {
+      "ordem": 2250,
+      "titulo_en": "Wisdom from God",
+      "chars_texto": 690,
+      "usage": {
+        "prompt_tokens": 1147,
+        "completion_tokens": 1494,
+        "total_tokens": 2641,
+        "cost_usd": 0.003231375,
+        "generation_id": "gen-1786832151-lZunEKJn3RhXT7k4pJal"
+      }
+    },
+    {
+      "ordem": 2251,
+      "titulo_en": "Spiritual Wisdom",
+      "chars_texto": 2077,
+      "usage": {
+        "prompt_tokens": 1495,
+        "completion_tokens": 1497,
+        "total_tokens": 2992,
+        "cost_usd": 0.0033675,
+        "generation_id": "gen-1786832152-LVlLiwkajuRPuusshzsc"
+      }
+    },
+    {
+      "ordem": 2252,
+      "titulo_en": "God's Fellow Workers",
+      "chars_texto": 1034,
+      "usage": {
+        "prompt_tokens": 1233,
+        "completion_tokens": 1504,
+        "total_tokens": 2737,
+        "cost_usd": 0.003282375,
+        "generation_id": "gen-1786832156-JUAHtjGZtKZVtRNUkChZ"
+      }
+    },
+    {
+      "ordem": 2256,
+      "titulo_en": "Do Not Be Proud",
+      "chars_texto": 1297,
+      "usage": {
+        "prompt_tokens": 1308,
+        "completion_tokens": 663,
+        "total_tokens": 1971,
+        "cost_usd": 0.001733625,
+        "generation_id": "gen-1786832164-s8VTLWkC1A2Jk8chfj5b"
+      }
+    },
+    {
+      "ordem": 2254,
+      "titulo_en": "God's Temple and God's Wisdom",
+      "chars_texto": 806,
+      "usage": {
+        "prompt_tokens": 1193,
+        "completion_tokens": 1547,
+        "total_tokens": 2740,
+        "cost_usd": 0.003348,
+        "generation_id": "gen-1786832159-NR9XcEvKntrnle876BvT"
+      }
+    },
+    {
+      "ordem": 2253,
+      "titulo_en": "Christ Our Foundation",
+      "chars_texto": 703,
+      "usage": {
+        "prompt_tokens": 1148,
+        "completion_tokens": 1590,
+        "total_tokens": 2738,
+        "cost_usd": 0.00341175,
+        "generation_id": "gen-1786832159-THV1oacE1sCVUbm3O6g5"
+      }
+    },
+    {
+      "ordem": 2255,
+      "titulo_en": "Spiritual Servants",
+      "chars_texto": 678,
+      "usage": {
+        "prompt_tokens": 1132,
+        "completion_tokens": 1389,
+        "total_tokens": 2521,
+        "cost_usd": 0.003028875,
+        "generation_id": "gen-1786832162-czyFQDYNWHgLSiD0w2BU"
+      }
+    },
+    {
+      "ordem": 2257,
+      "titulo_en": "Paul Warns against Arrogance",
+      "chars_texto": 904,
+      "usage": {
+        "prompt_tokens": 1220,
+        "completion_tokens": 1572,
+        "total_tokens": 2792,
+        "cost_usd": 0.003405,
+        "generation_id": "gen-1786832168-T22xy0fPoz8BKqLJclOV"
+      }
+    },
+    {
+      "ordem": 2261,
+      "titulo_en": "Lawsuits among Believers",
+      "chars_texto": 1024,
+      "usage": {
+        "prompt_tokens": 1211,
+        "completion_tokens": 1114,
+        "total_tokens": 2325,
+        "cost_usd": 0.002542875,
+        "generation_id": "gen-1786832172-XDj0iZzxsyMj88pbP8cP"
+      }
+    },
+    {
+      "ordem": 2259,
+      "titulo_en": "Your Boasting is Not Good",
+      "chars_texto": 444,
+      "usage": {
+        "prompt_tokens": 1083,
+        "completion_tokens": 1697,
+        "total_tokens": 2780,
+        "cost_usd": 0.003588,
+        "generation_id": "gen-1786832171-TXEG9tfugwhbnzjFYEg5"
+      }
+    },
+    {
+      "ordem": 2258,
+      "titulo_en": "Immorality Rebuked",
+      "chars_texto": 675,
+      "usage": {
+        "prompt_tokens": 1138,
+        "completion_tokens": 1663,
+        "total_tokens": 2801,
+        "cost_usd": 0.003544875,
+        "generation_id": "gen-1786832170-o54izt2k3rSVi9SpvbEo"
+      }
+    },
+    {
+      "ordem": 2260,
+      "titulo_en": "Expel the Immoral Brother",
+      "chars_texto": 601,
+      "usage": {
+        "prompt_tokens": 1141,
+        "completion_tokens": 1696,
+        "total_tokens": 2837,
+        "cost_usd": 0.003607875,
+        "generation_id": "gen-1786832172-akTzNWGJmoXkIc2WJtJX"
+      }
+    },
+    {
+      "ordem": 2262,
+      "titulo_en": "Members of Christ",
+      "chars_texto": 1224,
+      "usage": {
+        "prompt_tokens": 1299,
+        "completion_tokens": 1262,
+        "total_tokens": 2561,
+        "cost_usd": 0.002853375,
+        "generation_id": "gen-1786832180-y6NKWYTUYQ5EssE1098J"
+      }
+    },
+    {
+      "ordem": 2263,
+      "titulo_en": "The Temple of the Holy Spirit",
+      "chars_texto": 440,
+      "usage": {
+        "prompt_tokens": 1072,
+        "completion_tokens": 1386,
+        "total_tokens": 2458,
+        "cost_usd": 0.00300075,
+        "generation_id": "gen-1786832180-Vg1BjXujC3bWDpdFA1RC"
+      }
+    },
+    {
+      "ordem": 2265,
+      "titulo_en": "Live Your Calling",
+      "chars_texto": 872,
+      "usage": {
+        "prompt_tokens": 1202,
+        "completion_tokens": 1344,
+        "total_tokens": 2546,
+        "cost_usd": 0.00297075,
+        "generation_id": "gen-1786832183-C67MvGjqvQZVLDWgVLUc"
+      }
+    },
+    {
+      "ordem": 2264,
+      "titulo_en": "Principles of Marriage",
+      "chars_texto": 2064,
+      "usage": {
+        "prompt_tokens": 1532,
+        "completion_tokens": 1504,
+        "total_tokens": 3036,
+        "cost_usd": 0.0033945,
+        "generation_id": "gen-1786832183-w3TZBoaR7E80SadgQ0CW"
+      }
+    },
+    {
+      "ordem": 2266,
+      "titulo_en": "The Unmarried and Widowed",
+      "chars_texto": 2231,
+      "usage": {
+        "prompt_tokens": 1555,
+        "completion_tokens": 1375,
+        "total_tokens": 2930,
+        "cost_usd": 0.00316125,
+        "generation_id": "gen-1786832184-qJORkiUESGxDXBl3wmhf"
+      }
+    },
+    {
+      "ordem": 2267,
+      "titulo_en": "Food Sacrificed to Idols",
+      "chars_texto": 1769,
+      "usage": {
+        "prompt_tokens": 1428,
+        "completion_tokens": 1389,
+        "total_tokens": 2817,
+        "cost_usd": 0.003139875,
+        "generation_id": "gen-1786832190-73cGZNASG06Y9l8r5nNK"
+      }
+    },
+    {
+      "ordem": 2270,
+      "titulo_en": "Run Your Race to Win",
+      "chars_texto": 476,
+      "usage": {
+        "prompt_tokens": 1100,
+        "completion_tokens": 1126,
+        "total_tokens": 2226,
+        "cost_usd": 0.00252375,
+        "generation_id": "gen-1786832194-cmQ27rRyZINXXctx5KjO"
+      }
+    },
+    {
+      "ordem": 2268,
+      "titulo_en": "The Rights of an Apostle",
+      "chars_texto": 2346,
+      "usage": {
+        "prompt_tokens": 1565,
+        "completion_tokens": 1680,
+        "total_tokens": 3245,
+        "cost_usd": 0.003736875,
+        "generation_id": "gen-1786832191-jvtHPEY3GSJV30cE4SDC"
+      }
+    },
+    {
+      "ordem": 2271,
+      "titulo_en": "Lessons from the Exodus from Egypt",
+      "chars_texto": 1446,
+      "usage": {
+        "prompt_tokens": 1335,
+        "completion_tokens": 1490,
+        "total_tokens": 2825,
+        "cost_usd": 0.003294375,
+        "generation_id": "gen-1786832194-UK9tBtjbvHyt3QIgKHwt"
+      }
+    },
+    {
+      "ordem": 2269,
+      "titulo_en": "Paul the Servant to All",
+      "chars_texto": 690,
+      "usage": {
+        "prompt_tokens": 1155,
+        "completion_tokens": 1448,
+        "total_tokens": 2603,
+        "cost_usd": 0.003148125,
+        "generation_id": "gen-1786832194-xuMP9Pqcxqodn7cwpH00"
+      }
+    },
+    {
+      "ordem": 2275,
+      "titulo_en": "Sharing in the Lord's Supper",
+      "chars_texto": 2069,
+      "usage": {
+        "prompt_tokens": 1555,
+        "completion_tokens": 751,
+        "total_tokens": 2306,
+        "cost_usd": 0.00199125,
+        "generation_id": "gen-1786832205-HL0MiCGrZ1jqbHIF2o1E"
+      }
+    },
+    {
+      "ordem": 2273,
+      "titulo_en": "All to God's Glory",
+      "chars_texto": 1318,
+      "usage": {
+        "prompt_tokens": 1319,
+        "completion_tokens": 1365,
+        "total_tokens": 2684,
+        "cost_usd": 0.003054,
+        "generation_id": "gen-1786832203-wNFcWF33d2ztgJT7kIlD"
+      }
+    },
+    {
+      "ordem": 2272,
+      "titulo_en": "Flee from Idolatry",
+      "chars_texto": 1000,
+      "usage": {
+        "prompt_tokens": 1243,
+        "completion_tokens": 1527,
+        "total_tokens": 2770,
+        "cost_usd": 0.00332925,
+        "generation_id": "gen-1786832201-HUmqSgPUjpRUeuCxcd1M"
+      }
+    },
+    {
+      "ordem": 2274,
+      "titulo_en": "Roles in Worship",
+      "chars_texto": 1599,
+      "usage": {
+        "prompt_tokens": 1392,
+        "completion_tokens": 1570,
+        "total_tokens": 2962,
+        "cost_usd": 0.00346575,
+        "generation_id": "gen-1786832205-Q6gaBgPPrPigLA6hIGy1"
+      }
+    },
+    {
+      "ordem": 2276,
+      "titulo_en": "Different Gifts, Same Spirit",
+      "chars_texto": 1166,
+      "usage": {
+        "prompt_tokens": 1269,
+        "completion_tokens": 1405,
+        "total_tokens": 2674,
+        "cost_usd": 0.00311025,
+        "generation_id": "gen-1786832205-9tqJ4bVhUa3lorWCNtaU"
+      }
+    },
+    {
+      "ordem": 2277,
+      "titulo_en": "The Body of Christ is Composed of Many Parts",
+      "chars_texto": 1639,
+      "usage": {
+        "prompt_tokens": 1414,
+        "completion_tokens": 1365,
+        "total_tokens": 2779,
+        "cost_usd": 0.003089625,
+        "generation_id": "gen-1786832212-9CfwKDYuxLem95C4GevQ"
+      }
+    },
+    {
+      "ordem": 2279,
+      "titulo_en": "Love",
+      "chars_texto": 1503,
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1409,
+        "total_tokens": 2779,
+        "cost_usd": 0.003155625,
+        "generation_id": "gen-1786832213-RmylBgjna7MtNAfu2WDe"
+      }
+    },
+    {
+      "ordem": 2278,
+      "titulo_en": "The Greater Gifts",
+      "chars_texto": 677,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1655,
+        "total_tokens": 2794,
+        "cost_usd": 0.00353025,
+        "generation_id": "gen-1786832213-h9O5U9oca94v09JkGDEh"
+      }
+    },
+    {
+      "ordem": 2281,
+      "titulo_en": "Orderly Worship",
+      "chars_texto": 1576,
+      "usage": {
+        "prompt_tokens": 1382,
+        "completion_tokens": 1483,
+        "total_tokens": 2865,
+        "cost_usd": 0.003298875,
+        "generation_id": "gen-1786832217-DhYiU1UDEDeG5t1Uy6kJ"
+      }
+    },
+    {
+      "ordem": 2280,
+      "titulo_en": "Prophecy and Tongues",
+      "chars_texto": 3239,
+      "usage": {
+        "prompt_tokens": 1833,
+        "completion_tokens": 1828,
+        "total_tokens": 3661,
+        "cost_usd": 0.004114875,
+        "generation_id": "gen-1786832216-sNCkaMXD4dbunuUhIUqo"
+      }
+    },
+    {
+      "ordem": 2283,
+      "titulo_en": "Our Hope in the Resurrection",
+      "chars_texto": 839,
+      "usage": {
+        "prompt_tokens": 1215,
+        "completion_tokens": 1260,
+        "total_tokens": 2475,
+        "cost_usd": 0.002818125,
+        "generation_id": "gen-1786832224-JgwyNNkUreOgVdxgqu28"
+      }
+    },
+    {
+      "ordem": 2282,
+      "titulo_en": "The Resurrection of Christ",
+      "chars_texto": 1165,
+      "usage": {
+        "prompt_tokens": 1288,
+        "completion_tokens": 1607,
+        "total_tokens": 2895,
+        "cost_usd": 0.003496125,
+        "generation_id": "gen-1786832223-2RwSY5j6R8D4s6YziEhW"
+      }
+    },
+    {
+      "ordem": 2284,
+      "titulo_en": "The Order of Resurrection",
+      "chars_texto": 1681,
+      "usage": {
+        "prompt_tokens": 1435,
+        "completion_tokens": 1624,
+        "total_tokens": 3059,
+        "cost_usd": 0.003583125,
+        "generation_id": "gen-1786832225-TO312CQL3dvX1hU49gWq"
+      }
+    },
+    {
+      "ordem": 2285,
+      "titulo_en": "The Resurrection of the Body",
+      "chars_texto": 1610,
+      "usage": {
+        "prompt_tokens": 1433,
+        "completion_tokens": 1426,
+        "total_tokens": 2859,
+        "cost_usd": 0.003211125,
+        "generation_id": "gen-1786832229-yFC9nSmoxpZ82a4WRH5y"
+      }
+    },
+    {
+      "ordem": 2286,
+      "titulo_en": "Where, O Death, Is Your Victory?",
+      "chars_texto": 1099,
+      "usage": {
+        "prompt_tokens": 1270,
+        "completion_tokens": 1606,
+        "total_tokens": 2876,
+        "cost_usd": 0.0034875,
+        "generation_id": "gen-1786832229-Nto8O7rmuaFpCPohCp4Q"
+      }
+    },
+    {
+      "ordem": 2287,
+      "titulo_en": "The Collection for the Saints",
+      "chars_texto": 452,
+      "usage": {
+        "prompt_tokens": 1078,
+        "completion_tokens": 1436,
+        "total_tokens": 2514,
+        "cost_usd": 0.00309675,
+        "generation_id": "gen-1786832234-uJpYFECURgrWcx5wCHET"
+      }
+    },
+    {
+      "ordem": 2288,
+      "titulo_en": "Paul's Travel Plans",
+      "chars_texto": 513,
+      "usage": {
+        "prompt_tokens": 1085,
+        "completion_tokens": 1470,
+        "total_tokens": 2555,
+        "cost_usd": 0.003163125,
+        "generation_id": "gen-1786832235-8O8h0HIa47ejMc22JLXE"
+      }
+    },
+    {
+      "ordem": 2289,
+      "titulo_en": "Timothy and Apollos",
+      "chars_texto": 477,
+      "usage": {
+        "prompt_tokens": 1080,
+        "completion_tokens": 1409,
+        "total_tokens": 2489,
+        "cost_usd": 0.003046875,
+        "generation_id": "gen-1786832237-W1gLpQp8WHueYJ0YwYfU"
+      }
+    },
+    {
+      "ordem": 2290,
+      "titulo_en": "Concluding Exhortations",
+      "chars_texto": 607,
+      "usage": {
+        "prompt_tokens": 1139,
+        "completion_tokens": 1350,
+        "total_tokens": 2489,
+        "cost_usd": 0.002958375,
+        "generation_id": "gen-1786832239-IXRnYLmnFUdAxxNXh12Y"
+      }
+    },
+    {
+      "ordem": 2291,
+      "titulo_en": "Signature and Final Greetings",
+      "chars_texto": 463,
+      "usage": {
+        "prompt_tokens": 1100,
+        "completion_tokens": 1437,
+        "total_tokens": 2537,
+        "cost_usd": 0.003106875,
+        "generation_id": "gen-1786832241-KFf0oyrM9r4DeQ1q8jtI"
+      }
+    },
+    {
+      "ordem": 2292,
+      "titulo_en": "Paul Greets the Corinthians",
+      "chars_texto": 245,
+      "usage": {
+        "prompt_tokens": 1027,
+        "completion_tokens": 1372,
+        "total_tokens": 2399,
+        "cost_usd": 0.002957625,
+        "generation_id": "gen-1786832245-U7dq6BrxJKjQjRJ4bJPg"
+      }
+    },
+    {
+      "ordem": 2293,
+      "titulo_en": "The God of All Comfort",
+      "chars_texto": 1477,
+      "usage": {
+        "prompt_tokens": 1324,
+        "completion_tokens": 1350,
+        "total_tokens": 2674,
+        "cost_usd": 0.00302775,
+        "generation_id": "gen-1786832246-rxzqV0rC4mXNE30pxzPd"
+      }
+    },
+    {
+      "ordem": 2294,
+      "titulo_en": "Paul's Changed Plans",
+      "chars_texto": 2343,
+      "usage": {
+        "prompt_tokens": 1584,
+        "completion_tokens": 1616,
+        "total_tokens": 3200,
+        "cost_usd": 0.003624,
+        "generation_id": "gen-1786832247-LXmBFRpVs8AFL9cD6oh4"
+      }
+    },
+    {
+      "ordem": 2295,
+      "titulo_en": "Forgiveness for the Offender",
+      "chars_texto": 764,
+      "usage": {
+        "prompt_tokens": 1166,
+        "completion_tokens": 1275,
+        "total_tokens": 2441,
+        "cost_usd": 0.002827875,
+        "generation_id": "gen-1786832250-D7gZxhhqAADjtMVvpv3i"
+      }
+    },
+    {
+      "ordem": 2296,
+      "titulo_en": "Triumph in Christ",
+      "chars_texto": 882,
+      "usage": {
+        "prompt_tokens": 1186,
+        "completion_tokens": 1208,
+        "total_tokens": 2394,
+        "cost_usd": 0.00270975,
+        "generation_id": "gen-1786832252-ZOnbFAu23DV2ZtpDQOBu"
+      }
+    },
+    {
+      "ordem": 2297,
+      "titulo_en": "Ministers of a New Covenant",
+      "chars_texto": 2225,
+      "usage": {
+        "prompt_tokens": 1548,
+        "completion_tokens": 1627,
+        "total_tokens": 3175,
+        "cost_usd": 0.003631125,
+        "generation_id": "gen-1786832255-VrJfetnFyAy8cJiyPsWN"
+      }
+    },
+    {
+      "ordem": 2298,
+      "titulo_en": "The Light of the Gospel",
+      "chars_texto": 891,
+      "usage": {
+        "prompt_tokens": 1190,
+        "completion_tokens": 1523,
+        "total_tokens": 2713,
+        "cost_usd": 0.003301875,
+        "generation_id": "gen-1786832257-gE549qGIagyAOb6RrnjG"
+      }
+    },
+    {
+      "ordem": 2300,
+      "titulo_en": "Our Eternal Dwelling",
+      "chars_texto": 1062,
+      "usage": {
+        "prompt_tokens": 1226,
+        "completion_tokens": 937,
+        "total_tokens": 2163,
+        "cost_usd": 0.002216625,
+        "generation_id": "gen-1786832261-27saU4bfbtFhpSu0h5Lu"
+      }
+    },
+    {
+      "ordem": 2299,
+      "titulo_en": "Treasure in Jars of Clay",
+      "chars_texto": 1445,
+      "usage": {
+        "prompt_tokens": 1343,
+        "completion_tokens": 1228,
+        "total_tokens": 2571,
+        "cost_usd": 0.002806125,
+        "generation_id": "gen-1786832259-OkHRCGGlR7Q5GMUElSfe"
+      }
+    },
+    {
+      "ordem": 2301,
+      "titulo_en": "Ambassadors for Christ",
+      "chars_texto": 1568,
+      "usage": {
+        "prompt_tokens": 1360,
+        "completion_tokens": 1567,
+        "total_tokens": 2927,
+        "cost_usd": 0.003448125,
+        "generation_id": "gen-1786832261-Qe6VyT8m21O26uunMRlr"
+      }
+    },
+    {
+      "ordem": 2305,
+      "titulo_en": "Paul's Joy in the Corinthians",
+      "chars_texto": 2631,
+      "usage": {
+        "prompt_tokens": 1623,
+        "completion_tokens": 543,
+        "total_tokens": 2166,
+        "cost_usd": 0.00162675,
+        "generation_id": "gen-1786832269-Wh2ROJDwiKhJsdqQCjWN"
+      }
+    },
+    {
+      "ordem": 2302,
+      "titulo_en": "Hardships and God's Grace",
+      "chars_texto": 1140,
+      "usage": {
+        "prompt_tokens": 1279,
+        "completion_tokens": 1590,
+        "total_tokens": 2869,
+        "cost_usd": 0.003460875,
+        "generation_id": "gen-1786832266-1DX5JCPlIyJLSjbfWE7h"
+      }
+    },
+    {
+      "ordem": 2303,
+      "titulo_en": "Open Your Hearts",
+      "chars_texto": 308,
+      "usage": {
+        "prompt_tokens": 1044,
+        "completion_tokens": 1636,
+        "total_tokens": 2680,
+        "cost_usd": 0.003459,
+        "generation_id": "gen-1786832268-Zr0fSKG9dZ8CgmnKgdT5"
+      }
+    },
+    {
+      "ordem": 2304,
+      "titulo_en": "Do Not Be Unequally Yoked with Unbelievers",
+      "chars_texto": 689,
+      "usage": {
+        "prompt_tokens": 1168,
+        "completion_tokens": 1630,
+        "total_tokens": 2798,
+        "cost_usd": 0.00349425,
+        "generation_id": "gen-1786832268-uK8DONQNtWEYDe7qCMcC"
+      }
+    },
+    {
+      "ordem": 2306,
+      "titulo_en": "Generosity Commended",
+      "chars_texto": 2019,
+      "usage": {
+        "prompt_tokens": 1460,
+        "completion_tokens": 1578,
+        "total_tokens": 3038,
+        "cost_usd": 0.00350625,
+        "generation_id": "gen-1786832273-2FQdrsZOHBDcYyCLYqHe"
       }
     }
   ]

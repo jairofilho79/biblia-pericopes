@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 2000,
+  "done": 2100,
   "pending_total": 2640,
-  "sample_cost_usd": 6.485831249999999,
-  "avg_cost_usd": 0.003242915624999999,
-  "estimate_remaining_usd": 2.0754659999999996,
-  "estimate_full_run_usd": 8.561297249999997,
-  "elapsed_sec": 4545.509,
-  "throughput_per_sec": 0.4399947288631482,
-  "eta_sec": 1454.56288,
+  "sample_cost_usd": 6.793705124999997,
+  "avg_cost_usd": 0.003235097678571427,
+  "estimate_remaining_usd": 1.7469527464285706,
+  "estimate_full_run_usd": 8.540657871428568,
+  "elapsed_sec": 4763.461,
+  "throughput_per_sec": 0.4408559238755182,
+  "eta_sec": 1224.8899714285715,
   "catalog_total": 2647,
   "items": [
     {
@@ -24010,6 +24010,1206 @@
         "total_tokens": 2733,
         "cost_usd": 0.003385875,
         "generation_id": "gen-1786831600-LhjPv3ymAfAd80u7YyOC"
+      }
+    },
+    {
+      "ordem": 2008,
+      "titulo_en": "Jesus Calls Philip and Nathanael",
+      "chars_texto": 1090,
+      "usage": {
+        "prompt_tokens": 1273,
+        "completion_tokens": 735,
+        "total_tokens": 2008,
+        "cost_usd": 0.0018555,
+        "generation_id": "gen-1786831615-PHPaOALgiLRfxjyc3rgq"
+      }
+    },
+    {
+      "ordem": 2009,
+      "titulo_en": "The Wedding at Cana",
+      "chars_texto": 1179,
+      "usage": {
+        "prompt_tokens": 1274,
+        "completion_tokens": 1245,
+        "total_tokens": 2519,
+        "cost_usd": 0.002812125,
+        "generation_id": "gen-1786831615-Jfzg9Z2BDotmJuErHSek"
+      }
+    },
+    {
+      "ordem": 2007,
+      "titulo_en": "The First Disciples",
+      "chars_texto": 904,
+      "usage": {
+        "prompt_tokens": 1221,
+        "completion_tokens": 1534,
+        "total_tokens": 2755,
+        "cost_usd": 0.003334125,
+        "generation_id": "gen-1786831615-2cOpUGb0EJ22WXuXS2ha"
+      }
+    },
+    {
+      "ordem": 2010,
+      "titulo_en": "Jesus Cleanses the Temple",
+      "chars_texto": 1455,
+      "usage": {
+        "prompt_tokens": 1371,
+        "completion_tokens": 1599,
+        "total_tokens": 2970,
+        "cost_usd": 0.00351225,
+        "generation_id": "gen-1786831615-s5hH1rDWxVHINxT4hHON"
+      }
+    },
+    {
+      "ordem": 2011,
+      "titulo_en": "Jesus and Nicodemus",
+      "chars_texto": 2334,
+      "usage": {
+        "prompt_tokens": 1593,
+        "completion_tokens": 1669,
+        "total_tokens": 3262,
+        "cost_usd": 0.00372675,
+        "generation_id": "gen-1786831615-Lj3lZBokeBQVxavaPwSX"
+      }
+    },
+    {
+      "ordem": 2012,
+      "titulo_en": "John's Testimony about Jesus",
+      "chars_texto": 1568,
+      "usage": {
+        "prompt_tokens": 1382,
+        "completion_tokens": 1604,
+        "total_tokens": 2986,
+        "cost_usd": 0.00352575,
+        "generation_id": "gen-1786831621-hiM5WYtkXmajSUfRWMLD"
+      }
+    },
+    {
+      "ordem": 2016,
+      "titulo_en": "Jesus Heals the Official's Son",
+      "chars_texto": 1384,
+      "usage": {
+        "prompt_tokens": 1335,
+        "completion_tokens": 855,
+        "total_tokens": 2190,
+        "cost_usd": 0.00210375,
+        "generation_id": "gen-1786831628-ktY4lVu6OVKdsyE88n12"
+      }
+    },
+    {
+      "ordem": 2015,
+      "titulo_en": "Many Samaritans Believe",
+      "chars_texto": 504,
+      "usage": {
+        "prompt_tokens": 1089,
+        "completion_tokens": 1200,
+        "total_tokens": 2289,
+        "cost_usd": 0.002658375,
+        "generation_id": "gen-1786831626-pXU3cqZMd6fewGhlhxwn"
+      }
+    },
+    {
+      "ordem": 2013,
+      "titulo_en": "Jesus and the Samaritan Woman",
+      "chars_texto": 2712,
+      "usage": {
+        "prompt_tokens": 1710,
+        "completion_tokens": 1915,
+        "total_tokens": 3625,
+        "cost_usd": 0.004231875,
+        "generation_id": "gen-1786831624-dV38AmxJBJZWFQqZINNF"
+      }
+    },
+    {
+      "ordem": 2014,
+      "titulo_en": "The Disciples Return and Marvel",
+      "chars_texto": 1308,
+      "usage": {
+        "prompt_tokens": 1327,
+        "completion_tokens": 1394,
+        "total_tokens": 2721,
+        "cost_usd": 0.003111375,
+        "generation_id": "gen-1786831626-VXN0W6wWWV3EEKXAW3S1"
+      }
+    },
+    {
+      "ordem": 2017,
+      "titulo_en": "The Pool of Bethesda",
+      "chars_texto": 1584,
+      "usage": {
+        "prompt_tokens": 1407,
+        "completion_tokens": 1387,
+        "total_tokens": 2794,
+        "cost_usd": 0.00312825,
+        "generation_id": "gen-1786831632-U3pIT7Tp2DEZ1wGk0M7j"
+      }
+    },
+    {
+      "ordem": 2018,
+      "titulo_en": "The Father and the Son",
+      "chars_texto": 1823,
+      "usage": {
+        "prompt_tokens": 1473,
+        "completion_tokens": 1389,
+        "total_tokens": 2862,
+        "cost_usd": 0.00315675,
+        "generation_id": "gen-1786831635-JA0PywMn6tLASbYTdMdh"
+      }
+    },
+    {
+      "ordem": 2020,
+      "titulo_en": "The Witness of Scripture",
+      "chars_texto": 800,
+      "usage": {
+        "prompt_tokens": 1186,
+        "completion_tokens": 1417,
+        "total_tokens": 2603,
+        "cost_usd": 0.003101625,
+        "generation_id": "gen-1786831637-qpRzRluXKuwPmPuHRBp5"
+      }
+    },
+    {
+      "ordem": 2019,
+      "titulo_en": "Testimonies about Jesus",
+      "chars_texto": 895,
+      "usage": {
+        "prompt_tokens": 1201,
+        "completion_tokens": 1527,
+        "total_tokens": 2728,
+        "cost_usd": 0.0033135,
+        "generation_id": "gen-1786831636-PPsGfh2enPqni3HLZbxY"
+      }
+    },
+    {
+      "ordem": 2021,
+      "titulo_en": "The Feeding of the Five Thousand",
+      "chars_texto": 1627,
+      "usage": {
+        "prompt_tokens": 1408,
+        "completion_tokens": 1485,
+        "total_tokens": 2893,
+        "cost_usd": 0.003312375,
+        "generation_id": "gen-1786831637-A4EceQG2wsKm7ryfnodq"
+      }
+    },
+    {
+      "ordem": 2022,
+      "titulo_en": "Jesus Walks on Water",
+      "chars_texto": 564,
+      "usage": {
+        "prompt_tokens": 1111,
+        "completion_tokens": 1781,
+        "total_tokens": 2892,
+        "cost_usd": 0.003756,
+        "generation_id": "gen-1786831643-o5GF240MJw7uz7IfzdlZ"
+      }
+    },
+    {
+      "ordem": 2025,
+      "titulo_en": "Peter's Confession of Faith",
+      "chars_texto": 546,
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 1364,
+        "total_tokens": 2481,
+        "cost_usd": 0.002976375,
+        "generation_id": "gen-1786831647-tA28rRiKs5l3l8BzAmej"
+      }
+    },
+    {
+      "ordem": 2024,
+      "titulo_en": "Many Disciples Turn Back",
+      "chars_texto": 797,
+      "usage": {
+        "prompt_tokens": 1176,
+        "completion_tokens": 1709,
+        "total_tokens": 2885,
+        "cost_usd": 0.003645375,
+        "generation_id": "gen-1786831647-TEuUAFxth6uaWuO1qFpZ"
+      }
+    },
+    {
+      "ordem": 2026,
+      "titulo_en": "Jesus Goes to Jerusalem in Secret",
+      "chars_texto": 2558,
+      "usage": {
+        "prompt_tokens": 1663,
+        "completion_tokens": 1584,
+        "total_tokens": 3247,
+        "cost_usd": 0.003593625,
+        "generation_id": "gen-1786831648-jsa9huPJUcK3AUouw8vf"
+      }
+    },
+    {
+      "ordem": 2023,
+      "titulo_en": "Jesus the Bread of Life",
+      "chars_texto": 4084,
+      "usage": {
+        "prompt_tokens": 2121,
+        "completion_tokens": 1787,
+        "total_tokens": 3908,
+        "cost_usd": 0.004146,
+        "generation_id": "gen-1786831646-8gFH1GIU0tXUlPsxpXBE"
+      }
+    },
+    {
+      "ordem": 2027,
+      "titulo_en": "Is Jesus the Christ?",
+      "chars_texto": 1514,
+      "usage": {
+        "prompt_tokens": 1360,
+        "completion_tokens": 1626,
+        "total_tokens": 2986,
+        "cost_usd": 0.00355875,
+        "generation_id": "gen-1786831655-MRpotaaEU09mTbS5KDso"
+      }
+    },
+    {
+      "ordem": 2028,
+      "titulo_en": "Living Water",
+      "chars_texto": 405,
+      "usage": {
+        "prompt_tokens": 1060,
+        "completion_tokens": 1400,
+        "total_tokens": 2460,
+        "cost_usd": 0.0030225,
+        "generation_id": "gen-1786831658-a75gbx6RXPHPIgWZUW4Q"
+      }
+    },
+    {
+      "ordem": 2029,
+      "titulo_en": "Division regarding Jesus",
+      "chars_texto": 429,
+      "usage": {
+        "prompt_tokens": 1081,
+        "completion_tokens": 1367,
+        "total_tokens": 2448,
+        "cost_usd": 0.0029685,
+        "generation_id": "gen-1786831660-xAWvhi5BEUS4HiToojSe"
+      }
+    },
+    {
+      "ordem": 2030,
+      "titulo_en": "The Unbelief of the Jewish Leaders",
+      "chars_texto": 714,
+      "usage": {
+        "prompt_tokens": 1162,
+        "completion_tokens": 1437,
+        "total_tokens": 2599,
+        "cost_usd": 0.003130125,
+        "generation_id": "gen-1786831661-4388Pv7Mj8hu2T8Bdegc"
+      }
+    },
+    {
+      "ordem": 2031,
+      "titulo_en": "The Woman Caught in Adultery",
+      "chars_texto": 1163,
+      "usage": {
+        "prompt_tokens": 1282,
+        "completion_tokens": 1632,
+        "total_tokens": 2914,
+        "cost_usd": 0.00354075,
+        "generation_id": "gen-1786831661-DTENsCBfA6OowXJEal0N"
+      }
+    },
+    {
+      "ordem": 2032,
+      "titulo_en": "Jesus the Light of the World",
+      "chars_texto": 2217,
+      "usage": {
+        "prompt_tokens": 1574,
+        "completion_tokens": 1630,
+        "total_tokens": 3204,
+        "cost_usd": 0.0036465,
+        "generation_id": "gen-1786831666-OIAsYeHrgBlcTqYpGB2y"
+      }
+    },
+    {
+      "ordem": 2033,
+      "titulo_en": "The Truth Will Set You Free",
+      "chars_texto": 617,
+      "usage": {
+        "prompt_tokens": 1122,
+        "completion_tokens": 1293,
+        "total_tokens": 2415,
+        "cost_usd": 0.002845125,
+        "generation_id": "gen-1786831669-cTnxr7TzaH3YcsFgYhAH"
+      }
+    },
+    {
+      "ordem": 2035,
+      "titulo_en": "Before Abraham Was Born, I Am",
+      "chars_texto": 1386,
+      "usage": {
+        "prompt_tokens": 1360,
+        "completion_tokens": 1196,
+        "total_tokens": 2556,
+        "cost_usd": 0.0027525,
+        "generation_id": "gen-1786831671-PMCymLIWJgvT56WUumuN"
+      }
+    },
+    {
+      "ordem": 2034,
+      "titulo_en": "The Children of the Devil",
+      "chars_texto": 1381,
+      "usage": {
+        "prompt_tokens": 1339,
+        "completion_tokens": 1362,
+        "total_tokens": 2701,
+        "cost_usd": 0.003055875,
+        "generation_id": "gen-1786831670-25trshRhFYwNKXCXyaIp"
+      }
+    },
+    {
+      "ordem": 2036,
+      "titulo_en": "Jesus Heals the Man Born",
+      "chars_texto": 1190,
+      "usage": {
+        "prompt_tokens": 1308,
+        "completion_tokens": 1625,
+        "total_tokens": 2933,
+        "cost_usd": 0.003537375,
+        "generation_id": "gen-1786831673-LBTZy3h6mqNJ47eP3dnS"
+      }
+    },
+    {
+      "ordem": 2037,
+      "titulo_en": "The Pharisees Investigate the Healing",
+      "chars_texto": 2421,
+      "usage": {
+        "prompt_tokens": 1638,
+        "completion_tokens": 1139,
+        "total_tokens": 2777,
+        "cost_usd": 0.002749875,
+        "generation_id": "gen-1786831679-yMaptPIU0rHsTWyTk8hP"
+      }
+    },
+    {
+      "ordem": 2038,
+      "titulo_en": "Spiritual Blindness",
+      "chars_texto": 671,
+      "usage": {
+        "prompt_tokens": 1158,
+        "completion_tokens": 1268,
+        "total_tokens": 2426,
+        "cost_usd": 0.00281175,
+        "generation_id": "gen-1786831679-O8PUsJFGasQt1jORhlLt"
+      }
+    },
+    {
+      "ordem": 2040,
+      "titulo_en": "Questions of Divinity",
+      "chars_texto": 1673,
+      "usage": {
+        "prompt_tokens": 1453,
+        "completion_tokens": 1433,
+        "total_tokens": 2886,
+        "cost_usd": 0.00323175,
+        "generation_id": "gen-1786831681-Nln2sAdqJE36sqh6MOnv"
+      }
+    },
+    {
+      "ordem": 2041,
+      "titulo_en": "John's Testimony Confirmed",
+      "chars_texto": 286,
+      "usage": {
+        "prompt_tokens": 1038,
+        "completion_tokens": 662,
+        "total_tokens": 1700,
+        "cost_usd": 0.0016305,
+        "generation_id": "gen-1786831686-y2JjNyxAcWVK58gn8QgS"
+      }
+    },
+    {
+      "ordem": 2039,
+      "titulo_en": "Jesus the Good Shepherd",
+      "chars_texto": 2183,
+      "usage": {
+        "prompt_tokens": 1594,
+        "completion_tokens": 1786,
+        "total_tokens": 3380,
+        "cost_usd": 0.0039465,
+        "generation_id": "gen-1786831681-oXEa1BdeS2rb1kZj61yy"
+      }
+    },
+    {
+      "ordem": 2042,
+      "titulo_en": "The Death of Lazarus",
+      "chars_texto": 1528,
+      "usage": {
+        "prompt_tokens": 1403,
+        "completion_tokens": 1409,
+        "total_tokens": 2812,
+        "cost_usd": 0.003168,
+        "generation_id": "gen-1786831688-N5rTJG9bv1CfR2Omg0St"
+      }
+    },
+    {
+      "ordem": 2045,
+      "titulo_en": "The Plot to Kill Jesus",
+      "chars_texto": 1538,
+      "usage": {
+        "prompt_tokens": 1386,
+        "completion_tokens": 770,
+        "total_tokens": 2156,
+        "cost_usd": 0.0019635,
+        "generation_id": "gen-1786831692-RiBZfvfmqkGClW7JZ7ja"
+      }
+    },
+    {
+      "ordem": 2043,
+      "titulo_en": "Jesus Comforts Martha and Mary",
+      "chars_texto": 1952,
+      "usage": {
+        "prompt_tokens": 1542,
+        "completion_tokens": 1299,
+        "total_tokens": 2841,
+        "cost_usd": 0.003013875,
+        "generation_id": "gen-1786831689-f8TzXNBqMkDXPDpnYfw1"
+      }
+    },
+    {
+      "ordem": 2044,
+      "titulo_en": "Jesus Raises Lazarus",
+      "chars_texto": 832,
+      "usage": {
+        "prompt_tokens": 1205,
+        "completion_tokens": 1274,
+        "total_tokens": 2479,
+        "cost_usd": 0.002840625,
+        "generation_id": "gen-1786831692-UUJ9LrR9vjoPexZgAvij"
+      }
+    },
+    {
+      "ordem": 2046,
+      "titulo_en": "Mary Anoints Jesus",
+      "chars_texto": 899,
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 1477,
+        "total_tokens": 2687,
+        "cost_usd": 0.003223125,
+        "generation_id": "gen-1786831694-WHu7WqzJQRYMuWtUZ3w1"
+      }
+    },
+    {
+      "ordem": 2047,
+      "titulo_en": "The Plot to Kill Lazarus",
+      "chars_texto": 341,
+      "usage": {
+        "prompt_tokens": 1048,
+        "completion_tokens": 1417,
+        "total_tokens": 2465,
+        "cost_usd": 0.003049875,
+        "generation_id": "gen-1786831699-zw7S8WAKrJQROtyjJjjU"
+      }
+    },
+    {
+      "ordem": 2048,
+      "titulo_en": "The Triumphal Entry",
+      "chars_texto": 986,
+      "usage": {
+        "prompt_tokens": 1225,
+        "completion_tokens": 1503,
+        "total_tokens": 2728,
+        "cost_usd": 0.0032775,
+        "generation_id": "gen-1786831699-75rTP08xpyaaDcOdkQHC"
+      }
+    },
+    {
+      "ordem": 2049,
+      "titulo_en": "Jesus Predicts His Death",
+      "chars_texto": 1947,
+      "usage": {
+        "prompt_tokens": 1517,
+        "completion_tokens": 1738,
+        "total_tokens": 3255,
+        "cost_usd": 0.003827625,
+        "generation_id": "gen-1786831699-JliQaLOG9mjLhvpvfFbH"
+      }
+    },
+    {
+      "ordem": 2050,
+      "titulo_en": "Belief and Unbelief",
+      "chars_texto": 1457,
+      "usage": {
+        "prompt_tokens": 1376,
+        "completion_tokens": 1814,
+        "total_tokens": 3190,
+        "cost_usd": 0.00391725,
+        "generation_id": "gen-1786831701-IIifFSLDhATJmX6JG6Zq"
+      }
+    },
+    {
+      "ordem": 2052,
+      "titulo_en": "Jesus Predicts His Betrayal",
+      "chars_texto": 1578,
+      "usage": {
+        "prompt_tokens": 1399,
+        "completion_tokens": 519,
+        "total_tokens": 1918,
+        "cost_usd": 0.00149775,
+        "generation_id": "gen-1786831710-vUXAvwqwNX945tOg5NIM"
+      }
+    },
+    {
+      "ordem": 2051,
+      "titulo_en": "Jesus Washes His Disciples' Feet",
+      "chars_texto": 1862,
+      "usage": {
+        "prompt_tokens": 1494,
+        "completion_tokens": 1550,
+        "total_tokens": 3044,
+        "cost_usd": 0.0034665,
+        "generation_id": "gen-1786831706-1G2iSDauo8RQMV6QZaer"
+      }
+    },
+    {
+      "ordem": 2055,
+      "titulo_en": "In My Father's House Are Many Rooms",
+      "chars_texto": 399,
+      "usage": {
+        "prompt_tokens": 1068,
+        "completion_tokens": 471,
+        "total_tokens": 1539,
+        "cost_usd": 0.001283625,
+        "generation_id": "gen-1786831715-2SCRSJ1C5vbSg5i2xjvv"
+      }
+    },
+    {
+      "ordem": 2054,
+      "titulo_en": "Jesus Predicts Peter's Denial",
+      "chars_texto": 399,
+      "usage": {
+        "prompt_tokens": 1072,
+        "completion_tokens": 1201,
+        "total_tokens": 2273,
+        "cost_usd": 0.002653875,
+        "generation_id": "gen-1786831712-YugjJ0j9Hnz1EZlzWGgV"
+      }
+    },
+    {
+      "ordem": 2053,
+      "titulo_en": "Love One Another",
+      "chars_texto": 606,
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 1392,
+        "total_tokens": 2509,
+        "cost_usd": 0.003028875,
+        "generation_id": "gen-1786831711-DDVGgqvRf85kOOHyQKfk"
+      }
+    },
+    {
+      "ordem": 2056,
+      "titulo_en": "The Way, the Truth, and the Life",
+      "chars_texto": 1102,
+      "usage": {
+        "prompt_tokens": 1275,
+        "completion_tokens": 1469,
+        "total_tokens": 2744,
+        "cost_usd": 0.0032325,
+        "generation_id": "gen-1786831715-0R6hird1FoQEaJZqJiQA"
+      }
+    },
+    {
+      "ordem": 2057,
+      "titulo_en": "Jesus Promises the Holy Spirit",
+      "chars_texto": 1346,
+      "usage": {
+        "prompt_tokens": 1345,
+        "completion_tokens": 1369,
+        "total_tokens": 2714,
+        "cost_usd": 0.00307125,
+        "generation_id": "gen-1786831717-WIJeTBxkQKlYCeNGXyFx"
+      }
+    },
+    {
+      "ordem": 2058,
+      "titulo_en": "Peace I Leave with You",
+      "chars_texto": 638,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1605,
+        "total_tokens": 2745,
+        "cost_usd": 0.003436875,
+        "generation_id": "gen-1786831720-jsljs70cMG0aAwz637t8"
+      }
+    },
+    {
+      "ordem": 2059,
+      "titulo_en": "Jesus the True Vine",
+      "chars_texto": 939,
+      "usage": {
+        "prompt_tokens": 1212,
+        "completion_tokens": 1321,
+        "total_tokens": 2533,
+        "cost_usd": 0.002931375,
+        "generation_id": "gen-1786831722-coS07Vhwrv7K8s8xKfnd"
+      }
+    },
+    {
+      "ordem": 2060,
+      "titulo_en": "No Greater Love",
+      "chars_texto": 1018,
+      "usage": {
+        "prompt_tokens": 1238,
+        "completion_tokens": 1357,
+        "total_tokens": 2595,
+        "cost_usd": 0.003008625,
+        "generation_id": "gen-1786831722-wQ4Dt6QCoo26QPT6iG0a"
+      }
+    },
+    {
+      "ordem": 2061,
+      "titulo_en": "The Hatred of the World",
+      "chars_texto": 1198,
+      "usage": {
+        "prompt_tokens": 1297,
+        "completion_tokens": 1211,
+        "total_tokens": 2508,
+        "cost_usd": 0.002757,
+        "generation_id": "gen-1786831725-GLPq0w5XQlYILomT1Trm"
+      }
+    },
+    {
+      "ordem": 2062,
+      "titulo_en": "Persecution Foretold",
+      "chars_texto": 458,
+      "usage": {
+        "prompt_tokens": 1078,
+        "completion_tokens": 1122,
+        "total_tokens": 2200,
+        "cost_usd": 0.002508,
+        "generation_id": "gen-1786831727-2YxJeD5Oo7MmZiJ3bU6p"
+      }
+    },
+    {
+      "ordem": 2064,
+      "titulo_en": "Grief Will Turn to Joy",
+      "chars_texto": 1038,
+      "usage": {
+        "prompt_tokens": 1239,
+        "completion_tokens": 684,
+        "total_tokens": 1923,
+        "cost_usd": 0.001747125,
+        "generation_id": "gen-1786831732-aUdkcfF2JxjsNjIU6Twr"
+      }
+    },
+    {
+      "ordem": 2063,
+      "titulo_en": "The Promise of the Holy Spirit",
+      "chars_texto": 1152,
+      "usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 1493,
+        "total_tokens": 2777,
+        "cost_usd": 0.003280875,
+        "generation_id": "gen-1786831732-NakJnGALkTLJPfnGlwGQ"
+      }
+    },
+    {
+      "ordem": 2065,
+      "titulo_en": "Ask and You Will Receive",
+      "chars_texto": 1270,
+      "usage": {
+        "prompt_tokens": 1305,
+        "completion_tokens": 1379,
+        "total_tokens": 2684,
+        "cost_usd": 0.003075,
+        "generation_id": "gen-1786831733-S3YMtqDXGmZ4vFOYaeVd"
+      }
+    },
+    {
+      "ordem": 2066,
+      "titulo_en": "Prayer for the Son",
+      "chars_texto": 576,
+      "usage": {
+        "prompt_tokens": 1113,
+        "completion_tokens": 1669,
+        "total_tokens": 2782,
+        "cost_usd": 0.00354675,
+        "generation_id": "gen-1786831735-AdoPAn9ql2BUUu2hewJU"
+      }
+    },
+    {
+      "ordem": 2067,
+      "titulo_en": "Prayer for the Disciples",
+      "chars_texto": 1459,
+      "usage": {
+        "prompt_tokens": 1368,
+        "completion_tokens": 1644,
+        "total_tokens": 3012,
+        "cost_usd": 0.0035955,
+        "generation_id": "gen-1786831736-FteVsqpLZzaGWkcFaNjV"
+      }
+    },
+    {
+      "ordem": 2068,
+      "titulo_en": "Prayer for All Believers",
+      "chars_texto": 935,
+      "usage": {
+        "prompt_tokens": 1234,
+        "completion_tokens": 1609,
+        "total_tokens": 2843,
+        "cost_usd": 0.003479625,
+        "generation_id": "gen-1786831738-pgFh0aJ6cHfJRlrIJqc8"
+      }
+    },
+    {
+      "ordem": 2069,
+      "titulo_en": "The Betrayal of Jesus",
+      "chars_texto": 1600,
+      "usage": {
+        "prompt_tokens": 1403,
+        "completion_tokens": 1590,
+        "total_tokens": 2993,
+        "cost_usd": 0.003507375,
+        "generation_id": "gen-1786831743-JzcaFW1CWWW4rhwyDX1O"
+      }
+    },
+    {
+      "ordem": 2070,
+      "titulo_en": "Peter's First Denial",
+      "chars_texto": 634,
+      "usage": {
+        "prompt_tokens": 1129,
+        "completion_tokens": 1521,
+        "total_tokens": 2650,
+        "cost_usd": 0.00327525,
+        "generation_id": "gen-1786831743-jvyRVCCkhJPCNfPqYeuy"
+      }
+    },
+    {
+      "ordem": 2071,
+      "titulo_en": "Jesus before the High Priest",
+      "chars_texto": 729,
+      "usage": {
+        "prompt_tokens": 1162,
+        "completion_tokens": 1425,
+        "total_tokens": 2587,
+        "cost_usd": 0.003107625,
+        "generation_id": "gen-1786831746-6n6KdUAtakATDUdJWBkn"
+      }
+    },
+    {
+      "ordem": 2072,
+      "titulo_en": "Peter's Second and Third Denials",
+      "chars_texto": 367,
+      "usage": {
+        "prompt_tokens": 1071,
+        "completion_tokens": 1481,
+        "total_tokens": 2552,
+        "cost_usd": 0.0031785,
+        "generation_id": "gen-1786831749-QGovmE8KurURyOh9aqWs"
+      }
+    },
+    {
+      "ordem": 2073,
+      "titulo_en": "Jesus before Pilate",
+      "chars_texto": 1756,
+      "usage": {
+        "prompt_tokens": 1439,
+        "completion_tokens": 1687,
+        "total_tokens": 3126,
+        "cost_usd": 0.00370275,
+        "generation_id": "gen-1786831750-2KEr9i2Kou10ZBzjwveE"
+      }
+    },
+    {
+      "ordem": 2074,
+      "titulo_en": "The Soldiers Mock Jesus",
+      "chars_texto": 1878,
+      "usage": {
+        "prompt_tokens": 1497,
+        "completion_tokens": 1695,
+        "total_tokens": 3192,
+        "cost_usd": 0.0037395,
+        "generation_id": "gen-1786831754-5g1bXLpmrgTdh7ShMX1p"
+      }
+    },
+    {
+      "ordem": 2075,
+      "titulo_en": "The King of the Jews",
+      "chars_texto": 1540,
+      "usage": {
+        "prompt_tokens": 1405,
+        "completion_tokens": 1480,
+        "total_tokens": 2885,
+        "cost_usd": 0.003301875,
+        "generation_id": "gen-1786831755-xzDSLbvFOEJK5pEYX2af"
+      }
+    },
+    {
+      "ordem": 2076,
+      "titulo_en": "The Death of Jesus",
+      "chars_texto": 372,
+      "usage": {
+        "prompt_tokens": 1067,
+        "completion_tokens": 1515,
+        "total_tokens": 2582,
+        "cost_usd": 0.00324075,
+        "generation_id": "gen-1786831757-Bg7qHaV2t0wYpm6iBW4d"
+      }
+    },
+    {
+      "ordem": 2077,
+      "titulo_en": "Jesus' Side is Pierced",
+      "chars_texto": 847,
+      "usage": {
+        "prompt_tokens": 1189,
+        "completion_tokens": 1188,
+        "total_tokens": 2377,
+        "cost_usd": 0.002673375,
+        "generation_id": "gen-1786831760-khhJNzfZU4sJCyZzO0um"
+      }
+    },
+    {
+      "ordem": 2078,
+      "titulo_en": "The Burial of Jesus",
+      "chars_texto": 815,
+      "usage": {
+        "prompt_tokens": 1173,
+        "completion_tokens": 1331,
+        "total_tokens": 2504,
+        "cost_usd": 0.0029355,
+        "generation_id": "gen-1786831762-sO7MpzRJqgtS3KM4asY7"
+      }
+    },
+    {
+      "ordem": 2081,
+      "titulo_en": "Jesus Appears to the Disciples",
+      "chars_texto": 624,
+      "usage": {
+        "prompt_tokens": 1141,
+        "completion_tokens": 467,
+        "total_tokens": 1608,
+        "cost_usd": 0.0013035,
+        "generation_id": "gen-1786831768-3y2o28CSwJnnSIfe5Etw"
+      }
+    },
+    {
+      "ordem": 2079,
+      "titulo_en": "The Empty Tomb",
+      "chars_texto": 968,
+      "usage": {
+        "prompt_tokens": 1228,
+        "completion_tokens": 1385,
+        "total_tokens": 2613,
+        "cost_usd": 0.003057375,
+        "generation_id": "gen-1786831766-BYD6YZzz6kJWNCBHJpBP"
+      }
+    },
+    {
+      "ordem": 2080,
+      "titulo_en": "Jesus Appears to Mary Magdalene",
+      "chars_texto": 1177,
+      "usage": {
+        "prompt_tokens": 1306,
+        "completion_tokens": 1537,
+        "total_tokens": 2843,
+        "cost_usd": 0.003371625,
+        "generation_id": "gen-1786831767-O6q5reG5XFVrcn6xKTf6"
+      }
+    },
+    {
+      "ordem": 2083,
+      "titulo_en": "The Purpose of John's Book",
+      "chars_texto": 261,
+      "usage": {
+        "prompt_tokens": 1025,
+        "completion_tokens": 1190,
+        "total_tokens": 2215,
+        "cost_usd": 0.002615625,
+        "generation_id": "gen-1786831773-F1RaeaVLm3Mh7KT8fY1o"
+      }
+    },
+    {
+      "ordem": 2082,
+      "titulo_en": "Jesus Appears to Thomas",
+      "chars_texto": 806,
+      "usage": {
+        "prompt_tokens": 1198,
+        "completion_tokens": 1647,
+        "total_tokens": 2845,
+        "cost_usd": 0.003537375,
+        "generation_id": "gen-1786831770-kLfnwAyNj3l2IjlpJOaI"
+      }
+    },
+    {
+      "ordem": 2084,
+      "titulo_en": "Jesus Appears by the Sea of Tiberias",
+      "chars_texto": 1768,
+      "usage": {
+        "prompt_tokens": 1458,
+        "completion_tokens": 1615,
+        "total_tokens": 3073,
+        "cost_usd": 0.003574875,
+        "generation_id": "gen-1786831773-WgYlGFefb3msW8iU799F"
+      }
+    },
+    {
+      "ordem": 2085,
+      "titulo_en": "Jesus and Peter",
+      "chars_texto": 1031,
+      "usage": {
+        "prompt_tokens": 1244,
+        "completion_tokens": 1151,
+        "total_tokens": 2395,
+        "cost_usd": 0.002624625,
+        "generation_id": "gen-1786831777-77YWFMg54buuIZvxne2O"
+      }
+    },
+    {
+      "ordem": 2086,
+      "titulo_en": "Jesus and the Beloved Disciple",
+      "chars_texto": 904,
+      "usage": {
+        "prompt_tokens": 1214,
+        "completion_tokens": 1369,
+        "total_tokens": 2583,
+        "cost_usd": 0.003022125,
+        "generation_id": "gen-1786831779-cOuWHuz9A7FuYrEslauF"
+      }
+    },
+    {
+      "ordem": 2087,
+      "titulo_en": "Dedication to Theophilus",
+      "chars_texto": 698,
+      "usage": {
+        "prompt_tokens": 1134,
+        "completion_tokens": 1506,
+        "total_tokens": 2640,
+        "cost_usd": 0.003249,
+        "generation_id": "gen-1786831782-daSLRcirzANkuVlflYm2"
+      }
+    },
+    {
+      "ordem": 2088,
+      "titulo_en": "The Ascension",
+      "chars_texto": 843,
+      "usage": {
+        "prompt_tokens": 1171,
+        "completion_tokens": 1612,
+        "total_tokens": 2783,
+        "cost_usd": 0.003461625,
+        "generation_id": "gen-1786831782-UJ6SNMOAgdoYZzBlJ0MP"
+      }
+    },
+    {
+      "ordem": 2089,
+      "titulo_en": "Matthias Replaces Judas",
+      "chars_texto": 1957,
+      "usage": {
+        "prompt_tokens": 1504,
+        "completion_tokens": 1378,
+        "total_tokens": 2882,
+        "cost_usd": 0.00314775,
+        "generation_id": "gen-1786831784-btPSo2r95DYiPXE0tDeX"
+      }
+    },
+    {
+      "ordem": 2090,
+      "titulo_en": "The Holy Spirit at Pentecost",
+      "chars_texto": 1328,
+      "usage": {
+        "prompt_tokens": 1336,
+        "completion_tokens": 1422,
+        "total_tokens": 2758,
+        "cost_usd": 0.00316725,
+        "generation_id": "gen-1786831786-sd2l679yaou0ji691etR"
+      }
+    },
+    {
+      "ordem": 2091,
+      "titulo_en": "Peter Addresses the Crowd",
+      "chars_texto": 2815,
+      "usage": {
+        "prompt_tokens": 1742,
+        "completion_tokens": 1454,
+        "total_tokens": 3196,
+        "cost_usd": 0.0033795,
+        "generation_id": "gen-1786831790-6MHx54SqEKmqkOb4FYd6"
+      }
+    },
+    {
+      "ordem": 2092,
+      "titulo_en": "Three Thousand Believe",
+      "chars_texto": 680,
+      "usage": {
+        "prompt_tokens": 1136,
+        "completion_tokens": 1454,
+        "total_tokens": 2590,
+        "cost_usd": 0.00315225,
+        "generation_id": "gen-1786831792-Bo97uYVoGn99TqtbyaWT"
+      }
+    },
+    {
+      "ordem": 2093,
+      "titulo_en": "The Fellowship of Believers",
+      "chars_texto": 650,
+      "usage": {
+        "prompt_tokens": 1131,
+        "completion_tokens": 1194,
+        "total_tokens": 2325,
+        "cost_usd": 0.002662875,
+        "generation_id": "gen-1786831793-zcG0fhN94Kwmtfa39hpK"
+      }
+    },
+    {
+      "ordem": 2095,
+      "titulo_en": "Peter Speaks in Solomon's Colonnade",
+      "chars_texto": 2301,
+      "usage": {
+        "prompt_tokens": 1577,
+        "completion_tokens": 728,
+        "total_tokens": 2305,
+        "cost_usd": 0.001956375,
+        "generation_id": "gen-1786831797-Q7jLEyQ2uXgkb15y3HIz"
+      }
+    },
+    {
+      "ordem": 2094,
+      "titulo_en": "A Lame Man Walks",
+      "chars_texto": 1047,
+      "usage": {
+        "prompt_tokens": 1252,
+        "completion_tokens": 1246,
+        "total_tokens": 2498,
+        "cost_usd": 0.00280575,
+        "generation_id": "gen-1786831794-v3LtiAi7epkSPxBGnJl0"
+      }
+    },
+    {
+      "ordem": 2100,
+      "titulo_en": "Ananias and Sapphira",
+      "chars_texto": 1475,
+      "usage": {
+        "prompt_tokens": 1356,
+        "completion_tokens": 1199,
+        "total_tokens": 2555,
+        "cost_usd": 0.002756625,
+        "generation_id": "gen-1786831804-x5SOtJvLtLv5jC64kcUJ"
+      }
+    },
+    {
+      "ordem": 2096,
+      "titulo_en": "Peter and John before the Sanhedrin",
+      "chars_texto": 1403,
+      "usage": {
+        "prompt_tokens": 1330,
+        "completion_tokens": 1481,
+        "total_tokens": 2811,
+        "cost_usd": 0.003275625,
+        "generation_id": "gen-1786831801-eVcfwPEKuknpR2yAUwFf"
+      }
+    },
+    {
+      "ordem": 2097,
+      "titulo_en": "The Name Forbidden",
+      "chars_texto": 1152,
+      "usage": {
+        "prompt_tokens": 1267,
+        "completion_tokens": 1474,
+        "total_tokens": 2741,
+        "cost_usd": 0.003238875,
+        "generation_id": "gen-1786831803-1DvN7r2VlEsEKPA74nJf"
+      }
+    },
+    {
+      "ordem": 2099,
+      "titulo_en": "Sharing among Believers",
+      "chars_texto": 731,
+      "usage": {
+        "prompt_tokens": 1152,
+        "completion_tokens": 1453,
+        "total_tokens": 2605,
+        "cost_usd": 0.003156375,
+        "generation_id": "gen-1786831803-sg6rpi9HAvbRXuyHBHMi"
+      }
+    },
+    {
+      "ordem": 2098,
+      "titulo_en": "The Believer's Prayer",
+      "chars_texto": 1138,
+      "usage": {
+        "prompt_tokens": 1279,
+        "completion_tokens": 1657,
+        "total_tokens": 2936,
+        "cost_usd": 0.0035865,
+        "generation_id": "gen-1786831803-83uUPaRey9fep8CuC0XU"
+      }
+    },
+    {
+      "ordem": 2103,
+      "titulo_en": "The Apostles before the Sanhedrin",
+      "chars_texto": 1129,
+      "usage": {
+        "prompt_tokens": 1261,
+        "completion_tokens": 551,
+        "total_tokens": 1812,
+        "cost_usd": 0.001506,
+        "generation_id": "gen-1786831814-NEY9f2Wtdzuuub9GusK7"
+      }
+    },
+    {
+      "ordem": 2102,
+      "titulo_en": "The Apostles Arrested and Freed",
+      "chars_texto": 872,
+      "usage": {
+        "prompt_tokens": 1203,
+        "completion_tokens": 1419,
+        "total_tokens": 2622,
+        "cost_usd": 0.00311175,
+        "generation_id": "gen-1786831814-CTFBRXqK7fWVG3Lo8T6h"
+      }
+    },
+    {
+      "ordem": 2104,
+      "titulo_en": "Gamaliel's Advice",
+      "chars_texto": 1384,
+      "usage": {
+        "prompt_tokens": 1343,
+        "completion_tokens": 1440,
+        "total_tokens": 2783,
+        "cost_usd": 0.003203625,
+        "generation_id": "gen-1786831814-VdvZX2M0Nkfn545aVN8u"
+      }
+    },
+    {
+      "ordem": 2101,
+      "titulo_en": "The Apostles Heal Many",
+      "chars_texto": 663,
+      "usage": {
+        "prompt_tokens": 1131,
+        "completion_tokens": 1529,
+        "total_tokens": 2660,
+        "cost_usd": 0.003291,
+        "generation_id": "gen-1786831814-IjuWtmvPIykqOw2utF9t"
+      }
+    },
+    {
+      "ordem": 2105,
+      "titulo_en": "The Choosing of the Seven",
+      "chars_texto": 924,
+      "usage": {
+        "prompt_tokens": 1206,
+        "completion_tokens": 1472,
+        "total_tokens": 2678,
+        "cost_usd": 0.00321225,
+        "generation_id": "gen-1786831816-sKSaBzSNnmtgfEJcN9Vv"
+      }
+    },
+    {
+      "ordem": 2106,
+      "titulo_en": "The Arrest of Stephen",
+      "chars_texto": 935,
+      "usage": {
+        "prompt_tokens": 1230,
+        "completion_tokens": 1605,
+        "total_tokens": 2835,
+        "cost_usd": 0.003470625,
+        "generation_id": "gen-1786831819-SaFznc4nCLQ7V9Rwr4X0"
       }
     }
   ]

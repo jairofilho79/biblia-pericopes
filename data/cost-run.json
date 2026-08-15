@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 1000,
+  "done": 1100,
   "pending_total": 2640,
-  "sample_cost_usd": 3.269172,
-  "avg_cost_usd": 0.0032691720000000003,
-  "estimate_remaining_usd": 5.361442080000001,
-  "estimate_full_run_usd": 8.63061408,
-  "elapsed_sec": 2291.638,
-  "throughput_per_sec": 0.436369094944315,
-  "eta_sec": 3758.2863199999997,
+  "sample_cost_usd": 3.6322732500000012,
+  "avg_cost_usd": 0.003302066590909092,
+  "estimate_remaining_usd": 5.085182550000002,
+  "estimate_full_run_usd": 8.717455800000003,
+  "elapsed_sec": 2531.648,
+  "throughput_per_sec": 0.4344995828804004,
+  "eta_sec": 3544.3072,
   "catalog_total": 2647,
   "items": [
     {
@@ -12010,6 +12010,1206 @@
         "total_tokens": 3035,
         "cost_usd": 0.003521625,
         "generation_id": "gen-1786829345-2MMDYzCbYIW80dpmkrr7"
+      }
+    },
+    {
+      "ordem": 1008,
+      "titulo_en": "The Builders of the Walls",
+      "chars_texto": 4948,
+      "usage": {
+        "prompt_tokens": 2398,
+        "completion_tokens": 1184,
+        "total_tokens": 3582,
+        "cost_usd": 0.00311925,
+        "generation_id": "gen-1786829361-Gh9l5TtC051kHmbXq06d"
+      }
+    },
+    {
+      "ordem": 1011,
+      "titulo_en": "The Work Continues",
+      "chars_texto": 1172,
+      "usage": {
+        "prompt_tokens": 1284,
+        "completion_tokens": 1374,
+        "total_tokens": 2658,
+        "cost_usd": 0.00305775,
+        "generation_id": "gen-1786829361-arqRLqCW547R8ddjJ87I"
+      }
+    },
+    {
+      "ordem": 1009,
+      "titulo_en": "Sanballat and Tobiah Mock the Rebuilding",
+      "chars_texto": 1305,
+      "usage": {
+        "prompt_tokens": 1313,
+        "completion_tokens": 1283,
+        "total_tokens": 2596,
+        "cost_usd": 0.002898,
+        "generation_id": "gen-1786829361-56lcNx0FHZqQPq7yfbnq"
+      }
+    },
+    {
+      "ordem": 1010,
+      "titulo_en": "Discouragement Overcome",
+      "chars_texto": 1125,
+      "usage": {
+        "prompt_tokens": 1265,
+        "completion_tokens": 1613,
+        "total_tokens": 2878,
+        "cost_usd": 0.00349875,
+        "generation_id": "gen-1786829361-8ov3HRItBgtb1SgC4n0E"
+      }
+    },
+    {
+      "ordem": 1007,
+      "titulo_en": "Nehemiah Inspects the Walls",
+      "chars_texto": 1848,
+      "usage": {
+        "prompt_tokens": 1458,
+        "completion_tokens": 2015,
+        "total_tokens": 3473,
+        "cost_usd": 0.004324875,
+        "generation_id": "gen-1786829361-aXctXVjW0ejwVLrDJ7Ti"
+      }
+    },
+    {
+      "ordem": 1013,
+      "titulo_en": "The End of Usury",
+      "chars_texto": 1559,
+      "usage": {
+        "prompt_tokens": 1374,
+        "completion_tokens": 1206,
+        "total_tokens": 2580,
+        "cost_usd": 0.0027765,
+        "generation_id": "gen-1786829371-2AP2wzzKE8shPfByZOce"
+      }
+    },
+    {
+      "ordem": 1014,
+      "titulo_en": "Nehemiah's Generosity",
+      "chars_texto": 1093,
+      "usage": {
+        "prompt_tokens": 1256,
+        "completion_tokens": 1654,
+        "total_tokens": 2910,
+        "cost_usd": 0.00357225,
+        "generation_id": "gen-1786829371-348hzGFWSEPuSD6jtafa"
+      }
+    },
+    {
+      "ordem": 1012,
+      "titulo_en": "The Poor are Oppressed",
+      "chars_texto": 899,
+      "usage": {
+        "prompt_tokens": 1177,
+        "completion_tokens": 1601,
+        "total_tokens": 2778,
+        "cost_usd": 0.00344325,
+        "generation_id": "gen-1786829371-xKvIEVOAzbJ5Ikul56kC"
+      }
+    },
+    {
+      "ordem": 1016,
+      "titulo_en": "Completion of the Wall",
+      "chars_texto": 746,
+      "usage": {
+        "prompt_tokens": 1150,
+        "completion_tokens": 1485,
+        "total_tokens": 2635,
+        "cost_usd": 0.003215625,
+        "generation_id": "gen-1786829376-1iUK0Iuh0FlQqezcqzGf"
+      }
+    },
+    {
+      "ordem": 1015,
+      "titulo_en": "The Hiring of False Prophets",
+      "chars_texto": 2340,
+      "usage": {
+        "prompt_tokens": 1577,
+        "completion_tokens": 1901,
+        "total_tokens": 3478,
+        "cost_usd": 0.00415575,
+        "generation_id": "gen-1786829374-0Q4M5Xs4fgDWcjM0aEYJ"
+      }
+    },
+    {
+      "ordem": 1018,
+      "titulo_en": "Ezra Reads the Law",
+      "chars_texto": 2397,
+      "usage": {
+        "prompt_tokens": 1653,
+        "completion_tokens": 1275,
+        "total_tokens": 2928,
+        "cost_usd": 0.0030105,
+        "generation_id": "gen-1786829382-rNH3copSjlIErm4VYvZt"
+      }
+    },
+    {
+      "ordem": 1017,
+      "titulo_en": "The List of Returning Exiles",
+      "chars_texto": 6414,
+      "usage": {
+        "prompt_tokens": 2940,
+        "completion_tokens": 1650,
+        "total_tokens": 4590,
+        "cost_usd": 0.00419625,
+        "generation_id": "gen-1786829380-GTBlxY62aDqWd3Pnhrsb"
+      }
+    },
+    {
+      "ordem": 1019,
+      "titulo_en": "The Feast of Tabernacles",
+      "chars_texto": 1210,
+      "usage": {
+        "prompt_tokens": 1292,
+        "completion_tokens": 1657,
+        "total_tokens": 2949,
+        "cost_usd": 0.003591375,
+        "generation_id": "gen-1786829383-eC8pGiGnin4KbPpw7oCg"
+      }
+    },
+    {
+      "ordem": 1021,
+      "titulo_en": "The People Make a Covenant",
+      "chars_texto": 1713,
+      "usage": {
+        "prompt_tokens": 1574,
+        "completion_tokens": 1508,
+        "total_tokens": 3082,
+        "cost_usd": 0.00341775,
+        "generation_id": "gen-1786829387-goFJDItssFz9g4Lkipl5"
+      }
+    },
+    {
+      "ordem": 1020,
+      "titulo_en": "The People Confess Their Sins",
+      "chars_texto": 6926,
+      "usage": {
+        "prompt_tokens": 2905,
+        "completion_tokens": 1857,
+        "total_tokens": 4762,
+        "cost_usd": 0.00457125,
+        "generation_id": "gen-1786829387-GzShQyoJS0zcCWzSVxgt"
+      }
+    },
+    {
+      "ordem": 1023,
+      "titulo_en": "Jerusalem's New Settlers",
+      "chars_texto": 2572,
+      "usage": {
+        "prompt_tokens": 1732,
+        "completion_tokens": 1362,
+        "total_tokens": 3094,
+        "cost_usd": 0.00320325,
+        "generation_id": "gen-1786829392-MwjZFl2vrzleb05OTMvX"
+      }
+    },
+    {
+      "ordem": 1022,
+      "titulo_en": "The Vows of the Covenant",
+      "chars_texto": 2253,
+      "usage": {
+        "prompt_tokens": 1538,
+        "completion_tokens": 1597,
+        "total_tokens": 3135,
+        "cost_usd": 0.003571125,
+        "generation_id": "gen-1786829391-NGIPUjCrhBtcJn0vBBAg"
+      }
+    },
+    {
+      "ordem": 1024,
+      "titulo_en": "Residents Outside Jerusalem",
+      "chars_texto": 1452,
+      "usage": {
+        "prompt_tokens": 1429,
+        "completion_tokens": 1636,
+        "total_tokens": 3065,
+        "cost_usd": 0.003603375,
+        "generation_id": "gen-1786829397-yCfIvRGxa8EucoMFBhlb"
+      }
+    },
+    {
+      "ordem": 1025,
+      "titulo_en": "The Priests and Levites Who Returned",
+      "chars_texto": 1953,
+      "usage": {
+        "prompt_tokens": 1655,
+        "completion_tokens": 1626,
+        "total_tokens": 3281,
+        "cost_usd": 0.003669375,
+        "generation_id": "gen-1786829398-A5r5kzi7OTeWuyxaZhVH"
+      }
+    },
+    {
+      "ordem": 1027,
+      "titulo_en": "Provisions for Temple Worship",
+      "chars_texto": 883,
+      "usage": {
+        "prompt_tokens": 1196,
+        "completion_tokens": 1352,
+        "total_tokens": 2548,
+        "cost_usd": 0.0029835,
+        "generation_id": "gen-1786829402-g8sA7ks7cmuvkC9nT8jx"
+      }
+    },
+    {
+      "ordem": 1026,
+      "titulo_en": "The Dedication of the Wall",
+      "chars_texto": 2334,
+      "usage": {
+        "prompt_tokens": 1657,
+        "completion_tokens": 1634,
+        "total_tokens": 3291,
+        "cost_usd": 0.003685125,
+        "generation_id": "gen-1786829401-2cpK27s6VceJcU854ayq"
+      }
+    },
+    {
+      "ordem": 1028,
+      "titulo_en": "The Temple Cleansed",
+      "chars_texto": 1396,
+      "usage": {
+        "prompt_tokens": 1333,
+        "completion_tokens": 1622,
+        "total_tokens": 2955,
+        "cost_usd": 0.003541125,
+        "generation_id": "gen-1786829404-SsX4rEGLNubhCRpA6shK"
+      }
+    },
+    {
+      "ordem": 1031,
+      "titulo_en": "Intermarriage Forbidden",
+      "chars_texto": 1415,
+      "usage": {
+        "prompt_tokens": 1342,
+        "completion_tokens": 662,
+        "total_tokens": 2004,
+        "cost_usd": 0.0017445,
+        "generation_id": "gen-1786829412-2mt8WIvTkoudx4nTrpNG"
+      }
+    },
+    {
+      "ordem": 1029,
+      "titulo_en": "Tithes Restored",
+      "chars_texto": 815,
+      "usage": {
+        "prompt_tokens": 1191,
+        "completion_tokens": 1392,
+        "total_tokens": 2583,
+        "cost_usd": 0.003056625,
+        "generation_id": "gen-1786829410-gvvwtlliRGAIjgJWENDm"
+      }
+    },
+    {
+      "ordem": 1030,
+      "titulo_en": "The Sabbath Restored",
+      "chars_texto": 1547,
+      "usage": {
+        "prompt_tokens": 1365,
+        "completion_tokens": 1499,
+        "total_tokens": 2864,
+        "cost_usd": 0.0033225,
+        "generation_id": "gen-1786829410-ZUTAU0zOrrZNlzhOAkcI"
+      }
+    },
+    {
+      "ordem": 1033,
+      "titulo_en": "Queen Vashti's Refusal",
+      "chars_texto": 601,
+      "usage": {
+        "prompt_tokens": 1132,
+        "completion_tokens": 792,
+        "total_tokens": 1924,
+        "cost_usd": 0.0019095,
+        "generation_id": "gen-1786829416-u2vBPnA2sV7lbBx1x9dn"
+      }
+    },
+    {
+      "ordem": 1032,
+      "titulo_en": "Xerxes' Greatness",
+      "chars_texto": 1248,
+      "usage": {
+        "prompt_tokens": 1294,
+        "completion_tokens": 1502,
+        "total_tokens": 2796,
+        "cost_usd": 0.0033015,
+        "generation_id": "gen-1786829413-6duIxQc5zHyv90kb2gU9"
+      }
+    },
+    {
+      "ordem": 1035,
+      "titulo_en": "Seeking Vashti's Successor",
+      "chars_texto": 659,
+      "usage": {
+        "prompt_tokens": 1142,
+        "completion_tokens": 733,
+        "total_tokens": 1875,
+        "cost_usd": 0.001802625,
+        "generation_id": "gen-1786829421-Y287oqxHLcZlemkERrZt"
+      }
+    },
+    {
+      "ordem": 1034,
+      "titulo_en": "Queen Vashti Deposed",
+      "chars_texto": 1825,
+      "usage": {
+        "prompt_tokens": 1466,
+        "completion_tokens": 1302,
+        "total_tokens": 2768,
+        "cost_usd": 0.002991,
+        "generation_id": "gen-1786829419-4f4Tf3YZhmEcdQE7LAzO"
+      }
+    },
+    {
+      "ordem": 1037,
+      "titulo_en": "Esther Becomes Queen",
+      "chars_texto": 687,
+      "usage": {
+        "prompt_tokens": 1137,
+        "completion_tokens": 1260,
+        "total_tokens": 2397,
+        "cost_usd": 0.002788875,
+        "generation_id": "gen-1786829423-PZQDGxrv6vaGElourQrW"
+      }
+    },
+    {
+      "ordem": 1036,
+      "titulo_en": "Esther Finds Favor",
+      "chars_texto": 2244,
+      "usage": {
+        "prompt_tokens": 1571,
+        "completion_tokens": 1551,
+        "total_tokens": 3122,
+        "cost_usd": 0.00349725,
+        "generation_id": "gen-1786829422-3F0qSEAqztvOGnJdBfoj"
+      }
+    },
+    {
+      "ordem": 1038,
+      "titulo_en": "Mordecai Uncovers a Conspiracy",
+      "chars_texto": 476,
+      "usage": {
+        "prompt_tokens": 1093,
+        "completion_tokens": 1518,
+        "total_tokens": 2611,
+        "cost_usd": 0.003256125,
+        "generation_id": "gen-1786829425-ZO2FA6cqUT3CvqfmAOQb"
+      }
+    },
+    {
+      "ordem": 1039,
+      "titulo_en": "Haman Elevated",
+      "chars_texto": 382,
+      "usage": {
+        "prompt_tokens": 1060,
+        "completion_tokens": 1483,
+        "total_tokens": 2543,
+        "cost_usd": 0.003178125,
+        "generation_id": "gen-1786829428-lZG1QoB9UFNuRKlkNvgh"
+      }
+    },
+    {
+      "ordem": 1040,
+      "titulo_en": "Haman's Plot to Destroy His Enemies",
+      "chars_texto": 2614,
+      "usage": {
+        "prompt_tokens": 1691,
+        "completion_tokens": 1542,
+        "total_tokens": 3233,
+        "cost_usd": 0.003525375,
+        "generation_id": "gen-1786829429-arAkYyVIN0K5dXDwTLYs"
+      }
+    },
+    {
+      "ordem": 1041,
+      "titulo_en": "The Jews Lament Over the Royal Edict",
+      "chars_texto": 477,
+      "usage": {
+        "prompt_tokens": 1091,
+        "completion_tokens": 1533,
+        "total_tokens": 2624,
+        "cost_usd": 0.0032835,
+        "generation_id": "gen-1786829433-TjJBPCg15G10ItyP6abT"
+      }
+    },
+    {
+      "ordem": 1042,
+      "titulo_en": "Mordecai Persuades Esther to Appeal to the King",
+      "chars_texto": 2378,
+      "usage": {
+        "prompt_tokens": 1609,
+        "completion_tokens": 1618,
+        "total_tokens": 3227,
+        "cost_usd": 0.003637125,
+        "generation_id": "gen-1786829433-XoIb0S7CrYIN9TUaBIap"
+      }
+    },
+    {
+      "ordem": 1043,
+      "titulo_en": "Esther Approaches the King",
+      "chars_texto": 628,
+      "usage": {
+        "prompt_tokens": 1132,
+        "completion_tokens": 1606,
+        "total_tokens": 2738,
+        "cost_usd": 0.00343575,
+        "generation_id": "gen-1786829436-uqHEYR4b5GVL7UfpgpLj"
+      }
+    },
+    {
+      "ordem": 1044,
+      "titulo_en": "Esther Defers Her Request",
+      "chars_texto": 617,
+      "usage": {
+        "prompt_tokens": 1124,
+        "completion_tokens": 1484,
+        "total_tokens": 2608,
+        "cost_usd": 0.003204,
+        "generation_id": "gen-1786829439-UIo6gSmrjONXCNjEsZri"
+      }
+    },
+    {
+      "ordem": 1045,
+      "titulo_en": "Haman's Plot Against Mordecai",
+      "chars_texto": 1030,
+      "usage": {
+        "prompt_tokens": 1246,
+        "completion_tokens": 1783,
+        "total_tokens": 3029,
+        "cost_usd": 0.003810375,
+        "generation_id": "gen-1786829439-nwYh7E5IPukxDZ5e8ysA"
+      }
+    },
+    {
+      "ordem": 1047,
+      "titulo_en": "Haman's Downfall Begins",
+      "chars_texto": 596,
+      "usage": {
+        "prompt_tokens": 1117,
+        "completion_tokens": 1610,
+        "total_tokens": 2727,
+        "cost_usd": 0.003437625,
+        "generation_id": "gen-1786829445-PJibIqfHxid3R8OcLw55"
+      }
+    },
+    {
+      "ordem": 1046,
+      "titulo_en": "Mordecai is Honored",
+      "chars_texto": 1867,
+      "usage": {
+        "prompt_tokens": 1486,
+        "completion_tokens": 1732,
+        "total_tokens": 3218,
+        "cost_usd": 0.00380475,
+        "generation_id": "gen-1786829444-ZXqen5xTy27B0lSe1Fza"
+      }
+    },
+    {
+      "ordem": 1048,
+      "titulo_en": "Esther Pleads for Her People",
+      "chars_texto": 914,
+      "usage": {
+        "prompt_tokens": 1215,
+        "completion_tokens": 1468,
+        "total_tokens": 2683,
+        "cost_usd": 0.003208125,
+        "generation_id": "gen-1786829447-fVKQjtLQeDM4wZpOgrzy"
+      }
+    },
+    {
+      "ordem": 1049,
+      "titulo_en": "The Hanging of Haman",
+      "chars_texto": 888,
+      "usage": {
+        "prompt_tokens": 1200,
+        "completion_tokens": 1507,
+        "total_tokens": 2707,
+        "cost_usd": 0.003275625,
+        "generation_id": "gen-1786829450-rlDgVYWYEvcwjIGmpEcg"
+      }
+    },
+    {
+      "ordem": 1051,
+      "titulo_en": "The Jews Rejoice Over the New Royal Edict",
+      "chars_texto": 520,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 770,
+        "total_tokens": 1877,
+        "cost_usd": 0.001858875,
+        "generation_id": "gen-1786829456-4Yts91cc52TZG7meZAAu"
+      }
+    },
+    {
+      "ordem": 1053,
+      "titulo_en": "Haman's Sons Hanged",
+      "chars_texto": 1180,
+      "usage": {
+        "prompt_tokens": 1294,
+        "completion_tokens": 708,
+        "total_tokens": 2002,
+        "cost_usd": 0.00181275,
+        "generation_id": "gen-1786829458-WeSI5vcNJHBeoeit5PZM"
+      }
+    },
+    {
+      "ordem": 1050,
+      "titulo_en": "Esther and Mordecai Persuade the King to Issue New Edict",
+      "chars_texto": 2898,
+      "usage": {
+        "prompt_tokens": 1779,
+        "completion_tokens": 1848,
+        "total_tokens": 3627,
+        "cost_usd": 0.004132125,
+        "generation_id": "gen-1786829452-OzilIhsU7YscdSXkURpR"
+      }
+    },
+    {
+      "ordem": 1052,
+      "titulo_en": "The Jews Destroy Their Enemies",
+      "chars_texto": 1223,
+      "usage": {
+        "prompt_tokens": 1302,
+        "completion_tokens": 1591,
+        "total_tokens": 2893,
+        "cost_usd": 0.003471375,
+        "generation_id": "gen-1786829456-xICXvGwBRR9Xkj2J5SKO"
+      }
+    },
+    {
+      "ordem": 1055,
+      "titulo_en": "Tribute to Xerxes and Mordecai",
+      "chars_texto": 509,
+      "usage": {
+        "prompt_tokens": 1093,
+        "completion_tokens": 792,
+        "total_tokens": 1885,
+        "cost_usd": 0.001894875,
+        "generation_id": "gen-1786829462-AZIDP72JDaULEswcaHjp"
+      }
+    },
+    {
+      "ordem": 1054,
+      "titulo_en": "Feast of Purim Instituted",
+      "chars_texto": 2672,
+      "usage": {
+        "prompt_tokens": 1680,
+        "completion_tokens": 1399,
+        "total_tokens": 3079,
+        "cost_usd": 0.003253125,
+        "generation_id": "gen-1786829462-UWzFRR3MNnmFBfiChUWc"
+      }
+    },
+    {
+      "ordem": 1056,
+      "titulo_en": "Job's Character and Wealth",
+      "chars_texto": 824,
+      "usage": {
+        "prompt_tokens": 1174,
+        "completion_tokens": 1324,
+        "total_tokens": 2498,
+        "cost_usd": 0.00292275,
+        "generation_id": "gen-1786829464-d1qSHD77nuTJc7HlwQzE"
+      }
+    },
+    {
+      "ordem": 1057,
+      "titulo_en": "Satan in the Throne Room",
+      "chars_texto": 932,
+      "usage": {
+        "prompt_tokens": 1222,
+        "completion_tokens": 1458,
+        "total_tokens": 2680,
+        "cost_usd": 0.003192,
+        "generation_id": "gen-1786829465-qsHcqNrDkqeiR3Ono5kq"
+      }
+    },
+    {
+      "ordem": 1058,
+      "titulo_en": "Job Loses His Children and Possessions",
+      "chars_texto": 1408,
+      "usage": {
+        "prompt_tokens": 1352,
+        "completion_tokens": 1376,
+        "total_tokens": 2728,
+        "cost_usd": 0.003087,
+        "generation_id": "gen-1786829468-fh6Ox7LCEpTVOwIv1126"
+      }
+    },
+    {
+      "ordem": 1059,
+      "titulo_en": "Satan Back in the Throne Room",
+      "chars_texto": 853,
+      "usage": {
+        "prompt_tokens": 1196,
+        "completion_tokens": 1493,
+        "total_tokens": 2689,
+        "cost_usd": 0.003247875,
+        "generation_id": "gen-1786829470-k0s5sUZ1XSPMlrHvQeBo"
+      }
+    },
+    {
+      "ordem": 1061,
+      "titulo_en": "Job's Three Friends",
+      "chars_texto": 530,
+      "usage": {
+        "prompt_tokens": 1110,
+        "completion_tokens": 1529,
+        "total_tokens": 2639,
+        "cost_usd": 0.003283125,
+        "generation_id": "gen-1786829474-tVuf8Zql3n8Z8ahlIOsd"
+      }
+    },
+    {
+      "ordem": 1060,
+      "titulo_en": "Job Loses His Health",
+      "chars_texto": 468,
+      "usage": {
+        "prompt_tokens": 1088,
+        "completion_tokens": 1793,
+        "total_tokens": 2881,
+        "cost_usd": 0.003769875,
+        "generation_id": "gen-1786829473-3N96fmBFrFEkIzltRHws"
+      }
+    },
+    {
+      "ordem": 1062,
+      "titulo_en": "Job's Opening Lament",
+      "chars_texto": 2200,
+      "usage": {
+        "prompt_tokens": 1617,
+        "completion_tokens": 1563,
+        "total_tokens": 3180,
+        "cost_usd": 0.003537,
+        "generation_id": "gen-1786829476-HCVltX7bdd0ETYxzHkhT"
+      }
+    },
+    {
+      "ordem": 1063,
+      "titulo_en": "The Innocent Prosper",
+      "chars_texto": 1855,
+      "usage": {
+        "prompt_tokens": 1488,
+        "completion_tokens": 1635,
+        "total_tokens": 3123,
+        "cost_usd": 0.003623625,
+        "generation_id": "gen-1786829478-DAVM6QAVfSqrCZoQxitM"
+      }
+    },
+    {
+      "ordem": 1064,
+      "titulo_en": "God Blesses those Who Seek Him",
+      "chars_texto": 2339,
+      "usage": {
+        "prompt_tokens": 1651,
+        "completion_tokens": 1517,
+        "total_tokens": 3168,
+        "cost_usd": 0.0034635,
+        "generation_id": "gen-1786829481-9SGlV39hqADNiRwDjPMv"
+      }
+    },
+    {
+      "ordem": 1065,
+      "titulo_en": "My Complaint is Just",
+      "chars_texto": 2730,
+      "usage": {
+        "prompt_tokens": 1747,
+        "completion_tokens": 1704,
+        "total_tokens": 3451,
+        "cost_usd": 0.003850125,
+        "generation_id": "gen-1786829485-2vEbIt1kaKH6A84XmQOz"
+      }
+    },
+    {
+      "ordem": 1067,
+      "titulo_en": "Job Should Repent",
+      "chars_texto": 1875,
+      "usage": {
+        "prompt_tokens": 1508,
+        "completion_tokens": 1429,
+        "total_tokens": 2937,
+        "cost_usd": 0.003244875,
+        "generation_id": "gen-1786829487-cdjPQFWQVadeI5GV0aIY"
+      }
+    },
+    {
+      "ordem": 1066,
+      "titulo_en": "Life Seems Futile",
+      "chars_texto": 2094,
+      "usage": {
+        "prompt_tokens": 1569,
+        "completion_tokens": 1552,
+        "total_tokens": 3121,
+        "cost_usd": 0.003498375,
+        "generation_id": "gen-1786829487-FUxjNa6CFkQNpsiPRGfX"
+      }
+    },
+    {
+      "ordem": 1068,
+      "titulo_en": "How Can I Contend with God?",
+      "chars_texto": 2870,
+      "usage": {
+        "prompt_tokens": 1808,
+        "completion_tokens": 1581,
+        "total_tokens": 3389,
+        "cost_usd": 0.003642375,
+        "generation_id": "gen-1786829490-UBqvc9BZLVBCD5acv5e0"
+      }
+    },
+    {
+      "ordem": 1069,
+      "titulo_en": "Job's Plea to God",
+      "chars_texto": 2004,
+      "usage": {
+        "prompt_tokens": 1558,
+        "completion_tokens": 1646,
+        "total_tokens": 3204,
+        "cost_usd": 0.0036705,
+        "generation_id": "gen-1786829493-5nkijencruQM5i1Oo02Z"
+      }
+    },
+    {
+      "ordem": 1070,
+      "titulo_en": "Zophar Rebukes Job",
+      "chars_texto": 1820,
+      "usage": {
+        "prompt_tokens": 1487,
+        "completion_tokens": 1581,
+        "total_tokens": 3068,
+        "cost_usd": 0.003522,
+        "generation_id": "gen-1786829498-mPzYSbimH9ea5h2E8A7g"
+      }
+    },
+    {
+      "ordem": 1071,
+      "titulo_en": "Job presents His Case",
+      "chars_texto": 2084,
+      "usage": {
+        "prompt_tokens": 1570,
+        "completion_tokens": 1641,
+        "total_tokens": 3211,
+        "cost_usd": 0.003665625,
+        "generation_id": "gen-1786829499-Xt3K0b2vBnC1WWGvbkPn"
+      }
+    },
+    {
+      "ordem": 1072,
+      "titulo_en": "Job Prepares His Case",
+      "chars_texto": 2274,
+      "usage": {
+        "prompt_tokens": 1617,
+        "completion_tokens": 1674,
+        "total_tokens": 3291,
+        "cost_usd": 0.003745125,
+        "generation_id": "gen-1786829499-9fC3C6G60AeijfdeRXBG"
+      }
+    },
+    {
+      "ordem": 1073,
+      "titulo_en": "Job Laments the Finality of Death",
+      "chars_texto": 2021,
+      "usage": {
+        "prompt_tokens": 1554,
+        "completion_tokens": 1540,
+        "total_tokens": 3094,
+        "cost_usd": 0.00347025,
+        "generation_id": "gen-1786829502-28A8CGPFDWZkHlPzhNVb"
+      }
+    },
+    {
+      "ordem": 1074,
+      "titulo_en": "Job Does Not Fear God",
+      "chars_texto": 3025,
+      "usage": {
+        "prompt_tokens": 1833,
+        "completion_tokens": 1319,
+        "total_tokens": 3152,
+        "cost_usd": 0.0031605,
+        "generation_id": "gen-1786829505-mjuLm4VJSRaUBmM9bcUA"
+      }
+    },
+    {
+      "ordem": 1076,
+      "titulo_en": "Job Prepares for Death",
+      "chars_texto": 1403,
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 1396,
+        "total_tokens": 2763,
+        "cost_usd": 0.003130125,
+        "generation_id": "gen-1786829511-UDNGD0n3LM87N1RaTp4S"
+      }
+    },
+    {
+      "ordem": 1075,
+      "titulo_en": "Job Decries His Comforters",
+      "chars_texto": 2094,
+      "usage": {
+        "prompt_tokens": 1560,
+        "completion_tokens": 1820,
+        "total_tokens": 3380,
+        "cost_usd": 0.0039975,
+        "generation_id": "gen-1786829509-iNh6KaNTJf7HLoOUfXBy"
+      }
+    },
+    {
+      "ordem": 1077,
+      "titulo_en": "God Punishes the Wicked",
+      "chars_texto": 1728,
+      "usage": {
+        "prompt_tokens": 1480,
+        "completion_tokens": 1558,
+        "total_tokens": 3038,
+        "cost_usd": 0.00347625,
+        "generation_id": "gen-1786829511-hrPuck4pQ4i5bzLTEgbv"
+      }
+    },
+    {
+      "ordem": 1078,
+      "titulo_en": "Job Replies to Bildad",
+      "chars_texto": 2528,
+      "usage": {
+        "prompt_tokens": 1696,
+        "completion_tokens": 1723,
+        "total_tokens": 3419,
+        "cost_usd": 0.003866625,
+        "generation_id": "gen-1786829514-4b1i9beMylpYZEZxi7Vv"
+      }
+    },
+    {
+      "ordem": 1079,
+      "titulo_en": "Destruction Awaits the Wicked",
+      "chars_texto": 2613,
+      "usage": {
+        "prompt_tokens": 1735,
+        "completion_tokens": 1407,
+        "total_tokens": 3142,
+        "cost_usd": 0.00328875,
+        "generation_id": "gen-1786829516-My9uvLJ3nsFaAgY2jwB9"
+      }
+    },
+    {
+      "ordem": 1080,
+      "titulo_en": "Job Replies to Zophar",
+      "chars_texto": 2944,
+      "usage": {
+        "prompt_tokens": 1847,
+        "completion_tokens": 1562,
+        "total_tokens": 3409,
+        "cost_usd": 0.003621375,
+        "generation_id": "gen-1786829522-Ha3CYyAJ53tcPW9mJOOQ"
+      }
+    },
+    {
+      "ordem": 1081,
+      "titulo_en": "Can a Man Be of Use to God?",
+      "chars_texto": 2573,
+      "usage": {
+        "prompt_tokens": 1738,
+        "completion_tokens": 1767,
+        "total_tokens": 3505,
+        "cost_usd": 0.003964875,
+        "generation_id": "gen-1786829523-4HWWniJ9p20dKSEFqzsp"
+      }
+    },
+    {
+      "ordem": 1082,
+      "titulo_en": "Job Longs for God",
+      "chars_texto": 1450,
+      "usage": {
+        "prompt_tokens": 1375,
+        "completion_tokens": 1641,
+        "total_tokens": 3016,
+        "cost_usd": 0.0035925,
+        "generation_id": "gen-1786829524-fL941tRQ0YlyvDdHcb1a"
+      }
+    },
+    {
+      "ordem": 1084,
+      "titulo_en": "Man Cannot Be Righteous",
+      "chars_texto": 479,
+      "usage": {
+        "prompt_tokens": 1092,
+        "completion_tokens": 1432,
+        "total_tokens": 2524,
+        "cost_usd": 0.0030945,
+        "generation_id": "gen-1786829527-1BFqnXUPJrtCOItLkeoO"
+      }
+    },
+    {
+      "ordem": 1083,
+      "titulo_en": "Judgment for the Wicked",
+      "chars_texto": 2480,
+      "usage": {
+        "prompt_tokens": 1687,
+        "completion_tokens": 1692,
+        "total_tokens": 3379,
+        "cost_usd": 0.003805125,
+        "generation_id": "gen-1786829526-dSYtXqNw8XThZYJXuphA"
+      }
+    },
+    {
+      "ordem": 1087,
+      "titulo_en": "Job's Second Monologue",
+      "chars_texto": 8877,
+      "usage": {
+        "prompt_tokens": 3598,
+        "completion_tokens": 1004,
+        "total_tokens": 4602,
+        "cost_usd": 0.00323175,
+        "generation_id": "gen-1786829537-gKsRup30EfZ01engpsTG"
+      }
+    },
+    {
+      "ordem": 1085,
+      "titulo_en": "Job Replies to Bildad",
+      "chars_texto": 1127,
+      "usage": {
+        "prompt_tokens": 1279,
+        "completion_tokens": 1584,
+        "total_tokens": 2863,
+        "cost_usd": 0.003449625,
+        "generation_id": "gen-1786829534-epT2HIRdlfuQJ6BnnnF1"
+      }
+    },
+    {
+      "ordem": 1086,
+      "titulo_en": "Job's First Monologue",
+      "chars_texto": 4464,
+      "usage": {
+        "prompt_tokens": 2296,
+        "completion_tokens": 1646,
+        "total_tokens": 3942,
+        "cost_usd": 0.00394725,
+        "generation_id": "gen-1786829536-OoZRC2WFdUcgFTw8y4te"
+      }
+    },
+    {
+      "ordem": 1088,
+      "titulo_en": "Elihu Rebukes Job's Friends",
+      "chars_texto": 2147,
+      "usage": {
+        "prompt_tokens": 1571,
+        "completion_tokens": 1694,
+        "total_tokens": 3265,
+        "cost_usd": 0.003765375,
+        "generation_id": "gen-1786829538-poGG6uUeyFlPiuStUU6b"
+      }
+    },
+    {
+      "ordem": 1089,
+      "titulo_en": "Elihu Rebukes Job",
+      "chars_texto": 2758,
+      "usage": {
+        "prompt_tokens": 1775,
+        "completion_tokens": 1529,
+        "total_tokens": 3304,
+        "cost_usd": 0.0035325,
+        "generation_id": "gen-1786829539-gSXa8mTupZI6tZ71H23n"
+      }
+    },
+    {
+      "ordem": 1091,
+      "titulo_en": "Elihu Recalls God's Justice",
+      "chars_texto": 1327,
+      "usage": {
+        "prompt_tokens": 1341,
+        "completion_tokens": 1301,
+        "total_tokens": 2642,
+        "cost_usd": 0.00294225,
+        "generation_id": "gen-1786829546-VyYW3PcHrZ04psDdggRa"
+      }
+    },
+    {
+      "ordem": 1090,
+      "titulo_en": "Elihu Confirms God's Justice",
+      "chars_texto": 3389,
+      "usage": {
+        "prompt_tokens": 1926,
+        "completion_tokens": 1604,
+        "total_tokens": 3530,
+        "cost_usd": 0.00372975,
+        "generation_id": "gen-1786829545-MlQADmuxB35eCwmcUBPT"
+      }
+    },
+    {
+      "ordem": 1092,
+      "titulo_en": "Elihu Describes God's Power",
+      "chars_texto": 2906,
+      "usage": {
+        "prompt_tokens": 1786,
+        "completion_tokens": 1558,
+        "total_tokens": 3344,
+        "cost_usd": 0.003591,
+        "generation_id": "gen-1786829549-UXKeNE77ZUehb8OIQtQE"
+      }
+    },
+    {
+      "ordem": 1094,
+      "titulo_en": "God's First Challenge to Job",
+      "chars_texto": 6222,
+      "usage": {
+        "prompt_tokens": 2788,
+        "completion_tokens": 1640,
+        "total_tokens": 4428,
+        "cost_usd": 0.0041205,
+        "generation_id": "gen-1786829551-9WCufqviAz6Wb4Z4q48m"
+      }
+    },
+    {
+      "ordem": 1093,
+      "titulo_en": "Elihu Proclaims God's Majesty",
+      "chars_texto": 2269,
+      "usage": {
+        "prompt_tokens": 1615,
+        "completion_tokens": 1615,
+        "total_tokens": 3230,
+        "cost_usd": 0.00363375,
+        "generation_id": "gen-1786829551-z7twx9ZHFJ1ENxXQKNWi"
+      }
+    },
+    {
+      "ordem": 1095,
+      "titulo_en": "Job's First Reply to God",
+      "chars_texto": 206,
+      "usage": {
+        "prompt_tokens": 1022,
+        "completion_tokens": 1589,
+        "total_tokens": 2611,
+        "cost_usd": 0.003362625,
+        "generation_id": "gen-1786829556-Rw2JPgsLFPpbznrKCF2w"
+      }
+    },
+    {
+      "ordem": 1098,
+      "titulo_en": "The LORD Rebukes Job's Friends",
+      "chars_texto": 730,
+      "usage": {
+        "prompt_tokens": 1168,
+        "completion_tokens": 725,
+        "total_tokens": 1893,
+        "cost_usd": 0.001797375,
+        "generation_id": "gen-1786829564-DZNkDEl0ycts0qZAu16a"
+      }
+    },
+    {
+      "ordem": 1097,
+      "titulo_en": "Job's Second Reply to God",
+      "chars_texto": 519,
+      "usage": {
+        "prompt_tokens": 1109,
+        "completion_tokens": 1476,
+        "total_tokens": 2585,
+        "cost_usd": 0.003183375,
+        "generation_id": "gen-1786829561-qxdTkohjBDTGTxLhf9bX"
+      }
+    },
+    {
+      "ordem": 1096,
+      "titulo_en": "God's Second Challenge to Job",
+      "chars_texto": 4601,
+      "usage": {
+        "prompt_tokens": 2362,
+        "completion_tokens": 2042,
+        "total_tokens": 4404,
+        "cost_usd": 0.0047145,
+        "generation_id": "gen-1786829558-LoV4AXs7R2Kz6VC77727"
+      }
+    },
+    {
+      "ordem": 1099,
+      "titulo_en": "The LORD Blesses Job",
+      "chars_texto": 1013,
+      "usage": {
+        "prompt_tokens": 1249,
+        "completion_tokens": 1539,
+        "total_tokens": 2788,
+        "cost_usd": 0.003354,
+        "generation_id": "gen-1786829564-PeadHD7fHuiJYs6sfZ0Q"
+      }
+    },
+    {
+      "ordem": 1101,
+      "titulo_en": "Book 2",
+      "chars_texto": 45055,
+      "usage": {
+        "prompt_tokens": 14433,
+        "completion_tokens": 1723,
+        "total_tokens": 16156,
+        "cost_usd": 0.008643,
+        "generation_id": "gen-1786829570-g484uAL27ykbbWyJp4Z4"
+      }
+    },
+    {
+      "ordem": 1100,
+      "titulo_en": "Book 1",
+      "chars_texto": 58950,
+      "usage": {
+        "prompt_tokens": 18723,
+        "completion_tokens": 2017,
+        "total_tokens": 20740,
+        "cost_usd": 0.010803,
+        "generation_id": "gen-1786829568-LB0EoQflFkoKUh4BzQDx"
+      }
+    },
+    {
+      "ordem": 1102,
+      "titulo_en": "Book 3",
+      "chars_texto": 31657,
+      "usage": {
+        "prompt_tokens": 10471,
+        "completion_tokens": 1676,
+        "total_tokens": 12147,
+        "cost_usd": 0.007069125,
+        "generation_id": "gen-1786829572-Rr4bATm9gAfQ3AmIdd5U"
+      }
+    },
+    {
+      "ordem": 1103,
+      "titulo_en": "Book 4",
+      "chars_texto": 27904,
+      "usage": {
+        "prompt_tokens": 9441,
+        "completion_tokens": 1524,
+        "total_tokens": 10965,
+        "cost_usd": 0.006397875,
+        "generation_id": "gen-1786829574-MKj7psiOg8RauViuB7UJ"
+      }
+    },
+    {
+      "ordem": 1104,
+      "titulo_en": "Book 5",
+      "chars_texto": 58509,
+      "usage": {
+        "prompt_tokens": 18811,
+        "completion_tokens": 1960,
+        "total_tokens": 20771,
+        "cost_usd": 0.010729125,
+        "generation_id": "gen-1786829576-OmpnVxuBRz2MLT4FNE34"
+      }
+    },
+    {
+      "ordem": 1105,
+      "titulo_en": "The Beginning of Knowledge",
+      "chars_texto": 548,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 1221,
+        "total_tokens": 2328,
+        "cost_usd": 0.0027045,
+        "generation_id": "gen-1786829583-zn0ji5hHhectj47gzQ1T"
+      }
+    },
+    {
+      "ordem": 1106,
+      "titulo_en": "The Enticement of Sin",
+      "chars_texto": 1016,
+      "usage": {
+        "prompt_tokens": 1253,
+        "completion_tokens": 1864,
+        "total_tokens": 3117,
+        "cost_usd": 0.003964875,
+        "generation_id": "gen-1786829584-i1VkErb99s0wrdwvDFSb"
       }
     }
   ]

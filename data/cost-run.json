@@ -1,15 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
   "concurrency": 5,
-  "done": 1100,
+  "done": 1200,
   "pending_total": 2640,
-  "sample_cost_usd": 3.6322732500000012,
-  "avg_cost_usd": 0.003302066590909092,
-  "estimate_remaining_usd": 5.085182550000002,
-  "estimate_full_run_usd": 8.717455800000003,
-  "elapsed_sec": 2531.648,
-  "throughput_per_sec": 0.4344995828804004,
-  "eta_sec": 3544.3072,
+  "sample_cost_usd": 3.9708678749999993,
+  "avg_cost_usd": 0.0033090565624999996,
+  "estimate_remaining_usd": 4.765041449999999,
+  "estimate_full_run_usd": 8.735909325,
+  "elapsed_sec": 2764.225,
+  "throughput_per_sec": 0.4341180620246181,
+  "eta_sec": 3317.07,
   "catalog_total": 2647,
   "items": [
     {
@@ -13210,6 +13210,1206 @@
         "total_tokens": 3117,
         "cost_usd": 0.003964875,
         "generation_id": "gen-1786829584-i1VkErb99s0wrdwvDFSb"
+      }
+    },
+    {
+      "ordem": 1109,
+      "titulo_en": "Trust in the LORD with All Your Heart",
+      "chars_texto": 1049,
+      "usage": {
+        "prompt_tokens": 1255,
+        "completion_tokens": 1265,
+        "total_tokens": 2520,
+        "cost_usd": 0.0028425,
+        "generation_id": "gen-1786829601-rbnlrkQHWu0ZF1Xmfe8H"
+      }
+    },
+    {
+      "ordem": 1110,
+      "titulo_en": "The Blessings of Wisdom",
+      "chars_texto": 2002,
+      "usage": {
+        "prompt_tokens": 1542,
+        "completion_tokens": 1428,
+        "total_tokens": 2970,
+        "cost_usd": 0.00325575,
+        "generation_id": "gen-1786829601-ETm1LkcpzudIab8UZRxN"
+      }
+    },
+    {
+      "ordem": 1107,
+      "titulo_en": "Wisdom Calls Aloud",
+      "chars_texto": 1402,
+      "usage": {
+        "prompt_tokens": 1355,
+        "completion_tokens": 1565,
+        "total_tokens": 2920,
+        "cost_usd": 0.0034425,
+        "generation_id": "gen-1786829601-nif9bprdueQGaGU6mpSv"
+      }
+    },
+    {
+      "ordem": 1108,
+      "titulo_en": "The Benefits of Wisdom",
+      "chars_texto": 1813,
+      "usage": {
+        "prompt_tokens": 1462,
+        "completion_tokens": 1601,
+        "total_tokens": 3063,
+        "cost_usd": 0.003550125,
+        "generation_id": "gen-1786829601-zc7R5UVx34BYeBKut66V"
+      }
+    },
+    {
+      "ordem": 1111,
+      "titulo_en": "A Father's Instruction",
+      "chars_texto": 2338,
+      "usage": {
+        "prompt_tokens": 1636,
+        "completion_tokens": 1833,
+        "total_tokens": 3469,
+        "cost_usd": 0.004050375,
+        "generation_id": "gen-1786829601-PBX2zzL4IAb4iUh9bbnn"
+      }
+    },
+    {
+      "ordem": 1112,
+      "titulo_en": "Avoiding Immorality",
+      "chars_texto": 2028,
+      "usage": {
+        "prompt_tokens": 1539,
+        "completion_tokens": 1667,
+        "total_tokens": 3206,
+        "cost_usd": 0.00370275,
+        "generation_id": "gen-1786829611-RxnDJCViE5VzaaiQmIAN"
+      }
+    },
+    {
+      "ordem": 1113,
+      "titulo_en": "Warnings against Foolishness",
+      "chars_texto": 1514,
+      "usage": {
+        "prompt_tokens": 1398,
+        "completion_tokens": 1757,
+        "total_tokens": 3155,
+        "cost_usd": 0.003818625,
+        "generation_id": "gen-1786829611-uPjyJP216pud2U3qwp5U"
+      }
+    },
+    {
+      "ordem": 1114,
+      "titulo_en": "Warnings against Adultery",
+      "chars_texto": 1411,
+      "usage": {
+        "prompt_tokens": 1382,
+        "completion_tokens": 1703,
+        "total_tokens": 3085,
+        "cost_usd": 0.003711375,
+        "generation_id": "gen-1786829612-vEnDhYOm1dnVLPZAZ2gq"
+      }
+    },
+    {
+      "ordem": 1115,
+      "titulo_en": "Warning about the Adulteress",
+      "chars_texto": 2209,
+      "usage": {
+        "prompt_tokens": 1617,
+        "completion_tokens": 1685,
+        "total_tokens": 3302,
+        "cost_usd": 0.00376575,
+        "generation_id": "gen-1786829613-CswDdMcCyvbm07SMXVAf"
+      }
+    },
+    {
+      "ordem": 1116,
+      "titulo_en": "The Excellence of Wisdom",
+      "chars_texto": 3163,
+      "usage": {
+        "prompt_tokens": 1864,
+        "completion_tokens": 1763,
+        "total_tokens": 3627,
+        "cost_usd": 0.004004625,
+        "generation_id": "gen-1786829614-Pl8afSArs7my2L9AfCxn"
+      }
+    },
+    {
+      "ordem": 1118,
+      "titulo_en": "The Way of Folly",
+      "chars_texto": 474,
+      "usage": {
+        "prompt_tokens": 1103,
+        "completion_tokens": 1401,
+        "total_tokens": 2504,
+        "cost_usd": 0.0030405,
+        "generation_id": "gen-1786829624-meyXx7EnhR12PfyOs1B4"
+      }
+    },
+    {
+      "ordem": 1117,
+      "titulo_en": "The Way of Wisdom",
+      "chars_texto": 1001,
+      "usage": {
+        "prompt_tokens": 1263,
+        "completion_tokens": 1747,
+        "total_tokens": 3010,
+        "cost_usd": 0.00374925,
+        "generation_id": "gen-1786829624-LaRJmVSijD5dnpC1V855"
+      }
+    },
+    {
+      "ordem": 1120,
+      "titulo_en": "Dishonest Scales",
+      "chars_texto": 2631,
+      "usage": {
+        "prompt_tokens": 1738,
+        "completion_tokens": 1637,
+        "total_tokens": 3375,
+        "cost_usd": 0.003721125,
+        "generation_id": "gen-1786829625-fNH8qHGpO7w2ijzG82Nn"
+      }
+    },
+    {
+      "ordem": 1119,
+      "titulo_en": "The Wise Son",
+      "chars_texto": 2759,
+      "usage": {
+        "prompt_tokens": 1781,
+        "completion_tokens": 1584,
+        "total_tokens": 3365,
+        "cost_usd": 0.003637875,
+        "generation_id": "gen-1786829625-CVtlGg09xocQ6liErCop"
+      }
+    },
+    {
+      "ordem": 1121,
+      "titulo_en": "Loving Discipline and Knowledge",
+      "chars_texto": 2514,
+      "usage": {
+        "prompt_tokens": 1676,
+        "completion_tokens": 1668,
+        "total_tokens": 3344,
+        "cost_usd": 0.003756,
+        "generation_id": "gen-1786829627-CEaYbtGqwQUFGKJ8ROPK"
+      }
+    },
+    {
+      "ordem": 1122,
+      "titulo_en": "A Father's Discipline",
+      "chars_texto": 2151,
+      "usage": {
+        "prompt_tokens": 1586,
+        "completion_tokens": 1545,
+        "total_tokens": 3131,
+        "cost_usd": 0.003491625,
+        "generation_id": "gen-1786829634-pcfw2iDqz68S5PGP1By2"
+      }
+    },
+    {
+      "ordem": 1124,
+      "titulo_en": "A Gentle Answer Turns Away Wrath",
+      "chars_texto": 2853,
+      "usage": {
+        "prompt_tokens": 1790,
+        "completion_tokens": 1346,
+        "total_tokens": 3136,
+        "cost_usd": 0.003195,
+        "generation_id": "gen-1786829637-RwMP045MeVrDJ5H3Ktlu"
+      }
+    },
+    {
+      "ordem": 1123,
+      "titulo_en": "The Wise Woman",
+      "chars_texto": 3108,
+      "usage": {
+        "prompt_tokens": 1860,
+        "completion_tokens": 1566,
+        "total_tokens": 3426,
+        "cost_usd": 0.00363375,
+        "generation_id": "gen-1786829636-YjcgGFgczdCliJOsxStg"
+      }
+    },
+    {
+      "ordem": 1125,
+      "titulo_en": "The Reply of the Tongue Is from the LORD",
+      "chars_texto": 2908,
+      "usage": {
+        "prompt_tokens": 1786,
+        "completion_tokens": 1696,
+        "total_tokens": 3482,
+        "cost_usd": 0.00384975,
+        "generation_id": "gen-1786829637-mYn1fdyeajYLn49WtU7W"
+      }
+    },
+    {
+      "ordem": 1126,
+      "titulo_en": "Better a Dry Morsel in Quietness",
+      "chars_texto": 2503,
+      "usage": {
+        "prompt_tokens": 1674,
+        "completion_tokens": 1863,
+        "total_tokens": 3537,
+        "cost_usd": 0.004120875,
+        "generation_id": "gen-1786829639-ABxzytj1bQqNR4f1omkD"
+      }
+    },
+    {
+      "ordem": 1127,
+      "titulo_en": "The Selfishness of the Unfriendly",
+      "chars_texto": 1930,
+      "usage": {
+        "prompt_tokens": 1509,
+        "completion_tokens": 1533,
+        "total_tokens": 3042,
+        "cost_usd": 0.00344025,
+        "generation_id": "gen-1786829646-mHhvfzIIBDx7vnYrn8qv"
+      }
+    },
+    {
+      "ordem": 1128,
+      "titulo_en": "The Man of Integrity",
+      "chars_texto": 2602,
+      "usage": {
+        "prompt_tokens": 1733,
+        "completion_tokens": 1547,
+        "total_tokens": 3280,
+        "cost_usd": 0.0035505,
+        "generation_id": "gen-1786829648-kIo6EryN4eN0NRdOvbCZ"
+      }
+    },
+    {
+      "ordem": 1130,
+      "titulo_en": "The King's Heart",
+      "chars_texto": 2624,
+      "usage": {
+        "prompt_tokens": 1733,
+        "completion_tokens": 1451,
+        "total_tokens": 3184,
+        "cost_usd": 0.0033705,
+        "generation_id": "gen-1786829650-LN4b4qoPAGa4m8zhPD4K"
+      }
+    },
+    {
+      "ordem": 1129,
+      "titulo_en": "Wine is a Mocker",
+      "chars_texto": 2710,
+      "usage": {
+        "prompt_tokens": 1748,
+        "completion_tokens": 1910,
+        "total_tokens": 3658,
+        "cost_usd": 0.00423675,
+        "generation_id": "gen-1786829648-gxHhgJtWUtbiwNJgVS5I"
+      }
+    },
+    {
+      "ordem": 1131,
+      "titulo_en": "A Good Name",
+      "chars_texto": 1404,
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1530,
+        "total_tokens": 2900,
+        "cost_usd": 0.0033825,
+        "generation_id": "gen-1786829652-HwWMZMh3xFovads7glKW"
+      }
+    },
+    {
+      "ordem": 1133,
+      "titulo_en": "Further Sayings of the Wise",
+      "chars_texto": 1029,
+      "usage": {
+        "prompt_tokens": 1266,
+        "completion_tokens": 1358,
+        "total_tokens": 2624,
+        "cost_usd": 0.003021,
+        "generation_id": "gen-1786829658-SDq5qcnNTDoyLIlSlSYi"
+      }
+    },
+    {
+      "ordem": 1132,
+      "titulo_en": "Thirty Sayings of the Wise",
+      "chars_texto": 6295,
+      "usage": {
+        "prompt_tokens": 2757,
+        "completion_tokens": 1666,
+        "total_tokens": 4423,
+        "cost_usd": 0.004157625,
+        "generation_id": "gen-1786829657-ZYqNSnPBlE9amtvocw2O"
+      }
+    },
+    {
+      "ordem": 1134,
+      "titulo_en": "Hezekiah's Collection of Solomon's Proverbs",
+      "chars_texto": 12538,
+      "usage": {
+        "prompt_tokens": 4665,
+        "completion_tokens": 1488,
+        "total_tokens": 6153,
+        "cost_usd": 0.004539375,
+        "generation_id": "gen-1786829659-dkHp8KIuqV08mNdcuiVj"
+      }
+    },
+    {
+      "ordem": 1136,
+      "titulo_en": "The Sayings of King Lemuel",
+      "chars_texto": 754,
+      "usage": {
+        "prompt_tokens": 1179,
+        "completion_tokens": 1430,
+        "total_tokens": 2609,
+        "cost_usd": 0.003123375,
+        "generation_id": "gen-1786829663-Rovg5PzsJN3CCMizvUTA"
+      }
+    },
+    {
+      "ordem": 1135,
+      "titulo_en": "The Words of Agur",
+      "chars_texto": 3310,
+      "usage": {
+        "prompt_tokens": 1945,
+        "completion_tokens": 1701,
+        "total_tokens": 3646,
+        "cost_usd": 0.00391875,
+        "generation_id": "gen-1786829662-5eE5vmkJiITmnIV9wu7O"
+      }
+    },
+    {
+      "ordem": 1137,
+      "titulo_en": "The Virtues of a Noble Woman",
+      "chars_texto": 1631,
+      "usage": {
+        "prompt_tokens": 1475,
+        "completion_tokens": 1210,
+        "total_tokens": 2685,
+        "cost_usd": 0.002821875,
+        "generation_id": "gen-1786829669-q3XzA1O23lLAUStgW873"
+      }
+    },
+    {
+      "ordem": 1138,
+      "titulo_en": "Introduction to The Teacher",
+      "chars_texto": 67,
+      "usage": {
+        "prompt_tokens": 976,
+        "completion_tokens": 1292,
+        "total_tokens": 2268,
+        "cost_usd": 0.0027885,
+        "generation_id": "gen-1786829669-jKOdUtFUI5tFhXjhmiAy"
+      }
+    },
+    {
+      "ordem": 1139,
+      "titulo_en": "Everything is Futile",
+      "chars_texto": 1061,
+      "usage": {
+        "prompt_tokens": 1262,
+        "completion_tokens": 1535,
+        "total_tokens": 2797,
+        "cost_usd": 0.003351375,
+        "generation_id": "gen-1786829671-6kU4eiixDhouBhvMG3QK"
+      }
+    },
+    {
+      "ordem": 1140,
+      "titulo_en": "With Wisdom Comes Sorrow",
+      "chars_texto": 885,
+      "usage": {
+        "prompt_tokens": 1200,
+        "completion_tokens": 1662,
+        "total_tokens": 2862,
+        "cost_usd": 0.00356625,
+        "generation_id": "gen-1786829673-0UREdii3OvX2ocLyYKUA"
+      }
+    },
+    {
+      "ordem": 1142,
+      "titulo_en": "The Wise and the Foolish",
+      "chars_texto": 882,
+      "usage": {
+        "prompt_tokens": 1209,
+        "completion_tokens": 1333,
+        "total_tokens": 2542,
+        "cost_usd": 0.00295275,
+        "generation_id": "gen-1786829678-HONPyfNPFNmRXLbWNH3m"
+      }
+    },
+    {
+      "ordem": 1141,
+      "titulo_en": "The Futility of Pleasure",
+      "chars_texto": 1516,
+      "usage": {
+        "prompt_tokens": 1365,
+        "completion_tokens": 1555,
+        "total_tokens": 2920,
+        "cost_usd": 0.0034275,
+        "generation_id": "gen-1786829676-7KllvfKrVXW9zYdWAULO"
+      }
+    },
+    {
+      "ordem": 1143,
+      "titulo_en": "The Futility of Work",
+      "chars_texto": 1378,
+      "usage": {
+        "prompt_tokens": 1326,
+        "completion_tokens": 1451,
+        "total_tokens": 2777,
+        "cost_usd": 0.003217875,
+        "generation_id": "gen-1786829678-K1AiTPYZtLrdPam8uUBF"
+      }
+    },
+    {
+      "ordem": 1144,
+      "titulo_en": "To Everything There Is a Season",
+      "chars_texto": 670,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1671,
+        "total_tokens": 2811,
+        "cost_usd": 0.003560625,
+        "generation_id": "gen-1786829682-LLpZbULo645a9MgCL17W"
+      }
+    },
+    {
+      "ordem": 1145,
+      "titulo_en": "God's Works Remain Forever",
+      "chars_texto": 763,
+      "usage": {
+        "prompt_tokens": 1165,
+        "completion_tokens": 1328,
+        "total_tokens": 2493,
+        "cost_usd": 0.002926875,
+        "generation_id": "gen-1786829685-juqb8IiwRVfm8x5MtfHm"
+      }
+    },
+    {
+      "ordem": 1148,
+      "titulo_en": "The Futility of Power",
+      "chars_texto": 445,
+      "usage": {
+        "prompt_tokens": 1082,
+        "completion_tokens": 1323,
+        "total_tokens": 2405,
+        "cost_usd": 0.002886375,
+        "generation_id": "gen-1786829690-Ad7jQkozeTy70EeyvhKJ"
+      }
+    },
+    {
+      "ordem": 1146,
+      "titulo_en": "From Dust to Dust",
+      "chars_texto": 979,
+      "usage": {
+        "prompt_tokens": 1219,
+        "completion_tokens": 1520,
+        "total_tokens": 2739,
+        "cost_usd": 0.003307125,
+        "generation_id": "gen-1786829688-YOrLwLoX80kk5q9u0LOz"
+      }
+    },
+    {
+      "ordem": 1147,
+      "titulo_en": "The Evil of Oppression",
+      "chars_texto": 1446,
+      "usage": {
+        "prompt_tokens": 1343,
+        "completion_tokens": 1505,
+        "total_tokens": 2848,
+        "cost_usd": 0.0033255,
+        "generation_id": "gen-1786829689-GG4Q4mUc3Sy7xn8gHUh9"
+      }
+    },
+    {
+      "ordem": 1149,
+      "titulo_en": "Approaching God with Awe",
+      "chars_texto": 930,
+      "usage": {
+        "prompt_tokens": 1207,
+        "completion_tokens": 1777,
+        "total_tokens": 2984,
+        "cost_usd": 0.0037845,
+        "generation_id": "gen-1786829694-2OAVQP23mJeIGSIfRORZ"
+      }
+    },
+    {
+      "ordem": 1150,
+      "titulo_en": "The Futility of Wealth",
+      "chars_texto": 1792,
+      "usage": {
+        "prompt_tokens": 1439,
+        "completion_tokens": 1354,
+        "total_tokens": 2793,
+        "cost_usd": 0.003078375,
+        "generation_id": "gen-1786829696-ySi9VRwl2DLTco8x1OGH"
+      }
+    },
+    {
+      "ordem": 1152,
+      "titulo_en": "The Value of Wisdom",
+      "chars_texto": 1445,
+      "usage": {
+        "prompt_tokens": 1370,
+        "completion_tokens": 1420,
+        "total_tokens": 2790,
+        "cost_usd": 0.00317625,
+        "generation_id": "gen-1786829700-CyKtTJypt8wQlS1A2fsP"
+      }
+    },
+    {
+      "ordem": 1151,
+      "titulo_en": "The Futility of Life",
+      "chars_texto": 1496,
+      "usage": {
+        "prompt_tokens": 1356,
+        "completion_tokens": 1442,
+        "total_tokens": 2798,
+        "cost_usd": 0.00321225,
+        "generation_id": "gen-1786829700-VkloJnd89cE1i9KoQj4g"
+      }
+    },
+    {
+      "ordem": 1153,
+      "titulo_en": "The Limits of Human Wisdom",
+      "chars_texto": 1627,
+      "usage": {
+        "prompt_tokens": 1413,
+        "completion_tokens": 1588,
+        "total_tokens": 3001,
+        "cost_usd": 0.003507375,
+        "generation_id": "gen-1786829701-shvNfewfVR4oBVpIOVBg"
+      }
+    },
+    {
+      "ordem": 1154,
+      "titulo_en": "Obey the King",
+      "chars_texto": 1132,
+      "usage": {
+        "prompt_tokens": 1245,
+        "completion_tokens": 1502,
+        "total_tokens": 2747,
+        "cost_usd": 0.003283125,
+        "generation_id": "gen-1786829706-R26W1wdCnDBJNNj4y3hh"
+      }
+    },
+    {
+      "ordem": 1155,
+      "titulo_en": "Fear God",
+      "chars_texto": 564,
+      "usage": {
+        "prompt_tokens": 1107,
+        "completion_tokens": 1570,
+        "total_tokens": 2677,
+        "cost_usd": 0.003358875,
+        "generation_id": "gen-1786829706-CmZ7oxqOoozkgc27kIMh"
+      }
+    },
+    {
+      "ordem": 1156,
+      "titulo_en": "God's Ways Are Mysterious",
+      "chars_texto": 803,
+      "usage": {
+        "prompt_tokens": 1173,
+        "completion_tokens": 1238,
+        "total_tokens": 2411,
+        "cost_usd": 0.002761125,
+        "generation_id": "gen-1786829711-uMDwWJeZONDTTQ0HFT4V"
+      }
+    },
+    {
+      "ordem": 1160,
+      "titulo_en": "Wisdom and Folly",
+      "chars_texto": 2078,
+      "usage": {
+        "prompt_tokens": 1552,
+        "completion_tokens": 563,
+        "total_tokens": 2115,
+        "cost_usd": 0.001637625,
+        "generation_id": "gen-1786829718-vU0M40Sm6owVTB2zh7pD"
+      }
+    },
+    {
+      "ordem": 1157,
+      "titulo_en": "Death Comes to Good and Bad",
+      "chars_texto": 1138,
+      "usage": {
+        "prompt_tokens": 1254,
+        "completion_tokens": 1660,
+        "total_tokens": 2914,
+        "cost_usd": 0.00358275,
+        "generation_id": "gen-1786829711-Pe4xnkR4PSR2nnRj7S7o"
+      }
+    },
+    {
+      "ordem": 1158,
+      "titulo_en": "Enjoy Your Portion in This Life",
+      "chars_texto": 1145,
+      "usage": {
+        "prompt_tokens": 1253,
+        "completion_tokens": 1613,
+        "total_tokens": 2866,
+        "cost_usd": 0.00349425,
+        "generation_id": "gen-1786829713-eb5ty67M70d1b9zVoY7m"
+      }
+    },
+    {
+      "ordem": 1159,
+      "titulo_en": "Wisdom Is Better than Strength",
+      "chars_texto": 740,
+      "usage": {
+        "prompt_tokens": 1160,
+        "completion_tokens": 1270,
+        "total_tokens": 2430,
+        "cost_usd": 0.00281625,
+        "generation_id": "gen-1786829717-tZ4H69CrCwfW9EYBg8sb"
+      }
+    },
+    {
+      "ordem": 1161,
+      "titulo_en": "Cast Your Bread upon the Waters",
+      "chars_texto": 761,
+      "usage": {
+        "prompt_tokens": 1164,
+        "completion_tokens": 1283,
+        "total_tokens": 2447,
+        "cost_usd": 0.002842125,
+        "generation_id": "gen-1786829721-6o7UQMgQALCL4IHfjnaY"
+      }
+    },
+    {
+      "ordem": 1162,
+      "titulo_en": "Enjoy Your years",
+      "chars_texto": 591,
+      "usage": {
+        "prompt_tokens": 1126,
+        "completion_tokens": 1282,
+        "total_tokens": 2408,
+        "cost_usd": 0.002826,
+        "generation_id": "gen-1786829723-GzRHXeusG6HieD7q1mGM"
+      }
+    },
+    {
+      "ordem": 1163,
+      "titulo_en": "Remember Your Creator",
+      "chars_texto": 1294,
+      "usage": {
+        "prompt_tokens": 1336,
+        "completion_tokens": 1526,
+        "total_tokens": 2862,
+        "cost_usd": 0.00336225,
+        "generation_id": "gen-1786829724-kQfw03QWOrIUCMFzU4aM"
+      }
+    },
+    {
+      "ordem": 1164,
+      "titulo_en": "The Whole Duty of Man",
+      "chars_texto": 723,
+      "usage": {
+        "prompt_tokens": 1155,
+        "completion_tokens": 1542,
+        "total_tokens": 2697,
+        "cost_usd": 0.003324375,
+        "generation_id": "gen-1786829726-dAEPbZ81M1S7IXLIWX0U"
+      }
+    },
+    {
+      "ordem": 1165,
+      "titulo_en": "The Bride Confesses Her Love",
+      "chars_texto": 1743,
+      "usage": {
+        "prompt_tokens": 1498,
+        "completion_tokens": 1640,
+        "total_tokens": 3138,
+        "cost_usd": 0.00363675,
+        "generation_id": "gen-1786829727-l8d871lNWtNATJ6C7RNl"
+      }
+    },
+    {
+      "ordem": 1166,
+      "titulo_en": "The Bride's Admiration",
+      "chars_texto": 1827,
+      "usage": {
+        "prompt_tokens": 1509,
+        "completion_tokens": 1709,
+        "total_tokens": 3218,
+        "cost_usd": 0.00377025,
+        "generation_id": "gen-1786829730-VupMdUIOUlCpl7l7L6tX"
+      }
+    },
+    {
+      "ordem": 1167,
+      "titulo_en": "The Bride's Dream",
+      "chars_texto": 657,
+      "usage": {
+        "prompt_tokens": 1156,
+        "completion_tokens": 1453,
+        "total_tokens": 2609,
+        "cost_usd": 0.003157875,
+        "generation_id": "gen-1786829732-iwwWRuEVoxb5VSeWRE6D"
+      }
+    },
+    {
+      "ordem": 1168,
+      "titulo_en": "Solomon Arrives on His Wedding Day",
+      "chars_texto": 738,
+      "usage": {
+        "prompt_tokens": 1172,
+        "completion_tokens": 1553,
+        "total_tokens": 2725,
+        "cost_usd": 0.003351375,
+        "generation_id": "gen-1786829735-bqm93rUeIjKrygQQ4kVd"
+      }
+    },
+    {
+      "ordem": 1171,
+      "titulo_en": "Together in the Garden",
+      "chars_texto": 1492,
+      "usage": {
+        "prompt_tokens": 1406,
+        "completion_tokens": 528,
+        "total_tokens": 1934,
+        "cost_usd": 0.00151725,
+        "generation_id": "gen-1786829743-QZcqFolqR82OwQdfKe2c"
+      }
+    },
+    {
+      "ordem": 1169,
+      "titulo_en": "Solomon Admires His Bride",
+      "chars_texto": 1997,
+      "usage": {
+        "prompt_tokens": 1557,
+        "completion_tokens": 1532,
+        "total_tokens": 3089,
+        "cost_usd": 0.003456375,
+        "generation_id": "gen-1786829737-6KytZOIJ29ob4p9htJ09"
+      }
+    },
+    {
+      "ordem": 1170,
+      "titulo_en": "The Bride and Her Beloved",
+      "chars_texto": 2162,
+      "usage": {
+        "prompt_tokens": 1604,
+        "completion_tokens": 1726,
+        "total_tokens": 3330,
+        "cost_usd": 0.00383775,
+        "generation_id": "gen-1786829738-gP6HobRGfuf1r4Sv9qzR"
+      }
+    },
+    {
+      "ordem": 1172,
+      "titulo_en": "Admiration by the Bridegroom",
+      "chars_texto": 1501,
+      "usage": {
+        "prompt_tokens": 1397,
+        "completion_tokens": 1548,
+        "total_tokens": 2945,
+        "cost_usd": 0.003426375,
+        "generation_id": "gen-1786829744-OM8ETclMop3eT0YwFp0x"
+      }
+    },
+    {
+      "ordem": 1173,
+      "titulo_en": "Longing for Her Beloved",
+      "chars_texto": 1918,
+      "usage": {
+        "prompt_tokens": 1514,
+        "completion_tokens": 1480,
+        "total_tokens": 2994,
+        "cost_usd": 0.00334275,
+        "generation_id": "gen-1786829746-FeYRow7AtKL48k5DgCkE"
+      }
+    },
+    {
+      "ordem": 1175,
+      "titulo_en": "The Mountain of the House of the LORD",
+      "chars_texto": 746,
+      "usage": {
+        "prompt_tokens": 1174,
+        "completion_tokens": 1429,
+        "total_tokens": 2603,
+        "cost_usd": 0.003119625,
+        "generation_id": "gen-1786829749-7HvRhUrSWRYmLebo9Yuz"
+      }
+    },
+    {
+      "ordem": 1174,
+      "titulo_en": "Judah's Rebellion",
+      "chars_texto": 4286,
+      "usage": {
+        "prompt_tokens": 2183,
+        "completion_tokens": 1823,
+        "total_tokens": 4006,
+        "cost_usd": 0.00423675,
+        "generation_id": "gen-1786829748-kLzzLYxw4xhS2rMs2xnj"
+      }
+    },
+    {
+      "ordem": 1176,
+      "titulo_en": "Judgement on Jerusalem and Judah",
+      "chars_texto": 5036,
+      "usage": {
+        "prompt_tokens": 2412,
+        "completion_tokens": 1848,
+        "total_tokens": 4260,
+        "cost_usd": 0.0043695,
+        "generation_id": "gen-1786829752-6obElZQ1wJqOJKkSEFNz"
+      }
+    },
+    {
+      "ordem": 1177,
+      "titulo_en": "A Remnant in Zion",
+      "chars_texto": 669,
+      "usage": {
+        "prompt_tokens": 1134,
+        "completion_tokens": 1517,
+        "total_tokens": 2651,
+        "cost_usd": 0.003269625,
+        "generation_id": "gen-1786829755-XFM2kVU6ltz4IG5MDcby"
+      }
+    },
+    {
+      "ordem": 1179,
+      "titulo_en": "Isaiah's Commission",
+      "chars_texto": 1860,
+      "usage": {
+        "prompt_tokens": 1512,
+        "completion_tokens": 1159,
+        "total_tokens": 2671,
+        "cost_usd": 0.002740125,
+        "generation_id": "gen-1786829760-DEhBEcQSiVFhLSfZuOeV"
+      }
+    },
+    {
+      "ordem": 1178,
+      "titulo_en": "The Song of the Vineyard",
+      "chars_texto": 4570,
+      "usage": {
+        "prompt_tokens": 2251,
+        "completion_tokens": 1735,
+        "total_tokens": 3986,
+        "cost_usd": 0.00409725,
+        "generation_id": "gen-1786829757-R0Jg8VyVl4QumtYO5eHN"
+      }
+    },
+    {
+      "ordem": 1180,
+      "titulo_en": "Aram and Israel Advance",
+      "chars_texto": 1368,
+      "usage": {
+        "prompt_tokens": 1349,
+        "completion_tokens": 1575,
+        "total_tokens": 2924,
+        "cost_usd": 0.003459,
+        "generation_id": "gen-1786829761-lXTCWmITHjKCPt05nZ6v"
+      }
+    },
+    {
+      "ordem": 1181,
+      "titulo_en": "The Sign of Immanuel",
+      "chars_texto": 723,
+      "usage": {
+        "prompt_tokens": 1167,
+        "completion_tokens": 1377,
+        "total_tokens": 2544,
+        "cost_usd": 0.0030195,
+        "generation_id": "gen-1786829766-kD47gvECjKlkXc5kRfBC"
+      }
+    },
+    {
+      "ordem": 1182,
+      "titulo_en": "Judgement to Come",
+      "chars_texto": 1306,
+      "usage": {
+        "prompt_tokens": 1340,
+        "completion_tokens": 1651,
+        "total_tokens": 2991,
+        "cost_usd": 0.003598125,
+        "generation_id": "gen-1786829766-6lFLSNf1I7ZdjG8ZvRc5"
+      }
+    },
+    {
+      "ordem": 1184,
+      "titulo_en": "Unto Us a Child Is Born",
+      "chars_texto": 1270,
+      "usage": {
+        "prompt_tokens": 1309,
+        "completion_tokens": 1346,
+        "total_tokens": 2655,
+        "cost_usd": 0.003014625,
+        "generation_id": "gen-1786829770-PC5a23tyR6eyfkPXq1Zm"
+      }
+    },
+    {
+      "ordem": 1185,
+      "titulo_en": "For Pride",
+      "chars_texto": 595,
+      "usage": {
+        "prompt_tokens": 1126,
+        "completion_tokens": 760,
+        "total_tokens": 1886,
+        "cost_usd": 0.00184725,
+        "generation_id": "gen-1786829772-EepdyoseTzN0aQlGsjU4"
+      }
+    },
+    {
+      "ordem": 1183,
+      "titulo_en": "Assyrian Invasion Prophesied",
+      "chars_texto": 2839,
+      "usage": {
+        "prompt_tokens": 1804,
+        "completion_tokens": 1787,
+        "total_tokens": 3591,
+        "cost_usd": 0.004027125,
+        "generation_id": "gen-1786829770-D8t2t5p2Drw8TrKzbdID"
+      }
+    },
+    {
+      "ordem": 1188,
+      "titulo_en": "The Destruction of the Assyrian Empire",
+      "chars_texto": 4557,
+      "usage": {
+        "prompt_tokens": 2290,
+        "completion_tokens": 540,
+        "total_tokens": 2830,
+        "cost_usd": 0.00187125,
+        "generation_id": "gen-1786829779-VO5m02DAIhmvHGaxw8DY"
+      }
+    },
+    {
+      "ordem": 1186,
+      "titulo_en": "For Hypocrisy",
+      "chars_texto": 621,
+      "usage": {
+        "prompt_tokens": 1140,
+        "completion_tokens": 1485,
+        "total_tokens": 2625,
+        "cost_usd": 0.003211875,
+        "generation_id": "gen-1786829776-VurZJQ7nJqZh3NXeCGBy"
+      }
+    },
+    {
+      "ordem": 1189,
+      "titulo_en": "Messiah's Kingdom through the Root of Jesse",
+      "chars_texto": 2260,
+      "usage": {
+        "prompt_tokens": 1642,
+        "completion_tokens": 1627,
+        "total_tokens": 3269,
+        "cost_usd": 0.003666375,
+        "generation_id": "gen-1786829779-RKlFo32KFsAqOZq3Cw79"
+      }
+    },
+    {
+      "ordem": 1187,
+      "titulo_en": "For Unrepentance",
+      "chars_texto": 583,
+      "usage": {
+        "prompt_tokens": 1138,
+        "completion_tokens": 1769,
+        "total_tokens": 2907,
+        "cost_usd": 0.003743625,
+        "generation_id": "gen-1786829778-3nweJFXg8dlof1Cq5oJv"
+      }
+    },
+    {
+      "ordem": 1190,
+      "titulo_en": "Joyful Thanksgiving",
+      "chars_texto": 505,
+      "usage": {
+        "prompt_tokens": 1105,
+        "completion_tokens": 1436,
+        "total_tokens": 2541,
+        "cost_usd": 0.003106875,
+        "generation_id": "gen-1786829783-E11iTUTM9PiTWNNoHVNE"
+      }
+    },
+    {
+      "ordem": 1191,
+      "titulo_en": "Against Babylon",
+      "chars_texto": 6214,
+      "usage": {
+        "prompt_tokens": 2757,
+        "completion_tokens": 1523,
+        "total_tokens": 4280,
+        "cost_usd": 0.0038895,
+        "generation_id": "gen-1786829784-mieisTM19a4c97PJoWLR"
+      }
+    },
+    {
+      "ordem": 1192,
+      "titulo_en": "Against Assyria",
+      "chars_texto": 514,
+      "usage": {
+        "prompt_tokens": 1112,
+        "completion_tokens": 1327,
+        "total_tokens": 2439,
+        "cost_usd": 0.002905125,
+        "generation_id": "gen-1786829788-dteO7ONkOxqS680ElBNy"
+      }
+    },
+    {
+      "ordem": 1193,
+      "titulo_en": "Against Philistia",
+      "chars_texto": 716,
+      "usage": {
+        "prompt_tokens": 1172,
+        "completion_tokens": 1490,
+        "total_tokens": 2662,
+        "cost_usd": 0.00323325,
+        "generation_id": "gen-1786829791-zFZXNlhlKs3fLPH0eKQ0"
+      }
+    },
+    {
+      "ordem": 1194,
+      "titulo_en": "Against Moab",
+      "chars_texto": 3249,
+      "usage": {
+        "prompt_tokens": 1904,
+        "completion_tokens": 1451,
+        "total_tokens": 3355,
+        "cost_usd": 0.003434625,
+        "generation_id": "gen-1786829792-Lq8yXZAnAr4VDRARrabF"
+      }
+    },
+    {
+      "ordem": 1195,
+      "titulo_en": "Against Damascus",
+      "chars_texto": 2090,
+      "usage": {
+        "prompt_tokens": 1537,
+        "completion_tokens": 1509,
+        "total_tokens": 3046,
+        "cost_usd": 0.00340575,
+        "generation_id": "gen-1786829794-l4wGhouLzaHRGaCASxDR"
+      }
+    },
+    {
+      "ordem": 1196,
+      "titulo_en": "Against Cush",
+      "chars_texto": 1304,
+      "usage": {
+        "prompt_tokens": 1316,
+        "completion_tokens": 1539,
+        "total_tokens": 2855,
+        "cost_usd": 0.003379125,
+        "generation_id": "gen-1786829796-QxU48gG2GXhBv8DndYbN"
+      }
+    },
+    {
+      "ordem": 1197,
+      "titulo_en": "Against Egypt",
+      "chars_texto": 4603,
+      "usage": {
+        "prompt_tokens": 2312,
+        "completion_tokens": 1954,
+        "total_tokens": 4266,
+        "cost_usd": 0.00453075,
+        "generation_id": "gen-1786829798-CgiU6ctRdtPlL8nLVgDI"
+      }
+    },
+    {
+      "ordem": 1198,
+      "titulo_en": "Against Babylon Again",
+      "chars_texto": 1416,
+      "usage": {
+        "prompt_tokens": 1385,
+        "completion_tokens": 1645,
+        "total_tokens": 3030,
+        "cost_usd": 0.00360375,
+        "generation_id": "gen-1786829802-87Y6XSiO66mR5JEghe4a"
+      }
+    },
+    {
+      "ordem": 1199,
+      "titulo_en": "Against Edom",
+      "chars_texto": 239,
+      "usage": {
+        "prompt_tokens": 1027,
+        "completion_tokens": 1533,
+        "total_tokens": 2560,
+        "cost_usd": 0.0032595,
+        "generation_id": "gen-1786829803-oYmZ57ZQS8dYUEXiXqaq"
+      }
+    },
+    {
+      "ordem": 1200,
+      "titulo_en": "Against Arabia",
+      "chars_texto": 546,
+      "usage": {
+        "prompt_tokens": 1115,
+        "completion_tokens": 1507,
+        "total_tokens": 2622,
+        "cost_usd": 0.00324375,
+        "generation_id": "gen-1786829807-YyXkw0BmWWP5nPCjb20y"
+      }
+    },
+    {
+      "ordem": 1201,
+      "titulo_en": "Against the Valley of Vision",
+      "chars_texto": 3431,
+      "usage": {
+        "prompt_tokens": 1944,
+        "completion_tokens": 1714,
+        "total_tokens": 3658,
+        "cost_usd": 0.00394275,
+        "generation_id": "gen-1786829808-p1dDTN2GS1QF5ECJuCrj"
+      }
+    },
+    {
+      "ordem": 1203,
+      "titulo_en": "God's Judgement on the Earth",
+      "chars_texto": 2831,
+      "usage": {
+        "prompt_tokens": 1789,
+        "completion_tokens": 1682,
+        "total_tokens": 3471,
+        "cost_usd": 0.003824625,
+        "generation_id": "gen-1786829813-s3FcEQTeT7iRD3cmxSq3"
+      }
+    },
+    {
+      "ordem": 1202,
+      "titulo_en": "Against Tyre",
+      "chars_texto": 2426,
+      "usage": {
+        "prompt_tokens": 1654,
+        "completion_tokens": 1751,
+        "total_tokens": 3405,
+        "cost_usd": 0.003903375,
+        "generation_id": "gen-1786829812-lDPFXebR6QtKUU1UiWss"
+      }
+    },
+    {
+      "ordem": 1204,
+      "titulo_en": "Praise to the Victorious God",
+      "chars_texto": 1841,
+      "usage": {
+        "prompt_tokens": 1491,
+        "completion_tokens": 1587,
+        "total_tokens": 3078,
+        "cost_usd": 0.00353475,
+        "generation_id": "gen-1786829814-tiWWtQlVkB7Nentb4vnG"
+      }
+    },
+    {
+      "ordem": 1206,
+      "titulo_en": "The LORD's Vineyard",
+      "chars_texto": 2003,
+      "usage": {
+        "prompt_tokens": 1544,
+        "completion_tokens": 516,
+        "total_tokens": 2060,
+        "cost_usd": 0.0015465,
+        "generation_id": "gen-1786829820-ejZWAyWXmDSSHuEFVbA3"
+      }
+    },
+    {
+      "ordem": 1205,
+      "titulo_en": "A Song of Salvation",
+      "chars_texto": 2618,
+      "usage": {
+        "prompt_tokens": 1707,
+        "completion_tokens": 1686,
+        "total_tokens": 3393,
+        "cost_usd": 0.003801375,
+        "generation_id": "gen-1786829819-IDawZwLEX70eQKnbJerK"
       }
     }
   ]

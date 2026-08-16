@@ -8,7 +8,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: [
+        'favicon.svg',
+        'favicon.png',
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'brand/logo.png',
+        'brand/logo-master.png',
+      ],
       manifest: {
         name: 'Perícopes — Estudo Bíblico',
         short_name: 'Perícopes',
@@ -29,6 +36,12 @@ export default defineConfig({
             src: 'pwa-512.png',
             sizes: '512x512',
             type: 'image/png',
+          },
+          {
+            src: 'pwa-512-maskable.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },

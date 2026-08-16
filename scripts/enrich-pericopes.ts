@@ -64,14 +64,14 @@ CAMPOS:
 
 1) contexto_historico_literario (ANTES da leitura):
 - A chave de entrada: o mínimo para chegar preparado, com 1 insight que prepara a leitura (não resumo do enredo).
-- 1 parágrafo denso e claro (2 só se indispensável).
+- 1–2 parágrafos densos e claros (2 frases curtas/médias por parágrafo). Separe parágrafos com linha em branco (\n\n) no JSON.
 
 2) resenha (DEPOIS da leitura):
 - O que aconteceu e por quê, em palavras simples e precisas — e o que o texto realmente afirma.
 - Integre o insight à história; não jogue “curiosidades” à parte.
 - Sobre Deus: o que o próprio trecho mostra do caráter dEle, se estiver lá.
 - Sobre Jesus: SOMENTE com abertura real. Sem abertura, silêncio. Prefira omissão a ligação artificial.
-- 2 parágrafos curtos e densos (3 só se o trecho for muito rico). Sem tour versículo a versículo.
+- 2–3 parágrafos curtos e densos (~2 frases cada; 3 parágrafos só se o trecho for muito rico). Separe com linha em branco (\n\n) entre eles. Sem tour versículo a versículo.
 
 3) titulo_pericope_pt: natural, não palavra a palavra.
 4) perguntas_reflexao: 2 perguntas afiadas, em linguagem jovem (não sim/não). Deus/Jesus só se couber ao trecho.

@@ -68,3 +68,42 @@ export function proximaNoTestamento(all: Pericope[], ordem: number): number | nu
   if (i < 0 || i >= seq.length - 1) return null
   return seq[i + 1]
 }
+
+function matchesBook(p: Pericope, livroOrAbbrev: string): boolean {
+  return p.livro === livroOrAbbrev || p.abbrev === livroOrAbbrev
+}
+
+/** Inclusive range check across multi-chapter pericopes. */
+export function containsRef(
+  p: Pericope,
+  livroOrAbbrev: string,
+  cap: number,
+  ver: number,
+): boolean {
+  if (!matchesBook(p, livroOrAbbrev)) return false
+  const start = p.capitulo_inicio * 100_000 + p.versiculo_inicio
+  const end = p.capitulo_fim * 100_000 + p.versiculo_fim
+  const point = cap * 100_000 + ver
+  return point >= start && point <= end
+}
+
+export async function findPericopeByRef(
+  livroOrAbbrev: string,
+  cap: number,
+  ver: number,
+): Promise<Pericope | null> {
+  const list = await loadPericopes()
+  return list.find((p) => containsRef(p, livroOrAbbrev, cap, ver)) ?? null
+}
+
+export async function listPericopesByBookChapter(
+  livroOrAbbrev: string,
+  cap?: number,
+): Promise<Pericope[]> {
+  const list = await loadPericopes()
+  return list.filter((p) => {
+    if (!matchesBook(p, livroOrAbbrev)) return false
+    if (cap == null) return true
+    return p.capitulo_inicio <= cap && cap <= p.capitulo_fim
+  })
+}

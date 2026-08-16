@@ -2,17 +2,33 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#12151a" />
+    <meta name="theme-color" content="#2f5d50" />
     <meta name="description" content="Estudo diário da Bíblia NAA por perícopes" />
     <title>Perícopes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <script>
       (function () {
         try {
           var t = localStorage.getItem('pericopes-theme')
           if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
           document.documentElement.dataset.theme = t
+          var raw = localStorage.getItem('pericopes-reading')
+          var prefs = raw ? JSON.parse(raw) : {}
+          var steps = [0.95, 1.05, 1.15, 1.28, 1.42, 1.58]
+          var step = typeof prefs.sizeStep === 'number' && prefs.sizeStep >= 0 && prefs.sizeStep < steps.length ? prefs.sizeStep : 2
+          var fonts = {
+            serif: "'Source Serif 4', Georgia, serif",
+            literata: "'Literata', Georgia, serif",
+            sans: "'Source Sans 3', 'DM Sans', system-ui, sans-serif",
+          }
+          var font = fonts[prefs.font] || fonts.serif
+          document.documentElement.style.setProperty('--read-size', steps[step] + 'rem')
+          document.documentElement.style.setProperty('--read-font', font)
         } catch (e) {}
       })()
     </script>

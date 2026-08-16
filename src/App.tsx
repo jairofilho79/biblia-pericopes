@@ -32,21 +32,21 @@ export default function App() {
             />
             <span>Perícopes</span>
           </NavLink>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setTheme(toggleTheme())}
+            aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+          >
+            {theme === 'dark' ? 'Claro' : 'Escuro'}
+          </button>
           <nav>
             <NavLink to="/" end>
               Hoje
             </NavLink>
             <NavLink to="/indice">Índice</NavLink>
             <NavLink to="/pesquisar">Pesquisar</NavLink>
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={() => setTheme(toggleTheme())}
-              aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
-              title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-            >
-              {theme === 'dark' ? 'Claro' : 'Escuro'}
-            </button>
           </nav>
         </header>
         <main className="main">

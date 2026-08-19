@@ -419,6 +419,7 @@ type Usage = {
 }
 
 function merge(raw: RawPericope, ai: AiPartial): Pericope {
+  const prev = readCached(raw.ordem)
   return {
     ordem: raw.ordem,
     livro: raw.livro,
@@ -432,6 +433,7 @@ function merge(raw: RawPericope, ai: AiPartial): Pericope {
     contexto_historico_literario: ai.contexto_historico_literario,
     resenha: ai.resenha,
     perguntas_reflexao: ai.perguntas_reflexao,
+    ...(prev?.topicos_pregar ? { topicos_pregar: prev.topicos_pregar } : {}),
   }
 }
 

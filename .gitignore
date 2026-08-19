@@ -21,6 +21,7 @@ data/raw-pericopes.jsonl
 data/etl-warnings.json
 data/enrich-state.json
 data/NAA.json
+data/preach-sample/
 
 # Editor directories and files
 .vscode/*

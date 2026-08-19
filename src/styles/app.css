@@ -404,6 +404,78 @@ button.ghost {
   padding: 1.1rem 1.15rem;
 }
 
+.notes-tabs {
+  display: flex;
+  gap: 0.15rem;
+  margin: -0.25rem 0 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.notes-tab {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0.45rem 0.7rem;
+  min-height: 2.5rem;
+  cursor: pointer;
+}
+
+.notes-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.topics-view {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.topic-h {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  margin: 0.65rem 0 0.15rem;
+}
+
+.topic-h:first-child {
+  margin-top: 0;
+}
+
+.topic-bullet {
+  margin: 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.topic-bullet::before {
+  content: '·';
+  position: absolute;
+  left: 0.15rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.contexto-ia {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.copy-btn {
+  justify-self: start;
+}
+
+.contexto-ia-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.5;
+  user-select: all;
+}
+
 .read-toolbar {
   display: flex;
   flex-wrap: wrap;

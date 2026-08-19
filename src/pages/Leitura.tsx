@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getPericope, loadPericopes, proximaNoTestamento, refLabel } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
@@ -20,7 +20,45 @@ import {
 } from '../lib/user-db'
 import { getVerseFocus, setVerseFocus } from '../lib/verse-highlight'
 import { testamentLabel, testamentOf } from '../lib/testament'
+import { promptConversa } from '../lib/contexto-ia'
 import type { Anotacao, Pericope, ProgressoStatus } from '../lib/types'
+
+type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
+
+function inlineBold(text: string): ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      <span key={i}>{part}</span>
+    ),
+  )
+}
+
+function TopicsView({ text }: { text: string }) {
+  const lines = text.split('\n')
+  return (
+    <div className="topics-view">
+      {lines.map((line, i) => {
+        const t = line.trim()
+        if (!t) return null
+        if (/^[-*]\s+/.test(t)) {
+          return (
+            <p key={i} className="topic-bullet">
+              {inlineBold(t.replace(/^[-*]\s+/, ''))}
+            </p>
+          )
+        }
+        return (
+          <h3 key={i} className="topic-h">
+            {inlineBold(t.replace(/^#+\s*/, ''))}
+          </h3>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function Leitura() {
   const { ordem: ordemParam } = useParams()
@@ -35,6 +73,8 @@ export default function Leitura() {
   const [err, setErr] = useState('')
   const [prefs, setPrefs] = useState<ReadingPrefs>(() => getReadingPrefs())
   const [focusId, setFocusId] = useState<string | null>(null)
+  const [tab, setTab] = useState<NotesTab>('anotacoes')
+  const [copied, setCopied] = useState(false)
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
@@ -51,6 +91,7 @@ export default function Leitura() {
         }
         setP(peri)
         setNextOrdem(proximaNoTestamento(all, ordem))
+        setCopied(false)
         const fromQuery =
           verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
         const focus = fromQuery ?? getVerseFocus(ordem)
@@ -68,6 +109,10 @@ export default function Leitura() {
       }
     })()
   }, [ordem, verseParam])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [ordem, p])
 
   useEffect(() => {
     if (!focusId || !p) return
@@ -100,6 +145,13 @@ export default function Leitura() {
 
   function onFont(font: ReadingFont) {
     setPrefs(setReadingFont(font))
+  }
+
+  async function copyContexto() {
+    if (!p) return
+    await navigator.clipboard.writeText(promptConversa(p))
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1600)
   }
 
   if (err) return <p className="muted">{err}</p>
@@ -200,26 +252,67 @@ export default function Leitura() {
       </section>
 
       <section className="block notes">
-        <h2>Suas anotações</h2>
-        <form onSubmit={onSaveNote} className="note-form">
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={4}
-            placeholder="Escreva pensamentos, orações, aplicações…"
-          />
-          <button type="submit">Salvar anotação</button>
-        </form>
-        <ul className="note-list">
-          {notes.map((n) => (
-            <li key={n.id}>
-              <p>{n.texto}</p>
-              <button type="button" className="linkish" onClick={() => deleteAnotacao(n.id).then(refreshNotes)}>
-                Apagar
-              </button>
-            </li>
+        <div className="notes-tabs" role="tablist" aria-label="Anotações, tópicos e contexto">
+          {(
+            [
+              ['anotacoes', 'Anotações'],
+              ['topicos', 'Tópicos'],
+              ['contexto', 'Contexto'],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              className={`notes-tab${tab === id ? ' active' : ''}`}
+              onClick={() => setTab(id)}
+            >
+              {label}
+            </button>
           ))}
-        </ul>
+        </div>
+
+        {tab === 'anotacoes' && (
+          <>
+            <form onSubmit={onSaveNote} className="note-form">
+              <textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                rows={4}
+                placeholder="Escreva pensamentos, orações, aplicações…"
+              />
+              <button type="submit">Salvar anotação</button>
+            </form>
+            <ul className="note-list">
+              {notes.map((n) => (
+                <li key={n.id}>
+                  <p>{n.texto}</p>
+                  <button type="button" className="linkish" onClick={() => deleteAnotacao(n.id).then(refreshNotes)}>
+                    Apagar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {tab === 'topicos' &&
+          (p.topicos_pregar ? (
+            <TopicsView text={p.topicos_pregar} />
+          ) : (
+            <p className="muted">Ainda não gerado.</p>
+          ))}
+
+        {tab === 'contexto' && (
+          <div className="contexto-ia">
+            <button type="button" className="ghost copy-btn" onClick={copyContexto}>
+              {copied ? 'Copiado' : 'Copiar'}
+            </button>
+            <pre className="contexto-ia-text">{promptConversa(p)}</pre>
+          </div>
+        )}
+
         <div className="actions">
           {status !== 'concluido' ? (
             <button type="button" className="cta" onClick={markDone}>

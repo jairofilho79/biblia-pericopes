@@ -13,6 +13,8 @@ export type Pericope = {
   /** Apanhado do que aconteceu e por quê; Deus/Jesus só quando couber com naturalidade */
   resenha: string
   perguntas_reflexao: string[]
+  /** Outline curto para o pregador; markdown com **negrito** */
+  topicos_pregar?: string
 }
 
 export type ProgressoStatus = 'nao_iniciado' | 'em_andamento' | 'concluido'

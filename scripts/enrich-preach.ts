@@ -93,6 +93,9 @@ async function openRouterPreach(
     body: JSON.stringify({
       model,
       temperature: 0.4,
+      max_tokens: 1536,
+      max_completion_tokens: 1536,
+      reasoning: { max_tokens: 256, exclude: true },
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -156,6 +159,7 @@ async function withRetry(p: Pericope, model: string, on429: () => void) {
     } catch (e) {
       last = e
       const status = (e as { status?: number }).status
+      if (status === 402) throw e
       if (status === 429) {
         on429()
         await sleep(2000 * (attempt + 1) ** 2)

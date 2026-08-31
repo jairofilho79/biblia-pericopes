@@ -1,14 +1,25 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getMeta, getProgresso, listAnotacoes, listOutbox, saveAnotacao, setProgresso } from './user-db'
+import {
+  clearAllUserData,
+  deleteMeta,
+  getMeta,
+  getProgresso,
+  listAnotacoes,
+  listOutbox,
+  saveAnotacao,
+  setMeta,
+  setProgresso,
+} from './user-db'
+import { MAX_ITENS_POR_LOTE } from './sync-limits'
 
 vi.mock('./auth-client', () => ({
-  authClient: { getSession: vi.fn() },
+  authClient: { getSession: vi.fn(), signOut: vi.fn() },
 }))
 
 // Imported after the mock so the mocked module is what sync.ts resolves.
 import { authClient } from './auth-client'
-import { syncNow } from './sync'
+import { signOutLocal, syncNow } from './sync'
 
 const FAKE_SESSION = { data: { user: { id: 'u1', email: 'user@example.com' } } }
 const NO_SESSION = { data: null }
@@ -25,9 +36,19 @@ function jsonResponse(body: unknown, init?: { status?: number; ok?: boolean }) {
   } as Response
 }
 
+/** Zera o estado local compartilhado por estes testes (fake-indexeddb é um singleton). */
+async function resetLocal() {
+  await clearAllUserData()
+  await deleteMeta('sync-cursor')
+  await deleteMeta('sync-user')
+}
+
 beforeEach(() => {
   vi.resetAllMocks()
   vi.stubGlobal('navigator', { onLine: true })
+  // resetAllMocks zera a implementação; signOut precisa devolver uma promise
+  // porque sync.ts encadeia .catch() nela.
+  vi.mocked(authClient.signOut).mockResolvedValue(undefined as never)
 })
 
 describe('syncNow', () => {
@@ -116,6 +137,24 @@ describe('syncNow', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1) // only the POST — no GET pull after a 401
     const outboxAfter = await listOutbox()
     expect(outboxAfter.some((i) => i.kind === 'progresso' && i.ordem === 20003)).toBe(true)
+    // contrato do 401: derruba a sessão do cliente para o header voltar a "Entrar"
+    expect(authClient.signOut).toHaveBeenCalled()
+  })
+
+  it('GET returning 401 → signOut, cursor e dados locais intactos', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
+
+    // outbox vazio → syncNow vai direto para o pull
+    const fetchMock = vi.fn(async () => jsonResponse({ error: 'não autenticado' }, { status: 401, ok: false }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(authClient.signOut).toHaveBeenCalled()
+    expect(await getMeta('sync-cursor')).toBe('2026-01-01T00:00:00.000Z')
   })
 
   it('re-entrancy guard: a second syncNow() while one is running makes no extra request', async () => {
@@ -166,5 +205,144 @@ describe('syncNow', () => {
     await syncNow()
 
     expect((await listAnotacoes(20004)).find((n) => n.id === local.id)).toBeUndefined()
+  })
+})
+
+// O servidor rejeita (400) qualquer lista com mais de MAX_ITENS_POR_LOTE itens.
+// Sem fatiar, um outbox grande travava o sync para sempre: o POST voltava 400,
+// o cliente não limpava nada e reenviava o mesmo lote inválido a cada rodada.
+describe('syncNow — push em lotes', () => {
+  const TOTAL = MAX_ITENS_POR_LOTE * 2 + 1 // 1001 → 3 lotes (500 + 500 + 1)
+
+  async function encherOutbox() {
+    for (let i = 0; i < TOTAL; i++) await setProgresso(40000 + i, 'concluido')
+  }
+
+  it('outbox acima do limite → vários POSTs, nenhuma lista acima de 500, outbox limpo no fim', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await encherOutbox()
+
+    const posts: { progresso: unknown[]; anotacoes: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts.length).toBe(3)
+    for (const p of posts) {
+      expect(p.progresso.length).toBeLessThanOrEqual(MAX_ITENS_POR_LOTE)
+      expect(p.anotacoes.length).toBeLessThanOrEqual(MAX_ITENS_POR_LOTE)
+    }
+    // nada se perde no caminho: a soma dos lotes é o outbox deduplicado inteiro
+    expect(posts.reduce((n, p) => n + p.progresso.length, 0)).toBe(TOTAL)
+    expect(await listOutbox()).toEqual([])
+  })
+
+  it('lote do meio falhando → outbox NÃO é limpo e o pull nem acontece', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await encherOutbox()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    let posts = 0
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts += 1
+        if (posts === 2) return jsonResponse({ error: 'boom' }, { status: 500, ok: false })
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2) // parou no lote que falhou, sem GET
+    expect(await listOutbox()).toHaveLength(TOTAL) // at-least-once: nada é descartado
+    expect(warn).toHaveBeenCalledWith('[sync] push falhou', 500)
+    warn.mockRestore()
+  })
+})
+
+describe('troca de conta e logout', () => {
+  it('sessão de outro usuário → apaga os dados locais antes de aplicar os dele', async () => {
+    await resetLocal()
+    // dados do usuário A neste dispositivo
+    await setProgresso(50001, 'concluido')
+    const notaA = await saveAnotacao(50002, 'nota do usuário A')
+    await setMeta('sync-user', 'usuario-A')
+    await setMeta('sync-cursor', '2020-01-01T00:00:00.000Z')
+
+    // agora quem está logado é u1 (FAKE_SESSION)
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    let posts = 0
+    let getUrl = ''
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts += 1
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      getUrl = url
+      return jsonResponse({
+        progresso: [{ pericopeOrdem: 50003, status: 'concluido', atualizadoEm: FUTURE }],
+        anotacoes: [],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    // o outbox de A foi descartado junto: nada dele sobe para a conta de u1
+    expect(posts).toBe(0)
+    expect(await getProgresso(50001)).toBeUndefined()
+    expect((await listAnotacoes(50002)).find((n) => n.id === notaA.id)).toBeUndefined()
+    // cursor zerado → pull completo da conta nova
+    expect(getUrl).toBe('/api/sync?since=')
+    expect((await getProgresso(50003))?.status).toBe('concluido')
+    expect(await getMeta('sync-user')).toBe('u1')
+  })
+
+  it('mesma conta de novo → nada é apagado', async () => {
+    await resetLocal()
+    await setMeta('sync-user', 'u1')
+    await setProgresso(50004, 'concluido')
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) =>
+        init?.method === 'POST'
+          ? jsonResponse({ ok: true, agora: FUTURE })
+          : jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE }),
+      ),
+    )
+
+    await syncNow()
+
+    expect((await getProgresso(50004))?.status).toBe('concluido')
+  })
+
+  it('signOutLocal: esvazia o outbox, zera o cursor e desloga — mantendo a marca do dono', async () => {
+    await resetLocal()
+    await setProgresso(60001, 'concluido')
+    await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
+    await setMeta('sync-user', 'u1')
+
+    await signOutLocal()
+
+    expect(await listOutbox()).toEqual([])
+    expect(await getMeta('sync-cursor')).toBeUndefined()
+    // a marca do dono fica: é ela que dispara o wipe se outra conta entrar aqui
+    expect(await getMeta('sync-user')).toBe('u1')
+    // sair não apaga o que já está lido/anotado neste dispositivo
+    expect((await getProgresso(60001))?.status).toBe('concluido')
+    expect(authClient.signOut).toHaveBeenCalled()
   })
 })

@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/biblia-pericopes/',
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -24,8 +24,8 @@ export default defineConfig({
         background_color: '#f3efe6',
         display: 'standalone',
         lang: 'pt-BR',
-        start_url: '/biblia-pericopes/',
-        scope: '/biblia-pericopes/',
+        start_url: '/',
+        scope: '/',
         icons: [
           {
             src: 'pwa-192.png',

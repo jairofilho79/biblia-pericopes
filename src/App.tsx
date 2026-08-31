@@ -19,7 +19,7 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter basename="/biblia-pericopes">
+    <BrowserRouter>
       <div className="shell">
         <header className="top">
           <NavLink to="/" className="brand">

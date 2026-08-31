@@ -1,5 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { remoteWinsLocal } from './sync-merge'
+import { MAX_TEXTO } from './sync-limits'
 import type { Anotacao, Progresso, ProgressoStatus } from './types'
 
 const DB_NAME = 'biblia-pericopes'
@@ -57,8 +58,12 @@ export async function getProgresso(ordem: number): Promise<Progresso | undefined
 export async function setProgresso(ordem: number, status: ProgressoStatus): Promise<void> {
   const atualizadoEm = new Date().toISOString()
   const d = await db()
-  await d.put('progresso', { pericopeOrdem: ordem, status, atualizadoEm })
-  await d.put('outbox', { kind: 'progresso', ordem, status, atualizadoEm } as OutboxItem)
+  // Uma única transação sobre os dois stores: uma aba morta no meio não pode
+  // gravar o progresso local sem enfileirar o item correspondente do outbox.
+  const tx = d.transaction(['progresso', 'outbox'], 'readwrite')
+  await tx.objectStore('progresso').put({ pericopeOrdem: ordem, status, atualizadoEm })
+  await tx.objectStore('outbox').put({ kind: 'progresso', ordem, status, atualizadoEm } as OutboxItem)
+  await tx.done
 }
 
 export async function listAllProgresso(): Promise<Progresso[]> {
@@ -91,31 +96,40 @@ export async function listAnotacoes(ordem: number): Promise<Anotacao[]> {
 
 export async function saveAnotacao(pericopeOrdem: number, texto: string, id?: string): Promise<Anotacao> {
   const now = new Date().toISOString()
-  const existing = id ? await (await db()).get('anotacoes', id) : undefined
+  const d = await db()
+  const tx = d.transaction(['anotacoes', 'outbox'], 'readwrite')
+  const notas = tx.objectStore('anotacoes')
+  const existing = id ? await notas.get(id) : undefined
   const note: Anotacao = {
     id: existing?.id ?? crypto.randomUUID(),
     pericopeOrdem,
-    texto,
+    // Trunca no ponto de escrita: o servidor rejeita o lote inteiro acima de
+    // MAX_TEXTO, e uma nota grande demais travaria o outbox para sempre.
+    texto: texto.slice(0, MAX_TEXTO),
     criadoEm: existing?.criadoEm ?? now,
     atualizadoEm: now,
   }
-  await (await db()).put('anotacoes', note)
-  await (await db()).put('outbox', { kind: 'anotacao', nota: note, apagadoEm: null } as OutboxItem)
+  await notas.put(note)
+  await tx.objectStore('outbox').put({ kind: 'anotacao', nota: note, apagadoEm: null } as OutboxItem)
+  await tx.done
   return note
 }
 
 export async function deleteAnotacao(id: string): Promise<void> {
   const d = await db()
-  const existing = await d.get('anotacoes', id)
-  await d.delete('anotacoes', id)
+  const tx = d.transaction(['anotacoes', 'outbox'], 'readwrite')
+  const notas = tx.objectStore('anotacoes')
+  const existing = await notas.get(id)
+  await notas.delete(id)
   if (existing) {
     const now = new Date().toISOString()
-    await d.put('outbox', {
+    await tx.objectStore('outbox').put({
       kind: 'anotacao',
       nota: { ...existing, atualizadoEm: now },
       apagadoEm: now,
     } as OutboxItem)
   }
+  await tx.done
 }
 
 export async function listOutbox(): Promise<OutboxItem[]> {
@@ -126,12 +140,37 @@ export async function clearOutbox(upToSeq: number): Promise<void> {
   await (await db()).delete('outbox', IDBKeyRange.upperBound(upToSeq))
 }
 
+/** Esvazia o outbox inteiro (logout / troca de conta). */
+export async function clearOutboxAll(): Promise<void> {
+  await (await db()).clear('outbox')
+}
+
 export async function getMeta(key: string): Promise<string | undefined> {
   return (await (await db()).get('meta', key))?.value
 }
 
 export async function setMeta(key: string, value: string): Promise<void> {
   await (await db()).put('meta', { key, value })
+}
+
+export async function deleteMeta(key: string): Promise<void> {
+  await (await db()).delete('meta', key)
+}
+
+/**
+ * Apaga todo o dado de usuário local (progresso, anotações e outbox) numa
+ * transação só. Usado quando a sessão pertence a outra conta que não a dona
+ * dos dados gravados neste dispositivo.
+ */
+export async function clearAllUserData(): Promise<void> {
+  const d = await db()
+  const tx = d.transaction(['progresso', 'anotacoes', 'outbox'], 'readwrite')
+  await Promise.all([
+    tx.objectStore('progresso').clear(),
+    tx.objectStore('anotacoes').clear(),
+    tx.objectStore('outbox').clear(),
+    tx.done,
+  ])
 }
 
 export async function applyRemoteProgresso(

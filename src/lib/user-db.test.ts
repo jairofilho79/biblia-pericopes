@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   applyRemoteAnotacoes,
   applyRemoteProgresso,
+  clearAllUserData,
   clearOutbox,
   deleteAnotacao,
+  deleteMeta,
   getMeta,
   getProgresso,
   listAnotacoes,
@@ -13,6 +15,7 @@ import {
   setMeta,
   setProgresso,
 } from './user-db'
+import { MAX_TEXTO } from './sync-limits'
 
 const FUTURE = '2099-01-01T00:00:00.000Z'
 const PAST = '2000-01-01T00:00:00.000Z'
@@ -174,5 +177,36 @@ describe('user-db v2 (outbox/meta)', () => {
     const anotacaoOutboxBefore = outboxBefore.filter((i) => i.kind === 'anotacao').length
     const anotacaoOutboxAfter = outboxAfter.filter((i) => i.kind === 'anotacao').length
     expect(anotacaoOutboxAfter).toBe(anotacaoOutboxBefore + 2)
+  })
+
+  // Sem o corte na escrita, uma nota acima do limite envenenaria o lote inteiro:
+  // o servidor rejeita o POST com 400 e o outbox nunca mais é esvaziado.
+  it('saveAnotacao corta o texto em MAX_TEXTO (local e no outbox)', async () => {
+    const gigante = 'a'.repeat(MAX_TEXTO + 500)
+    const note = await saveAnotacao(9010, gigante)
+
+    expect(note.texto).toHaveLength(MAX_TEXTO)
+    const salva = (await listAnotacoes(9010)).find((n) => n.id === note.id)
+    expect(salva?.texto).toHaveLength(MAX_TEXTO)
+
+    const outbox = await listOutbox()
+    const item = outbox.find((i) => i.kind === 'anotacao' && i.nota.id === note.id)
+    if (item?.kind === 'anotacao') expect(item.nota.texto).toHaveLength(MAX_TEXTO)
+  })
+
+  it('clearAllUserData apaga progresso, anotações e outbox; deleteMeta remove a chave', async () => {
+    await setProgresso(9011, 'concluido')
+    await saveAnotacao(9012, 'some junto')
+    await setMeta('chave-temp', 'x')
+
+    await clearAllUserData()
+
+    expect(await getProgresso(9011)).toBeUndefined()
+    expect(await listAnotacoes(9012)).toEqual([])
+    expect(await listOutbox()).toEqual([])
+    // meta sobrevive ao wipe dos dados; só sai por deleteMeta
+    expect(await getMeta('chave-temp')).toBe('x')
+    await deleteMeta('chave-temp')
+    expect(await getMeta('chave-temp')).toBeUndefined()
   })
 })

@@ -14,6 +14,8 @@ export type PushAnotacao = {
 }
 
 const STATUS = new Set(['nao_iniciado', 'em_andamento', 'concluido'])
+// Cópia deliberada dos limites de src/lib/sync-limits.ts: o Worker não pode
+// importar de src/ (tsconfig/bundle separados). Mantenha os dois em sincronia.
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 

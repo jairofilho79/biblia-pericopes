@@ -70,4 +70,9 @@ app.post('/api/sync', async (c) => {
 
 app.notFound((c) => c.json({ error: 'não encontrado' }, 404))
 
+app.onError((err, c) => {
+  console.error(err)
+  return c.json({ error: 'erro interno' }, 500)
+})
+
 export default app

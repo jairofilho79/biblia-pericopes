@@ -31,4 +31,15 @@ describe('parseSyncPush', () => {
     expect(parseSyncPush({ progresso: Array(501).fill(prog) })).toBeNull()
     expect(parseSyncPush({ anotacoes: [{ ...nota, texto: 'x'.repeat(20001) }] })).toBeNull()
   })
+  it('exige timestamps no formato ISO canônico (toISOString)', () => {
+    expect(
+      parseSyncPush({ progresso: [{ ...prog, atualizadoEm: '2026-08-31T09:00:00-03:00' }] }),
+    ).toBeNull()
+    expect(
+      parseSyncPush({ progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00Z' }] }),
+    ).toBeNull()
+    expect(
+      parseSyncPush({ progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z' }] }),
+    ).toEqual({ progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z' }], anotacoes: [] })
+  })
 })

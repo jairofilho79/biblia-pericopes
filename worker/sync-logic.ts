@@ -17,8 +17,10 @@ const STATUS = new Set(['nao_iniciado', 'em_andamento', 'concluido'])
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 
+const ISO_CANONICAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+
 function isIso(v: unknown): v is string {
-  return typeof v === 'string' && !Number.isNaN(Date.parse(v))
+  return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
 }
 
 function validProgresso(v: unknown): v is PushProgresso {

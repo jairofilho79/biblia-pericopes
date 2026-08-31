@@ -27,8 +27,24 @@ via Cloudflare D1 (last-write-wins). Sem login, tudo funciona 100% local.
 
 ## Deploy
 
-Cloudflare Workers (static assets + API). Push na `main` roda migrations D1 e
-`wrangler deploy` via GitHub Actions. Secrets do worker: `BETTER_AUTH_SECRET`,
-`RESEND_API_KEY`. Env opcional `ALLOWED_EMAILS` restringe o cadastro.
+Cloudflare Workers (static assets + API). Push na `main` roda lint, testes,
+typecheck do worker, build, migrations D1 e `wrangler deploy` via GitHub Actions.
+
+### Checklist do primeiro deploy
+
+1. `npx wrangler d1 create biblia-pericopes` e coloque o `database_id` real no
+   `wrangler.jsonc` (hoje é um placeholder só de zeros).
+2. Ajuste `APP_URL` em `wrangler.jsonc` para a URL real do workers.dev
+   (formato `<name>.<subdomínio>.workers.dev`) — ela alimenta o `baseURL`, os
+   `trustedOrigins` e os links dos e-mails de login.
+3. `wrangler secret put BETTER_AUTH_SECRET` e `wrangler secret put RESEND_API_KEY`.
+4. `wrangler d1 migrations apply biblia-pericopes --remote`.
+5. Sem um domínio verificado no Resend, o remetente `onboarding@resend.dev` só
+   entrega e-mails para o dono da conta Resend. Para cadastro aberto de verdade,
+   verifique um domínio; até lá, considere restringir com `ALLOWED_EMAILS`.
+6. O primeiro run do CI depois do merge vai falhar até os secrets existirem —
+   é esperado.
+
+Env opcional `ALLOWED_EMAILS` (lista separada por vírgula) restringe o cadastro.
 
 **Nota:** NAA é texto protegido (SBB). Uso pessoal/estudo; distribuição pública exige licença.

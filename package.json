@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
+    "typecheck:worker": "tsc -p worker/tsconfig.json --noEmit",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "dev:worker": "wrangler dev",

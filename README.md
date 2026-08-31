@@ -21,6 +21,14 @@ npm run dev
 
 ## Dados do usuário
 
-Progresso e anotações ficam no IndexedDB do navegador (offline).
+Progresso e anotações ficam no IndexedDB (offline-first). Com login (e-mail →
+código de 6 dígitos ou magic link), os dados sincronizam entre dispositivos
+via Cloudflare D1 (last-write-wins). Sem login, tudo funciona 100% local.
+
+## Deploy
+
+Cloudflare Workers (static assets + API). Push na `main` roda migrations D1 e
+`wrangler deploy` via GitHub Actions. Secrets do worker: `BETTER_AUTH_SECRET`,
+`RESEND_API_KEY`. Env opcional `ALLOWED_EMAILS` restringe o cadastro.
 
 **Nota:** NAA é texto protegido (SBB). Uso pessoal/estudo; distribuição pública exige licença.

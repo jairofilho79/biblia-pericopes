@@ -8,6 +8,7 @@ import Entrar from './pages/Entrar'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
 import { applyTheme, resolveTheme, toggleTheme, type Theme } from './lib/theme'
 import { authClient } from './lib/auth-client'
+import { initSyncTriggers } from './lib/sync'
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => resolveTheme())
@@ -19,6 +20,10 @@ export default function App() {
 
   useEffect(() => {
     applyReadingPrefs(getReadingPrefs())
+  }, [])
+
+  useEffect(() => {
+    initSyncTriggers()
   }, [])
 
   return (

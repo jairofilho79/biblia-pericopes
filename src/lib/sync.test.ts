@@ -1,0 +1,170 @@
+import 'fake-indexeddb/auto'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getMeta, getProgresso, listAnotacoes, listOutbox, saveAnotacao, setProgresso } from './user-db'
+
+vi.mock('./auth-client', () => ({
+  authClient: { getSession: vi.fn() },
+}))
+
+// Imported after the mock so the mocked module is what sync.ts resolves.
+import { authClient } from './auth-client'
+import { syncNow } from './sync'
+
+const FAKE_SESSION = { data: { user: { id: 'u1', email: 'user@example.com' } } }
+const NO_SESSION = { data: null }
+// Must postdate whatever the real clock stamps local writes with in this test run, so that
+// applyRemoteProgresso/applyRemoteAnotacoes treat these fixtures as the newer, winning side.
+const FUTURE = '2099-01-01T00:00:00.000Z'
+
+function jsonResponse(body: unknown, init?: { status?: number; ok?: boolean }) {
+  const status = init?.status ?? 200
+  return {
+    ok: init?.ok ?? (status >= 200 && status < 300),
+    status,
+    json: async () => body,
+  } as Response
+}
+
+beforeEach(() => {
+  vi.resetAllMocks()
+  vi.stubGlobal('navigator', { onLine: true })
+})
+
+describe('syncNow', () => {
+  it('no session → no fetch calls', async () => {
+    vi.mocked(authClient.getSession).mockResolvedValue(NO_SESSION as never)
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('offline → no fetch calls (session not even checked)', async () => {
+    vi.stubGlobal('navigator', { onLine: false })
+    const getSessionMock = vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(getSessionMock).not.toHaveBeenCalled()
+  })
+
+  it('session + non-empty outbox → POST deduped payload, clears outbox, GET pulls and stores cursor', async () => {
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // ordem 20001 written twice: dedupe must keep only the LAST state ("em_andamento" then
+    // "concluido" wins), proving toPush() collapses by key instead of pushing every outbox row.
+    await setProgresso(20001, 'em_andamento')
+    await setProgresso(20001, 'concluido')
+    const nota = await saveAnotacao(20002, 'primeira anotação')
+
+    const remoteAgora = '2026-08-31T12:00:00.000Z'
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        const body = JSON.parse(init.body as string)
+        expect(body.progresso).toEqual([
+          { pericopeOrdem: 20001, status: 'concluido', atualizadoEm: expect.any(String) },
+        ])
+        expect(body.anotacoes).toEqual([
+          {
+            id: nota.id,
+            pericopeOrdem: 20002,
+            texto: 'primeira anotação',
+            criadoEm: nota.criadoEm,
+            atualizadoEm: nota.atualizadoEm,
+            apagadoEm: null,
+          },
+        ])
+        return jsonResponse({ ok: true, agora: remoteAgora })
+      }
+      expect(url).toBe(`/api/sync?since=${encodeURIComponent('')}`)
+      return jsonResponse({
+        progresso: [{ pericopeOrdem: 30001, status: 'concluido', atualizadoEm: remoteAgora }],
+        anotacoes: [],
+        agora: remoteAgora,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+
+    const outboxAfter = await listOutbox()
+    expect(outboxAfter.some((i) => i.kind === 'progresso' && i.ordem === 20001)).toBe(false)
+    expect(outboxAfter.some((i) => i.kind === 'anotacao' && i.nota.id === nota.id)).toBe(false)
+
+    const pulled = await getProgresso(30001)
+    expect(pulled?.status).toBe('concluido')
+
+    expect(await getMeta('sync-cursor')).toBe(remoteAgora)
+  })
+
+  it('POST returning 401 → outbox NOT cleared, no pull attempted', async () => {
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await setProgresso(20003, 'concluido')
+
+    const fetchMock = vi.fn(async () => jsonResponse({ error: 'não autenticado' }, { status: 401, ok: false }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(1) // only the POST — no GET pull after a 401
+    const outboxAfter = await listOutbox()
+    expect(outboxAfter.some((i) => i.kind === 'progresso' && i.ordem === 20003)).toBe(true)
+  })
+
+  it('re-entrancy guard: a second syncNow() while one is running makes no extra request', async () => {
+    // Deliberately NOT asserting an absolute call count: earlier tests may leave items in the
+    // shared fake-indexeddb outbox (e.g. the 401 test's uncleared item), so a fresh syncNow()
+    // here may issue a push + a pull. What matters for this guard is that the concurrent second
+    // call contributes zero additional requests beyond what a single completed run would make.
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const fetchMock = vi.fn(async () =>
+      jsonResponse({ progresso: [], anotacoes: [], agora: '2026-08-31T12:00:00.000Z' }),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    // `running` is set synchronously before the first `await`, so calling syncNow() again
+    // before awaiting the first call must short-circuit on the guard.
+    const first = syncNow()
+    const second = syncNow()
+    await first
+    const callsAfterFirst = fetchMock.mock.calls.length
+    expect(callsAfterFirst).toBeGreaterThan(0)
+    await second
+    expect(fetchMock.mock.calls.length).toBe(callsAfterFirst)
+  })
+
+  it('remote tombstone from pull removes the local note', async () => {
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const local = await saveAnotacao(20004, 'nota a ser apagada remotamente')
+
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') return jsonResponse({ ok: true, agora: FUTURE })
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [
+          {
+            id: local.id,
+            pericopeOrdem: 20004,
+            texto: local.texto,
+            criadoEm: local.criadoEm,
+            atualizadoEm: FUTURE,
+            apagadoEm: FUTURE,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect((await listAnotacoes(20004)).find((n) => n.id === local.id)).toBeUndefined()
+  })
+})

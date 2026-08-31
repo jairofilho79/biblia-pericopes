@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { authClient } from '../lib/auth-client'
+import { syncNow } from '../lib/sync'
 
 type Etapa = 'email' | 'codigo' | 'verificando'
 
@@ -27,7 +28,10 @@ export default function Entrar() {
   }, [searchParams])
 
   useEffect(() => {
-    if (session) navigate('/', { replace: true })
+    if (session) {
+      syncNow()
+      navigate('/', { replace: true })
+    }
   }, [session, navigate])
 
   async function verificar(em: string, otp: string) {

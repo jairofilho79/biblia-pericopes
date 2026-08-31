@@ -13,12 +13,12 @@
     {
       "binding": "DB",
       "database_name": "biblia-pericopes",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "9918986e-1100-432f-8347-567ac5fb81fc",
       "migrations_dir": "migrations"
     }
   ],
   "vars": {
-    "APP_URL": "https://biblia-pericopes.workers.dev",
+    "APP_URL": "https://biblia-pericopes.jairofilho79.workers.dev",
     "EMAIL_FROM": "Perícopes <onboarding@resend.dev>"
   }
 }

@@ -25,7 +25,7 @@ próprio progresso manualmente se quiser.
 | Auth | **better-auth** rodando no Worker, banco **D1** | Biblioteca própria, sem serviço gerenciado (requisito: nada de Supabase/Firebase) |
 | Fluxo de login | **email OTP** como token único; o e-mail traz o código de 6 dígitos **e** um link que carrega o mesmo código | Um token serve os dois caminhos; se o iOS abrir o link no Safari em vez do PWA, o usuário digita o código dentro do PWA |
 | Envio de e-mail | **Resend** (free: 3k/mês) agora; trocar pelo Cloudflare Email Service quando sair de beta | Resend é o caminho GA recomendado pela própria doc da Cloudflare; troca é isolada num módulo |
-| Cadastro | **Allowlist de e-mails** via env (`ALLOWED_EMAILS`) | Usuário único; protege cota de e-mail e o texto NAA (licença SBB) |
+| Cadastro | **Aberto** (sign up = sign in: primeira verificação de OTP cria a conta). `ALLOWED_EMAILS` é env **opcional**: vazia/ausente = aberto; preenchida = restringe aos listados | Cadastro aberto é requisito; a allowlist fica como kill-switch de configuração se houver abuso da cota de e-mail |
 | Dados bíblicos | `pericopes.json` **continua asset estático precacheado** | Offline exige precache de qualquer forma; D1 é só para dados do usuário |
 | Sync | **Local-first, last-write-wins** por `atualizadoEm` (já existe nos registros) | Simples, suficiente para 1 usuário multi-dispositivo |
 | Base path | Muda de `/biblia-pericopes/` para `/` | Worker serve na raiz do workers.dev; simplifica router, manifest e SW |
@@ -72,10 +72,13 @@ Pages).
   depois.
 - Conteúdo do e-mail: código de 6 dígitos em destaque + botão/link
   `https://<host>/entrar?email=…&code=…`.
+- Cadastro: aberto — a primeira verificação de OTP bem-sucedida cria a conta
+  (sign up e sign in são o mesmo fluxo, numa única tela "Entrar").
 - Regras: código expira em 10 min, uso único, máx. 3 tentativas de verificação,
-  rate limit do better-auth nas rotas de auth. E-mails fora da
-  `ALLOWED_EMAILS` recebem resposta genérica de sucesso (sem enviar e-mail e
-  sem vazar se o endereço é permitido).
+  rate limit por IP e por e-mail nas rotas de auth. Se `ALLOWED_EMAILS`
+  estiver preenchida, e-mails fora dela recebem resposta genérica de sucesso
+  (sem enviar e-mail e sem vazar se o endereço é permitido); com a env
+  vazia/ausente, qualquer e-mail pode entrar.
 - Sessão: cookie httpOnly de 1ª parte, 30 dias com renovação rolante —
   persiste no PWA instalado (mesma origem).
 - UI: página `/entrar` (campo de e-mail → tela "digite o código" com input de

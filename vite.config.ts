@@ -51,6 +51,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,svg,png,json,woff2}'],
         maximumFileSizeToCacheInBytes: 16 * 1024 * 1024,
+        // /api/** é do Worker (auth e sync): nunca responder com o index.html
+        // do app shell no lugar de uma resposta de API.
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],

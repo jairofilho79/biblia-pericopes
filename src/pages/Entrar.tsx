@@ -106,10 +106,12 @@ export default function Entrar() {
               inputMode="numeric"
               autoComplete="one-time-code"
               pattern="[0-9]{6}"
-              maxLength={6}
               required
               value={codigo}
-              onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
+              // Sem maxLength: ele truncaria a colagem ANTES de tirarmos os
+              // separadores, e "123 456" viraria "12345". Tira não-dígito e só
+              // então corta em 6.
+              onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="000000"
             />
           </label>
@@ -122,7 +124,11 @@ export default function Entrar() {
         </form>
       )}
       {etapa === 'verificando' && <p className="muted">Verificando…</p>}
-      {erro && <p className="entrar-erro">{erro}</p>}
+      {erro && (
+        <p className="entrar-erro" role="alert">
+          {erro}
+        </p>
+      )}
     </section>
   )
 }

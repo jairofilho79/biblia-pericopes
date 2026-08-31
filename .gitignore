@@ -14,6 +14,7 @@ dist-ssr
 .env
 .env.*
 .wrangler/
+.dev.vars
 
 # ETL / enrich bulky intermediates (keep NAA path local)
 data/raw/

@@ -23,7 +23,10 @@
     "pipeline": "npm run etl && npm run enrich"
   },
   "dependencies": {
+    "better-auth": "^1.7.2",
+    "hono": "^4.13.5",
     "idb": "^8.0.3",
+    "kysely-d1": "^0.4.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",

@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "noEmit": true,
+    "skipLibCheck": true,
     "types": ["@cloudflare/workers-types"]
   },
   "include": ["./**/*.ts"]

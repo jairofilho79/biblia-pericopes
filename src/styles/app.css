@@ -976,3 +976,49 @@ button.ghost {
     transition: none;
   }
 }
+
+.entrar {
+  max-width: 24rem;
+}
+
+.entrar-form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.entrar-form label {
+  display: grid;
+  gap: 0.3rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.entrar-form input {
+  width: 100%;
+  font: inherit;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 2.75rem;
+}
+
+.entrar-form input[inputmode='numeric'] {
+  font-size: 1.5rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.entrar-erro {
+  font-family: var(--font-ui);
+  color: #b3564d;
+  font-size: 0.9rem;
+}
+
+.nav-conta {
+  font-size: inherit;
+  color: var(--muted);
+}

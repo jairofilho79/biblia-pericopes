@@ -4,11 +4,14 @@ import Home from './pages/Home'
 import Leitura from './pages/Leitura'
 import Indice from './pages/Indice'
 import Pesquisar from './pages/Pesquisar'
+import Entrar from './pages/Entrar'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
 import { applyTheme, resolveTheme, toggleTheme, type Theme } from './lib/theme'
+import { authClient } from './lib/auth-client'
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>(() => resolveTheme())
+  const { data: session } = authClient.useSession()
 
   useEffect(() => {
     applyTheme(theme)
@@ -47,6 +50,18 @@ export default function App() {
             </NavLink>
             <NavLink to="/indice">Índice</NavLink>
             <NavLink to="/pesquisar">Pesquisar</NavLink>
+            {session ? (
+              <button
+                type="button"
+                className="linkish nav-conta"
+                onClick={() => authClient.signOut()}
+                title={session.user.email}
+              >
+                Sair
+              </button>
+            ) : (
+              <NavLink to="/entrar">Entrar</NavLink>
+            )}
           </nav>
         </header>
         <main className="main">
@@ -55,6 +70,7 @@ export default function App() {
             <Route path="/leitura/:ordem" element={<Leitura />} />
             <Route path="/indice" element={<Indice />} />
             <Route path="/pesquisar" element={<Pesquisar />} />
+            <Route path="/entrar" element={<Entrar />} />
           </Routes>
         </main>
       </div>

@@ -38,6 +38,31 @@ describe('createAuth — databaseHooks.user.create.before (gate de criação de 
   })
 })
 
+describe('createAuth — rate limit / IP', () => {
+  it('resolve o IP do cliente pelos headers da Cloudflare (senão o balde vira global)', () => {
+    const auth = createAuth(fakeEnv())
+    expect(auth.options.advanced?.ipAddress?.ipAddressHeaders).toEqual([
+      'cf-connecting-ip',
+      'x-forwarded-for',
+    ])
+  })
+
+  it('aperta o envio de OTP com uma regra por rota', () => {
+    const auth = createAuth(fakeEnv())
+    // A chave é o path normalizado contra o basePath (sem o prefixo /api/auth).
+    expect(auth.options.rateLimit?.customRules?.['/email-otp/send-verification-otp']).toEqual({
+      window: 600,
+      max: 5,
+    })
+  })
+
+  it('mantém o rate limit ligado e persistido no D1', () => {
+    const auth = createAuth(fakeEnv())
+    expect(auth.options.rateLimit?.enabled).toBe(true)
+    expect(auth.options.rateLimit?.storage).toBe('database')
+  })
+})
+
 describe('createAuth — trustedOrigins', () => {
   it('inclui os localhost de dev quando APP_URL é local', () => {
     const auth = createAuth(fakeEnv({ APP_URL: 'http://localhost:8787' }))

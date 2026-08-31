@@ -1,8 +1,13 @@
 import { openDB, type IDBPDatabase } from 'idb'
+import { remoteWinsLocal } from './sync-merge'
 import type { Anotacao, Progresso, ProgressoStatus } from './types'
 
 const DB_NAME = 'biblia-pericopes'
-const DB_VERSION = 1
+const DB_VERSION = 2
+
+export type OutboxItem =
+  | { seq?: number; kind: 'progresso'; ordem: number; status: ProgressoStatus; atualizadoEm: string }
+  | { seq?: number; kind: 'anotacao'; nota: Anotacao; apagadoEm: string | null }
 
 type Schema = {
   progresso: {
@@ -14,6 +19,14 @@ type Schema = {
     value: Anotacao
     indexes: { 'by-pericope': number }
   }
+  outbox: {
+    key: number
+    value: OutboxItem
+  }
+  meta: {
+    key: string
+    value: { key: string; value: string }
+  }
 }
 
 let dbPromise: Promise<IDBPDatabase<Schema>> | null = null
@@ -21,10 +34,16 @@ let dbPromise: Promise<IDBPDatabase<Schema>> | null = null
 function db() {
   if (!dbPromise) {
     dbPromise = openDB<Schema>(DB_NAME, DB_VERSION, {
-      upgrade(database) {
-        database.createObjectStore('progresso', { keyPath: 'pericopeOrdem' })
-        const notes = database.createObjectStore('anotacoes', { keyPath: 'id' })
-        notes.createIndex('by-pericope', 'pericopeOrdem')
+      upgrade(database, oldVersion) {
+        if (oldVersion < 1) {
+          database.createObjectStore('progresso', { keyPath: 'pericopeOrdem' })
+          const notes = database.createObjectStore('anotacoes', { keyPath: 'id' })
+          notes.createIndex('by-pericope', 'pericopeOrdem')
+        }
+        if (oldVersion < 2) {
+          database.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true })
+          database.createObjectStore('meta', { keyPath: 'key' })
+        }
       },
     })
   }
@@ -36,13 +55,10 @@ export async function getProgresso(ordem: number): Promise<Progresso | undefined
 }
 
 export async function setProgresso(ordem: number, status: ProgressoStatus): Promise<void> {
-  await (
-    await db()
-  ).put('progresso', {
-    pericopeOrdem: ordem,
-    status,
-    atualizadoEm: new Date().toISOString(),
-  })
+  const atualizadoEm = new Date().toISOString()
+  const d = await db()
+  await d.put('progresso', { pericopeOrdem: ordem, status, atualizadoEm })
+  await d.put('outbox', { kind: 'progresso', ordem, status, atualizadoEm } as OutboxItem)
 }
 
 export async function listAllProgresso(): Promise<Progresso[]> {
@@ -84,9 +100,71 @@ export async function saveAnotacao(pericopeOrdem: number, texto: string, id?: st
     atualizadoEm: now,
   }
   await (await db()).put('anotacoes', note)
+  await (await db()).put('outbox', { kind: 'anotacao', nota: note, apagadoEm: null } as OutboxItem)
   return note
 }
 
 export async function deleteAnotacao(id: string): Promise<void> {
-  await (await db()).delete('anotacoes', id)
+  const d = await db()
+  const existing = await d.get('anotacoes', id)
+  await d.delete('anotacoes', id)
+  if (existing) {
+    const now = new Date().toISOString()
+    await d.put('outbox', {
+      kind: 'anotacao',
+      nota: { ...existing, atualizadoEm: now },
+      apagadoEm: now,
+    } as OutboxItem)
+  }
+}
+
+export async function listOutbox(): Promise<OutboxItem[]> {
+  return (await db()).getAll('outbox')
+}
+
+export async function clearOutbox(upToSeq: number): Promise<void> {
+  await (await db()).delete('outbox', IDBKeyRange.upperBound(upToSeq))
+}
+
+export async function getMeta(key: string): Promise<string | undefined> {
+  return (await (await db()).get('meta', key))?.value
+}
+
+export async function setMeta(key: string, value: string): Promise<void> {
+  await (await db()).put('meta', { key, value })
+}
+
+export async function applyRemoteProgresso(
+  items: { pericopeOrdem: number; status: ProgressoStatus; atualizadoEm: string }[],
+): Promise<void> {
+  const d = await db()
+  for (const item of items) {
+    const local = await d.get('progresso', item.pericopeOrdem)
+    if (remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) {
+      await d.put('progresso', item)
+    }
+  }
+}
+
+export async function applyRemoteAnotacoes(
+  items: {
+    id: string
+    pericopeOrdem: number
+    texto: string
+    criadoEm: string
+    atualizadoEm: string
+    apagadoEm: string | null
+  }[],
+): Promise<void> {
+  const d = await db()
+  for (const item of items) {
+    const local = await d.get('anotacoes', item.id)
+    if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
+    if (item.apagadoEm) {
+      await d.delete('anotacoes', item.id)
+    } else {
+      const { apagadoEm: _apagadoEm, ...nota } = item
+      await d.put('anotacoes', nota)
+    }
+  }
 }

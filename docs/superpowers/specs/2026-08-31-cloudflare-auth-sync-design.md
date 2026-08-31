@@ -79,8 +79,10 @@ Pages).
   estiver preenchida, e-mails fora dela recebem resposta genérica de sucesso
   (sem enviar e-mail e sem vazar se o endereço é permitido); com a env
   vazia/ausente, qualquer e-mail pode entrar.
-- Sessão: cookie httpOnly de 1ª parte, 30 dias com renovação rolante —
-  persiste no PWA instalado (mesma origem).
+- Sessão: cookie httpOnly de 1ª parte, **90 dias com renovação rolante** (cada
+  uso renova o prazo; só relogam dispositivos parados há 90 dias) — persiste no
+  PWA instalado (mesma origem). Prazo longo de propósito: reduz reenvio de
+  códigos e alivia a cota de 100 e-mails/dia do Resend.
 - UI: página `/entrar` (campo de e-mail → tela "digite o código" com input de
   6 dígitos → logado). Se a URL trouxer `email`+`code`, verifica
   automaticamente. Header ganha estado de conta discreto (entrar/sair).

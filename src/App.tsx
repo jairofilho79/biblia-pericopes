@@ -26,6 +26,12 @@ export default function App() {
     initSyncTriggers()
   }, [])
 
+  useEffect(() => {
+    const onTheme = () => setTheme(resolveTheme())
+    window.addEventListener('pericopes-theme', onTheme)
+    return () => window.removeEventListener('pericopes-theme', onTheme)
+  }, [])
+
   return (
     <BrowserRouter>
       <div className="shell">

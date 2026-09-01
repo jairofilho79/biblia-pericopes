@@ -14,6 +14,7 @@ export function resolveTheme(): Theme {
 export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme
   localStorage.setItem(KEY, theme)
+  window.dispatchEvent(new Event('pericopes-theme'))
 }
 
 export function toggleTheme(): Theme {

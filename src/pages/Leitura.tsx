@@ -1,16 +1,10 @@
 import { Fragment, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import ReadingMenu from '../components/ReadingMenu'
 import { getPericope, loadPericopes, proximaNoTestamento, refLabel } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
-import {
-  bumpReadingSize,
-  FONT_OPTIONS,
-  getReadingPrefs,
-  setReadingFont,
-  type ReadingFont,
-  type ReadingPrefs,
-} from '../lib/reading-prefs'
+import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
   getProgresso,
@@ -139,14 +133,6 @@ export default function Leitura() {
     setVerseFocus(ordem, next)
   }
 
-  function onSize(delta: number) {
-    setPrefs(bumpReadingSize(delta))
-  }
-
-  function onFont(font: ReadingFont) {
-    setPrefs(setReadingFont(font))
-  }
-
   async function copyContexto() {
     if (!p) return
     await navigator.clipboard.writeText(promptConversa(p))
@@ -166,33 +152,9 @@ export default function Leitura() {
         <Link to="/indice">{p.livro}</Link>
       </p>
       <h1>{p.titulo_pericope_pt}</h1>
-      <p className="ref">{refLabel(p)}</p>
-
-      <div className="read-toolbar" role="toolbar" aria-label="Preferências de leitura">
-        <div className="read-size" aria-label="Tamanho do texto">
-          <button type="button" className="read-tool" onClick={() => onSize(-1)} aria-label="Diminuir texto">
-            A−
-          </button>
-          <span className="read-size-label" aria-hidden>
-            A
-          </span>
-          <button type="button" className="read-tool" onClick={() => onSize(1)} aria-label="Aumentar texto">
-            A+
-          </button>
-        </div>
-        <div className="read-fonts" role="group" aria-label="Fonte">
-          {FONT_OPTIONS.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`read-tool${prefs.font === f.id ? ' active' : ''}`}
-              aria-pressed={prefs.font === f.id}
-              onClick={() => onFont(f.id)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+      <div className="ref-row">
+        <p className="ref">{refLabel(p)}</p>
+        <ReadingMenu prefs={prefs} onPrefs={setPrefs} />
       </div>
 
       <section className="block block-plain">

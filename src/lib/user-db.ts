@@ -152,9 +152,12 @@ export async function deleteAnotacao(id: string): Promise<void> {
 }
 
 /** Id determinístico do destaque: um por versículo por perícope. */
-function destaqueId(pericopeOrdem: number, verseId: string): string {
+export function destaqueId(pericopeOrdem: number, verseId: string): string {
   return `${pericopeOrdem}:${verseId}`
 }
+
+/** "capitulo:versiculo" — mesmo formato aceito pelo Worker em VERSE_ID. */
+const VERSE_ID_RE = /^\d+:\d+$/
 
 export async function listDestaques(ordem: number): Promise<Destaque[]> {
   return (await db()).getAllFromIndex('destaques', 'by-pericope', ordem)
@@ -164,7 +167,12 @@ export async function setDestaque(
   pericopeOrdem: number,
   verseId: string,
   cor: DestaqueCor,
-): Promise<Destaque> {
+): Promise<Destaque | null> {
+  // Recusa no ponto de escrita: parseTextoNaa emite blocos órfãos com ids como
+  // "x:1", e o Worker rejeita qualquer verseId fora de "capitulo:versiculo" —
+  // um único item assim no outbox travaria o sync inteiro para sempre (mesma
+  // lógica do corte em MAX_TEXTO em saveAnotacao).
+  if (!VERSE_ID_RE.test(verseId)) return null
   const now = new Date().toISOString()
   const d = await db()
   const tx = d.transaction(['destaques', 'outbox'], 'readwrite')

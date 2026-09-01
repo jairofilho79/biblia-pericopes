@@ -35,6 +35,7 @@ function jsonResponse(body: unknown, init?: { status?: number; ok?: boolean }) {
     ok: init?.ok ?? (status >= 200 && status < 300),
     status,
     json: async () => body,
+    text: async () => JSON.stringify(body),
   } as Response
 }
 
@@ -272,6 +273,37 @@ describe('syncNow — push em lotes', () => {
     expect(await listOutbox()).toHaveLength(TOTAL) // at-least-once: nada é descartado
     expect(warn).toHaveBeenCalledWith('[sync] push falhou', 500)
     warn.mockRestore()
+  })
+})
+
+// 400 é validação determinística: reenviar o mesmo lote nunca muda o
+// resultado. Sem esse escape, o outbox nunca esvaziava e travava o pull (e
+// todas as outras entidades) para sempre atrás de um único item ruim.
+describe('syncNow — push rejeitado com 400', () => {
+  it('POST retornando 400 → outbox é limpo e o pull acontece mesmo assim', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await setProgresso(80001, 'concluido')
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    let getUrl = ''
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        return jsonResponse({ error: 'payload inválido' }, { status: 400, ok: false })
+      }
+      getUrl = url
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2) // POST rejeitado + GET do pull
+    expect(await listOutbox()).toEqual([])
+    expect(getUrl).toBe('/api/sync?since=')
+    expect(await getMeta('sync-cursor')).toBe(FUTURE) // cursor avançou: o pull rodou de verdade
+    expect(errorSpy).toHaveBeenCalledWith('[sync] push rejeitado (400)', expect.any(String))
+    errorSpy.mockRestore()
   })
 })
 

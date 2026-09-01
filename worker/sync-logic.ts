@@ -30,6 +30,7 @@ const CORES = new Set(['amarelo', 'verde', 'azul', 'rosa'])
 const VERSE_ID = /^\d+:\d+$/
 // Cópia deliberada dos limites de src/lib/sync-limits.ts: o Worker não pode
 // importar de src/ (tsconfig/bundle separados). Mantenha os dois em sincronia.
+// MAX_ITENS vale para as três listas (progresso/anotacoes/destaques).
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 

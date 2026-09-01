@@ -15,6 +15,7 @@ import { clearReadingPosition, getReadingPosition, setReadingPosition } from '..
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
+  destaqueId,
   getProgresso,
   listAnotacoes,
   listDestaques,
@@ -191,11 +192,15 @@ export default function Leitura() {
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
     if (!draft.trim()) return
-    await saveAnotacao(ordem, draft.trim(), editingId ?? undefined, draftRef)
-    setDraft('')
-    setDraftRef(null)
-    setEditingId(null)
-    await refreshNotes()
+    try {
+      await saveAnotacao(ordem, draft.trim(), editingId ?? undefined, draftRef)
+      setDraft('')
+      setDraftRef(null)
+      setEditingId(null)
+      await refreshNotes()
+    } catch {
+      flashAviso('Não foi possível salvar agora')
+    }
   }
 
   function editarNota(n: Anotacao) {
@@ -213,10 +218,14 @@ export default function Leitura() {
   }
 
   async function apagarNota(id: string) {
-    await deleteAnotacao(id)
-    setConfirmarId(null)
-    if (editingId === id) cancelarEdicao()
-    await refreshNotes()
+    try {
+      await deleteAnotacao(id)
+      setConfirmarId(null)
+      if (editingId === id) cancelarEdicao()
+      await refreshNotes()
+    } catch {
+      flashAviso('Não foi possível salvar agora')
+    }
   }
 
   async function markDone() {
@@ -268,21 +277,34 @@ export default function Leitura() {
   }
 
   async function destacarSelecao(cor: DestaqueCor) {
-    const proximos = new Map(destaques)
-    for (const v of selecionados) {
-      await setDestaque(ordem, v.id, cor)
-      proximos.set(v.id, cor)
+    try {
+      const proximos = new Map(destaques)
+      for (const v of selecionados) {
+        // Belt-and-suspenders: setDestaque já recusa ids fora do formato
+        // "capitulo:versiculo", mas filtrar aqui evita que o Map de estado da UI
+        // registre uma cor para um versículo que nunca foi de fato gravado.
+        if (!/^\d+:\d+$/.test(v.id)) continue
+        await setDestaque(ordem, v.id, cor)
+        proximos.set(v.id, cor)
+      }
+      setDestaques(proximos)
+    } catch {
+      flashAviso('Não foi possível salvar agora')
     }
-    setDestaques(proximos)
   }
 
   async function removerDestaqueSelecao() {
-    const proximos = new Map(destaques)
-    for (const v of selecionados) {
-      await removeDestaque(`${ordem}:${v.id}`)
-      proximos.delete(v.id)
+    try {
+      const proximos = new Map(destaques)
+      for (const v of selecionados) {
+        if (!/^\d+:\d+$/.test(v.id)) continue
+        await removeDestaque(destaqueId(ordem, v.id))
+        proximos.delete(v.id)
+      }
+      setDestaques(proximos)
+    } catch {
+      flashAviso('Não foi possível salvar agora')
     }
-    setDestaques(proximos)
   }
 
   function anotarSelecao() {
@@ -314,6 +336,12 @@ export default function Leitura() {
   if (!p) return <p className="muted">Carregando…</p>
 
   const selecionadosIds = new Set(selecionados.map((v) => v.id))
+  // Cor "atual" da seleção para os swatches (aria-pressed): só quando TODOS os
+  // versículos selecionados compartilham a mesma cor — misto ou sem destaque
+  // vira null, e nenhum swatch aparece marcado.
+  const coresSelecionadas = new Set(selecionados.map((v) => destaques.get(v.id) ?? null))
+  const corAtual: DestaqueCor | null =
+    coresSelecionadas.size === 1 ? [...coresSelecionadas][0] : null
 
   function verseClass(base: string, id: string): string {
     const cor = destaques.get(id)
@@ -593,6 +621,7 @@ export default function Leitura() {
         <VerseActions
           label={rangeLabel(p, selecionados)}
           temDestaque={selecionados.some((v) => destaques.has(v.id))}
+          corAtual={corAtual}
           aviso={aviso}
           onCopiar={() => void copiarSelecao()}
           onCompartilhar={() => void compartilharSelecao()}

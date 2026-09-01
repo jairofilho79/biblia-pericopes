@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { DestaqueCor } from '../lib/types'
 
-export const CORES: { id: DestaqueCor; label: string }[] = [
+const CORES: { id: DestaqueCor; label: string }[] = [
   { id: 'amarelo', label: 'Amarelo' },
   { id: 'verde', label: 'Verde' },
   { id: 'azul', label: 'Azul' },
@@ -11,6 +11,9 @@ export const CORES: { id: DestaqueCor; label: string }[] = [
 type Props = {
   label: string
   temDestaque: boolean
+  // Cor compartilhada por TODA a seleção; null quando não há destaque ou a
+  // seleção mistura cores — nenhum swatch aparece pressionado nesse caso.
+  corAtual: DestaqueCor | null
   aviso: string
   onCopiar: () => void
   onCompartilhar: () => void
@@ -23,6 +26,7 @@ type Props = {
 export default function VerseActions({
   label,
   temDestaque,
+  corAtual,
   aviso,
   onCopiar,
   onCompartilhar,
@@ -65,6 +69,7 @@ export default function VerseActions({
             type="button"
             className={`hl-swatch hl-${c.id}`}
             aria-label={`Destacar em ${c.label.toLowerCase()}`}
+            aria-pressed={corAtual === c.id}
             onClick={() => onDestacar(c.id)}
           />
         ))}

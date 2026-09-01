@@ -75,8 +75,10 @@ function derrubarSessao() {
 
 /**
  * Envia o outbox em lotes de no máximo MAX_ITENS_POR_LOTE itens por lista.
- * Deduplica antes de fatiar (último estado de cada chave vence) e só devolve
- * `true` quando TODOS os lotes passaram — o outbox só é limpo nesse caso.
+ * Deduplica antes de fatiar (último estado de cada chave vence) e devolve
+ * `true` quando o chamador deve limpar o outbox: todos os lotes passaram, OU
+ * um deles voltou 400 e foi abandonado de propósito (ver comentário abaixo).
+ * `false` significa "tenta de novo depois" — o outbox fica intacto.
  * Reenviar um lote já aceito é inofensivo: o upsert no servidor é idempotente.
  */
 async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
@@ -100,6 +102,16 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
     if (res.status === 401) {
       derrubarSessao()
       return false
+    }
+    if (res.status === 400) {
+      // 400 é validação determinística (payload inválido): reenviar o mesmo
+      // lote nunca muda o resultado, e insistir travaria o outbox — e com ele
+      // o pull e TODAS as outras entidades — para sempre. Abandona o lote em
+      // vez de retentar: as linhas continuam intactas e visíveis no IndexedDB
+      // local, só a sincronização delas é que é desistida. Pior seria um
+      // travamento permanente por causa de um único item ruim.
+      console.error('[sync] push rejeitado (400)', await res.text().catch(() => ''))
+      return true
     }
     if (!res.ok) {
       // fica no outbox para a próxima tentativa — mas agora com rastro no console

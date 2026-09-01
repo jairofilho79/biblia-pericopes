@@ -221,7 +221,7 @@ describe('user-db v2 (outbox/meta)', () => {
 describe('user-db v3 (destaques)', () => {
   it('setDestaque grava o destaque e enfileira o outbox na mesma transação', async () => {
     const d = await setDestaque(9101, '1:3', 'amarelo')
-    expect(d.id).toBe('9101:1:3')
+    expect(d?.id).toBe('9101:1:3')
     expect((await listDestaques(9101)).map((x) => x.cor)).toEqual(['amarelo'])
 
     const outbox = await listOutbox()
@@ -236,18 +236,18 @@ describe('user-db v3 (destaques)', () => {
   it('destacar de novo troca a cor e preserva criadoEm', async () => {
     const primeiro = await setDestaque(9102, '2:7', 'verde')
     const segundo = await setDestaque(9102, '2:7', 'rosa')
-    expect(segundo.id).toBe(primeiro.id)
-    expect(segundo.criadoEm).toBe(primeiro.criadoEm)
+    expect(segundo?.id).toBe(primeiro?.id)
+    expect(segundo?.criadoEm).toBe(primeiro?.criadoEm)
     expect((await listDestaques(9102)).map((x) => x.cor)).toEqual(['rosa'])
   })
 
   it('removeDestaque apaga o local e enfileira a lápide', async () => {
     const d = await setDestaque(9103, '1:1', 'azul')
-    await removeDestaque(d.id)
+    await removeDestaque(d!.id)
 
     expect(await listDestaques(9103)).toEqual([])
     const outbox = await listOutbox()
-    const lapides = outbox.filter((i) => i.kind === 'destaque' && i.destaque.id === d.id)
+    const lapides = outbox.filter((i) => i.kind === 'destaque' && i.destaque.id === d!.id)
     const ultima = lapides[lapides.length - 1]
     expect(ultima).toBeDefined()
     if (ultima?.kind === 'destaque') {
@@ -256,16 +256,30 @@ describe('user-db v3 (destaques)', () => {
     }
   })
 
+  // parseTextoNaa emite blocos órfãos com ids fora de "capitulo:versiculo"
+  // (ex.: "x:1"); o Worker rejeita o outbox inteiro se um item assim chegar
+  // lá, então o guard tem que barrar a escrita ANTES do outbox existir.
+  it('setDestaque com verseId inválido não escreve nada (nem linha, nem outbox)', async () => {
+    const outboxAntes = await listOutbox()
+
+    const resultado = await setDestaque(1, 'x:1', 'amarelo')
+
+    expect(resultado).toBeNull()
+    expect(await listDestaques(1)).toEqual([])
+    const outboxDepois = await listOutbox()
+    expect(outboxDepois).toEqual(outboxAntes)
+  })
+
   it('applyRemoteDestaques: mais velho é ignorado, mais novo vence, lápide apaga', async () => {
     const local = await setDestaque(9104, '1:2', 'amarelo')
 
-    await applyRemoteDestaques([{ ...local, cor: 'verde', atualizadoEm: PAST, apagadoEm: null }])
+    await applyRemoteDestaques([{ ...local!, cor: 'verde', atualizadoEm: PAST, apagadoEm: null }])
     expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['amarelo'])
 
-    await applyRemoteDestaques([{ ...local, cor: 'azul', atualizadoEm: FUTURE, apagadoEm: null }])
+    await applyRemoteDestaques([{ ...local!, cor: 'azul', atualizadoEm: FUTURE, apagadoEm: null }])
     expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['azul'])
 
-    await applyRemoteDestaques([{ ...local, cor: 'azul', atualizadoEm: FUTURE_2, apagadoEm: FUTURE_2 }])
+    await applyRemoteDestaques([{ ...local!, cor: 'azul', atualizadoEm: FUTURE_2, apagadoEm: FUTURE_2 }])
     expect(await listDestaques(9104)).toEqual([])
   })
 })

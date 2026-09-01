@@ -831,9 +831,9 @@ button.ghost {
 }
 
 .hl-swatch {
-  width: 2.25rem;
-  height: 2.25rem;
-  min-height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -944,9 +944,9 @@ button.ghost {
   color: var(--accent);
   background: var(--accent-soft);
   border-radius: 999px;
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.75rem;
   margin-bottom: 0.35rem;
-  min-height: 1.9rem;
+  min-height: 2.75rem;
 }
 
 .note-form-actions,

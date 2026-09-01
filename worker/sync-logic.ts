@@ -8,6 +8,7 @@ export type PushAnotacao = {
   id: string
   pericopeOrdem: number
   texto: string
+  verseRef: string | null
   criadoEm: string
   atualizadoEm: string
   apagadoEm: string | null
@@ -33,6 +34,8 @@ const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 
 const ISO_CANONICAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+// "c:v" ou "c:v-c:v" cabem folgado; o limite existe só para barrar abuso.
+const MAX_VERSE_REF = 32
 
 function isIso(v: unknown): v is string {
   return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
@@ -49,7 +52,7 @@ function validProgresso(v: unknown): v is PushProgresso {
   )
 }
 
-function validAnotacao(v: unknown): v is PushAnotacao {
+function validAnotacao(v: unknown): v is Omit<PushAnotacao, 'verseRef'> & { verseRef?: unknown } {
   if (typeof v !== 'object' || v === null) return false
   const a = v as Record<string, unknown>
   return (
@@ -59,6 +62,9 @@ function validAnotacao(v: unknown): v is PushAnotacao {
     typeof a.pericopeOrdem === 'number' &&
     typeof a.texto === 'string' &&
     a.texto.length <= MAX_TEXTO &&
+    (a.verseRef === undefined ||
+      a.verseRef === null ||
+      (typeof a.verseRef === 'string' && a.verseRef.length <= MAX_VERSE_REF)) &&
     isIso(a.criadoEm) &&
     isIso(a.atualizadoEm) &&
     (a.apagadoEm === null || isIso(a.apagadoEm))
@@ -104,5 +110,12 @@ export function parseSyncPush(
   ) {
     return null
   }
-  return { progresso, anotacoes, destaques }
+  return {
+    progresso,
+    anotacoes: anotacoes.map((a) => ({
+      ...a,
+      verseRef: typeof a.verseRef === 'string' ? a.verseRef : null,
+    })),
+    destaques,
+  }
 }

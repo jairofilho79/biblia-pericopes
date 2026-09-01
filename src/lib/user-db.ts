@@ -104,7 +104,12 @@ export async function listAnotacoes(ordem: number): Promise<Anotacao[]> {
   return (await db()).getAllFromIndex('anotacoes', 'by-pericope', ordem)
 }
 
-export async function saveAnotacao(pericopeOrdem: number, texto: string, id?: string): Promise<Anotacao> {
+export async function saveAnotacao(
+  pericopeOrdem: number,
+  texto: string,
+  id?: string,
+  verseRef?: string | null,
+): Promise<Anotacao> {
   const now = new Date().toISOString()
   const d = await db()
   const tx = d.transaction(['anotacoes', 'outbox'], 'readwrite')
@@ -116,6 +121,8 @@ export async function saveAnotacao(pericopeOrdem: number, texto: string, id?: st
     // Trunca no ponto de escrita: o servidor rejeita o lote inteiro acima de
     // MAX_TEXTO, e uma nota grande demais travaria o outbox para sempre.
     texto: texto.slice(0, MAX_TEXTO),
+    // Parâmetro ausente numa edição preserva o vínculo; `null` explícito remove.
+    verseRef: verseRef !== undefined ? verseRef : (existing?.verseRef ?? null),
     criadoEm: existing?.criadoEm ?? now,
     atualizadoEm: now,
   }
@@ -254,6 +261,7 @@ export async function applyRemoteAnotacoes(
     id: string
     pericopeOrdem: number
     texto: string
+    verseRef?: string | null
     criadoEm: string
     atualizadoEm: string
     apagadoEm: string | null
@@ -267,7 +275,9 @@ export async function applyRemoteAnotacoes(
       await d.delete('anotacoes', item.id)
     } else {
       const { apagadoEm: _apagadoEm, ...nota } = item
-      await d.put('anotacoes', nota)
+      // Linha vinda de servidor sem a coluna (ou de antes da migration) entra
+      // como null: o tipo local exige o campo presente.
+      await d.put('anotacoes', { ...nota, verseRef: nota.verseRef ?? null })
     }
   }
 }

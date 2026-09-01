@@ -269,3 +269,23 @@ describe('user-db v3 (destaques)', () => {
     expect(await listDestaques(9104)).toEqual([])
   })
 })
+
+describe('anotações com vínculo a versículo', () => {
+  it('saveAnotacao grava verseRef e a edição preserva criadoEm e o vínculo', async () => {
+    const nova = await saveAnotacao(9105, 'nota vinculada', undefined, '1:3-1:7')
+    expect(nova.verseRef).toBe('1:3-1:7')
+
+    const editada = await saveAnotacao(9105, 'nota editada', nova.id)
+    expect(editada.id).toBe(nova.id)
+    expect(editada.criadoEm).toBe(nova.criadoEm)
+    expect(editada.verseRef).toBe('1:3-1:7')
+
+    const semVinculo = await saveAnotacao(9105, 'nota editada', nova.id, null)
+    expect(semVinculo.verseRef).toBeNull()
+  })
+
+  it('anotação sem vínculo tem verseRef null', async () => {
+    const nota = await saveAnotacao(9106, 'nota solta')
+    expect(nota.verseRef).toBeNull()
+  })
+})

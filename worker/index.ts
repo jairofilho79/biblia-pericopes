@@ -28,8 +28,8 @@ app.get('/api/sync', async (c) => {
     .bind(userId, since)
     .all()
   const notas = await c.env.DB.prepare(
-    `SELECT id, pericope_ordem AS pericopeOrdem, texto, criado_em AS criadoEm,
-            atualizado_em AS atualizadoEm, apagado_em AS apagadoEm
+    `SELECT id, pericope_ordem AS pericopeOrdem, texto, verse_ref AS verseRef,
+            criado_em AS criadoEm, atualizado_em AS atualizadoEm, apagado_em AS apagadoEm
      FROM anotacoes WHERE user_id = ?1 AND server_em > ?2`,
   )
     .bind(userId, since)
@@ -73,13 +73,24 @@ app.post('/api/sync', async (c) => {
     ),
     ...parsed.anotacoes.map((a) =>
       c.env.DB.prepare(
-        `INSERT INTO anotacoes (id, user_id, pericope_ordem, texto, criado_em, atualizado_em, apagado_em, server_em)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+        `INSERT INTO anotacoes (id, user_id, pericope_ordem, texto, verse_ref, criado_em, atualizado_em, apagado_em, server_em)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
          ON CONFLICT(user_id, id) DO UPDATE SET
-           texto = excluded.texto, atualizado_em = excluded.atualizado_em,
+           texto = excluded.texto, verse_ref = excluded.verse_ref,
+           atualizado_em = excluded.atualizado_em,
            apagado_em = excluded.apagado_em, server_em = excluded.server_em
          WHERE excluded.atualizado_em > anotacoes.atualizado_em`,
-      ).bind(a.id, userId, a.pericopeOrdem, a.texto, a.criadoEm, a.atualizadoEm, a.apagadoEm, serverEm),
+      ).bind(
+        a.id,
+        userId,
+        a.pericopeOrdem,
+        a.texto,
+        a.verseRef,
+        a.criadoEm,
+        a.atualizadoEm,
+        a.apagadoEm,
+        serverEm,
+      ),
     ),
     ...parsed.destaques.map((d) =>
       c.env.DB.prepare(

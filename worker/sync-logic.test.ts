@@ -6,6 +6,7 @@ const nota = {
   id: 'a1',
   pericopeOrdem: 1,
   texto: 'oração',
+  verseRef: null,
   criadoEm: '2026-08-31T09:00:00.000Z',
   atualizadoEm: '2026-08-31T10:00:00.000Z',
   apagadoEm: null,
@@ -80,5 +81,21 @@ describe('parseSyncPush — destaques', () => {
   })
   it('rejeita lote de destaques acima de 500 itens', () => {
     expect(parseSyncPush({ destaques: Array(501).fill(destaque) })).toBeNull()
+  })
+})
+
+describe('parseSyncPush — verseRef da anotação', () => {
+  it('aceita string, null e ausente (ausente vira null)', () => {
+    expect(parseSyncPush({ anotacoes: [{ ...nota, verseRef: '1:3-2:2' }] })?.anotacoes).toEqual([
+      { ...nota, verseRef: '1:3-2:2' },
+    ])
+    expect(parseSyncPush({ anotacoes: [{ ...nota, verseRef: null }] })?.anotacoes).toEqual([nota])
+    const semCampo = { ...nota } as Record<string, unknown>
+    delete semCampo.verseRef
+    expect(parseSyncPush({ anotacoes: [semCampo] })?.anotacoes).toEqual([nota])
+  })
+  it('rejeita verseRef de tipo errado ou acima de 32 chars', () => {
+    expect(parseSyncPush({ anotacoes: [{ ...nota, verseRef: 7 }] })).toBeNull()
+    expect(parseSyncPush({ anotacoes: [{ ...nota, verseRef: 'x'.repeat(33) }] })).toBeNull()
   })
 })

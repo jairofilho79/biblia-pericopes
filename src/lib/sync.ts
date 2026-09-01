@@ -23,6 +23,7 @@ type PushAnotacao = {
   id: string
   pericopeOrdem: number
   texto: string
+  verseRef: string | null
   criadoEm: string
   atualizadoEm: string
   apagadoEm: string | null

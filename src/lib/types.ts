@@ -29,6 +29,8 @@ export type Anotacao = {
   id: string
   pericopeOrdem: number
   texto: string
+  /** Vínculo opcional a versículo(s): "c:v" ou "c:v-c:v". */
+  verseRef: string | null
   criadoEm: string
   atualizadoEm: string
 }

@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest'
 import { getReadingPrefs, setReadingLayout } from './reading-prefs'
+import { installLocalStorageMock } from './testing/storage-mock'
+
+installLocalStorageMock()
 
 describe('reading-prefs layout', () => {
   beforeEach(() => localStorage.clear())

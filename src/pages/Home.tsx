@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getPericope, loadPericopes, ordensDoTestamento, refLabel } from '../lib/content'
+import { readingMinutes } from '../lib/reading-time'
 import {
   countConcluidasNaSequencia,
   getProximaOrdemNaSequencia,
@@ -16,6 +17,7 @@ type Track = {
   done: number
   total: number
   allDone: boolean
+  minutos: number
 }
 
 export default function Home() {
@@ -40,6 +42,7 @@ export default function Home() {
             done,
             total: ordens.length,
             allDone: done >= ordens.length,
+            minutos: readingMinutes(peri.texto_naa),
           })
         }
         setTracks(built)
@@ -76,7 +79,9 @@ export default function Home() {
           <article key={t.testament} className="track-card">
             <p className="track-label">{testamentLabel(t.testament)}</p>
             <h2>{t.peri.titulo_pericope_pt}</h2>
-            <p className="ref">{refLabel(t.peri)}</p>
+            <p className="ref">
+              {refLabel(t.peri)} · ~{t.minutos} min
+            </p>
             <p className="track-progress">
               {t.done} de {t.total}
               {t.allDone ? ' · concluído' : ''}

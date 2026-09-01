@@ -11,6 +11,7 @@ import {
   refLabel,
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
+import { readingMinutes } from '../lib/reading-time'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { useSwipeNav } from '../lib/use-swipe-nav'
@@ -107,6 +108,9 @@ export default function Leitura() {
     () => (selection ? versesInRange(blocks, selection.start, selection.end) : []),
     [blocks, selection],
   )
+  // Só o texto bíblico entra na conta: contexto, resenha e reflexão são
+  // leitura de primeira classe, mas o "~N min" é do texto da NAA.
+  const minutos = useMemo(() => (p ? readingMinutes(p.texto_naa) : 1), [p])
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
@@ -396,7 +400,9 @@ export default function Leitura() {
       </p>
       <h1>{p.titulo_pericope_pt}</h1>
       <div className="ref-row">
-        <p className="ref">{refLabel(p)}</p>
+        <p className="ref">
+          {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
+        </p>
         <div className="ref-nav">
           {prev && (
             <Link

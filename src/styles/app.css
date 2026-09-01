@@ -556,6 +556,10 @@ button.ghost {
   margin: 0;
 }
 
+.ref-min {
+  white-space: nowrap;
+}
+
 .readmenu {
   position: relative;
 }

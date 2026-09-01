@@ -822,6 +822,41 @@ button.ghost {
   text-shadow: var(--read-shadow);
 }
 
+.collapse-h {
+  margin-bottom: 0.35rem;
+}
+
+.collapse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0.1rem 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.collapse-chevron {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 0.85em;
+  transition: transform 0.18s ease;
+}
+
+.collapse-chevron.open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapse-chevron {
+    transition: none;
+  }
+}
+
 .texto-biblico {
   font-family: var(--read-font);
   font-size: var(--read-size);

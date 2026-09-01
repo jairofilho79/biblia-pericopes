@@ -24,9 +24,12 @@ type Props = {
   abbrev: string
   /** Corrido↔Blocos troca a subárvore de versículos: precisa re-observar. */
   layout: ReadingLayout
+  /** Avisa a página ANTES de rolar — é assim que o chip Contexto expande a
+   * seção colapsada em vez de parar num título mudo. */
+  onIr?: (id: string) => void
 }
 
-export default function SectionChips({ ordem, abbrev, layout }: Props) {
+export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
   const [ativo, setAtivo] = useState<string>(SECTIONS[0].id)
   const [refViva, setRefViva] = useState<string | null>(null)
   const rowRef = useRef<HTMLDivElement>(null)
@@ -131,6 +134,9 @@ export default function SectionChips({ ordem, abbrev, layout }: Props) {
   }, [ativo])
 
   function irPara(id: string) {
+    onIr?.(id)
+    // Expandir o Contexto não move o topo dele — é a primeira seção da página
+    // —, então rolar na mesma volta do evento já chega no lugar certo.
     document.getElementById(id)?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
   }
 

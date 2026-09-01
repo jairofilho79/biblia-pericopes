@@ -35,6 +35,7 @@ import { getVerseFocus, setVerseFocus } from '../lib/verse-highlight'
 import { nextSelection, parseVerseRef, rangeLabel, rangeRef, verseRefLabel, versesInRange, type VerseSelection } from '../lib/verse-range'
 import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
+import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
@@ -108,6 +109,7 @@ export default function Leitura() {
   const [falando, setFalando] = useState<string | null>(null)
   // Uma vez só: a capacidade do browser não muda no meio da sessão.
   const [temTts] = useState(() => ttsSupported())
+  const [contextoAberto, setContextoAbertoState] = useState(() => getContextoAberto())
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
   // handlers de seleção precisam dos blocos antes dos returns antecipados.
@@ -399,6 +401,18 @@ export default function Leitura() {
     setBarOpen(false)
   }
 
+  function alternarContexto() {
+    const proximo = !contextoAberto
+    setContextoAbertoState(proximo)
+    setContextoAberto(proximo)
+  }
+
+  function abrirContexto() {
+    if (contextoAberto) return
+    setContextoAbertoState(true)
+    setContextoAberto(true)
+  }
+
   async function copyContexto() {
     if (!p) return
     await navigator.clipboard.writeText(promptConversa(p))
@@ -472,15 +486,37 @@ export default function Leitura() {
         </div>
       </div>
 
-      <SectionChips ordem={p.ordem} abbrev={p.abbrev} layout={prefs.layout} />
+      <SectionChips
+        ordem={p.ordem}
+        abbrev={p.abbrev}
+        layout={prefs.layout}
+        onIr={(id) => {
+          if (id === 'contexto') abrirContexto()
+        }}
+      />
 
       <section className="block block-plain" id="contexto">
-        <h2>Contexto</h2>
-        {paragraphize(p.contexto_historico_literario, { maxParas: 2 }).map((para, i) => (
-          <p key={i} className="prose">
-            {para}
-          </p>
-        ))}
+        <h2 className="collapse-h">
+          <button
+            type="button"
+            className="collapse-btn"
+            aria-expanded={contextoAberto}
+            aria-controls="contexto-corpo"
+            onClick={alternarContexto}
+          >
+            <span className={`collapse-chevron${contextoAberto ? ' open' : ''}`} aria-hidden>
+              ▸
+            </span>
+            Contexto
+          </button>
+        </h2>
+        <div id="contexto-corpo" hidden={!contextoAberto}>
+          {paragraphize(p.contexto_historico_literario, { maxParas: 2 }).map((para, i) => (
+            <p key={i} className="prose">
+              {para}
+            </p>
+          ))}
+        </div>
       </section>
 
       <section className="block block-plain" id="texto">

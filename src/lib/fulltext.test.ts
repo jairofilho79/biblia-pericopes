@@ -157,3 +157,31 @@ describe('searchTexto', () => {
     expect(await searchTexto('deus', 1)).toHaveLength(1)
   })
 })
+
+describe('buildIndex — recuperação de falha', () => {
+  it('uma falha transitória no carregamento não trava a busca pela sessão inteira', async () => {
+    vi.resetModules()
+    let chamadas = 0
+    vi.doMock('./content', async (importOriginal) => {
+      const real = await importOriginal<typeof import('./content')>()
+      return {
+        ...real,
+        loadPericopes: async () => {
+          chamadas += 1
+          if (chamadas === 1) throw new Error('offline')
+          return FIXTURES
+        },
+      }
+    })
+
+    const { searchTexto: searchTextoFresco } = await import('./fulltext')
+
+    await expect(searchTextoFresco('coracao')).rejects.toThrow('offline')
+    const hits = await searchTextoFresco('coracao')
+    expect(hits).toHaveLength(1)
+    expect(hits[0].verseId).toBe('1:1')
+
+    vi.doUnmock('./content')
+    vi.resetModules()
+  })
+})

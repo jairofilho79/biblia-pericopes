@@ -175,7 +175,13 @@ async function buildIndex(): Promise<Entrada[]> {
     indice = out
     construindo = null
     return out
-  })()
+  })().catch((err: unknown) => {
+    // Falha transitória (offline, rede instável — isto é um PWA) não pode
+    // desabilitar a busca pela sessão inteira: limpa o "em construção" para
+    // a próxima chamada tentar de novo, em vez de reservar a rejeição.
+    construindo = null
+    throw err
+  })
   return construindo
 }
 

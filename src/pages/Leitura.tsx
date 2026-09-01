@@ -4,6 +4,7 @@ import ReadingMenu from '../components/ReadingMenu'
 import { getPericope, loadPericopes, proximaNoTestamento, refLabel } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
+import { getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
@@ -104,15 +105,40 @@ export default function Leitura() {
     })()
   }, [ordem, verseParam])
 
+  // Prioridade de rolagem ao abrir: ?v= na URL > posição salva > topo.
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [ordem, p])
+    if (!p) return
+    if (verseParam && /^\d+:\d+$/.test(verseParam)) return
+    window.scrollTo(0, getReadingPosition(ordem) ?? 0)
+  }, [ordem, p, verseParam])
 
   useEffect(() => {
     if (!focusId || !p) return
+    if (!(verseParam && /^\d+:\d+$/.test(verseParam))) return
     const el = document.querySelector('.verse-focus')
     el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }, [focusId, p])
+  }, [focusId, p, verseParam])
+
+  useEffect(() => {
+    let last = 0
+    let timer: number | undefined
+    const save = () => setReadingPosition(ordem, window.scrollY)
+    const onScroll = () => {
+      const now = Date.now()
+      if (now - last > 500) {
+        last = now
+        save()
+      } else {
+        window.clearTimeout(timer)
+        timer = window.setTimeout(save, 500)
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [ordem])
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()

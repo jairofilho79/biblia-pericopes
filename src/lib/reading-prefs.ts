@@ -2,9 +2,12 @@ const KEY = 'pericopes-reading'
 
 export type ReadingFont = 'serif' | 'literata' | 'sans'
 
+export type ReadingLayout = 'corrido' | 'blocos'
+
 export type ReadingPrefs = {
   sizeStep: number
   font: ReadingFont
+  layout: ReadingLayout
 }
 
 /** rem steps for biblical + prose text */
@@ -16,7 +19,7 @@ export const FONT_OPTIONS: { id: ReadingFont; label: string; stack: string }[] =
   { id: 'sans', label: 'Sans', stack: "'Source Sans 3', 'DM Sans', system-ui, sans-serif" },
 ]
 
-const DEFAULTS: ReadingPrefs = { sizeStep: 2, font: 'serif' }
+const DEFAULTS: ReadingPrefs = { sizeStep: 2, font: 'serif', layout: 'corrido' }
 
 export function getReadingPrefs(): ReadingPrefs {
   try {
@@ -28,7 +31,8 @@ export function getReadingPrefs(): ReadingPrefs {
         ? parsed.sizeStep
         : DEFAULTS.sizeStep
     const font = FONT_OPTIONS.some((f) => f.id === parsed.font) ? (parsed.font as ReadingFont) : DEFAULTS.font
-    return { sizeStep, font }
+    const layout: ReadingLayout = parsed.layout === 'blocos' ? 'blocos' : 'corrido'
+    return { sizeStep, font, layout }
   } catch {
     return { ...DEFAULTS }
   }
@@ -56,6 +60,13 @@ export function bumpReadingSize(delta: number): ReadingPrefs {
 export function setReadingFont(font: ReadingFont): ReadingPrefs {
   const prefs = getReadingPrefs()
   prefs.font = font
+  applyReadingPrefs(prefs)
+  return prefs
+}
+
+export function setReadingLayout(layout: ReadingLayout): ReadingPrefs {
+  const prefs = getReadingPrefs()
+  prefs.layout = layout
   applyReadingPrefs(prefs)
   return prefs
 }

@@ -39,3 +39,30 @@ export function parseTextoNaa(raw: string): TextoBlock[] {
 
   return blocks
 }
+
+export type VerseBlock = Extract<TextoBlock, { kind: 'verse' }>
+
+export type CorridoGroup = {
+  chapter: number
+  label: string | null
+  verses: VerseBlock[]
+}
+
+/** Um grupo fluido por capítulo, para o modo de leitura corrido. */
+export function groupCorrido(blocks: TextoBlock[]): CorridoGroup[] {
+  const groups: CorridoGroup[] = []
+  let current: CorridoGroup | null = null
+  for (const b of blocks) {
+    if (b.kind === 'chapter') {
+      current = { chapter: b.chapter, label: b.label, verses: [] }
+      groups.push(current)
+    } else {
+      if (!current) {
+        current = { chapter: b.chapter, label: null, verses: [] }
+        groups.push(current)
+      }
+      current.verses.push(b)
+    }
+  }
+  return groups
+}

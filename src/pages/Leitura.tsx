@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormE
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
+import { SkeletonLeitura } from '../components/Skeleton'
 import VerseActions from '../components/VerseActions'
 import {
   anteriorNoTestamento,
@@ -364,7 +365,7 @@ export default function Leitura() {
   }
 
   if (err) return <p className="muted">{err}</p>
-  if (!p) return <p className="muted">Carregando…</p>
+  if (!p) return <SkeletonLeitura />
 
   const selecionadosIds = new Set(selecionados.map((v) => v.id))
   // Cor "atual" da seleção para os swatches (aria-pressed): só quando TODOS os

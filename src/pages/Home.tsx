@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SkeletonHome } from '../components/Skeleton'
 import { getPericope, loadPericopes, ordensDoTestamento, refLabel } from '../lib/content'
 import { readingMinutes } from '../lib/reading-time'
 import {
@@ -56,7 +57,7 @@ export default function Home() {
   }, [])
 
   if (err) return <p className="muted">{err}</p>
-  if (!tracks.length) return <p className="muted">Carregando…</p>
+  if (!tracks.length) return <SkeletonHome />
 
   return (
     <section className="home">

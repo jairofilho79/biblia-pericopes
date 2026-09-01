@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { SkeletonIndice } from '../components/Skeleton'
 import {
   listLivros,
   listPericopes,
@@ -50,11 +51,23 @@ export default function Indice() {
   // Lista completa (sem filtro de busca): a barra de progresso do livro
   // aberto precisa do total do livro inteiro, não do que sobrou da busca.
   const [todas, setTodas] = useState<Pericope[]>([])
+  const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
-    listLivros().then(setLivros)
-    doneSet().then(setDone)
-    loadPericopes().then(setTodas)
+    let vivo = true
+    Promise.all([listLivros(), doneSet(), loadPericopes()])
+      .then(([ls, feitas, tudo]) => {
+        if (!vivo) return
+        setLivros(ls)
+        setDone(feitas)
+        setTodas(tudo)
+      })
+      .finally(() => {
+        if (vivo) setCarregando(false)
+      })
+    return () => {
+      vivo = false
+    }
   }, [])
 
   useEffect(() => {
@@ -99,7 +112,9 @@ export default function Indice() {
         </select>
       </div>
 
-      {livro || q ? (
+      {carregando ? (
+        <SkeletonIndice />
+      ) : livro || q ? (
         <>
           {progAberto && (
             <div className="book-group-head">

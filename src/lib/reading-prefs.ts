@@ -14,9 +14,9 @@ export type ReadingPrefs = {
 export const SIZE_STEPS = [0.95, 1.05, 1.15, 1.28, 1.42, 1.58] as const
 
 export const FONT_OPTIONS: { id: ReadingFont; label: string; stack: string }[] = [
-  { id: 'serif', label: 'Serif', stack: "'Source Serif 4', Georgia, serif" },
-  { id: 'literata', label: 'Literata', stack: "'Literata', Georgia, serif" },
-  { id: 'sans', label: 'Sans', stack: "'Source Sans 3', 'DM Sans', system-ui, sans-serif" },
+  { id: 'serif', label: 'Serif', stack: "'Source Serif 4 Variable', Georgia, serif" },
+  { id: 'literata', label: 'Literata', stack: "'Literata Variable', Georgia, serif" },
+  { id: 'sans', label: 'Sans', stack: "'Source Sans 3 Variable', 'DM Sans Variable', system-ui, sans-serif" },
 ]
 
 const DEFAULTS: ReadingPrefs = { sizeStep: 2, font: 'serif', layout: 'corrido' }

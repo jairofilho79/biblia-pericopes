@@ -24,6 +24,11 @@
     "pipeline": "npm run etl && npm run enrich"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/literata": "^5.3.0",
+    "@fontsource-variable/source-sans-3": "^5.3.0",
+    "@fontsource-variable/source-serif-4": "^5.3.0",
     "better-auth": "^1.7.2",
     "hono": "^4.13.5",
     "idb": "^8.0.3",

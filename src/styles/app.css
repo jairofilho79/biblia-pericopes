@@ -652,10 +652,22 @@ button.ghost {
   margin: 0 -1.05rem 0.9rem;
   padding: 0.4rem 1.05rem;
   background: color-mix(in srgb, var(--paper) 82%, transparent);
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--line);
   font-family: var(--font-ui);
   transition: top 0.25s ease;
+}
+
+/* Clique num chip ou `?v=` na URL rolam até a seção via âncora nativa: sem
+   esse respiro ela para colada embaixo das barras sticky (header + chips,
+   ~48px) e o título fica escondido. */
+#contexto,
+#texto,
+#resenha,
+#reflexao,
+#notas {
+  scroll-margin-top: calc(var(--top-h, 0px) + 3.5rem);
 }
 
 .shell:has(.top-hidden) .section-chips {
@@ -1103,6 +1115,13 @@ button.ghost {
   border-bottom: 1px solid var(--line);
   color: inherit;
   min-height: 3rem;
+}
+
+/* content-visibility corta o layout do <li> nos limites da caixa: o anel de
+   foco padrão do navegador vaza pra fora e fica cortado. Anel interno resolve. */
+.peri-list li a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .peri-list li a strong {

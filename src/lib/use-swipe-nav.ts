@@ -47,6 +47,7 @@ export function useSwipeNav(
     let y0 = 0
     let t0 = 0
     let ativo = false
+    let dentroDosChips = false
 
     const onStart = (e: TouchEvent) => {
       // Multitoque é pinça/zoom, nunca navegação.
@@ -59,6 +60,10 @@ export function useSwipeNav(
       y0 = t.clientY
       t0 = Date.now()
       ativo = true
+      // Barra de chips rola horizontalmente por conta própria: um arrasto ali
+      // é rolagem da barra, não swipe de navegação entre perícopes.
+      dentroDosChips =
+        (t.target as Element | null)?.closest?.('.section-chips') != null
     }
 
     const onCancel = () => {
@@ -68,6 +73,7 @@ export function useSwipeNav(
     const onEnd = (e: TouchEvent) => {
       if (!ativo) return
       ativo = false
+      if (dentroDosChips) return
       if (e.changedTouches.length !== 1) return
       // Seleção de texto viva: o dedo estava arrastando as alças da seleção,
       // não pedindo a próxima perícope.

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   listLivros,
   listPericopes,
+  loadPericopes,
   progressoPorLivro,
   refLabel,
   type LivroProgresso,
@@ -46,10 +47,14 @@ export default function Indice() {
   const [q, setQ] = useState('')
   const [items, setItems] = useState<Pericope[]>([])
   const [done, setDone] = useState<Set<number>>(new Set())
+  // Lista completa (sem filtro de busca): a barra de progresso do livro
+  // aberto precisa do total do livro inteiro, não do que sobrou da busca.
+  const [todas, setTodas] = useState<Pericope[]>([])
 
   useEffect(() => {
     listLivros().then(setLivros)
     doneSet().then(setDone)
+    loadPericopes().then(setTodas)
   }, [])
 
   useEffect(() => {
@@ -68,7 +73,11 @@ export default function Indice() {
   }, [items, livro])
 
   const progresso = useMemo(() => progressoPorLivro(items, done), [items, done])
-  const progAberto = livro ? (progresso.get(livro) ?? null) : null
+  // Progresso do livro aberto vem sempre da lista cheia: com livro+busca
+  // ativos ao mesmo tempo, `items` já veio filtrado pela query e sub-contaria
+  // o livro.
+  const progressoTodas = useMemo(() => progressoPorLivro(todas, done), [todas, done])
+  const progAberto = livro ? (progressoTodas.get(livro) ?? null) : null
 
   return (
     <section className="indice">

@@ -96,6 +96,9 @@ export default function Leitura() {
   const [tab, setTab] = useState<NotesTab>('anotacoes')
   const [copied, setCopied] = useState(false)
   const doneRef = useRef(false)
+  // Último valor de `?v=` já rolado até — evita re-centralizar a cada toque
+  // em versículo (ver efeito abaixo).
+  const vAplicado = useRef<string | null>(null)
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
   // handlers de seleção precisam dos blocos antes dos returns antecipados.
@@ -112,6 +115,10 @@ export default function Leitura() {
   useEffect(() => {
     ;(async () => {
       doneRef.current = false
+      // Ids de versículo são relativos ("cap:vers"): o mesmo `?v=` pode
+      // valer para outra perícope, então a marca de "já rolei" não atravessa
+      // a troca de perícope.
+      vAplicado.current = null
       try {
         const all = await loadPericopes()
         const peri = await getPericope(ordem)
@@ -166,8 +173,12 @@ export default function Leitura() {
   useEffect(() => {
     if (!selection || !p) return
     if (!(verseParam && /^\d+:\d+$/.test(verseParam))) return
+    // Só rola uma vez por valor de `?v=`: sem isso, cada toque em versículo
+    // muda `selection` e o efeito re-centraliza a tela no ?v= original.
+    if (vAplicado.current === verseParam) return
     const el = document.querySelector('.verse-focus')
     el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    vAplicado.current = verseParam
   }, [selection, p, verseParam])
 
   useEffect(() => {
@@ -411,7 +422,7 @@ export default function Leitura() {
         </div>
       </div>
 
-      <SectionChips ordem={p.ordem} abbrev={p.abbrev} />
+      <SectionChips ordem={p.ordem} abbrev={p.abbrev} layout={prefs.layout} />
 
       <section className="block block-plain" id="contexto">
         <h2>Contexto</h2>

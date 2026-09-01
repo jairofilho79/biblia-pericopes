@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ReadingLayout } from '../lib/reading-prefs'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
  * mais de uma seção cruza a faixa de leitura ao mesmo tempo. */
@@ -21,11 +22,14 @@ type Props = {
   /** Muda a cada perícope: força re-observar o DOM novo. */
   ordem: number
   abbrev: string
+  /** Corrido↔Blocos troca a subárvore de versículos: precisa re-observar. */
+  layout: ReadingLayout
 }
 
-export default function SectionChips({ ordem, abbrev }: Props) {
+export default function SectionChips({ ordem, abbrev, layout }: Props) {
   const [ativo, setAtivo] = useState<string>(SECTIONS[0].id)
   const [refViva, setRefViva] = useState<string | null>(null)
+  const rowRef = useRef<HTMLDivElement>(null)
 
   // O header é sticky e some ao rolar: os chips precisam saber a altura dele
   // para encostar embaixo sem sobrepor. O CSS zera esse offset quando o header
@@ -77,6 +81,8 @@ export default function SectionChips({ ordem, abbrev }: Props) {
   }, [ordem])
 
   // Referência viva: segundo observer, só enquanto o Texto está ativo.
+  // `layout` entra nas deps porque Corrido↔Blocos troca a subárvore de
+  // versículos: sem isso o observer continuaria vigiando nós já removidos.
   useEffect(() => {
     if (ativo !== 'texto') {
       setRefViva(null)
@@ -85,6 +91,8 @@ export default function SectionChips({ ordem, abbrev }: Props) {
     if (typeof IntersectionObserver === 'undefined') return
     const alvos = Array.from(document.querySelectorAll<HTMLElement>('[data-verse-id]'))
     if (!alvos.length) return
+    // Novo Set a cada (re)execução: nada de estado "visível" sobrevivendo à
+    // troca de layout.
     const visiveis = new Set<HTMLElement>()
     let raf = 0
     const atualizar = () => {
@@ -111,7 +119,16 @@ export default function SectionChips({ ordem, abbrev }: Props) {
       if (raf) cancelAnimationFrame(raf)
       obs.disconnect()
     }
-  }, [ativo, abbrev, ordem])
+  }, [ativo, abbrev, ordem, layout])
+
+  // Chip ativo pode ficar fora da faixa visível da barra (ela rola de lado):
+  // traz ele pra dentro sem mexer na rolagem da página.
+  useEffect(() => {
+    const row = rowRef.current
+    if (!row) return
+    const chipEl = row.querySelector<HTMLElement>('.section-chip.active')
+    chipEl?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'auto' })
+  }, [ativo])
 
   function irPara(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
@@ -119,7 +136,7 @@ export default function SectionChips({ ordem, abbrev }: Props) {
 
   return (
     <nav className="section-chips" aria-label="Seções da perícope">
-      <div className="section-chips-row">
+      <div className="section-chips-row" ref={rowRef}>
         {SECTIONS.map((s) => (
           <button
             key={s.id}

@@ -519,21 +519,6 @@ button.ghost {
   flex-wrap: wrap;
 }
 
-.ref-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.ref-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  text-decoration: none;
-}
-
 .pager {
   display: flex;
   justify-content: space-between;
@@ -581,6 +566,21 @@ button.ghost {
   color: var(--accent);
   border-color: var(--focus-line);
   background: var(--accent-soft);
+}
+
+.ref-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ref-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  text-decoration: none;
 }
 
 .texto-biblico,

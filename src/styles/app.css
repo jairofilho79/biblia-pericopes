@@ -105,7 +105,9 @@ a {
   --shell-pad: 1.1rem;
   max-width: 720px;
   margin: 0 auto;
-  padding: 0 var(--shell-pad) 3rem;
+  padding: 0 max(var(--shell-pad), env(safe-area-inset-right, 0px))
+    calc(3rem + env(safe-area-inset-bottom, 0px))
+    max(var(--shell-pad), env(safe-area-inset-left, 0px));
 }
 
 .top {
@@ -117,7 +119,10 @@ a {
   /* ponytail: full-bleed sticky so bg matches body edge-to-edge */
   width: 100vw;
   margin-inline: calc(50% - 50vw);
-  padding: 0.85rem calc(50vw - 50% + var(--shell-pad)) 0.55rem;
+  padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+  padding-right: calc(50vw - 50% + var(--shell-pad));
+  padding-bottom: 0.55rem;
+  padding-left: calc(50vw - 50% + var(--shell-pad));
   position: sticky;
   top: 0;
   background: var(--page-bg);
@@ -137,7 +142,7 @@ a {
 }
 
 .shell:has(.leitura) .top {
-  padding-block: 0.55rem 0.4rem;
+  padding-block: calc(0.55rem + env(safe-area-inset-top, 0px)) 0.4rem;
 }
 
 .shell:has(.leitura) .brand {
@@ -735,16 +740,6 @@ button.ghost {
   padding-left: 0.15rem;
 }
 
-/* ponytail: mobile long-form reading comfort */
-@media (max-width: 767.98px) {
-  .prose,
-  .perguntas,
-  .verse {
-    text-align: justify;
-    -webkit-hyphens: auto;
-    hyphens: auto;
-  }
-}
 
 .note-form textarea,
 .filters input,

@@ -27,6 +27,12 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
+    const onTheme = () => setTheme(resolveTheme())
+    window.addEventListener('pericopes-theme', onTheme)
+    return () => window.removeEventListener('pericopes-theme', onTheme)
+  }, [])
+
+  useEffect(() => {
     if (!open) return
     function onDown(e: PointerEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
@@ -109,10 +115,7 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
             <button
               type="button"
               className="read-tool"
-              onClick={() => {
-                toggleTheme()
-                setTheme(resolveTheme())
-              }}
+              onClick={() => toggleTheme()}
             >
               {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
             </button>

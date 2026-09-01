@@ -1355,6 +1355,24 @@ button.ghost {
   padding: 0.55rem 0;
 }
 
+/* Virtualização barata, sem biblioteca: o navegador pula layout e paint dos
+   itens fora da viewport e usa o tamanho estimado no lugar. Navegador sem
+   suporte simplesmente ignora as duas propriedades — degradação limpa.
+   O ganho é no livro aberto e na busca, onde a lista tem centenas de itens. */
+.peri-list > li {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 72px;
+}
+
+.peri-list.compact > li {
+  contain-intrinsic-size: auto 48px;
+}
+
+.book-group {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
 @media (min-width: 640px) {
   .filters {
     grid-template-columns: 1.4fr 1fr;

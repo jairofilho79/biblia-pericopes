@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getPericope, loadPericopes, ordensDoTestamento, refLabel } from '../lib/content'
-import { countConcluidasNaSequencia, getProximaOrdemNaSequencia } from '../lib/user-db'
+import {
+  countConcluidasNaSequencia,
+  getProximaOrdemNaSequencia,
+  listAllProgresso,
+} from '../lib/user-db'
 import { testamentLabel, type Testament } from '../lib/testament'
 import type { Pericope } from '../lib/types'
+import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
 
 type Track = {
   testament: Testament
@@ -16,6 +21,7 @@ type Track = {
 export default function Home() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [err, setErr] = useState('')
+  const [streak, setStreak] = useState<Streak>({ atual: 0, recorde: 0 })
 
   useEffect(() => {
     ;(async () => {
@@ -37,6 +43,9 @@ export default function Home() {
           })
         }
         setTracks(built)
+        // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
+        // entidade nova, e o streak segue o usuário para o celular novo.
+        setStreak(computeStreak(diasComConclusao(await listAllProgresso()), new Date()))
       } catch (e) {
         setErr(e instanceof Error ? e.message : 'Erro')
       }
@@ -53,6 +62,15 @@ export default function Home() {
       <p className="lead">
         Velho e Novo Testamento avançam cada um no seu ritmo. Escolha por onde continuar.
       </p>
+      {streak.atual > 0 && (
+        <p className="streak">
+          <span aria-hidden>🔥</span>{' '}
+          <strong>{streak.atual === 1 ? '1 dia seguido' : `${streak.atual} dias seguidos`}</strong>
+          {streak.recorde > streak.atual && (
+            <span className="streak-recorde"> · recorde: {streak.recorde}</span>
+          )}
+        </p>
+      )}
       <div className="track-grid">
         {tracks.map((t) => (
           <article key={t.testament} className="track-card">

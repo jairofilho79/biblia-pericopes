@@ -1,8 +1,8 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getPericope, loadPericopes, proximaNoTestamento, refLabel } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
-import { parseTextoNaa } from '../lib/parse-texto'
+import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
 import {
   bumpReadingSize,
   FONT_OPTIONS,
@@ -116,7 +116,7 @@ export default function Leitura() {
 
   useEffect(() => {
     if (!focusId || !p) return
-    const el = document.querySelector(`.verse.verse-focus`)
+    const el = document.querySelector('.verse-focus')
     el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }, [focusId, p])
 
@@ -207,29 +207,55 @@ export default function Leitura() {
       <section className="block block-plain">
         <h2>Texto (NAA)</h2>
         <div className="texto-biblico">
-          {blocks.map((b) =>
-            b.kind === 'chapter' ? (
-              <h3 key={`c-${b.chapter}`} className="cap-label">
-                {b.label}
-              </h3>
-            ) : (
-              <button
-                key={b.id}
-                type="button"
-                className={`verse${focusId === b.id ? ' verse-focus' : ''}`}
-                aria-pressed={focusId === b.id}
-                aria-label={
-                  b.verse
-                    ? `Versículo ${b.chapter}:${b.verse}${focusId === b.id ? ', em leitura' : ''}`
-                    : b.text.slice(0, 40)
-                }
-                onClick={() => selectVerse(b.id)}
-              >
-                {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
-                <span className="verse-text">{b.text}</span>
-              </button>
-            ),
-          )}
+          {prefs.layout === 'corrido'
+            ? groupCorrido(blocks).map((g, gi) => (
+                <div key={g.label ? `c-${g.chapter}` : `orfao-${gi}`} className="corrido-group">
+                  {g.label && <h3 className="cap-label">{g.label}</h3>}
+                  <p className="corrido">
+                    {g.verses.map((b) => (
+                      <Fragment key={b.id}>
+                        <button
+                          type="button"
+                          className={`verse-inline${focusId === b.id ? ' verse-focus' : ''}`}
+                          aria-pressed={focusId === b.id}
+                          aria-label={
+                            b.verse
+                              ? `Versículo ${b.chapter}:${b.verse}${focusId === b.id ? ', em leitura' : ''}`
+                              : b.text.slice(0, 40)
+                          }
+                          onClick={() => selectVerse(b.id)}
+                        >
+                          {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
+                          <span className="verse-text">{b.text}</span>
+                        </button>{' '}
+                      </Fragment>
+                    ))}
+                  </p>
+                </div>
+              ))
+            : blocks.map((b) =>
+                b.kind === 'chapter' ? (
+                  <h3 key={`c-${b.chapter}`} className="cap-label">
+                    {b.label}
+                  </h3>
+                ) : (
+                  <button
+                    key={b.id}
+                    type="button"
+                    className={`verse${focusId === b.id ? ' verse-focus' : ''}`}
+                    aria-pressed={focusId === b.id}
+                    aria-label={
+                      b.verse
+                        ? `Versículo ${b.chapter}:${b.verse}${focusId === b.id ? ', em leitura' : ''}`
+                        : b.text.slice(0, 40)
+                    }
+                    onClick={() => selectVerse(b.id)}
+                  >
+                    {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
+                    <span className="verse-text">{b.text}</span>
+                  </button>
+                ),
+              )}
         </div>
       </section>
 

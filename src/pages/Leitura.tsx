@@ -13,6 +13,7 @@ import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { useSwipeNav } from '../lib/use-swipe-nav'
+import { useKeyboardNav } from '../lib/use-keyboard-nav'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
@@ -201,6 +202,7 @@ export default function Leitura() {
   }, [navigate, next])
 
   useSwipeNav(rootRef, { onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
+  useKeyboardNav({ onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
@@ -385,12 +387,22 @@ export default function Leitura() {
         <p className="ref">{refLabel(p)}</p>
         <div className="ref-nav">
           {prev && (
-            <Link className="read-tool ref-arrow" aria-label={`Anterior: ${prev.titulo}`} to={`/leitura/${prev.ordem}`}>
+            <Link
+              className="read-tool ref-arrow"
+              aria-label={`Anterior: ${prev.titulo}`}
+              title={`Anterior: ${prev.titulo} · atalho ←`}
+              to={`/leitura/${prev.ordem}`}
+            >
               ←
             </Link>
           )}
           {next && (
-            <Link className="read-tool ref-arrow" aria-label={`Próxima: ${next.titulo}`} to={`/leitura/${next.ordem}`}>
+            <Link
+              className="read-tool ref-arrow"
+              aria-label={`Próxima: ${next.titulo}`}
+              title={`Próxima: ${next.titulo} · atalho →`}
+              to={`/leitura/${next.ordem}`}
+            >
               →
             </Link>
           )}
@@ -609,6 +621,7 @@ export default function Leitura() {
             <Link
               className="ghost pager-link"
               aria-label={`Anterior: ${prev.titulo}`}
+              title="Atalho: ←"
               to={`/leitura/${prev.ordem}`}
             >
               ← {prev.titulo}
@@ -620,6 +633,7 @@ export default function Leitura() {
             <Link
               className="ghost pager-link pager-next"
               aria-label={`Próxima: ${next.titulo}`}
+              title="Atalho: →"
               to={`/leitura/${next.ordem}`}
             >
               {next.titulo} →

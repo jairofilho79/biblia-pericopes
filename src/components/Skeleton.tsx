@@ -4,7 +4,8 @@
  * intervalo (nas visitas seguintes o cache torna a troca instantânea).
  *
  * O shimmer é pura decoração — quem usa leitor de tela recebe o `role="status"`
- * com o rótulo — e o CSS desliga a animação sob `prefers-reduced-motion`.
+ * com um texto visualmente oculto (`aria-label` sozinho não é anunciado por
+ * todo leitor de tela) — e o CSS desliga a animação sob `prefers-reduced-motion`.
  */
 
 function Linhas({ n, curta = false }: { n: number; curta?: boolean }) {
@@ -23,7 +24,8 @@ function Linhas({ n, curta = false }: { n: number; curta?: boolean }) {
 
 export function SkeletonLeitura() {
   return (
-    <article className="leitura skeleton-page" role="status" aria-label="Carregando a perícope…">
+    <article className="leitura skeleton-page" role="status">
+      <span className="sr-only">Carregando…</span>
       <span className="skeleton skeleton-crumb" />
       <span className="skeleton skeleton-title" />
       <span className="skeleton skeleton-ref" />
@@ -42,7 +44,8 @@ export function SkeletonLeitura() {
 
 export function SkeletonHome() {
   return (
-    <section className="home skeleton-page" role="status" aria-label="Carregando as leituras…">
+    <section className="home skeleton-page" role="status">
+      <span className="sr-only">Carregando…</span>
       <span className="skeleton skeleton-title" />
       <div className="track-grid">
         {[0, 1].map((i) => (
@@ -58,7 +61,8 @@ export function SkeletonHome() {
 
 export function SkeletonIndice() {
   return (
-    <div className="skeleton-page" role="status" aria-label="Carregando o índice…">
+    <div className="skeleton-page" role="status">
+      <span className="sr-only">Carregando…</span>
       {[0, 1, 2].map((g) => (
         <div key={g} className="skeleton-block">
           <span className="skeleton skeleton-subtitle" />

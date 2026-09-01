@@ -25,6 +25,9 @@ class FakeUtterance {
 
 class FakeSynth {
   fila: FakeUtterance[] = []
+  // A utterance "em fala" no momento: como o browser real fala uma de cada
+  // vez, é a primeira enfileirada depois do cancel anterior.
+  atual: FakeUtterance | null = null
   cancelou = 0
   pausou = 0
   retomou = 0
@@ -37,11 +40,19 @@ class FakeSynth {
 
   speak(u: FakeUtterance) {
     this.fila.push(u)
+    if (!this.atual) this.atual = u
   }
 
+  /** Espelha o browser real: `cancel()` dispara `end` de forma ASSÍNCRONA na
+   *  utterance que estava em fala — nunca na hora. */
   cancel() {
     this.cancelou += 1
     this.fila = []
+    const emFala = this.atual
+    this.atual = null
+    if (emFala) {
+      setTimeout(() => emFala.onend?.(), 0)
+    }
   }
 
   pause() {
@@ -244,6 +255,33 @@ describe('createTtsController', () => {
     ctrl.resume()
     expect(synth.retomou).toBe(1)
     expect(estados.at(-1)).toBe('playing')
+    ctrl.stop()
+  })
+
+  it('parar e tocar de novo no mesmo instante não mata a sessão nova', () => {
+    // Regressão: um booleano único de "sessão viva" deixava o `end`
+    // assíncrono da utterance CANCELADA (disparado pelo `synth.cancel()` do
+    // stop) derrubar a sessão NOVA, iniciada antes desse callback chegar.
+    synth.vozes = [{ lang: 'pt-BR', name: 'Luciana' }]
+    const ctrl = controlador()
+    ctrl.play([{ id: '1:1', text: 'Primeira sessão' }])
+    expect(estados.at(-1)).toBe('playing')
+
+    ctrl.stop()
+    expect(estados.at(-1)).toBe('idle')
+
+    // ▶ de novo antes do `end` assíncrono da sessão anterior chegar.
+    ctrl.play([{ id: '2:1', text: 'Segunda sessão' }])
+    expect(estados.at(-1)).toBe('playing')
+
+    // O `end` tardio da PRIMEIRA sessão finalmente chega...
+    vi.runOnlyPendingTimers()
+
+    // ...mas a sessão nova segue tocando, intacta.
+    expect(estados.at(-1)).toBe('playing')
+    synth.fila[0].onstart?.()
+    expect(versiculos.at(-1)).toBe('2:1')
+
     ctrl.stop()
   })
 })

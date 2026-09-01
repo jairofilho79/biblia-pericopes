@@ -37,6 +37,10 @@ export function useWakeLock(enabled: boolean): void {
 
     let vivo = true
     let sentinel: WakeLockSentinelLike | null = null
+    // Guarda contra pedidos concorrentes: `visibilitychange` pode disparar de
+    // novo enquanto um `request()` anterior ainda está no ar, e sem isso os
+    // dois criam sentinelas em paralelo (uma delas vaza, sem nunca ser solta).
+    let emVoo = false
 
     const soltar = (s: WakeLockSentinelLike | null) => {
       if (s && !s.released) void s.release().catch(() => undefined)
@@ -45,16 +49,23 @@ export function useWakeLock(enabled: boolean): void {
     const pedir = async () => {
       if (!vivo || document.visibilityState !== 'visible') return
       if (sentinel && !sentinel.released) return
+      if (emVoo) return
+      emVoo = true
       try {
         const novo = await wl.request('screen')
-        // O efeito pode ter sido limpo enquanto a promessa estava no ar.
-        if (!vivo) {
+        // O efeito pode ter sido limpo, OU outro pedido pode ter vencido a
+        // corrida enquanto esta promessa estava no ar — nos dois casos esta
+        // sentinela é supérflua e não pode substituir a que já está viva.
+        if (!vivo || (sentinel && !sentinel.released)) {
           soltar(novo)
           return
         }
         sentinel = novo
       } catch {
-        sentinel = null
+        // Falha aqui não pode zerar uma sentinela viva de um pedido que
+        // tenha vencido a corrida antes deste `catch` rodar.
+      } finally {
+        emVoo = false
       }
     }
 

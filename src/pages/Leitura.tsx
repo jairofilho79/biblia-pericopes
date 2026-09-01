@@ -101,6 +101,9 @@ export default function Leitura() {
   const [tab, setTab] = useState<NotesTab>('anotacoes')
   const [copied, setCopied] = useState(false)
   const doneRef = useRef(false)
+  // Espelha `p` para o listener de rolagem: evita reinscrever o `scroll` a
+  // cada troca de skeleton → conteúdo (ver efeito de salvar posição abaixo).
+  const pRef = useRef<Pericope | null>(null)
   // Último valor de `?v=` já rolado até — evita re-centralizar a cada toque
   // em versículo (ver efeito abaixo).
   const vAplicado = useRef<string | null>(null)
@@ -203,10 +206,17 @@ export default function Leitura() {
   }, [selection, p, verseParam])
 
   useEffect(() => {
+    pRef.current = p
+  }, [p])
+
+  useEffect(() => {
     let last = 0
     let timer: number | undefined
     const save = () => {
       if (doneRef.current) return
+      // Durante o skeleton (`!p`) a rolagem pode vir clampada ao conteúdo
+      // ainda vazio: gravar aqui sobrescreveria a posição real salva antes.
+      if (!pRef.current) return
       setReadingPosition(ordem, window.scrollY)
     }
     const onScroll = () => {
@@ -258,12 +268,15 @@ export default function Leitura() {
   }, [ordem])
 
   useEffect(() => {
-    if (!falando) return
+    // Ouvir continua, mas a rolagem cede quando o leitor está interagindo:
+    // barra de ações aberta, nota em edição ou vínculo de versículo pendente
+    // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
+    if (!falando || barOpen || editingId || draftRef) return
     const el = document.querySelector<HTMLElement>(`[data-verse-id="${falando}"]`)
     if (!el) return
     const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     el.scrollIntoView({ block: 'center', behavior: reduzido ? 'auto' : 'smooth' })
-  }, [falando])
+  }, [falando, barOpen, editingId, draftRef])
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
@@ -523,45 +536,37 @@ export default function Leitura() {
         <h2>Texto (NAA)</h2>
         {temTts && (
           <div className="tts-bar">
-            {ttsState === 'idle' ? (
+            {/* Sempre o mesmo nó de botão primário nos três estados — só
+                rótulo/handler mudam — para o foco de teclado/leitor de tela
+                não cair pro <body> a cada transição (fragmento vs. elemento
+                remontava a árvore). O botão de parar é irmão condicional. */}
+            <button
+              type="button"
+              className={ttsState === 'idle' ? 'read-tool' : 'read-tool active'}
+              aria-label={
+                ttsState === 'idle'
+                  ? 'Ouvir a perícope em voz alta'
+                  : ttsState === 'playing'
+                    ? 'Pausar a leitura em voz alta'
+                    : 'Retomar a leitura em voz alta'
+              }
+              onClick={() => {
+                if (ttsState === 'idle') ttsRef.current?.play(versesParaFala)
+                else if (ttsState === 'playing') ttsRef.current?.pause()
+                else ttsRef.current?.resume()
+              }}
+            >
+              {ttsState === 'idle' ? '▶ Ouvir' : ttsState === 'playing' ? '⏸ Pausar' : '▶ Retomar'}
+            </button>
+            {ttsState !== 'idle' && (
               <button
                 type="button"
                 className="read-tool"
-                aria-label="Ouvir a perícope em voz alta"
-                onClick={() => ttsRef.current?.play(versesParaFala)}
+                aria-label="Parar a leitura em voz alta"
+                onClick={() => ttsRef.current?.stop()}
               >
-                ▶ Ouvir
+                ⏹
               </button>
-            ) : (
-              <>
-                {ttsState === 'playing' ? (
-                  <button
-                    type="button"
-                    className="read-tool active"
-                    aria-label="Pausar a leitura em voz alta"
-                    onClick={() => ttsRef.current?.pause()}
-                  >
-                    ⏸ Pausar
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="read-tool active"
-                    aria-label="Retomar a leitura em voz alta"
-                    onClick={() => ttsRef.current?.resume()}
-                  >
-                    ▶ Retomar
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="read-tool"
-                  aria-label="Parar a leitura em voz alta"
-                  onClick={() => ttsRef.current?.stop()}
-                >
-                  ⏹
-                </button>
-              </>
             )}
           </div>
         )}

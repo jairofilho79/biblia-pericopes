@@ -51,9 +51,14 @@ export function createTtsController(opts: {
   onState?: (s: TtsState) => void
 }): TtsController {
   let fila: TtsVerse[] = []
-  // Sessão de fala corrente: callbacks de utterances já canceladas conferem
-  // este sinalizador antes de mexer na UI.
-  let vivo = false
+  // Token monotônico da sessão de fala corrente. `synth.cancel()` dispara
+  // `end`/`error` de forma ASSÍNCRONA nas utterances canceladas — com um
+  // booleano simples, o callback tardio de uma sessão já cancelada podia
+  // matar uma sessão NOVA (⏹ seguido de ▶ no mesmo frame). Cada `play()`
+  // grava seu próprio número; todo callback só age se ainda for o corrente.
+  let sessao = 0
+  // Independente do token: só diz se HÁ sessão ativa agora, para pause/resume.
+  let ativo = false
   let onVozes: (() => void) | null = null
   let timerVozes = 0
 
@@ -72,7 +77,8 @@ export function createTtsController(opts: {
   }
 
   function encerrar(avisar: boolean) {
-    vivo = false
+    sessao++
+    ativo = false
     fila = []
     soltarVozes()
     synth()?.cancel()
@@ -82,7 +88,7 @@ export function createTtsController(opts: {
     }
   }
 
-  function enfileirar(voz: SpeechSynthesisVoice | null) {
+  function enfileirar(voz: SpeechSynthesisVoice | null, minha: number) {
     const s = synth()
     if (!s) return
     const Utterance = window.SpeechSynthesisUtterance
@@ -92,15 +98,15 @@ export function createTtsController(opts: {
       u.lang = 'pt-BR'
       if (voz) u.voice = voz
       u.onstart = () => {
-        if (vivo) marcar(v.id)
+        if (minha === sessao) marcar(v.id)
       }
       u.onend = () => {
         // Fim da fila: `stop` implícito, sem o leitor precisar apertar nada.
-        if (vivo && i === total - 1) encerrar(true)
+        if (minha === sessao && i === total - 1) encerrar(true)
       }
       u.onerror = () => {
         // Voz que falha no meio (ou aba suspensa) some em silêncio.
-        if (vivo) encerrar(true)
+        if (minha === sessao) encerrar(true)
       }
       s.speak(u)
     })
@@ -112,12 +118,13 @@ export function createTtsController(opts: {
     encerrar(false)
     fila = montarFila(verses)
     if (!fila.length) return
-    vivo = true
+    const minha = ++sessao
+    ativo = true
     emitir('playing')
 
     const vozes = s.getVoices()
     if (vozes.length) {
-      enfileirar(escolherVoz(vozes))
+      enfileirar(escolherVoz(vozes), minha)
       return
     }
 
@@ -125,16 +132,16 @@ export function createTtsController(opts: {
     // resolver a lista. A voz é resolvida AQUI, no play, nunca no mount.
     onVozes = () => {
       soltarVozes()
-      if (!vivo) return
-      enfileirar(escolherVoz(s.getVoices()))
+      if (minha !== sessao) return
+      enfileirar(escolherVoz(s.getVoices()), minha)
     }
     s.addEventListener('voiceschanged', onVozes)
     // Rede de segurança: browser que nunca dispara o evento ainda fala, só que
     // com a voz padrão do sistema.
     timerVozes = window.setTimeout(() => {
-      if (!vivo || !onVozes) return
+      if (minha !== sessao || !onVozes) return
       soltarVozes()
-      enfileirar(escolherVoz(s.getVoices()))
+      enfileirar(escolherVoz(s.getVoices()), minha)
     }, ESPERA_VOZES_MS)
   }
 
@@ -142,13 +149,13 @@ export function createTtsController(opts: {
     play,
     pause() {
       const s = synth()
-      if (!s || !vivo) return
+      if (!s || !ativo) return
       s.pause()
       emitir('paused')
     },
     resume() {
       const s = synth()
-      if (!s || !vivo) return
+      if (!s || !ativo) return
       s.resume()
       emitir('playing')
     },

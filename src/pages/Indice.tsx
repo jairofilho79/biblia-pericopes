@@ -52,6 +52,11 @@ export default function Indice() {
   // aberto precisa do total do livro inteiro, não do que sobrou da busca.
   const [todas, setTodas] = useState<Pericope[]>([])
   const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState('')
+  // Só desliga o skeleton depois que a lista de perícopes chegou pela
+  // primeira vez: sem isso, `carregando` vira `false` antes do segundo efeito
+  // (que busca `items`) terminar, e some skeleton → quadro em branco → conteúdo.
+  const [itensProntos, setItensProntos] = useState(false)
 
   useEffect(() => {
     let vivo = true
@@ -62,6 +67,9 @@ export default function Indice() {
         setDone(feitas)
         setTodas(tudo)
       })
+      .catch(() => {
+        if (vivo) setErro('Não foi possível carregar o índice.')
+      })
       .finally(() => {
         if (vivo) setCarregando(false)
       })
@@ -71,7 +79,10 @@ export default function Indice() {
   }, [])
 
   useEffect(() => {
-    listPericopes({ livro: livro || undefined, q: q || undefined }).then(setItems)
+    listPericopes({ livro: livro || undefined, q: q || undefined }).then((r) => {
+      setItems(r)
+      setItensProntos(true)
+    })
   }, [livro, q])
 
   const grouped = useMemo(() => {
@@ -91,6 +102,8 @@ export default function Indice() {
   // o livro.
   const progressoTodas = useMemo(() => progressoPorLivro(todas, done), [todas, done])
   const progAberto = livro ? (progressoTodas.get(livro) ?? null) : null
+
+  if (erro) return <p className="muted">{erro}</p>
 
   return (
     <section className="indice">
@@ -112,7 +125,7 @@ export default function Indice() {
         </select>
       </div>
 
-      {carregando ? (
+      {carregando || !itensProntos ? (
         <SkeletonIndice />
       ) : livro || q ? (
         <>

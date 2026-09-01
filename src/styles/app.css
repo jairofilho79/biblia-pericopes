@@ -921,7 +921,6 @@ button.ghost {
 .verse.verse-speaking,
 .verse-inline.verse-speaking {
   box-shadow: inset 0 -0.12em 0 var(--accent);
-  border-radius: 4px;
 }
 
 .verse-num {

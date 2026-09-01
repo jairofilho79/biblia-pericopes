@@ -49,6 +49,9 @@ export default function Home() {
         setTracks(built)
         // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
         // entidade nova, e o streak segue o usuário para o celular novo.
+        // Limitação aceita por ora: calculado só na montagem — um pull de
+        // sync que chegue depois em segundo plano só aparece na próxima
+        // visita à Home, não nesta sessão já aberta.
         setStreak(computeStreak(diasComConclusao(await listAllProgresso()), new Date()))
       } catch (e) {
         setErr(e instanceof Error ? e.message : 'Erro')

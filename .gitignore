@@ -37,3 +37,5 @@ data/preach-sample/
 *.sw?
 
 .worktrees/
+
+.superpowers/

@@ -1,6 +1,7 @@
-import { Fragment, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
+import VerseActions from '../components/VerseActions'
 import {
   anteriorNoTestamento,
   getPericope,
@@ -9,20 +10,24 @@ import {
   refLabel,
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
-import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
+import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
   getProgresso,
   listAnotacoes,
+  listDestaques,
+  removeDestaque,
   saveAnotacao,
+  setDestaque,
   setProgresso,
 } from '../lib/user-db'
 import { getVerseFocus, setVerseFocus } from '../lib/verse-highlight'
+import { nextSelection, rangeLabel, rangeRef, versesInRange, type VerseSelection } from '../lib/verse-range'
 import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
-import type { Anotacao, Pericope, ProgressoStatus } from '../lib/types'
+import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
 type Vizinha = { ordem: number; titulo: string }
@@ -75,10 +80,25 @@ export default function Leitura() {
   const [draft, setDraft] = useState('')
   const [err, setErr] = useState('')
   const [prefs, setPrefs] = useState<ReadingPrefs>(() => getReadingPrefs())
-  const [focusId, setFocusId] = useState<string | null>(null)
+  const [selection, setSelection] = useState<VerseSelection | null>(null)
+  const [barOpen, setBarOpen] = useState(false)
+  const [destaques, setDestaques] = useState<Map<string, DestaqueCor>>(new Map())
+  const [draftRef, setDraftRef] = useState<string | null>(null)
+  // draftRef só é lido pela Task 8 (prefill do formulário de anotação) — a
+  // referência abaixo mantém o build limpo (noUnusedLocals) até lá.
+  void draftRef
+  const [aviso, setAviso] = useState('')
   const [tab, setTab] = useState<NotesTab>('anotacoes')
   const [copied, setCopied] = useState(false)
   const doneRef = useRef(false)
+
+  // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
+  // handlers de seleção precisam dos blocos antes dos returns antecipados.
+  const blocks = useMemo(() => (p ? parseTextoNaa(p.texto_naa) : []), [p])
+  const selecionados = useMemo(
+    () => (selection ? versesInRange(blocks, selection.start, selection.end) : []),
+    [blocks, selection],
+  )
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
@@ -106,8 +126,14 @@ export default function Leitura() {
         const fromQuery =
           verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
         const focus = fromQuery ?? getVerseFocus(ordem)
-        setFocusId(focus)
+        // Restaurar foco seleciona só aquele versículo e NÃO abre a barra:
+        // a barra é resposta a toque, não a navegação.
+        setSelection(focus ? { start: focus, end: focus } : null)
+        setBarOpen(false)
+        setDraftRef(null)
         if (fromQuery) setVerseFocus(ordem, fromQuery)
+        const hl = await listDestaques(ordem)
+        setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
         const prog = await getProgresso(ordem)
         const next = prog?.status ?? 'em_andamento'
         setStatus(next === 'nao_iniciado' ? 'em_andamento' : next)
@@ -130,11 +156,11 @@ export default function Leitura() {
   }, [ordem, p, verseParam])
 
   useEffect(() => {
-    if (!focusId || !p) return
+    if (!selection || !p) return
     if (!(verseParam && /^\d+:\d+$/.test(verseParam))) return
     const el = document.querySelector('.verse-focus')
     el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }, [focusId, p, verseParam])
+  }, [selection, p, verseParam])
 
   useEffect(() => {
     let last = 0
@@ -176,9 +202,77 @@ export default function Leitura() {
   }
 
   function selectVerse(id: string) {
-    const next = focusId === id ? null : id
-    setFocusId(next)
-    setVerseFocus(ordem, next)
+    const prox = nextSelection(blocks, selection, id)
+    setSelection(prox)
+    setBarOpen(prox !== null)
+    const verses = prox ? versesInRange(blocks, prox.start, prox.end) : []
+    // "versículo em leitura" persistido continua sendo o PRIMEIRO da seleção.
+    setVerseFocus(ordem, verses[0]?.id ?? null)
+  }
+
+  function flashAviso(msg: string) {
+    setAviso(msg)
+    window.setTimeout(() => setAviso(''), 1600)
+  }
+
+  function citacaoSelecao(): string {
+    if (!p) return ''
+    return `"${selecionados.map((v) => v.text).join(' ')}" (${rangeLabel(p, selecionados)}, NAA)`
+  }
+
+  async function copiarSelecao() {
+    try {
+      await navigator.clipboard.writeText(citacaoSelecao())
+      flashAviso('Copiado ✓')
+    } catch {
+      flashAviso('Não foi possível copiar')
+    }
+  }
+
+  async function compartilharSelecao() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ text: citacaoSelecao() })
+        return
+      } catch (e) {
+        // cancelar o share nativo não é erro: some em silêncio
+        if (e instanceof Error && e.name === 'AbortError') return
+      }
+    }
+    await copiarSelecao()
+  }
+
+  async function destacarSelecao(cor: DestaqueCor) {
+    const proximos = new Map(destaques)
+    for (const v of selecionados) {
+      await setDestaque(ordem, v.id, cor)
+      proximos.set(v.id, cor)
+    }
+    setDestaques(proximos)
+  }
+
+  async function removerDestaqueSelecao() {
+    const proximos = new Map(destaques)
+    for (const v of selecionados) {
+      await removeDestaque(`${ordem}:${v.id}`)
+      proximos.delete(v.id)
+    }
+    setDestaques(proximos)
+  }
+
+  function anotarSelecao() {
+    setTab('anotacoes')
+    setDraftRef(rangeRef(selecionados))
+    setBarOpen(false)
+    window.setTimeout(() => {
+      const el = document.querySelector<HTMLTextAreaElement>('.note-form textarea')
+      el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      el?.focus()
+    }, 0)
+  }
+
+  function fecharBarra() {
+    setBarOpen(false)
   }
 
   async function copyContexto() {
@@ -191,7 +285,25 @@ export default function Leitura() {
   if (err) return <p className="muted">{err}</p>
   if (!p) return <p className="muted">Carregando…</p>
 
-  const blocks = parseTextoNaa(p.texto_naa)
+  const selecionadosIds = new Set(selecionados.map((v) => v.id))
+
+  function verseClass(base: string, id: string): string {
+    const cor = destaques.get(id)
+    const foco = selecionadosIds.has(id) ? ' verse-focus' : ''
+    return `${base}${foco}${cor ? ` verse-hl-${cor}` : ''}`
+  }
+
+  function verseAria(b: VerseBlock): string {
+    if (!b.verse) return b.text.slice(0, 40)
+    const cor = destaques.get(b.id)
+    const marcas = [
+      selecionadosIds.has(b.id) ? 'selecionado' : '',
+      cor ? `destacado em ${cor}` : '',
+    ]
+      .filter(Boolean)
+      .join(', ')
+    return `Versículo ${b.chapter}:${b.verse}${marcas ? `, ${marcas}` : ''}`
+  }
 
   return (
     <article className="leitura">
@@ -238,13 +350,9 @@ export default function Leitura() {
                       <Fragment key={b.id}>
                         <button
                           type="button"
-                          className={`verse-inline${focusId === b.id ? ' verse-focus' : ''}`}
-                          aria-pressed={focusId === b.id}
-                          aria-label={
-                            b.verse
-                              ? `Versículo ${b.chapter}:${b.verse}${focusId === b.id ? ', em leitura' : ''}`
-                              : b.text.slice(0, 40)
-                          }
+                          className={verseClass('verse-inline', b.id)}
+                          aria-pressed={selecionadosIds.has(b.id)}
+                          aria-label={verseAria(b)}
                           onClick={() => selectVerse(b.id)}
                         >
                           {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
@@ -264,13 +372,9 @@ export default function Leitura() {
                   <button
                     key={b.id}
                     type="button"
-                    className={`verse${focusId === b.id ? ' verse-focus' : ''}`}
-                    aria-pressed={focusId === b.id}
-                    aria-label={
-                      b.verse
-                        ? `Versículo ${b.chapter}:${b.verse}${focusId === b.id ? ', em leitura' : ''}`
-                        : b.text.slice(0, 40)
-                    }
+                    className={verseClass('verse', b.id)}
+                    aria-pressed={selecionadosIds.has(b.id)}
+                    aria-label={verseAria(b)}
                     onClick={() => selectVerse(b.id)}
                   >
                     {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
@@ -394,6 +498,20 @@ export default function Leitura() {
           )}
         </nav>
       </section>
+
+      {barOpen && selecionados.length > 0 && (
+        <VerseActions
+          label={rangeLabel(p, selecionados)}
+          temDestaque={selecionados.some((v) => destaques.has(v.id))}
+          aviso={aviso}
+          onCopiar={() => void copiarSelecao()}
+          onCompartilhar={() => void compartilharSelecao()}
+          onDestacar={(cor) => void destacarSelecao(cor)}
+          onRemoverDestaque={() => void removerDestaqueSelecao()}
+          onAnotar={anotarSelecao}
+          onFechar={fecharBarra}
+        />
+      )}
     </article>
   )
 }

@@ -13,6 +13,7 @@ import {
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
+import { createTtsController, ttsSupported, type TtsController, type TtsState } from '../lib/tts'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { useSwipeNav } from '../lib/use-swipe-nav'
@@ -101,6 +102,11 @@ export default function Leitura() {
   // Último valor de `?v=` já rolado até — evita re-centralizar a cada toque
   // em versículo (ver efeito abaixo).
   const vAplicado = useRef<string | null>(null)
+  const ttsRef = useRef<TtsController | null>(null)
+  const [ttsState, setTtsState] = useState<TtsState>('idle')
+  const [falando, setFalando] = useState<string | null>(null)
+  // Uma vez só: a capacidade do browser não muda no meio da sessão.
+  const [temTts] = useState(() => ttsSupported())
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
   // handlers de seleção precisam dos blocos antes dos returns antecipados.
@@ -112,6 +118,13 @@ export default function Leitura() {
   // Só o texto bíblico entra na conta: contexto, resenha e reflexão são
   // leitura de primeira classe, mas o "~N min" é do texto da NAA.
   const minutos = useMemo(() => (p ? readingMinutes(p.texto_naa) : 1), [p])
+  const versesParaFala = useMemo(
+    () =>
+      blocks
+        .filter((b): b is VerseBlock => b.kind === 'verse')
+        .map((b) => ({ id: b.id, text: b.text })),
+    [blocks],
+  )
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
@@ -220,6 +233,31 @@ export default function Leitura() {
 
   useSwipeNav(rootRef, { onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
   useKeyboardNav({ onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
+
+  useEffect(() => {
+    if (!temTts) return
+    const ctrl = createTtsController({ onVerse: setFalando, onState: setTtsState })
+    ttsRef.current = ctrl
+    return () => {
+      // Sair da leitura cala a fala: nada de voz órfã lendo o que já saiu da tela.
+      ctrl.stop()
+      ttsRef.current = null
+    }
+  }, [temTts])
+
+  useEffect(() => {
+    // Trocar de perícope também para: continuar lendo o texto anterior sobre a
+    // página nova seria desorientador.
+    return () => ttsRef.current?.stop()
+  }, [ordem])
+
+  useEffect(() => {
+    if (!falando) return
+    const el = document.querySelector<HTMLElement>(`[data-verse-id="${falando}"]`)
+    if (!el) return
+    const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    el.scrollIntoView({ block: 'center', behavior: reduzido ? 'auto' : 'smooth' })
+  }, [falando])
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
@@ -378,7 +416,8 @@ export default function Leitura() {
   function verseClass(base: string, id: string): string {
     const cor = destaques.get(id)
     const foco = selecionadosIds.has(id) ? ' verse-focus' : ''
-    return `${base}${foco}${cor ? ` verse-hl-${cor}` : ''}`
+    const fala = falando === id ? ' verse-speaking' : ''
+    return `${base}${foco}${fala}${cor ? ` verse-hl-${cor}` : ''}`
   }
 
   function verseAria(b: VerseBlock): string {
@@ -442,6 +481,50 @@ export default function Leitura() {
 
       <section className="block block-plain" id="texto">
         <h2>Texto (NAA)</h2>
+        {temTts && (
+          <div className="tts-bar">
+            {ttsState === 'idle' ? (
+              <button
+                type="button"
+                className="read-tool"
+                aria-label="Ouvir a perícope em voz alta"
+                onClick={() => ttsRef.current?.play(versesParaFala)}
+              >
+                ▶ Ouvir
+              </button>
+            ) : (
+              <>
+                {ttsState === 'playing' ? (
+                  <button
+                    type="button"
+                    className="read-tool active"
+                    aria-label="Pausar a leitura em voz alta"
+                    onClick={() => ttsRef.current?.pause()}
+                  >
+                    ⏸ Pausar
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="read-tool active"
+                    aria-label="Retomar a leitura em voz alta"
+                    onClick={() => ttsRef.current?.resume()}
+                  >
+                    ▶ Retomar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="read-tool"
+                  aria-label="Parar a leitura em voz alta"
+                  onClick={() => ttsRef.current?.stop()}
+                >
+                  ⏹
+                </button>
+              </>
+            )}
+          </div>
+        )}
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
             ? groupCorrido(blocks).map((g, gi) => (

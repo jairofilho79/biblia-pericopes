@@ -1,6 +1,7 @@
 import { authClient } from './auth-client'
 import { MAX_ITENS_POR_LOTE } from './sync-limits'
 import {
+  applyRemoteDestaques,
   applyRemoteAnotacoes,
   applyRemoteProgresso,
   clearAllUserData,
@@ -26,10 +27,20 @@ type PushAnotacao = {
   atualizadoEm: string
   apagadoEm: string | null
 }
+type PushDestaque = {
+  id: string
+  pericopeOrdem: number
+  verseId: string
+  cor: string
+  criadoEm: string
+  atualizadoEm: string
+  apagadoEm: string | null
+}
 
 function toPush(items: OutboxItem[]) {
   const progresso = new Map<number, PushProgresso>()
   const anotacoes = new Map<string, PushAnotacao>()
+  const destaques = new Map<string, PushDestaque>()
   for (const item of items) {
     if (item.kind === 'progresso') {
       progresso.set(item.ordem, {
@@ -37,11 +48,17 @@ function toPush(items: OutboxItem[]) {
         status: item.status,
         atualizadoEm: item.atualizadoEm,
       })
-    } else {
+    } else if (item.kind === 'anotacao') {
       anotacoes.set(item.nota.id, { ...item.nota, apagadoEm: item.apagadoEm })
+    } else {
+      destaques.set(item.destaque.id, { ...item.destaque, apagadoEm: item.apagadoEm })
     }
   }
-  return { progresso: [...progresso.values()], anotacoes: [...anotacoes.values()] }
+  return {
+    progresso: [...progresso.values()],
+    anotacoes: [...anotacoes.values()],
+    destaques: [...destaques.values()],
+  }
 }
 
 function chunk<T>(items: T[], size: number): T[][] {
@@ -62,10 +79,11 @@ function derrubarSessao() {
  * Reenviar um lote já aceito é inofensivo: o upsert no servidor é idempotente.
  */
 async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
-  const { progresso, anotacoes } = toPush(outbox)
+  const { progresso, anotacoes, destaques } = toPush(outbox)
   const lotesProgresso = chunk(progresso, MAX_ITENS_POR_LOTE)
   const lotesAnotacoes = chunk(anotacoes, MAX_ITENS_POR_LOTE)
-  const total = Math.max(lotesProgresso.length, lotesAnotacoes.length)
+  const lotesDestaques = chunk(destaques, MAX_ITENS_POR_LOTE)
+  const total = Math.max(lotesProgresso.length, lotesAnotacoes.length, lotesDestaques.length)
 
   for (let i = 0; i < total; i++) {
     const res = await fetch('/api/sync', {
@@ -75,6 +93,7 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
       body: JSON.stringify({
         progresso: lotesProgresso[i] ?? [],
         anotacoes: lotesAnotacoes[i] ?? [],
+        destaques: lotesDestaques[i] ?? [],
       }),
     })
     if (res.status === 401) {
@@ -134,10 +153,14 @@ export async function syncNow(): Promise<void> {
     const data = (await res.json()) as {
       progresso: Parameters<typeof applyRemoteProgresso>[0]
       anotacoes: Parameters<typeof applyRemoteAnotacoes>[0]
+      // opcional: uma resposta sem a lista (servidor mais velho, ou um mock de
+      // teste) vira lista vazia em vez de estourar e abortar o pull inteiro.
+      destaques?: Parameters<typeof applyRemoteDestaques>[0]
       agora: string
     }
     await applyRemoteProgresso(data.progresso)
     await applyRemoteAnotacoes(data.anotacoes)
+    await applyRemoteDestaques(data.destaques ?? [])
     await setMeta(CURSOR_KEY, data.agora)
   } catch (err) {
     // offline/erro transitório: outbox preservado, próxima chance sincroniza

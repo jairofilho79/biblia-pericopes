@@ -6,8 +6,10 @@ import {
   getMeta,
   getProgresso,
   listAnotacoes,
+  listDestaques,
   listOutbox,
   saveAnotacao,
+  setDestaque,
   setMeta,
   setProgresso,
 } from './user-db'
@@ -344,5 +346,71 @@ describe('troca de conta e logout', () => {
     // sair não apaga o que já está lido/anotado neste dispositivo
     expect((await getProgresso(60001))?.status).toBe('concluido')
     expect(authClient.signOut).toHaveBeenCalled()
+  })
+})
+
+describe('syncNow — destaques', () => {
+  it('push envia destaques deduplicados por id e o pull aplica os remotos', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // mesmo versículo destacado duas vezes: só a última cor sobe
+    await setDestaque(70001, '1:3', 'amarelo')
+    await setDestaque(70001, '1:3', 'verde')
+
+    const posts: { destaques: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [
+          {
+            id: '70002:2:5',
+            pericopeOrdem: 70002,
+            verseId: '2:5',
+            cor: 'azul',
+            criadoEm: FUTURE,
+            atualizadoEm: FUTURE,
+            apagadoEm: null,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts).toHaveLength(1)
+    expect(posts[0].destaques).toEqual([
+      {
+        id: '70001:1:3',
+        pericopeOrdem: 70001,
+        verseId: '1:3',
+        cor: 'verde',
+        criadoEm: expect.any(String),
+        atualizadoEm: expect.any(String),
+        apagadoEm: null,
+      },
+    ])
+    expect((await listDestaques(70002)).map((d) => d.cor)).toEqual(['azul'])
+    expect(await listOutbox()).toEqual([])
+  })
+
+  it('resposta de pull sem a lista destaques não quebra o sync', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })),
+    )
+
+    await syncNow()
+
+    expect(await getMeta('sync-cursor')).toBe(FUTURE)
   })
 })

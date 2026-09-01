@@ -1305,6 +1305,45 @@ button.ghost {
   margin-top: 1rem;
 }
 
+.modo-busca {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.modo-btn {
+  flex: 0 0 auto;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.modo-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--cta-ink);
+}
+
+/* mais específico que `.peri-list li a span`, senão o trecho fica miúdo e cinza */
+.peri-list li a span.hit-snippet {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.hit-snippet mark {
+  padding: 0 0.1em;
+  border-radius: 3px;
+  background: var(--focus-bg);
+  color: inherit;
+}
+
 @media (min-width: 640px) {
   .ref-form {
     grid-template-columns: 1fr 1fr auto;

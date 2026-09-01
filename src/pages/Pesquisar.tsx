@@ -12,6 +12,14 @@ import {
   listPericopesByBookChapter,
   refLabel,
 } from '../lib/content'
+import {
+  indexPronto,
+  LIMITE_RESULTADOS,
+  marcarTrecho,
+  MIN_CHARS,
+  searchTexto,
+  type FulltextHit,
+} from '../lib/fulltext'
 import { testamentLabel } from '../lib/testament'
 import type { Pericope } from '../lib/types'
 
@@ -45,6 +53,13 @@ export default function Pesquisar() {
   const [capFilter, setCapFilter] = useState<number | null>(null)
   const [hit, setHit] = useState<Pericope | null>(null)
   const [miss, setMiss] = useState('')
+  const [modo, setModo] = useState<'ref' | 'texto'>('ref')
+  const [texto, setTexto] = useState('')
+  const [hits, setHits] = useState<FulltextHit[]>([])
+  const [buscando, setBuscando] = useState(false)
+  const [preparando, setPreparando] = useState(false)
+
+  const termo = texto.trim()
 
   const filtered = useMemo(() => filterBooks(q), [q])
   const groups = useMemo(() => groupBooks(filtered), [filtered])
@@ -63,6 +78,38 @@ export default function Pesquisar() {
     }
     listPericopesByBookChapter(selected.abbrev, capFilter ?? undefined).then(setPeris)
   }, [selected, capFilter])
+
+  // Debounce de 300 ms: digitar não pode disparar uma varredura por tecla.
+  useEffect(() => {
+    if (modo !== 'texto' || termo.length < MIN_CHARS) {
+      setHits([])
+      setBuscando(false)
+      setPreparando(false)
+      return
+    }
+    let vivo = true
+    setBuscando(true)
+    // A primeira busca paga a construção do índice; as seguintes, não.
+    setPreparando(!indexPronto())
+    const timer = window.setTimeout(() => {
+      searchTexto(termo)
+        .then((r) => {
+          if (vivo) setHits(r)
+        })
+        .catch(() => {
+          if (vivo) setHits([])
+        })
+        .finally(() => {
+          if (!vivo) return
+          setBuscando(false)
+          setPreparando(false)
+        })
+    }, 300)
+    return () => {
+      vivo = false
+      window.clearTimeout(timer)
+    }
+  }, [modo, termo])
 
   function selectBook(book: BibleBook) {
     setSelected(book)
@@ -107,7 +154,74 @@ export default function Pesquisar() {
     <section className="pesquisar">
       <h1>Pesquisar</h1>
 
-      {selected ? (
+      <div className="modo-busca" role="group" aria-label="Modo de busca">
+        <button
+          type="button"
+          className={`modo-btn${modo === 'ref' ? ' active' : ''}`}
+          aria-pressed={modo === 'ref'}
+          onClick={() => setModo('ref')}
+        >
+          Referência
+        </button>
+        <button
+          type="button"
+          className={`modo-btn${modo === 'texto' ? ' active' : ''}`}
+          aria-pressed={modo === 'texto'}
+          onClick={() => setModo('texto')}
+        >
+          No texto
+        </button>
+      </div>
+
+      {modo === 'texto' ? (
+        <>
+          <div className="filters">
+            <input
+              type="search"
+              placeholder="Buscar no texto bíblico…"
+              value={texto}
+              autoFocus
+              onChange={(e) => setTexto(e.target.value)}
+              aria-label="Buscar no texto bíblico"
+            />
+          </div>
+
+          {termo.length > 0 && termo.length < MIN_CHARS && (
+            <p className="muted">Digite ao menos {MIN_CHARS} letras.</p>
+          )}
+          {preparando && <p className="muted">Preparando busca…</p>}
+          {!preparando && buscando && <p className="muted">Buscando…</p>}
+
+          {!buscando && termo.length >= MIN_CHARS && (
+            <p className="peri-count">
+              {hits.length === 0
+                ? 'Nenhum resultado'
+                : `${hits.length} resultado${hits.length === 1 ? '' : 's'}${
+                    hits.length === LIMITE_RESULTADOS ? ' (primeiros)' : ''
+                  }`}
+            </p>
+          )}
+
+          <ul className="peri-list">
+            {hits.map((h) => {
+              const { antes, marcado, depois } = marcarTrecho(h.snippet, termo)
+              return (
+                <li key={h.ordem}>
+                  <Link to={`/leitura/${h.ordem}${h.verseId ? `?v=${h.verseId}` : ''}`}>
+                    <strong>{h.titulo}</strong>
+                    <span>{h.refLabel}</span>
+                    <span className="hit-snippet">
+                      {antes}
+                      {marcado && <mark>{marcado}</mark>}
+                      {depois}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </>
+      ) : selected ? (
         <>
           <div className="ref-sticky">
             <div className="selected-book">

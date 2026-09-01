@@ -109,10 +109,12 @@ Processo separado (`tools/tts-batch/subir.py`) roda junto com as esteiras:
   `pericopes-audio`, chaves `v1/{claudio|dorabella}/{ordem}/{secao}.*`, com
   retry exponencial; sucesso → marcador `{ordem}.sent`; roda em loop até as
   esteiras acabarem e a fila esvaziar.
-- Credenciais: token de API R2 (Object Read & Write no bucket) criado pelo
-  usuário e exportado **num terminal de verdade** (regra do secret vazio);
-  o script lê de variáveis de ambiente (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
-  `R2_SECRET_ACCESS_KEY`) via S3 API (boto3). `--dry-run` para validar antes.
+- Credenciais: o wrangler local já está autenticado (OAuth) com acesso ao R2
+  — o upload usa `wrangler r2 object put` com concorrência (4–8 uploads
+  simultâneos), sem criar credencial nova. Se o upload não acompanhar as
+  esteiras, otimização opcional: token S3 do R2 criado pelo usuário **num
+  terminal de verdade** (regra do secret vazio) + boto3. `--dry-run` para
+  validar antes.
 
 ## 7. Estimativas
 

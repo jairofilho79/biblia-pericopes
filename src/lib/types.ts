@@ -33,6 +33,20 @@ export type Anotacao = {
   atualizadoEm: string
 }
 
+export type DestaqueCor = 'amarelo' | 'verde' | 'azul' | 'rosa'
+
+/** `id` determinístico `${pericopeOrdem}:${verseId}`: um destaque por versículo
+ * por usuário, então destacar de novo é um upsert e o LWW resolve sozinho. */
+export type Destaque = {
+  id: string
+  pericopeOrdem: number
+  /** "capitulo:versiculo", igual ao TextoBlock.id */
+  verseId: string
+  cor: DestaqueCor
+  criadoEm: string
+  atualizadoEm: string
+}
+
 export type RawPericope = {
   ordem: number
   titulo_en: string

@@ -1,14 +1,15 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { remoteWinsLocal } from './sync-merge'
 import { MAX_TEXTO } from './sync-limits'
-import type { Anotacao, Progresso, ProgressoStatus } from './types'
+import type { Anotacao, Destaque, DestaqueCor, Progresso, ProgressoStatus } from './types'
 
 const DB_NAME = 'biblia-pericopes'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 export type OutboxItem =
   | { seq?: number; kind: 'progresso'; ordem: number; status: ProgressoStatus; atualizadoEm: string }
   | { seq?: number; kind: 'anotacao'; nota: Anotacao; apagadoEm: string | null }
+  | { seq?: number; kind: 'destaque'; destaque: Destaque; apagadoEm: string | null }
 
 type Schema = {
   progresso: {
@@ -18,6 +19,11 @@ type Schema = {
   anotacoes: {
     key: string
     value: Anotacao
+    indexes: { 'by-pericope': number }
+  }
+  destaques: {
+    key: string
+    value: Destaque
     indexes: { 'by-pericope': number }
   }
   outbox: {
@@ -44,6 +50,10 @@ function db() {
         if (oldVersion < 2) {
           database.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true })
           database.createObjectStore('meta', { keyPath: 'key' })
+        }
+        if (oldVersion < 3) {
+          const hl = database.createObjectStore('destaques', { keyPath: 'id' })
+          hl.createIndex('by-pericope', 'pericopeOrdem')
         }
       },
     })
@@ -132,6 +142,59 @@ export async function deleteAnotacao(id: string): Promise<void> {
   await tx.done
 }
 
+/** Id determinístico do destaque: um por versículo por perícope. */
+function destaqueId(pericopeOrdem: number, verseId: string): string {
+  return `${pericopeOrdem}:${verseId}`
+}
+
+export async function listDestaques(ordem: number): Promise<Destaque[]> {
+  return (await db()).getAllFromIndex('destaques', 'by-pericope', ordem)
+}
+
+export async function setDestaque(
+  pericopeOrdem: number,
+  verseId: string,
+  cor: DestaqueCor,
+): Promise<Destaque> {
+  const now = new Date().toISOString()
+  const d = await db()
+  const tx = d.transaction(['destaques', 'outbox'], 'readwrite')
+  const store = tx.objectStore('destaques')
+  const id = destaqueId(pericopeOrdem, verseId)
+  const existing = await store.get(id)
+  const destaque: Destaque = {
+    id,
+    pericopeOrdem,
+    verseId,
+    cor,
+    criadoEm: existing?.criadoEm ?? now,
+    atualizadoEm: now,
+  }
+  await store.put(destaque)
+  await tx.objectStore('outbox').put({ kind: 'destaque', destaque, apagadoEm: null } as OutboxItem)
+  await tx.done
+  return destaque
+}
+
+export async function removeDestaque(id: string): Promise<void> {
+  const d = await db()
+  const tx = d.transaction(['destaques', 'outbox'], 'readwrite')
+  const store = tx.objectStore('destaques')
+  const existing = await store.get(id)
+  await store.delete(id)
+  if (existing) {
+    // Soft delete: a linha some daqui, mas sobe como lápide para o servidor
+    // tombar a dele — senão o próximo pull ressuscitaria o destaque.
+    const now = new Date().toISOString()
+    await tx.objectStore('outbox').put({
+      kind: 'destaque',
+      destaque: { ...existing, atualizadoEm: now },
+      apagadoEm: now,
+    } as OutboxItem)
+  }
+  await tx.done
+}
+
 export async function listOutbox(): Promise<OutboxItem[]> {
   return (await db()).getAll('outbox')
 }
@@ -164,10 +227,11 @@ export async function deleteMeta(key: string): Promise<void> {
  */
 export async function clearAllUserData(): Promise<void> {
   const d = await db()
-  const tx = d.transaction(['progresso', 'anotacoes', 'outbox'], 'readwrite')
+  const tx = d.transaction(['progresso', 'anotacoes', 'destaques', 'outbox'], 'readwrite')
   await Promise.all([
     tx.objectStore('progresso').clear(),
     tx.objectStore('anotacoes').clear(),
+    tx.objectStore('destaques').clear(),
     tx.objectStore('outbox').clear(),
     tx.done,
   ])
@@ -204,6 +268,30 @@ export async function applyRemoteAnotacoes(
     } else {
       const { apagadoEm: _apagadoEm, ...nota } = item
       await d.put('anotacoes', nota)
+    }
+  }
+}
+
+export async function applyRemoteDestaques(
+  items: {
+    id: string
+    pericopeOrdem: number
+    verseId: string
+    cor: DestaqueCor
+    criadoEm: string
+    atualizadoEm: string
+    apagadoEm: string | null
+  }[],
+): Promise<void> {
+  const d = await db()
+  for (const item of items) {
+    const local = await d.get('destaques', item.id)
+    if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
+    if (item.apagadoEm) {
+      await d.delete('destaques', item.id)
+    } else {
+      const { apagadoEm: _apagadoEm, ...destaque } = item
+      await d.put('destaques', destaque)
     }
   }
 }

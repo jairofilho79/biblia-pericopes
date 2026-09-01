@@ -2,6 +2,7 @@ import 'fake-indexeddb/auto'
 import { describe, expect, it } from 'vitest'
 import {
   applyRemoteAnotacoes,
+  applyRemoteDestaques,
   applyRemoteProgresso,
   clearAllUserData,
   clearOutbox,
@@ -10,14 +11,18 @@ import {
   getMeta,
   getProgresso,
   listAnotacoes,
+  listDestaques,
   listOutbox,
+  removeDestaque,
   saveAnotacao,
+  setDestaque,
   setMeta,
   setProgresso,
 } from './user-db'
 import { MAX_TEXTO } from './sync-limits'
 
 const FUTURE = '2099-01-01T00:00:00.000Z'
+const FUTURE_2 = '2099-06-01T00:00:00.000Z'
 const PAST = '2000-01-01T00:00:00.000Z'
 
 // NOTE: vitest runs this file in isolation, but the tests below share the
@@ -197,16 +202,70 @@ describe('user-db v2 (outbox/meta)', () => {
   it('clearAllUserData apaga progresso, anotações e outbox; deleteMeta remove a chave', async () => {
     await setProgresso(9011, 'concluido')
     await saveAnotacao(9012, 'some junto')
+    await setDestaque(9013, '1:1', 'verde')
     await setMeta('chave-temp', 'x')
 
     await clearAllUserData()
 
     expect(await getProgresso(9011)).toBeUndefined()
     expect(await listAnotacoes(9012)).toEqual([])
+    expect(await listDestaques(9013)).toEqual([])
     expect(await listOutbox()).toEqual([])
     // meta sobrevive ao wipe dos dados; só sai por deleteMeta
     expect(await getMeta('chave-temp')).toBe('x')
     await deleteMeta('chave-temp')
     expect(await getMeta('chave-temp')).toBeUndefined()
+  })
+})
+
+describe('user-db v3 (destaques)', () => {
+  it('setDestaque grava o destaque e enfileira o outbox na mesma transação', async () => {
+    const d = await setDestaque(9101, '1:3', 'amarelo')
+    expect(d.id).toBe('9101:1:3')
+    expect((await listDestaques(9101)).map((x) => x.cor)).toEqual(['amarelo'])
+
+    const outbox = await listOutbox()
+    const item = outbox.find((i) => i.kind === 'destaque' && i.destaque.id === '9101:1:3')
+    expect(item).toBeDefined()
+    if (item?.kind === 'destaque') {
+      expect(item.apagadoEm).toBeNull()
+      expect(item.destaque.cor).toBe('amarelo')
+    }
+  })
+
+  it('destacar de novo troca a cor e preserva criadoEm', async () => {
+    const primeiro = await setDestaque(9102, '2:7', 'verde')
+    const segundo = await setDestaque(9102, '2:7', 'rosa')
+    expect(segundo.id).toBe(primeiro.id)
+    expect(segundo.criadoEm).toBe(primeiro.criadoEm)
+    expect((await listDestaques(9102)).map((x) => x.cor)).toEqual(['rosa'])
+  })
+
+  it('removeDestaque apaga o local e enfileira a lápide', async () => {
+    const d = await setDestaque(9103, '1:1', 'azul')
+    await removeDestaque(d.id)
+
+    expect(await listDestaques(9103)).toEqual([])
+    const outbox = await listOutbox()
+    const lapides = outbox.filter((i) => i.kind === 'destaque' && i.destaque.id === d.id)
+    const ultima = lapides[lapides.length - 1]
+    expect(ultima).toBeDefined()
+    if (ultima?.kind === 'destaque') {
+      expect(ultima.apagadoEm).not.toBeNull()
+      expect(ultima.destaque.atualizadoEm).toBe(ultima.apagadoEm)
+    }
+  })
+
+  it('applyRemoteDestaques: mais velho é ignorado, mais novo vence, lápide apaga', async () => {
+    const local = await setDestaque(9104, '1:2', 'amarelo')
+
+    await applyRemoteDestaques([{ ...local, cor: 'verde', atualizadoEm: PAST, apagadoEm: null }])
+    expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['amarelo'])
+
+    await applyRemoteDestaques([{ ...local, cor: 'azul', atualizadoEm: FUTURE, apagadoEm: null }])
+    expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['azul'])
+
+    await applyRemoteDestaques([{ ...local, cor: 'azul', atualizadoEm: FUTURE_2, apagadoEm: FUTURE_2 }])
+    expect(await listDestaques(9104)).toEqual([])
   })
 })

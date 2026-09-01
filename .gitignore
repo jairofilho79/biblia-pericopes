@@ -35,3 +35,5 @@ data/preach-sample/
 *.njsproj
 *.sln
 *.sw?
+
+.worktrees/

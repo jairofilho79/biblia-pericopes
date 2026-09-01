@@ -1,0 +1,159 @@
+import { describe, expect, it, vi } from 'vitest'
+import {
+  indexarLinhas,
+  marcarTrecho,
+  normalize,
+  searchTexto,
+  snippetAt,
+  verseIdAtOffset,
+} from './fulltext'
+import type { Pericope } from './types'
+
+const TEXTO =
+  'Capítulo 1\n1 No princípio, Deus criou o coração.\n2 A terra era sem forma.\nCapítulo 2\n1 Assim foram concluídos os céus.'
+
+function peri(ordem: number, livro: string, abbrev: string, texto: string): Pericope {
+  return {
+    ordem,
+    livro,
+    abbrev,
+    capitulo_inicio: 1,
+    versiculo_inicio: 1,
+    capitulo_fim: 2,
+    versiculo_fim: 1,
+    titulo_pericope_pt: `Título ${ordem}`,
+    texto_naa: texto,
+    contexto_historico_literario: '',
+    resenha: '',
+    perguntas_reflexao: [],
+  }
+}
+
+const FIXTURES: Pericope[] = [
+  peri(0, 'Gênesis', 'Gn', TEXTO),
+  peri(1, 'Salmos', 'Sl', 'Capítulo 23\n1 O Senhor é o meu pastor; nada me faltará.'),
+  peri(2, 'João', 'Jo', 'Capítulo 3\n16 Porque Deus amou o mundo de tal maneira.'),
+]
+
+vi.mock('./content', async (importOriginal) => {
+  const real = await importOriginal<typeof import('./content')>()
+  return { ...real, loadPericopes: async () => FIXTURES }
+})
+
+const LONGO = `${'a'.repeat(60)} meio ${'b'.repeat(60)}`
+
+describe('normalize', () => {
+  it('tira acentos e caixa preservando o comprimento', () => {
+    expect(normalize('Coração ÁGUIA çedilha')).toBe('coracao aguia cedilha')
+    expect(normalize('Coração')).toHaveLength('Coração'.length)
+  })
+
+  it('string vazia continua vazia', () => {
+    expect(normalize('')).toBe('')
+  })
+})
+
+describe('indexarLinhas', () => {
+  it('marca o versículo de cada linha atravessando capítulos', () => {
+    expect(indexarLinhas(TEXTO).map((l) => l.verseId)).toEqual([
+      null,
+      '1:1',
+      '1:2',
+      null,
+      '2:1',
+    ])
+  })
+
+  it('os offsets acompanham o texto normalizado, linha a linha', () => {
+    const linhas = indexarLinhas(TEXTO)
+    const norm = linhas.map((l) => normalize(l.texto)).join('\n')
+    expect(linhas.map((l) => l.inicio)).toEqual([0, 11, 49, 74, 85])
+    expect(norm.slice(linhas[1].inicio, linhas[1].inicio + 4)).toBe('1 no')
+    expect(norm.slice(linhas[4].inicio, linhas[4].inicio + 7)).toBe('1 assim')
+  })
+
+  it('linha sem número herda o versículo anterior', () => {
+    const linhas = indexarLinhas('Capítulo 1\n1 Primeira.\ncontinuação solta\n2 Segunda.')
+    expect(linhas.map((l) => l.verseId)).toEqual([null, '1:1', '1:1', '1:2'])
+  })
+})
+
+describe('verseIdAtOffset', () => {
+  const linhas = indexarLinhas(TEXTO)
+
+  it('resolve o versículo de um offset no meio do texto', () => {
+    expect(verseIdAtOffset(linhas, 20)).toBe('1:1')
+    expect(verseIdAtOffset(linhas, 55)).toBe('1:2')
+    expect(verseIdAtOffset(linhas, 90)).toBe('2:1')
+  })
+
+  it('offset num cabeçalho de capítulo cai no primeiro versículo seguinte', () => {
+    expect(verseIdAtOffset(linhas, 0)).toBe('1:1')
+    expect(verseIdAtOffset(linhas, 76)).toBe('2:1')
+  })
+
+  it('lista vazia ou offset negativo devolve null', () => {
+    expect(verseIdAtOffset([], 0)).toBeNull()
+    expect(verseIdAtOffset(linhas, -1)).toBeNull()
+  })
+})
+
+describe('snippetAt', () => {
+  it('ocorrência no começo de um texto curto não ganha reticências', () => {
+    expect(snippetAt('No princípio Deus criou', 0, 2)).toBe('No princípio Deus criou')
+  })
+
+  it('ocorrência no fim não ganha reticência à direita', () => {
+    const s = snippetAt(LONGO, LONGO.length - 3, 3)
+    expect(s.startsWith('…')).toBe(true)
+    expect(s.endsWith('…')).toBe(false)
+  })
+
+  it('ocorrência no meio ganha reticências dos dois lados', () => {
+    const s = snippetAt(LONGO, LONGO.indexOf('meio'), 4)
+    expect(s.startsWith('…')).toBe(true)
+    expect(s.endsWith('…')).toBe(true)
+    expect(s).toContain('meio')
+  })
+})
+
+describe('marcarTrecho', () => {
+  it('acha o trecho com e sem acento', () => {
+    const esperado = { antes: 'Deus criou o ', marcado: 'coração', depois: '.' }
+    expect(marcarTrecho('Deus criou o coração.', 'coracao')).toEqual(esperado)
+    expect(marcarTrecho('Deus criou o coração.', 'CORAÇÃO')).toEqual(esperado)
+  })
+
+  it('termo ausente devolve o snippet inteiro sem marcação', () => {
+    expect(marcarTrecho('Deus criou.', 'peixe')).toEqual({
+      antes: 'Deus criou.',
+      marcado: '',
+      depois: '',
+    })
+  })
+})
+
+describe('searchTexto', () => {
+  it('acha com e sem acento e resolve o versículo da ocorrência', async () => {
+    const semAcento = await searchTexto('coracao')
+    expect(semAcento).toHaveLength(1)
+    expect(semAcento[0].ordem).toBe(0)
+    expect(semAcento[0].verseId).toBe('1:1')
+    expect(semAcento[0].titulo).toBe('Título 0')
+    expect(semAcento[0].refLabel).toBe('Gênesis 1:1–2:1')
+    expect(semAcento[0].snippet).toContain('coração')
+
+    const comAcento = await searchTexto('coração')
+    expect(comAcento.map((h) => h.verseId)).toEqual(['1:1'])
+
+    const segundoCapitulo = await searchTexto('concluidos')
+    expect(segundoCapitulo.map((h) => h.verseId)).toEqual(['2:1'])
+  })
+
+  it('respeita o mínimo de caracteres e o limite de resultados', async () => {
+    expect(await searchTexto('de')).toEqual([])
+    expect(await searchTexto('   ')).toEqual([])
+    expect(await searchTexto('deus')).toHaveLength(2)
+    expect(await searchTexto('deus', 1)).toHaveLength(1)
+  })
+})

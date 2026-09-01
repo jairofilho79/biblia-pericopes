@@ -24,7 +24,7 @@ import {
   setProgresso,
 } from '../lib/user-db'
 import { getVerseFocus, setVerseFocus } from '../lib/verse-highlight'
-import { nextSelection, rangeLabel, rangeRef, versesInRange, type VerseSelection } from '../lib/verse-range'
+import { nextSelection, parseVerseRef, rangeLabel, rangeRef, verseRefLabel, versesInRange, type VerseSelection } from '../lib/verse-range'
 import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
@@ -84,10 +84,9 @@ export default function Leitura() {
   const [barOpen, setBarOpen] = useState(false)
   const [destaques, setDestaques] = useState<Map<string, DestaqueCor>>(new Map())
   const [draftRef, setDraftRef] = useState<string | null>(null)
-  // draftRef só é lido pela Task 8 (prefill do formulário de anotação) — a
-  // referência abaixo mantém o build limpo (noUnusedLocals) até lá.
-  void draftRef
   const [aviso, setAviso] = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [confirmarId, setConfirmarId] = useState<string | null>(null)
   const [tab, setTab] = useState<NotesTab>('anotacoes')
   const [copied, setCopied] = useState(false)
   const doneRef = useRef(false)
@@ -189,8 +188,31 @@ export default function Leitura() {
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
     if (!draft.trim()) return
-    await saveAnotacao(ordem, draft.trim())
+    await saveAnotacao(ordem, draft.trim(), editingId ?? undefined, draftRef)
     setDraft('')
+    setDraftRef(null)
+    setEditingId(null)
+    await refreshNotes()
+  }
+
+  function editarNota(n: Anotacao) {
+    setEditingId(n.id)
+    setDraft(n.texto)
+    setDraftRef(n.verseRef ?? null)
+    setConfirmarId(null)
+    setTab('anotacoes')
+  }
+
+  function cancelarEdicao() {
+    setEditingId(null)
+    setDraft('')
+    setDraftRef(null)
+  }
+
+  async function apagarNota(id: string) {
+    await deleteAnotacao(id)
+    setConfirmarId(null)
+    if (editingId === id) cancelarEdicao()
     await refreshNotes()
   }
 
@@ -262,6 +284,8 @@ export default function Leitura() {
 
   function anotarSelecao() {
     setTab('anotacoes')
+    setEditingId(null)
+    setConfirmarId(null)
     setDraftRef(rangeRef(selecionados))
     setBarOpen(false)
     window.setTimeout(() => {
@@ -428,21 +452,75 @@ export default function Leitura() {
         {tab === 'anotacoes' && (
           <>
             <form onSubmit={onSaveNote} className="note-form">
+              {draftRef && (
+                <p className="note-ref-row">
+                  <span className="note-ref-chip">{verseRefLabel(p.abbrev, draftRef)}</span>
+                  <button type="button" className="linkish" onClick={() => setDraftRef(null)}>
+                    Remover vínculo
+                  </button>
+                </p>
+              )}
               <textarea
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 rows={4}
                 placeholder="Escreva pensamentos, orações, aplicações…"
               />
-              <button type="submit">Salvar anotação</button>
+              <div className="note-form-actions">
+                <button type="submit">{editingId ? 'Salvar alterações' : 'Salvar anotação'}</button>
+                {editingId && (
+                  <button type="button" className="linkish" onClick={cancelarEdicao}>
+                    Cancelar
+                  </button>
+                )}
+              </div>
             </form>
             <ul className="note-list">
               {notes.map((n) => (
                 <li key={n.id}>
+                  {n.verseRef && (
+                    <Link
+                      className="note-ref-chip"
+                      to={`/leitura/${ordem}?v=${parseVerseRef(n.verseRef)?.start ?? ''}`}
+                    >
+                      {verseRefLabel(p.abbrev, n.verseRef)}
+                    </Link>
+                  )}
                   <p>{n.texto}</p>
-                  <button type="button" className="linkish" onClick={() => deleteAnotacao(n.id).then(refreshNotes)}>
-                    Apagar
-                  </button>
+                  <div className="note-item-actions">
+                    {confirmarId === n.id ? (
+                      <>
+                        <span className="muted">Apagar mesmo?</span>
+                        <button
+                          type="button"
+                          className="linkish"
+                          onClick={() => void apagarNota(n.id)}
+                        >
+                          Sim
+                        </button>
+                        <button
+                          type="button"
+                          className="linkish"
+                          onClick={() => setConfirmarId(null)}
+                        >
+                          Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" className="linkish" onClick={() => editarNota(n)}>
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="linkish"
+                          onClick={() => setConfirmarId(n.id)}
+                        >
+                          Apagar
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

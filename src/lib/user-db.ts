@@ -101,7 +101,9 @@ export async function countConcluidasNaSequencia(ordens: number[]): Promise<numb
 }
 
 export async function listAnotacoes(ordem: number): Promise<Anotacao[]> {
-  return (await db()).getAllFromIndex('anotacoes', 'by-pericope', ordem)
+  const notas = await (await db()).getAllFromIndex('anotacoes', 'by-pericope', ordem)
+  // Mais recentes primeiro: a última anotação escrita fica no topo da lista.
+  return notas.sort((a, b) => (a.criadoEm < b.criadoEm ? 1 : a.criadoEm > b.criadoEm ? -1 : 0))
 }
 
 export async function saveAnotacao(

@@ -288,4 +288,38 @@ describe('anotações com vínculo a versículo', () => {
     const nota = await saveAnotacao(9106, 'nota solta')
     expect(nota.verseRef).toBeNull()
   })
+
+  it('listAnotacoes devolve as notas mais recentes primeiro', async () => {
+    await applyRemoteAnotacoes([
+      {
+        id: 'ord-a',
+        pericopeOrdem: 9200,
+        texto: 'antiga',
+        verseRef: null,
+        criadoEm: '2026-01-01T00:00:00.000Z',
+        atualizadoEm: FUTURE,
+        apagadoEm: null,
+      },
+      {
+        id: 'ord-b',
+        pericopeOrdem: 9200,
+        texto: 'nova',
+        verseRef: null,
+        criadoEm: '2026-06-01T00:00:00.000Z',
+        atualizadoEm: FUTURE,
+        apagadoEm: null,
+      },
+      {
+        id: 'ord-c',
+        pericopeOrdem: 9200,
+        texto: 'do meio',
+        verseRef: null,
+        criadoEm: '2026-03-01T00:00:00.000Z',
+        atualizadoEm: FUTURE,
+        apagadoEm: null,
+      },
+    ])
+
+    expect((await listAnotacoes(9200)).map((n) => n.id)).toEqual(['ord-b', 'ord-c', 'ord-a'])
+  })
 })

@@ -58,6 +58,7 @@ export default function Pesquisar() {
   const [hits, setHits] = useState<FulltextHit[]>([])
   const [buscando, setBuscando] = useState(false)
   const [preparando, setPreparando] = useState(false)
+  const [erro, setErro] = useState(false)
 
   const termo = texto.trim()
 
@@ -85,10 +86,12 @@ export default function Pesquisar() {
       setHits([])
       setBuscando(false)
       setPreparando(false)
+      setErro(false)
       return
     }
     let vivo = true
     setBuscando(true)
+    setErro(false)
     // A primeira busca paga a construção do índice; as seguintes, não.
     setPreparando(!indexPronto())
     const timer = window.setTimeout(() => {
@@ -97,7 +100,10 @@ export default function Pesquisar() {
           if (vivo) setHits(r)
         })
         .catch(() => {
-          if (vivo) setHits([])
+          if (vivo) {
+            setHits([])
+            setErro(true)
+          }
         })
         .finally(() => {
           if (!vivo) return
@@ -189,18 +195,27 @@ export default function Pesquisar() {
           {termo.length > 0 && termo.length < MIN_CHARS && (
             <p className="muted">Digite ao menos {MIN_CHARS} letras.</p>
           )}
-          {preparando && <p className="muted">Preparando busca…</p>}
-          {!preparando && buscando && <p className="muted">Buscando…</p>}
 
-          {!buscando && termo.length >= MIN_CHARS && (
-            <p className="peri-count">
-              {hits.length === 0
-                ? 'Nenhum resultado'
-                : `${hits.length} resultado${hits.length === 1 ? '' : 's'}${
-                    hits.length === LIMITE_RESULTADOS ? ' (primeiros)' : ''
-                  }`}
-            </p>
-          )}
+          <div aria-live="polite">
+            {preparando && <p className="muted">Preparando busca…</p>}
+            {!preparando && buscando && <p className="muted">Buscando…</p>}
+
+            {!buscando && erro && (
+              <p className="muted">
+                Não foi possível buscar agora — verifique a conexão e tente de novo.
+              </p>
+            )}
+
+            {!buscando && !erro && termo.length >= MIN_CHARS && (
+              <p className="peri-count">
+                {hits.length === 0
+                  ? 'Nenhum resultado'
+                  : `${hits.length} resultado${hits.length === 1 ? '' : 's'}${
+                      hits.length === LIMITE_RESULTADOS ? ' (primeiros)' : ''
+                    }`}
+              </p>
+            )}
+          </div>
 
           <ul className="peri-list">
             {hits.map((h) => {

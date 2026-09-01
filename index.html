@@ -13,10 +13,14 @@
       (function () {
         try {
           var t = localStorage.getItem('pericopes-theme')
-          if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          if (t !== 'light' && t !== 'dark' && t !== 'sepia') {
+            t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          }
           document.documentElement.dataset.theme = t
           var raw = localStorage.getItem('pericopes-reading')
           var prefs = raw ? JSON.parse(raw) : {}
+          // DUPLICAÇÃO DELIBERADA de src/lib/reading-prefs.ts: este script roda
+          // antes de qualquer bundle. Mudou lá, mude aqui.
           var steps = [0.95, 1.05, 1.15, 1.28, 1.42, 1.58]
           var step = typeof prefs.sizeStep === 'number' && prefs.sizeStep >= 0 && prefs.sizeStep < steps.length ? prefs.sizeStep : 2
           var fonts = {
@@ -25,8 +29,14 @@
             sans: "'Source Sans 3 Variable', 'DM Sans Variable', system-ui, sans-serif",
           }
           var font = fonts[prefs.font] || fonts.serif
+          var leadings = [1.5, 1.65, 1.8, 1.95]
+          var lstep = typeof prefs.leadingStep === 'number' && prefs.leadingStep >= 0 && prefs.leadingStep < leadings.length ? prefs.leadingStep : 1
+          var measures = { estreita: '32rem', media: '38rem', larga: '46rem' }
+          var measure = measures[prefs.measure] || measures.media
           document.documentElement.style.setProperty('--read-size', steps[step] + 'rem')
           document.documentElement.style.setProperty('--read-font', font)
+          document.documentElement.style.setProperty('--read-leading', String(leadings[lstep]))
+          document.documentElement.style.setProperty('--read-measure', measure)
         } catch (e) {}
       })()
     </script>

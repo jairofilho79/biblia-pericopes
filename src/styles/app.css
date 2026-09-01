@@ -427,7 +427,7 @@ button.ghost {
 }
 
 .leitura {
-  max-width: var(--measure);
+  max-width: var(--read-measure, var(--measure));
   /* ponytail: paper plane — surface only, no card chrome */
   background: var(--paper);
   padding: 1rem 1.05rem 1.35rem;
@@ -649,7 +649,7 @@ button.ghost {
 .texto-biblico {
   font-family: var(--read-font);
   font-size: var(--read-size);
-  line-height: 1.75;
+  line-height: var(--read-leading, 1.65);
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -719,9 +719,9 @@ button.ghost {
 
 .corrido {
   margin: 0;
-  max-width: var(--measure);
+  max-width: var(--read-measure, var(--measure));
   font-family: inherit;
-  line-height: 1.75;
+  line-height: var(--read-leading, 1.65);
 }
 
 .verse-inline {
@@ -857,8 +857,8 @@ button.ghost {
   margin: 0 0 0.85rem;
   font-family: var(--read-font);
   font-size: var(--read-size);
-  line-height: 1.7;
-  max-width: var(--measure);
+  line-height: var(--read-leading, 1.65);
+  max-width: var(--read-measure, var(--measure));
   font-size-adjust: from-font;
 }
 
@@ -867,7 +867,7 @@ button.ghost {
   padding-left: 1.2rem;
   font-family: var(--read-font);
   font-size: calc(var(--read-size) * 0.96);
-  line-height: 1.65;
+  line-height: var(--read-leading, 1.65);
   font-size-adjust: from-font;
 }
 

@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  bumpReadingLeading,
   bumpReadingSize,
   FONT_OPTIONS,
+  LEADING_STEPS,
+  MEASURE_OPTIONS,
   setReadingFont,
   setReadingLayout,
+  setReadingMeasure,
   SIZE_STEPS,
   type ReadingLayout,
   type ReadingPrefs,
@@ -115,6 +119,39 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
                 onClick={() => onPrefs(setReadingLayout(l.id))}
               >
                 {l.label}
+              </button>
+            ))}
+          </div>
+          <div className="readmenu-row" role="group" aria-label="Espaçamento entre linhas">
+            <button
+              type="button"
+              className="read-tool"
+              disabled={prefs.leadingStep === 0}
+              aria-label="Diminuir espaçamento"
+              onClick={() => onPrefs(bumpReadingLeading(-1))}
+            >
+              ▼
+            </button>
+            <button
+              type="button"
+              className="read-tool"
+              disabled={prefs.leadingStep === LEADING_STEPS.length - 1}
+              aria-label="Aumentar espaçamento"
+              onClick={() => onPrefs(bumpReadingLeading(1))}
+            >
+              ▲
+            </button>
+          </div>
+          <div className="readmenu-row" role="group" aria-label="Largura do texto">
+            {MEASURE_OPTIONS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`read-tool${prefs.measure === m.id ? ' active' : ''}`}
+                aria-pressed={prefs.measure === m.id}
+                onClick={() => onPrefs(setReadingMeasure(m.id))}
+              >
+                {m.label}
               </button>
             ))}
           </div>

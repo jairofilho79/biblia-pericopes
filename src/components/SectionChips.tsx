@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
  * mais de uma seção cruza a faixa de leitura ao mesmo tempo. */
-export const SECTIONS: { id: string; label: string }[] = [
+const SECTIONS: { id: string; label: string }[] = [
   { id: 'contexto', label: 'Contexto' },
   { id: 'texto', label: 'Texto' },
   { id: 'resenha', label: 'Resenha' },

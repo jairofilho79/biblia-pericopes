@@ -130,6 +130,9 @@ export default function Leitura() {
         setSelection(focus ? { start: focus, end: focus } : null)
         setBarOpen(false)
         setDraftRef(null)
+        setEditingId(null)
+        setConfirmarId(null)
+        setDraft('')
         if (fromQuery) setVerseFocus(ordem, fromQuery)
         const hl = await listDestaques(ordem)
         setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
@@ -286,6 +289,7 @@ export default function Leitura() {
     setTab('anotacoes')
     setEditingId(null)
     setConfirmarId(null)
+    setDraft('')
     setDraftRef(rangeRef(selecionados))
     setBarOpen(false)
     window.setTimeout(() => {

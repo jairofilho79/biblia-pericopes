@@ -807,6 +807,28 @@ button.ghost {
   font-weight: 600;
 }
 
+.done-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--focus-line);
+  border-radius: var(--radius);
+  background: var(--focus-bg);
+  color: var(--ink);
+  text-decoration: none;
+  font-family: var(--font-ui);
+}
+
+.done-card .badge {
+  margin: 0;
+}
+
+.done-next {
+  font-size: 0.95rem;
+}
+
 .crumb {
   font-family: var(--font-ui);
   font-size: 0.85rem;

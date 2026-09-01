@@ -10,7 +10,7 @@ import {
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
-import { getReadingPosition, setReadingPosition } from '../lib/reading-position'
+import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
@@ -164,6 +164,7 @@ export default function Leitura() {
 
   async function markDone() {
     await setProgresso(ordem, 'concluido')
+    clearReadingPosition(ordem)
     setStatus('concluido')
   }
 
@@ -358,8 +359,15 @@ export default function Leitura() {
             <button type="button" className="cta" onClick={markDone}>
               Marcar como concluída
             </button>
+          ) : next ? (
+            <Link className="done-card" to={`/leitura/${next.ordem}`}>
+              <span className="badge">Concluída ✓</span>
+              <span className="done-next">
+                Próxima: <strong>{next.titulo}</strong> →
+              </span>
+            </Link>
           ) : (
-            <p className="badge">Concluída</p>
+            <p className="badge">Concluída ✓</p>
           )}
         </div>
         <nav className="pager" aria-label="Navegação entre perícopes">

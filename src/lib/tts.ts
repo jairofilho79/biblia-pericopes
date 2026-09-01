@@ -29,26 +29,84 @@ export function montarFila(verses: TtsVerse[]): TtsVerse[] {
   return fila
 }
 
+const normLang = (lang: string) => (lang ?? '').toLowerCase().replace('_', '-')
+
+/** Vozes que os sistemas rotulam como as de síntese mais natural. */
+const QUALIDADE = /google|natural|enhanced|premium|aprimorad/i
+
+type Voz = { lang: string; name: string; voiceURI?: string }
+
 /**
- * pt-BR primeiro, qualquer português depois, `null` por último — `null` quer
- * dizer "deixa a voz padrão do sistema", que é melhor do que falar português
- * com voz inglesa.
+ * A voz preferida do leitor vence tudo (se ainda existir no aparelho); depois
+ * o ranking: sotaque certo vale mais que polimento — pt-BR de qualidade,
+ * pt-BR comum, qualquer português de qualidade, qualquer português. `null`
+ * por último quer dizer "deixa a voz padrão do sistema", que é melhor do que
+ * falar português com voz inglesa.
  */
-export function escolherVoz<T extends { lang: string }>(vozes: T[]): T | null {
-  const norm = (lang: string) => (lang ?? '').toLowerCase().replace('_', '-')
-  return (
-    vozes.find((v) => norm(v.lang) === 'pt-br') ??
-    vozes.find((v) => norm(v.lang).startsWith('pt')) ??
-    null
-  )
+export function escolherVoz<T extends Voz>(vozes: T[], preferida?: string | null): T | null {
+  if (preferida) {
+    const escolhida = vozes.find((v) => v.voiceURI === preferida)
+    if (escolhida) return escolhida
+  }
+  const nota = (v: T) => {
+    const lang = normLang(v.lang)
+    if (!lang.startsWith('pt')) return 0
+    return (lang === 'pt-br' ? 20 : 10) + (QUALIDADE.test(v.name) ? 5 : 0)
+  }
+  let melhor: T | null = null
+  let melhorNota = 0
+  for (const v of vozes) {
+    const n = nota(v)
+    if (n > melhorNota) {
+      melhor = v
+      melhorNota = n
+    }
+  }
+  return melhor
+}
+
+/** As vozes em português do aparelho, pt-BR antes das demais, para o seletor. */
+export function listarVozesPt<T extends Voz>(vozes: T[]): T[] {
+  const pt = vozes.filter((v) => normLang(v.lang).startsWith('pt'))
+  const br = pt.filter((v) => normLang(v.lang) === 'pt-br')
+  return [...br, ...pt.filter((v) => !br.includes(v))]
+}
+
+/**
+ * Fila de fala de uma seção em prosa (contexto, resenha, reflexão): um item
+ * por parágrafo/pergunta. O id carrega o índice ORIGINAL para o realce achar
+ * o nó certo mesmo quando um item vazio é descartado.
+ */
+export function filaDeTextos(prefixo: string, textos: string[]): TtsVerse[] {
+  return montarFila(textos.map((text, i) => ({ id: `${prefixo}-${i}`, text })))
+}
+
+/** Frase curta e neutra só para o leitor ouvir o timbre da voz. */
+const AMOSTRA = 'No princípio era o Verbo, e o Verbo estava com Deus.'
+
+/** Prévia do seletor: interrompe o que estiver falando e diz uma frase só. */
+export function falarAmostra(voz: string | null, rate: number): void {
+  if (!ttsSupported()) return
+  const s = window.speechSynthesis
+  s.cancel()
+  const u = new window.SpeechSynthesisUtterance(AMOSTRA)
+  u.lang = 'pt-BR'
+  u.rate = rate
+  const escolhida = escolherVoz(s.getVoices(), voz)
+  if (escolhida) u.voice = escolhida
+  s.speak(u)
 }
 
 /** Quanto esperar pelo `voiceschanged` antes de falar com a voz padrão. */
 const ESPERA_VOZES_MS = 250
 
+export type TtsPrefs = { voz: string | null; rate: number }
+
 export function createTtsController(opts: {
   onVerse?: (verseId: string | null) => void
   onState?: (s: TtsState) => void
+  /** Lidas a cada `play`: mudar a preferência vale já na próxima fala. */
+  prefs?: () => TtsPrefs
 }): TtsController {
   let fila: TtsVerse[] = []
   // Token monotônico da sessão de fala corrente. `synth.cancel()` dispara
@@ -88,7 +146,7 @@ export function createTtsController(opts: {
     }
   }
 
-  function enfileirar(voz: SpeechSynthesisVoice | null, minha: number) {
+  function enfileirar(voz: SpeechSynthesisVoice | null, minha: number, rate: number) {
     const s = synth()
     if (!s) return
     const Utterance = window.SpeechSynthesisUtterance
@@ -96,6 +154,7 @@ export function createTtsController(opts: {
     fila.forEach((v, i) => {
       const u = new Utterance(v.text)
       u.lang = 'pt-BR'
+      u.rate = rate
       if (voz) u.voice = voz
       u.onstart = () => {
         if (minha === sessao) marcar(v.id)
@@ -116,15 +175,19 @@ export function createTtsController(opts: {
     const s = synth()
     if (!s) return
     encerrar(false)
+    // Motor pausado (▶ numa seção com outra em pausa) seguraria o `speak`
+    // novo indefinidamente — o cancel não limpa o pause.
+    if (s.paused) s.resume()
     fila = montarFila(verses)
     if (!fila.length) return
     const minha = ++sessao
     ativo = true
     emitir('playing')
 
+    const { voz, rate } = opts.prefs?.() ?? { voz: null, rate: 1 }
     const vozes = s.getVoices()
     if (vozes.length) {
-      enfileirar(escolherVoz(vozes), minha)
+      enfileirar(escolherVoz(vozes, voz), minha, rate)
       return
     }
 
@@ -133,7 +196,7 @@ export function createTtsController(opts: {
     onVozes = () => {
       soltarVozes()
       if (minha !== sessao) return
-      enfileirar(escolherVoz(s.getVoices()), minha)
+      enfileirar(escolherVoz(s.getVoices(), voz), minha, rate)
     }
     s.addEventListener('voiceschanged', onVozes)
     // Rede de segurança: browser que nunca dispara o evento ainda fala, só que
@@ -141,7 +204,7 @@ export function createTtsController(opts: {
     timerVozes = window.setTimeout(() => {
       if (minha !== sessao || !onVozes) return
       soltarVozes()
-      enfileirar(escolherVoz(s.getVoices()), minha)
+      enfileirar(escolherVoz(s.getVoices(), voz), minha, rate)
     }, ESPERA_VOZES_MS)
   }
 

@@ -13,7 +13,16 @@ import {
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
-import { createTtsController, ttsSupported, type TtsController, type TtsState } from '../lib/tts'
+import {
+  createTtsController,
+  filaDeTextos,
+  ttsSupported,
+  type TtsController,
+  type TtsState,
+  type TtsVerse,
+} from '../lib/tts'
+import { getVelocidade, getVozPreferida, rateDaVelocidade } from '../lib/tts-prefs'
+import TtsMenu from '../components/TtsMenu'
 import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
@@ -40,6 +49,69 @@ import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/ty
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
 type Vizinha = { ordem: number; titulo: string }
+
+/** Qual fila é dona da fala corrente: cada seção tem a sua, mais o "tudo". */
+type FonteFala = 'tudo' | 'contexto' | 'texto' | 'resenha' | 'reflexao'
+
+/**
+ * Controles de fala de uma fila (▶/⏸/retomar + ⏹). O estado global do TTS só
+ * vale para a barra DONA da sessão; as outras seguem mostrando ▶ Ouvir — e
+ * apertar ▶ nelas troca de fila (o controller cancela a anterior sozinho).
+ */
+function BarraOuvir(props: {
+  dona: boolean
+  state: TtsState
+  assunto: string
+  rotulo?: string
+  onPlay: () => void
+  onPause: () => void
+  onResume: () => void
+  onStop: () => void
+  children?: ReactNode
+}) {
+  const estado = props.dona ? props.state : 'idle'
+  return (
+    <div className="tts-bar">
+      {/* Sempre o mesmo nó de botão primário nos três estados — só
+          rótulo/handler mudam — para o foco de teclado/leitor de tela
+          não cair pro <body> a cada transição (fragmento vs. elemento
+          remontava a árvore). O botão de parar é irmão condicional. */}
+      <button
+        type="button"
+        className={estado === 'idle' ? 'read-tool' : 'read-tool active'}
+        aria-label={
+          estado === 'idle'
+            ? `Ouvir ${props.assunto} em voz alta`
+            : estado === 'playing'
+              ? 'Pausar a leitura em voz alta'
+              : 'Retomar a leitura em voz alta'
+        }
+        onClick={() => {
+          if (estado === 'idle') props.onPlay()
+          else if (estado === 'playing') props.onPause()
+          else props.onResume()
+        }}
+      >
+        {estado === 'idle'
+          ? (props.rotulo ?? '▶ Ouvir')
+          : estado === 'playing'
+            ? '⏸ Pausar'
+            : '▶ Retomar'}
+      </button>
+      {estado !== 'idle' && (
+        <button
+          type="button"
+          className="read-tool"
+          aria-label="Parar a leitura em voz alta"
+          onClick={props.onStop}
+        >
+          ⏹
+        </button>
+      )}
+      {props.children}
+    </div>
+  )
+}
 
 function inlineBold(text: string): ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -109,6 +181,7 @@ export default function Leitura() {
   const vAplicado = useRef<string | null>(null)
   const ttsRef = useRef<TtsController | null>(null)
   const [ttsState, setTtsState] = useState<TtsState>('idle')
+  const [fonteFala, setFonteFala] = useState<FonteFala | null>(null)
   const [falando, setFalando] = useState<string | null>(null)
   // Uma vez só: a capacidade do browser não muda no meio da sessão.
   const [temTts] = useState(() => ttsSupported())
@@ -130,6 +203,20 @@ export default function Leitura() {
         .filter((b): b is VerseBlock => b.kind === 'verse')
         .map((b) => ({ id: b.id, text: b.text })),
     [blocks],
+  )
+  // Os MESMOS parágrafos que a página mostra (paragraphize com os mesmos
+  // limites) viram as filas de fala das seções em prosa.
+  const parasContexto = useMemo(
+    () => (p ? paragraphize(p.contexto_historico_literario, { maxParas: 2 }) : []),
+    [p],
+  )
+  const parasResenha = useMemo(() => (p ? paragraphize(p.resenha, { maxParas: 3 }) : []), [p])
+  const filaContexto = useMemo(() => filaDeTextos('contexto', parasContexto), [parasContexto])
+  const filaResenha = useMemo(() => filaDeTextos('resenha', parasResenha), [parasResenha])
+  const filaReflexao = useMemo(() => filaDeTextos('reflexao', p?.perguntas_reflexao ?? []), [p])
+  const filaTudo = useMemo(
+    () => [...filaContexto, ...versesParaFala, ...filaResenha, ...filaReflexao],
+    [filaContexto, versesParaFala, filaResenha, filaReflexao],
   )
 
   async function refreshNotes() {
@@ -252,7 +339,13 @@ export default function Leitura() {
 
   useEffect(() => {
     if (!temTts) return
-    const ctrl = createTtsController({ onVerse: setFalando, onState: setTtsState })
+    const ctrl = createTtsController({
+      onVerse: setFalando,
+      onState: setTtsState,
+      // Direto do storage a cada play: mudar voz/velocidade no menu vale na
+      // próxima fala sem recriar o controller.
+      prefs: () => ({ voz: getVozPreferida(), rate: rateDaVelocidade(getVelocidade()) }),
+    })
     ttsRef.current = ctrl
     return () => {
       // Sair da leitura cala a fala: nada de voz órfã lendo o que já saiu da tela.
@@ -266,6 +359,18 @@ export default function Leitura() {
     // página nova seria desorientador.
     return () => ttsRef.current?.stop()
   }, [ordem])
+
+  useEffect(() => {
+    // Fim (ou parada) da fala devolve todas as barras ao ▶ Ouvir.
+    if (ttsState === 'idle') setFonteFala(null)
+  }, [ttsState])
+
+  function tocar(fonte: FonteFala, fila: TtsVerse[]) {
+    // Falar o contexto colapsado realçaria parágrafos invisíveis.
+    if (fonte === 'contexto' || fonte === 'tudo') abrirContexto()
+    setFonteFala(fonte)
+    ttsRef.current?.play(fila)
+  }
 
   useEffect(() => {
     // Ouvir continua, mas a rolagem cede quando o leitor está interagindo:
@@ -444,6 +549,11 @@ export default function Leitura() {
   const corAtual: DestaqueCor | null =
     coresSelecionadas.size === 1 ? [...coresSelecionadas][0] : null
 
+  function falaClass(base: string, id: string): string {
+    if (falando !== id) return base
+    return base ? `${base} prose-speaking` : 'prose-speaking'
+  }
+
   function verseClass(base: string, id: string): string {
     const cor = destaques.get(id)
     const foco = selecionadosIds.has(id) ? ' verse-focus' : ''
@@ -508,6 +618,19 @@ export default function Leitura() {
         }}
       />
 
+      {temTts && (
+        <BarraOuvir
+          dona={fonteFala === 'tudo'}
+          state={ttsState}
+          assunto="a página inteira, do contexto às reflexões,"
+          rotulo="▶ Ouvir tudo"
+          onPlay={() => tocar('tudo', filaTudo)}
+          onPause={() => ttsRef.current?.pause()}
+          onResume={() => ttsRef.current?.resume()}
+          onStop={() => ttsRef.current?.stop()}
+        />
+      )}
+
       <section className="block block-plain" id="contexto">
         <h2 className="collapse-h">
           <button
@@ -524,8 +647,19 @@ export default function Leitura() {
           </button>
         </h2>
         <div id="contexto-corpo" hidden={!contextoAberto}>
-          {paragraphize(p.contexto_historico_literario, { maxParas: 2 }).map((para, i) => (
-            <p key={i} className="prose">
+          {temTts && (
+            <BarraOuvir
+              dona={fonteFala === 'contexto'}
+              state={ttsState}
+              assunto="o contexto"
+              onPlay={() => tocar('contexto', filaContexto)}
+              onPause={() => ttsRef.current?.pause()}
+              onResume={() => ttsRef.current?.resume()}
+              onStop={() => ttsRef.current?.stop()}
+            />
+          )}
+          {parasContexto.map((para, i) => (
+            <p key={i} className={falaClass('prose', `contexto-${i}`)} data-verse-id={`contexto-${i}`}>
               {para}
             </p>
           ))}
@@ -535,40 +669,17 @@ export default function Leitura() {
       <section className="block block-plain" id="texto">
         <h2>Texto (NAA)</h2>
         {temTts && (
-          <div className="tts-bar">
-            {/* Sempre o mesmo nó de botão primário nos três estados — só
-                rótulo/handler mudam — para o foco de teclado/leitor de tela
-                não cair pro <body> a cada transição (fragmento vs. elemento
-                remontava a árvore). O botão de parar é irmão condicional. */}
-            <button
-              type="button"
-              className={ttsState === 'idle' ? 'read-tool' : 'read-tool active'}
-              aria-label={
-                ttsState === 'idle'
-                  ? 'Ouvir a perícope em voz alta'
-                  : ttsState === 'playing'
-                    ? 'Pausar a leitura em voz alta'
-                    : 'Retomar a leitura em voz alta'
-              }
-              onClick={() => {
-                if (ttsState === 'idle') ttsRef.current?.play(versesParaFala)
-                else if (ttsState === 'playing') ttsRef.current?.pause()
-                else ttsRef.current?.resume()
-              }}
-            >
-              {ttsState === 'idle' ? '▶ Ouvir' : ttsState === 'playing' ? '⏸ Pausar' : '▶ Retomar'}
-            </button>
-            {ttsState !== 'idle' && (
-              <button
-                type="button"
-                className="read-tool"
-                aria-label="Parar a leitura em voz alta"
-                onClick={() => ttsRef.current?.stop()}
-              >
-                ⏹
-              </button>
-            )}
-          </div>
+          <BarraOuvir
+            dona={fonteFala === 'texto'}
+            state={ttsState}
+            assunto="a perícope"
+            onPlay={() => tocar('texto', versesParaFala)}
+            onPause={() => ttsRef.current?.pause()}
+            onResume={() => ttsRef.current?.resume()}
+            onStop={() => ttsRef.current?.stop()}
+          >
+            <TtsMenu />
+          </BarraOuvir>
         )}
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
@@ -619,8 +730,19 @@ export default function Leitura() {
 
       <section className="block block-plain" id="resenha">
         <h2>Resenha</h2>
-        {paragraphize(p.resenha, { maxParas: 3 }).map((para, i) => (
-          <p key={i} className="prose">
+        {temTts && (
+          <BarraOuvir
+            dona={fonteFala === 'resenha'}
+            state={ttsState}
+            assunto="a resenha"
+            onPlay={() => tocar('resenha', filaResenha)}
+            onPause={() => ttsRef.current?.pause()}
+            onResume={() => ttsRef.current?.resume()}
+            onStop={() => ttsRef.current?.stop()}
+          />
+        )}
+        {parasResenha.map((para, i) => (
+          <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
             {para}
           </p>
         ))}
@@ -628,9 +750,22 @@ export default function Leitura() {
 
       <section className="block block-plain" id="reflexao">
         <h2>Reflexão</h2>
+        {temTts && (
+          <BarraOuvir
+            dona={fonteFala === 'reflexao'}
+            state={ttsState}
+            assunto="as perguntas de reflexão"
+            onPlay={() => tocar('reflexao', filaReflexao)}
+            onPause={() => ttsRef.current?.pause()}
+            onResume={() => ttsRef.current?.resume()}
+            onStop={() => ttsRef.current?.stop()}
+          />
+        )}
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
-            <li key={i}>{q}</li>
+            <li key={i} className={falaClass('', `reflexao-${i}`)} data-verse-id={`reflexao-${i}`}>
+              {q}
+            </li>
           ))}
         </ol>
       </section>

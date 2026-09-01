@@ -3,16 +3,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createTtsController,
   escolherVoz,
+  falarAmostra,
+  filaDeTextos,
+  listarVozesPt,
   montarFila,
   ttsSupported,
   type TtsState,
 } from './tts'
 
-type VozFalsa = { lang: string; name: string }
+type VozFalsa = { lang: string; name: string; voiceURI?: string }
 
 class FakeUtterance {
   text: string
   lang = ''
+  rate = 1
   voice: VozFalsa | null = null
   onstart: (() => void) | null = null
   onend: (() => void) | null = null
@@ -55,12 +59,17 @@ class FakeSynth {
     }
   }
 
+  // Como no browser real: `paused` sobrevive ao `cancel()` — só `resume` limpa.
+  paused = false
+
   pause() {
     this.pausou += 1
+    this.paused = true
   }
 
   resume() {
     this.retomou += 1
+    this.paused = false
   }
 
   addEventListener(tipo: string, fn: () => void) {
@@ -120,6 +129,75 @@ describe('escolherVoz', () => {
   it('lista vazia devolve null', () => {
     expect(escolherVoz([])).toBeNull()
   })
+
+  it('entre as pt-BR, prefere a de melhor qualidade (Google/Natural/Enhanced/Premium)', () => {
+    const voz = escolherVoz([
+      { lang: 'pt-BR', name: 'Luciana' },
+      { lang: 'pt-BR', name: 'Google português do Brasil' },
+    ])
+    expect(voz?.name).toBe('Google português do Brasil')
+  })
+
+  it('"Enhanced" e "Premium" no nome também contam como qualidade alta', () => {
+    expect(
+      escolherVoz([
+        { lang: 'pt-BR', name: 'Luciana' },
+        { lang: 'pt-BR', name: 'Luciana (Enhanced)' },
+      ])?.name,
+    ).toBe('Luciana (Enhanced)')
+    expect(
+      escolherVoz([
+        { lang: 'pt-BR', name: 'Luciana' },
+        { lang: 'pt-BR', name: 'Luciana (Premium)' },
+      ])?.name,
+    ).toBe('Luciana (Premium)')
+  })
+
+  it('sotaque certo vale mais que polimento: pt-BR comum ganha de pt-PT premium', () => {
+    const voz = escolherVoz([
+      { lang: 'pt-PT', name: 'Joana (Premium)' },
+      { lang: 'pt-BR', name: 'Luciana' },
+    ])
+    expect(voz?.name).toBe('Luciana')
+  })
+
+  it('a voz preferida do leitor vence o ranking', () => {
+    const voz = escolherVoz(
+      [
+        { lang: 'pt-BR', name: 'Google português do Brasil', voiceURI: 'google-pt-br' },
+        { lang: 'pt-BR', name: 'Felipe', voiceURI: 'felipe' },
+      ],
+      'felipe',
+    )
+    expect(voz?.name).toBe('Felipe')
+  })
+
+  it('preferida que sumiu do aparelho cai de volta no ranking', () => {
+    const voz = escolherVoz(
+      [
+        { lang: 'pt-BR', name: 'Luciana', voiceURI: 'luciana' },
+        { lang: 'pt-BR', name: 'Google português do Brasil', voiceURI: 'google-pt-br' },
+      ],
+      'voz-desinstalada',
+    )
+    expect(voz?.name).toBe('Google português do Brasil')
+  })
+})
+
+describe('listarVozesPt', () => {
+  it('devolve só as vozes em português, pt-BR antes das demais', () => {
+    const vozes = listarVozesPt([
+      { lang: 'en-US', name: 'Alex' },
+      { lang: 'pt-PT', name: 'Joana' },
+      { lang: 'pt_BR', name: 'Felipe' },
+      { lang: 'pt-BR', name: 'Luciana' },
+    ])
+    expect(vozes.map((v) => v.name)).toEqual(['Felipe', 'Luciana', 'Joana'])
+  })
+
+  it('sem voz portuguesa devolve lista vazia', () => {
+    expect(listarVozesPt([{ lang: 'en-US', name: 'Alex' }])).toEqual([])
+  })
 })
 
 describe('montarFila', () => {
@@ -147,6 +225,64 @@ describe('montarFila', () => {
 
   it('lista vazia devolve fila vazia', () => {
     expect(montarFila([])).toEqual([])
+  })
+})
+
+describe('filaDeTextos', () => {
+  it('vira um item de fala por texto, com ids previsíveis da seção', () => {
+    expect(filaDeTextos('contexto', ['Primeiro parágrafo.', 'Segundo.'])).toEqual([
+      { id: 'contexto-0', text: 'Primeiro parágrafo.' },
+      { id: 'contexto-1', text: 'Segundo.' },
+    ])
+  })
+
+  it('apara o texto e descarta itens vazios sem furar a numeração original', () => {
+    expect(filaDeTextos('reflexao', ['  Uma pergunta?  ', '   ', 'Outra?'])).toEqual([
+      { id: 'reflexao-0', text: 'Uma pergunta?' },
+      { id: 'reflexao-2', text: 'Outra?' },
+    ])
+  })
+
+  it('lista vazia devolve fila vazia', () => {
+    expect(filaDeTextos('resenha', [])).toEqual([])
+  })
+})
+
+describe('falarAmostra', () => {
+  let synth: FakeSynth
+
+  beforeEach(() => {
+    synth = new FakeSynth()
+    vi.stubGlobal('speechSynthesis', synth)
+    vi.stubGlobal('SpeechSynthesisUtterance', FakeUtterance)
+  })
+
+  it('fala uma frase curta com a voz e a velocidade pedidas', () => {
+    synth.vozes = [
+      { lang: 'pt-BR', name: 'Luciana', voiceURI: 'luciana' },
+      { lang: 'pt-BR', name: 'Felipe', voiceURI: 'felipe' },
+    ]
+    falarAmostra('felipe', 1.15)
+    expect(synth.fila).toHaveLength(1)
+    expect(synth.fila[0].voice?.name).toBe('Felipe')
+    expect(synth.fila[0].rate).toBe(1.15)
+    expect(synth.fila[0].lang).toBe('pt-BR')
+    expect(synth.fila[0].text.length).toBeGreaterThan(0)
+  })
+
+  it('cancela o que estivesse falando antes da amostra', () => {
+    synth.vozes = [{ lang: 'pt-BR', name: 'Luciana', voiceURI: 'luciana' }]
+    falarAmostra(null, 1)
+    expect(synth.cancelou).toBe(1)
+  })
+
+  it('voz automática (null) usa a melhor voz do ranking', () => {
+    synth.vozes = [
+      { lang: 'pt-BR', name: 'Luciana', voiceURI: 'luciana' },
+      { lang: 'pt-BR', name: 'Google português do Brasil', voiceURI: 'google' },
+    ]
+    falarAmostra(null, 1)
+    expect(synth.fila[0].voice?.name).toBe('Google português do Brasil')
   })
 })
 
@@ -253,6 +389,63 @@ describe('createTtsController', () => {
     expect(synth.pausou).toBe(1)
     expect(estados.at(-1)).toBe('paused')
     ctrl.resume()
+    expect(synth.retomou).toBe(1)
+    expect(estados.at(-1)).toBe('playing')
+    ctrl.stop()
+  })
+
+  it('as preferências valem no play: rate em cada fala e a voz preferida', () => {
+    synth.vozes = [
+      { lang: 'pt-BR', name: 'Google português do Brasil', voiceURI: 'google-pt-br' },
+      { lang: 'pt-BR', name: 'Felipe', voiceURI: 'felipe' },
+    ]
+    const ctrl = createTtsController({
+      onVerse: (id) => versiculos.push(id),
+      onState: (s) => estados.push(s),
+      prefs: () => ({ voz: 'felipe', rate: 0.85 }),
+    })
+    ctrl.play([
+      { id: '1:1', text: 'No princípio…' },
+      { id: '1:2', text: 'A terra…' },
+    ])
+    expect(synth.fila.map((u) => u.rate)).toEqual([0.85, 0.85])
+    expect(synth.fila[0].voice?.name).toBe('Felipe')
+    ctrl.stop()
+  })
+
+  it('sem prefs, a fala sai na velocidade normal com a voz do ranking', () => {
+    synth.vozes = [
+      { lang: 'pt-BR', name: 'Luciana' },
+      { lang: 'pt-BR', name: 'Google português do Brasil' },
+    ]
+    const ctrl = controlador()
+    ctrl.play([{ id: '1:1', text: 'No princípio…' }])
+    expect(synth.fila[0].rate).toBe(1)
+    expect(synth.fila[0].voice?.name).toBe('Google português do Brasil')
+    ctrl.stop()
+  })
+
+  it('mudar a preferência entre um play e outro vale já no play seguinte', () => {
+    synth.vozes = [{ lang: 'pt-BR', name: 'Luciana' }]
+    let rate = 1
+    const ctrl = createTtsController({ prefs: () => ({ voz: null, rate }) })
+    ctrl.play([{ id: '1:1', text: 'No princípio…' }])
+    expect(synth.fila[0].rate).toBe(1)
+    ctrl.stop()
+    rate = 1.15
+    ctrl.play([{ id: '1:1', text: 'No princípio…' }])
+    expect(synth.fila.at(-1)?.rate).toBe(1.15)
+    ctrl.stop()
+  })
+
+  it('play com o motor pausado destrava o pause antes de falar a fila nova', () => {
+    // Agora há uma fila por seção: dá para apertar ▶ na Resenha com o Texto
+    // pausado. O synth pausado segura o `speak` novo até alguém dar resume.
+    synth.vozes = [{ lang: 'pt-BR', name: 'Luciana' }]
+    const ctrl = controlador()
+    ctrl.play([{ id: '1:1', text: 'Texto' }])
+    ctrl.pause()
+    ctrl.play([{ id: 'resenha-0', text: 'Resenha' }])
     expect(synth.retomou).toBe(1)
     expect(estados.at(-1)).toBe('playing')
     ctrl.stop()

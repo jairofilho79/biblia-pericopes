@@ -923,6 +923,43 @@ button.ghost {
   box-shadow: inset 0 -0.12em 0 var(--accent);
 }
 
+/* mesmo sublinhado no parágrafo/pergunta em fala (contexto, resenha, reflexão) */
+.prose-speaking {
+  box-shadow: inset 0 -0.12em 0 var(--accent);
+}
+
+/* o gatilho ⚙ fica à ESQUERDA da coluna: o popover abre para a direita,
+   senão escaparia do conteúdo (o readmenu-pop original alinha à direita) */
+.ttsmenu-pop {
+  left: 0;
+  right: auto;
+}
+
+/* ajustes de voz: a linha do seletor divide o espaço com o botão de prévia */
+.ttsmenu-voz-row {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.ttsmenu-label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ttsmenu-voz {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.35rem 0.4rem;
+  min-height: 2.25rem;
+}
+
 .verse-num {
   font-family: var(--font-ui);
   font-size: 0.72em;

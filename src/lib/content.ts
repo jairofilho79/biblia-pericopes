@@ -69,6 +69,15 @@ export function proximaNoTestamento(all: Pericope[], ordem: number): number | nu
   return seq[i + 1]
 }
 
+export function anteriorNoTestamento(all: Pericope[], ordem: number): number | null {
+  const found = all.find((p) => p.ordem === ordem)
+  if (!found) return null
+  const seq = ordensDoTestamento(all, testamentOf(found))
+  const i = seq.indexOf(ordem)
+  if (i <= 0) return null
+  return seq[i - 1]
+}
+
 function matchesBook(p: Pericope, livroOrAbbrev: string): boolean {
   return p.livro === livroOrAbbrev || p.abbrev === livroOrAbbrev
 }

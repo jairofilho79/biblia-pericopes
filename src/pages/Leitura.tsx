@@ -1,7 +1,13 @@
 import { Fragment, useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
-import { getPericope, loadPericopes, proximaNoTestamento, refLabel } from '../lib/content'
+import {
+  anteriorNoTestamento,
+  getPericope,
+  loadPericopes,
+  proximaNoTestamento,
+  refLabel,
+} from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa } from '../lib/parse-texto'
 import { getReadingPosition, setReadingPosition } from '../lib/reading-position'
@@ -19,6 +25,7 @@ import { promptConversa } from '../lib/contexto-ia'
 import type { Anotacao, Pericope, ProgressoStatus } from '../lib/types'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
+type Vizinha = { ordem: number; titulo: string }
 
 function inlineBold(text: string): ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -61,7 +68,8 @@ export default function Leitura() {
   const ordem = Number(ordemParam)
   const verseParam = searchParams.get('v')
   const [p, setP] = useState<Pericope | null>(null)
-  const [nextOrdem, setNextOrdem] = useState<number | null>(null)
+  const [prev, setPrev] = useState<Vizinha | null>(null)
+  const [next, setNext] = useState<Vizinha | null>(null)
   const [status, setStatus] = useState<ProgressoStatus>('nao_iniciado')
   const [notes, setNotes] = useState<Anotacao[]>([])
   const [draft, setDraft] = useState('')
@@ -85,7 +93,13 @@ export default function Leitura() {
           return
         }
         setP(peri)
-        setNextOrdem(proximaNoTestamento(all, ordem))
+        const vizinha = (o: number | null): Vizinha | null => {
+          if (o == null) return null
+          const v = all.find((x) => x.ordem === o)
+          return v ? { ordem: v.ordem, titulo: v.titulo_pericope_pt } : null
+        }
+        setPrev(vizinha(anteriorNoTestamento(all, ordem)))
+        setNext(vizinha(proximaNoTestamento(all, ordem)))
         setCopied(false)
         const fromQuery =
           verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
@@ -180,7 +194,19 @@ export default function Leitura() {
       <h1>{p.titulo_pericope_pt}</h1>
       <div className="ref-row">
         <p className="ref">{refLabel(p)}</p>
-        <ReadingMenu prefs={prefs} onPrefs={setPrefs} />
+        <div className="ref-nav">
+          {prev && (
+            <Link className="read-tool ref-arrow" aria-label={`Anterior: ${prev.titulo}`} to={`/leitura/${prev.ordem}`}>
+              ←
+            </Link>
+          )}
+          {next && (
+            <Link className="read-tool ref-arrow" aria-label={`Próxima: ${next.titulo}`} to={`/leitura/${next.ordem}`}>
+              →
+            </Link>
+          )}
+          <ReadingMenu prefs={prefs} onPrefs={setPrefs} />
+        </div>
       </div>
 
       <section className="block block-plain">
@@ -335,12 +361,23 @@ export default function Leitura() {
           ) : (
             <p className="badge">Concluída</p>
           )}
-          {nextOrdem != null && (
-            <Link className="ghost" to={`/leitura/${nextOrdem}`}>
-              Próxima →
-            </Link>
-          )}
         </div>
+        <nav className="pager" aria-label="Navegação entre perícopes">
+          {prev ? (
+            <Link className="ghost pager-link" to={`/leitura/${prev.ordem}`}>
+              ← {prev.titulo}
+            </Link>
+          ) : (
+            <span aria-hidden />
+          )}
+          {next ? (
+            <Link className="ghost pager-link pager-next" to={`/leitura/${next.ordem}`}>
+              {next.titulo} →
+            </Link>
+          ) : (
+            <span aria-hidden />
+          )}
+        </nav>
       </section>
     </article>
   )

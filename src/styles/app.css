@@ -640,6 +640,73 @@ button.ghost {
   text-decoration: none;
 }
 
+/* barra de âncoras: sticky abaixo do header, e colada no topo quando ele some.
+   z-index 4 fica abaixo do .top (5) e da .verse-actions (8) de propósito. */
+.section-chips {
+  position: sticky;
+  top: var(--top-h, 0px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 -1.05rem 0.9rem;
+  padding: 0.4rem 1.05rem;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-ui);
+  transition: top 0.25s ease;
+}
+
+.shell:has(.top-hidden) .section-chips {
+  top: 0;
+}
+
+.section-chips-row {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.section-chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+.section-chip {
+  flex: 0 0 auto;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.section-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--cta-ink);
+}
+
+.section-ref {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-chips {
+    transition: none;
+  }
+}
+
 .texto-biblico,
 .prose,
 .perguntas {

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
+import SectionChips from '../components/SectionChips'
 import VerseActions from '../components/VerseActions'
 import {
   anteriorNoTestamento,
@@ -410,7 +411,9 @@ export default function Leitura() {
         </div>
       </div>
 
-      <section className="block block-plain">
+      <SectionChips ordem={p.ordem} abbrev={p.abbrev} />
+
+      <section className="block block-plain" id="contexto">
         <h2>Contexto</h2>
         {paragraphize(p.contexto_historico_literario, { maxParas: 2 }).map((para, i) => (
           <p key={i} className="prose">
@@ -419,7 +422,7 @@ export default function Leitura() {
         ))}
       </section>
 
-      <section className="block block-plain">
+      <section className="block block-plain" id="texto">
         <h2>Texto (NAA)</h2>
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
@@ -432,6 +435,7 @@ export default function Leitura() {
                         <button
                           type="button"
                           className={verseClass('verse-inline', b.id)}
+                          data-verse-id={b.id}
                           aria-pressed={selecionadosIds.has(b.id)}
                           aria-label={verseAria(b)}
                           onClick={() => selectVerse(b.id)}
@@ -454,6 +458,7 @@ export default function Leitura() {
                     key={b.id}
                     type="button"
                     className={verseClass('verse', b.id)}
+                    data-verse-id={b.id}
                     aria-pressed={selecionadosIds.has(b.id)}
                     aria-label={verseAria(b)}
                     onClick={() => selectVerse(b.id)}
@@ -466,7 +471,7 @@ export default function Leitura() {
         </div>
       </section>
 
-      <section className="block block-plain">
+      <section className="block block-plain" id="resenha">
         <h2>Resenha</h2>
         {paragraphize(p.resenha, { maxParas: 3 }).map((para, i) => (
           <p key={i} className="prose">
@@ -475,7 +480,7 @@ export default function Leitura() {
         ))}
       </section>
 
-      <section className="block block-plain">
+      <section className="block block-plain" id="reflexao">
         <h2>Reflexão</h2>
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
@@ -484,7 +489,7 @@ export default function Leitura() {
         </ol>
       </section>
 
-      <section className="block notes">
+      <section className="block notes" id="notas">
         <div className="notes-tabs" role="tablist" aria-label="Anotações, tópicos e contexto">
           {(
             [

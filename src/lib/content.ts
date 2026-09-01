@@ -116,3 +116,32 @@ export async function listPericopesByBookChapter(
     return p.capitulo_inicio <= cap && cap <= p.capitulo_fim
   })
 }
+
+export type LivroProgresso = {
+  livro: string
+  total: number
+  concluidas: number
+  /** 0–100, arredondado; 0 quando o livro não tem nenhuma perícope. */
+  pct: number
+}
+
+/**
+ * Contagem por livro na ordem de primeira aparição da lista recebida — a mesma
+ * ordem em que o Índice agrupa, então o mapa serve direto para os cabeçalhos.
+ */
+export function progressoPorLivro(
+  all: Pericope[],
+  done: Set<number>,
+): Map<string, LivroProgresso> {
+  const out = new Map<string, LivroProgresso>()
+  for (const p of all) {
+    const atual = out.get(p.livro) ?? { livro: p.livro, total: 0, concluidas: 0, pct: 0 }
+    atual.total += 1
+    if (done.has(p.ordem)) atual.concluidas += 1
+    out.set(p.livro, atual)
+  }
+  for (const v of out.values()) {
+    v.pct = v.total ? Math.round((v.concluidas / v.total) * 100) : 0
+  }
+  return out
+}

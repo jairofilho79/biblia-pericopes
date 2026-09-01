@@ -1373,6 +1373,47 @@ button.ghost {
   contain-intrinsic-size: auto 320px;
 }
 
+.book-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.book-group-head h2 {
+  margin: 0;
+}
+
+.book-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.book-progress {
+  width: 6rem;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.book-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.book-progress-label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 @media (min-width: 640px) {
   .filters {
     grid-template-columns: 1.4fr 1fr;

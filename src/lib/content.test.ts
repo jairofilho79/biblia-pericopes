@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { anteriorNoTestamento, proximaNoTestamento } from './content'
+import { anteriorNoTestamento, progressoPorLivro, proximaNoTestamento } from './content'
 import type { Pericope } from './types'
 
 function peri(ordem: number, abbrev: string): Pericope {
@@ -27,5 +27,30 @@ describe('anteriorNoTestamento', () => {
   it('espelha proximaNoTestamento na outra ponta', () => {
     expect(proximaNoTestamento(ALL, 2)).toBeNull()
     expect(proximaNoTestamento(ALL, 1)).toBe(2)
+  })
+})
+
+function pl(ordem: number, livro: string): Pericope {
+  return { ordem, livro, abbrev: livro.slice(0, 2), titulo_pericope_pt: `P${ordem}` } as Pericope
+}
+
+describe('progressoPorLivro', () => {
+  const LISTA = [pl(1, 'Gênesis'), pl(2, 'Gênesis'), pl(3, 'Gênesis'), pl(4, 'Êxodo')]
+
+  it('conta total e concluídas por livro, na ordem de aparição', () => {
+    const m = progressoPorLivro(LISTA, new Set([1, 3, 4]))
+    expect([...m.keys()]).toEqual(['Gênesis', 'Êxodo'])
+    expect(m.get('Gênesis')).toEqual({ livro: 'Gênesis', total: 3, concluidas: 2, pct: 67 })
+    expect(m.get('Êxodo')).toEqual({ livro: 'Êxodo', total: 1, concluidas: 1, pct: 100 })
+  })
+
+  it('livro sem nenhuma concluída fica em 0%', () => {
+    const m = progressoPorLivro(LISTA, new Set())
+    expect(m.get('Gênesis')?.pct).toBe(0)
+    expect(m.get('Êxodo')?.concluidas).toBe(0)
+  })
+
+  it('lista vazia devolve mapa vazio', () => {
+    expect(progressoPorLivro([], new Set([1]))).toEqual(new Map())
   })
 })

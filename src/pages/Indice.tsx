@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { listLivros, listPericopes, refLabel } from '../lib/content'
+import {
+  listLivros,
+  listPericopes,
+  progressoPorLivro,
+  refLabel,
+  type LivroProgresso,
+} from '../lib/content'
 import { doneSet } from '../lib/user-db'
 import type { Pericope } from '../lib/types'
 
@@ -17,6 +23,20 @@ function PeriLink({ p, done }: { p: Pericope; done: boolean }) {
         </span>
       </span>
     </Link>
+  )
+}
+
+function BookProgress({ prog }: { prog: LivroProgresso }) {
+  return (
+    <span className="book-progress-wrap">
+      {/* a barra é decoração: quem lê com leitor de tela recebe o "N de M" */}
+      <span className="book-progress" aria-hidden>
+        <span className="book-progress-fill" style={{ width: `${prog.pct}%` }} />
+      </span>
+      <span className="book-progress-label">
+        {prog.concluidas} de {prog.total}
+      </span>
+    </span>
   )
 }
 
@@ -47,6 +67,9 @@ export default function Indice() {
     return map
   }, [items, livro])
 
+  const progresso = useMemo(() => progressoPorLivro(items, done), [items, done])
+  const progAberto = livro ? (progresso.get(livro) ?? null) : null
+
   return (
     <section className="indice">
       <h1>Índice</h1>
@@ -68,38 +91,49 @@ export default function Indice() {
       </div>
 
       {livro || q ? (
-        <ul className="peri-list">
-          {items.map((p) => (
-            <li key={p.ordem}>
-              <PeriLink p={p} done={done.has(p.ordem)} />
-            </li>
-          ))}
-        </ul>
+        <>
+          {progAberto && (
+            <div className="book-group-head">
+              <h2>{livro}</h2>
+              <BookProgress prog={progAberto} />
+            </div>
+          )}
+          <ul className="peri-list">
+            {items.map((p) => (
+              <li key={p.ordem}>
+                <PeriLink p={p} done={done.has(p.ordem)} />
+              </li>
+            ))}
+          </ul>
+        </>
       ) : (
-        [...(grouped?.entries() ?? [])].map(([book, list]) => (
-          <div key={book} className="book-group">
-            <h2>
-              <button type="button" className="linkish" onClick={() => setLivro(book)}>
-                {book}
-              </button>{' '}
-              <span className="muted">
-                ({list.filter((p) => done.has(p.ordem)).length}/{list.length})
-              </span>
-            </h2>
-            <ul className="peri-list compact">
-              {list.slice(0, 5).map((p) => (
-                <li key={p.ordem}>
-                  <PeriLink p={p} done={done.has(p.ordem)} />
-                </li>
-              ))}
-            </ul>
-            {list.length > 5 && (
-              <button type="button" className="ghost" onClick={() => setLivro(book)}>
-                Ver todas ({list.length})
-              </button>
-            )}
-          </div>
-        ))
+        [...(grouped?.entries() ?? [])].map(([book, list]) => {
+          const prog = progresso.get(book)
+          return (
+            <div key={book} className="book-group">
+              <div className="book-group-head">
+                <h2>
+                  <button type="button" className="linkish" onClick={() => setLivro(book)}>
+                    {book}
+                  </button>
+                </h2>
+                {prog && <BookProgress prog={prog} />}
+              </div>
+              <ul className="peri-list compact">
+                {list.slice(0, 5).map((p) => (
+                  <li key={p.ordem}>
+                    <PeriLink p={p} done={done.has(p.ordem)} />
+                  </li>
+                ))}
+              </ul>
+              {list.length > 5 && (
+                <button type="button" className="ghost" onClick={() => setLivro(book)}>
+                  Ver todas ({list.length})
+                </button>
+              )}
+            </div>
+          )
+        })
       )}
     </section>
   )

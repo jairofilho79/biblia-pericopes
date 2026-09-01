@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
 import VerseActions from '../components/VerseActions'
 import {
@@ -12,6 +12,7 @@ import {
 import { paragraphize } from '../lib/paragraphize'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
+import { useSwipeNav } from '../lib/use-swipe-nav'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   deleteAnotacao,
@@ -71,6 +72,8 @@ function TopicsView({ text }: { text: string }) {
 export default function Leitura() {
   const { ordem: ordemParam } = useParams()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const rootRef = useRef<HTMLElement>(null)
   const ordem = Number(ordemParam)
   const verseParam = searchParams.get('v')
   const [p, setP] = useState<Pericope | null>(null)
@@ -188,6 +191,16 @@ export default function Leitura() {
       window.removeEventListener('scroll', onScroll)
     }
   }, [ordem])
+
+  const irAnterior = useCallback(() => {
+    if (prev) navigate(`/leitura/${prev.ordem}`)
+  }, [navigate, prev])
+
+  const irProxima = useCallback(() => {
+    if (next) navigate(`/leitura/${next.ordem}`)
+  }, [navigate, next])
+
+  useSwipeNav(rootRef, { onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
@@ -362,7 +375,7 @@ export default function Leitura() {
   }
 
   return (
-    <article className="leitura">
+    <article className="leitura" ref={rootRef}>
       <p className="crumb">
         <Link to="/">Hoje</Link> · {testamentLabel(testamentOf(p))} ·{' '}
         <Link to="/indice">{p.livro}</Link>

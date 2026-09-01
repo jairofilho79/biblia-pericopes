@@ -14,6 +14,7 @@ import {
 import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
 import { createTtsController, ttsSupported, type TtsController, type TtsState } from '../lib/tts'
+import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
 import { useSwipeNav } from '../lib/use-swipe-nav'
@@ -233,6 +234,9 @@ export default function Leitura() {
 
   useSwipeNav(rootRef, { onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
   useKeyboardNav({ onPrev: irAnterior, onNext: irProxima, enabled: p !== null })
+
+  // Ler é o caso de uso: com a perícope aberta a tela fica acesa, sem toggle.
+  useWakeLock(p !== null)
 
   useEffect(() => {
     if (!temTts) return

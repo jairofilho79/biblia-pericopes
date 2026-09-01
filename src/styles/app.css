@@ -123,6 +123,17 @@ a {
   background: var(--page-bg);
   background-attachment: fixed;
   z-index: 5;
+  transition: transform 0.25s ease;
+}
+
+.top-hidden {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top {
+    transition: none;
+  }
 }
 
 .shell:has(.leitura) .top {

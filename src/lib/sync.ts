@@ -172,15 +172,16 @@ export async function syncNow(): Promise<void> {
 }
 
 /**
- * Logout que não deixa rastro sincronizável do usuário anterior: esvazia o
- * outbox (senão o próximo login herdaria escritas alheias) e zera o cursor
- * (senão o próximo login pularia o histórico dele). A marca `sync-user`
- * permanece de propósito: é ela que dispara o wipe se outra conta entrar aqui.
+ * Logout que não deixa rastro sincronizável do usuário anterior. O sign-out vem
+ * PRIMEIRO de propósito: se ele falhar (rede fora), o outbox e o cursor ficam
+ * intactos e o usuário continua logado — limpar antes destruía escritas ainda
+ * não sincronizadas de uma sessão que seguia viva. A marca `sync-user`
+ * permanece: é ela que dispara o wipe se outra conta entrar aqui.
  */
 export async function signOutLocal(): Promise<void> {
+  await authClient.signOut()
   await clearOutboxAll()
   await deleteMeta(CURSOR_KEY)
-  await authClient.signOut()
 }
 
 export function initSyncTriggers(): void {

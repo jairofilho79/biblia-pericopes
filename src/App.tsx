@@ -16,6 +16,22 @@ function Shell() {
   const { data: session } = authClient.useSession()
   const { pathname } = useLocation()
   const headerHidden = useHideOnScroll(pathname.startsWith('/leitura/'))
+  const [saindo, setSaindo] = useState(false)
+  const [erroSaida, setErroSaida] = useState('')
+
+  async function sair() {
+    if (saindo) return
+    setSaindo(true)
+    setErroSaida('')
+    try {
+      await signOutLocal()
+    } catch {
+      // nunca deixar virar rejeição não tratada: o usuário precisa saber
+      setErroSaida('Não foi possível sair. Tente de novo.')
+    } finally {
+      setSaindo(false)
+    }
+  }
 
   useEffect(() => {
     applyReadingPrefs(getReadingPrefs())
@@ -73,14 +89,20 @@ function Shell() {
           <NavLink to="/indice">Índice</NavLink>
           <NavLink to="/pesquisar">Pesquisar</NavLink>
           {session ? (
-            <button
-              type="button"
-              className="linkish nav-conta"
-              onClick={() => signOutLocal()}
-              title={session.user.email}
-            >
-              Sair
-            </button>
+            <>
+              <button
+                type="button"
+                className="linkish nav-conta"
+                onClick={() => void sair()}
+                disabled={saindo}
+                title={erroSaida || session.user.email}
+              >
+                {saindo ? 'Saindo…' : 'Sair'}
+              </button>
+              <span className="sr-only" role="status" aria-live="polite">
+                {erroSaida}
+              </span>
+            </>
           ) : (
             <NavLink to="/entrar">Entrar</NavLink>
           )}

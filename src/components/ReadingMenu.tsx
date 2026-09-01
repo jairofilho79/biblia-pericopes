@@ -36,6 +36,7 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
   const [themePref, setPref] = useState<ThemePref>(() => getThemePref())
   const rootRef = useRef<HTMLDivElement>(null)
   const btnRef = useRef<HTMLButtonElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onTheme = () => setPref(getThemePref())
@@ -45,13 +46,34 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
 
   useEffect(() => {
     if (!open) return
+    const pop = popRef.current
+    pop?.querySelector<HTMLElement>('button:not([disabled])')?.focus()
+
+    function fechar() {
+      setOpen(false)
+      // foco volta ao gatilho também quando o fechamento vem de toque fora
+      btnRef.current?.focus()
+    }
     function onDown(e: PointerEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) fechar()
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        setOpen(false)
-        btnRef.current?.focus()
+        fechar()
+        return
+      }
+      if (e.key !== 'Tab' || !pop) return
+      const focaveis = [...pop.querySelectorAll<HTMLElement>('button:not([disabled])')]
+      if (focaveis.length === 0) return
+      const primeiro = focaveis[0]
+      const ultimo = focaveis[focaveis.length - 1]
+      const ativo = document.activeElement
+      if (e.shiftKey && (ativo === primeiro || !pop.contains(ativo))) {
+        e.preventDefault()
+        ultimo.focus()
+      } else if (!e.shiftKey && ativo === ultimo) {
+        e.preventDefault()
+        primeiro.focus()
       }
     }
     document.addEventListener('pointerdown', onDown)
@@ -75,7 +97,13 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
         Aa
       </button>
       {open && (
-        <div className="readmenu-pop" role="dialog" aria-label="Preferências de leitura">
+        <div
+          className="readmenu-pop"
+          ref={popRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Preferências de leitura"
+        >
           <div className="readmenu-row" role="group" aria-label="Tamanho do texto">
             <button
               type="button"

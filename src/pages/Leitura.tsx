@@ -565,14 +565,22 @@ export default function Leitura() {
         </div>
         <nav className="pager" aria-label="Navegação entre perícopes">
           {prev ? (
-            <Link className="ghost pager-link" to={`/leitura/${prev.ordem}`}>
+            <Link
+              className="ghost pager-link"
+              aria-label={`Anterior: ${prev.titulo}`}
+              to={`/leitura/${prev.ordem}`}
+            >
               ← {prev.titulo}
             </Link>
           ) : (
             <span aria-hidden />
           )}
           {next ? (
-            <Link className="ghost pager-link pager-next" to={`/leitura/${next.ordem}`}>
+            <Link
+              className="ghost pager-link pager-next"
+              aria-label={`Próxima: ${next.titulo}`}
+              to={`/leitura/${next.ordem}`}
+            >
               {next.titulo} →
             </Link>
           ) : (

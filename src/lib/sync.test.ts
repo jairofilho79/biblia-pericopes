@@ -349,6 +349,19 @@ describe('troca de conta e logout', () => {
     expect((await getProgresso(60001))?.status).toBe('concluido')
     expect(authClient.signOut).toHaveBeenCalled()
   })
+
+  it('signOutLocal: se o signOut falhar, o outbox e o cursor ficam intactos', async () => {
+    await resetLocal()
+    await setProgresso(60002, 'concluido')
+    await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
+    vi.mocked(authClient.signOut).mockRejectedValue(new Error('offline') as never)
+
+    await expect(signOutLocal()).rejects.toThrow('offline')
+
+    // nada de dado local jogado fora por um logout que nem aconteceu
+    expect((await listOutbox()).some((i) => i.kind === 'progresso' && i.ordem === 60002)).toBe(true)
+    expect(await getMeta('sync-cursor')).toBe('2026-01-01T00:00:00.000Z')
+  })
 })
 
 describe('syncNow — destaques', () => {

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import ReadingMenu from '../components/ReadingMenu'
 import {
@@ -78,6 +78,7 @@ export default function Leitura() {
   const [focusId, setFocusId] = useState<string | null>(null)
   const [tab, setTab] = useState<NotesTab>('anotacoes')
   const [copied, setCopied] = useState(false)
+  const doneRef = useRef(false)
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
@@ -85,6 +86,7 @@ export default function Leitura() {
 
   useEffect(() => {
     ;(async () => {
+      doneRef.current = false
       try {
         const all = await loadPericopes()
         const peri = await getPericope(ordem)
@@ -109,6 +111,7 @@ export default function Leitura() {
         const prog = await getProgresso(ordem)
         const next = prog?.status ?? 'em_andamento'
         setStatus(next === 'nao_iniciado' ? 'em_andamento' : next)
+        if (prog?.status === 'concluido') doneRef.current = true
         if (!prog || prog.status === 'nao_iniciado') {
           await setProgresso(ordem, 'em_andamento')
         }
@@ -121,7 +124,7 @@ export default function Leitura() {
 
   // Prioridade de rolagem ao abrir: ?v= na URL > posição salva > topo.
   useEffect(() => {
-    if (!p) return
+    if (!p || p.ordem !== ordem) return
     if (verseParam && /^\d+:\d+$/.test(verseParam)) return
     window.scrollTo(0, getReadingPosition(ordem) ?? 0)
   }, [ordem, p, verseParam])
@@ -136,7 +139,10 @@ export default function Leitura() {
   useEffect(() => {
     let last = 0
     let timer: number | undefined
-    const save = () => setReadingPosition(ordem, window.scrollY)
+    const save = () => {
+      if (doneRef.current) return
+      setReadingPosition(ordem, window.scrollY)
+    }
     const onScroll = () => {
       const now = Date.now()
       if (now - last > 500) {
@@ -165,6 +171,7 @@ export default function Leitura() {
   async function markDone() {
     await setProgresso(ordem, 'concluido')
     clearReadingPosition(ordem)
+    doneRef.current = true
     setStatus('concluido')
   }
 

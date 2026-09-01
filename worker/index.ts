@@ -34,10 +34,18 @@ app.get('/api/sync', async (c) => {
   )
     .bind(userId, since)
     .all()
+  const marcas = await c.env.DB.prepare(
+    `SELECT id, pericope_ordem AS pericopeOrdem, verse_id AS verseId, cor,
+            criado_em AS criadoEm, atualizado_em AS atualizadoEm, apagado_em AS apagadoEm
+     FROM destaques WHERE user_id = ?1 AND server_em > ?2`,
+  )
+    .bind(userId, since)
+    .all()
   // server_em não volta para o cliente: o cursor dele é o `agora` opaco.
   return c.json({
     progresso: prog.results,
     anotacoes: notas.results,
+    destaques: marcas.results,
     agora,
   })
 })
@@ -72,6 +80,26 @@ app.post('/api/sync', async (c) => {
            apagado_em = excluded.apagado_em, server_em = excluded.server_em
          WHERE excluded.atualizado_em > anotacoes.atualizado_em`,
       ).bind(a.id, userId, a.pericopeOrdem, a.texto, a.criadoEm, a.atualizadoEm, a.apagadoEm, serverEm),
+    ),
+    ...parsed.destaques.map((d) =>
+      c.env.DB.prepare(
+        `INSERT INTO destaques (user_id, id, pericope_ordem, verse_id, cor, criado_em, atualizado_em, apagado_em, server_em)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+         ON CONFLICT(user_id, id) DO UPDATE SET
+           cor = excluded.cor, atualizado_em = excluded.atualizado_em,
+           apagado_em = excluded.apagado_em, server_em = excluded.server_em
+         WHERE excluded.atualizado_em > destaques.atualizado_em`,
+      ).bind(
+        userId,
+        d.id,
+        d.pericopeOrdem,
+        d.verseId,
+        d.cor,
+        d.criadoEm,
+        d.atualizadoEm,
+        d.apagadoEm,
+        serverEm,
+      ),
     ),
   ]
   if (stmts.length) await c.env.DB.batch(stmts)

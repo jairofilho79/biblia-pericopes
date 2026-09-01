@@ -51,8 +51,27 @@
   color-scheme: dark;
 }
 
+[data-theme='sepia'] {
+  --bg: #f0e7d5;
+  --bg-deep: #e4d8bf;
+  --ink: #3a2f21;
+  --read-ink: #2b2318;
+  --read-shadow: 0 1px 0 rgb(43 35 24 / 0.08);
+  --muted: #6b5b45;
+  --accent: #8a5a2b;
+  --accent-soft: #ecdcc2;
+  --line: #d8c9ac;
+  --paper: #f7f0e0;
+  --cta-ink: #fbf6ec;
+  --glow-a: #efe2c8;
+  --glow-b: #e8dcc3;
+  --focus-bg: color-mix(in srgb, var(--accent) 14%, var(--paper));
+  --focus-line: color-mix(in srgb, var(--accent) 45%, var(--line));
+  color-scheme: light;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
+  :root:not([data-theme='light']):not([data-theme='sepia']) {
     --bg: #12151a;
     --bg-deep: #0c0e12;
     --ink: #e8e4db;

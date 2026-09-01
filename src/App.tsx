@@ -6,7 +6,7 @@ import Indice from './pages/Indice'
 import Pesquisar from './pages/Pesquisar'
 import Entrar from './pages/Entrar'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
-import { applyTheme, resolveTheme, toggleTheme, type Theme } from './lib/theme'
+import { getStoredTheme, resolveTheme, toggleTheme, type Theme } from './lib/theme'
 import { authClient } from './lib/auth-client'
 import { initSyncTriggers, signOutLocal } from './lib/sync'
 import { useHideOnScroll } from './lib/use-hide-on-scroll'
@@ -16,10 +16,6 @@ function Shell() {
   const { data: session } = authClient.useSession()
   const { pathname } = useLocation()
   const headerHidden = useHideOnScroll(pathname.startsWith('/leitura/'))
-
-  useEffect(() => {
-    applyTheme(theme)
-  }, [theme])
 
   useEffect(() => {
     applyReadingPrefs(getReadingPrefs())
@@ -33,6 +29,19 @@ function Shell() {
     const onTheme = () => setTheme(resolveTheme())
     window.addEventListener('pericopes-theme', onTheme)
     return () => window.removeEventListener('pericopes-theme', onTheme)
+  }, [])
+
+  // Sem preferência gravada, o app segue o sistema em tempo real.
+  useEffect(() => {
+    const mq = matchMedia('(prefers-color-scheme: dark)')
+    const onSystem = () => {
+      if (getStoredTheme() !== null) return
+      const t = resolveTheme()
+      document.documentElement.dataset.theme = t
+      setTheme(t)
+    }
+    mq.addEventListener('change', onSystem)
+    return () => mq.removeEventListener('change', onSystem)
   }, [])
 
   return (

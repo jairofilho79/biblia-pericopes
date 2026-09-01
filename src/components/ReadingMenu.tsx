@@ -8,7 +8,7 @@ import {
   type ReadingLayout,
   type ReadingPrefs,
 } from '../lib/reading-prefs'
-import { resolveTheme, toggleTheme, type Theme } from '../lib/theme'
+import { getThemePref, setThemePref, type ThemePref } from '../lib/theme'
 
 type Props = {
   prefs: ReadingPrefs
@@ -20,14 +20,21 @@ const LAYOUTS: { id: ReadingLayout; label: string }[] = [
   { id: 'blocos', label: 'Blocos' },
 ]
 
+const TEMAS: { id: ThemePref; label: string }[] = [
+  { id: 'light', label: 'Claro' },
+  { id: 'sepia', label: 'Sépia' },
+  { id: 'dark', label: 'Escuro' },
+  { id: 'system', label: 'Sistema' },
+]
+
 export default function ReadingMenu({ prefs, onPrefs }: Props) {
   const [open, setOpen] = useState(false)
-  const [theme, setTheme] = useState<Theme>(() => resolveTheme())
+  const [themePref, setPref] = useState<ThemePref>(() => getThemePref())
   const rootRef = useRef<HTMLDivElement>(null)
   const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const onTheme = () => setTheme(resolveTheme())
+    const onTheme = () => setPref(getThemePref())
     window.addEventListener('pericopes-theme', onTheme)
     return () => window.removeEventListener('pericopes-theme', onTheme)
   }, [])
@@ -112,13 +119,20 @@ export default function ReadingMenu({ prefs, onPrefs }: Props) {
             ))}
           </div>
           <div className="readmenu-row" role="group" aria-label="Tema">
-            <button
-              type="button"
-              className="read-tool"
-              onClick={() => toggleTheme()}
-            >
-              {theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-            </button>
+            {TEMAS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                className={`read-tool${themePref === t.id ? ' active' : ''}`}
+                aria-pressed={themePref === t.id}
+                onClick={() => {
+                  setThemePref(t.id)
+                  setPref(t.id)
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
         </div>
       )}

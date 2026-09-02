@@ -6,7 +6,7 @@ App de leitura por **perícopes** (unidades narrativas), com texto NAA, contexto
 
 ```bash
 # 1) Coloque NAA.json em data/NAA.json e o dataset em data/raw/PericopeGroupedKJVVerses.json
-npm run pipeline   # ETL + enrich local → public/data/pericopes.json
+npm run pipeline   # ETL + enrich local → data/pericopes.json
 npm run dev
 ```
 

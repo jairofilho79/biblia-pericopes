@@ -18,6 +18,7 @@ export default defineConfig({
         'apple-touch-icon.png',
         'brand/logo.png',
         'brand/logo-master.png',
+        'data/index.json',
       ],
       manifest: {
         name: 'Perícopes — Estudo Bíblico',
@@ -49,11 +50,22 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,svg,png,json,woff2}'],
-        maximumFileSizeToCacheInBytes: 16 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
+        // O índice entra no precache (é o que a primeira tela espera); os shards
+        // não — precachear os 132 arquivos desfaria a mudança inteira.
+        globIgnores: ['**/data/texto/**', '**/data/estudo/**'],
         // /api/** é do Worker (auth e sync): nunca responder com o index.html
         // do app shell no lugar de uma resposta de API.
         navigateFallbackDenylist: [/^\/api\//],
+        runtimeCaching: [
+          {
+            // Conteúdo estático dentro de uma versão do build: uma vez em cache,
+            // nunca precisa de rede.
+            urlPattern: /\/data\/(texto|estudo)\/.*\.json$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'catalogo-shards', expiration: { maxEntries: 200 } },
+          },
+        ],
       },
     }),
   ],

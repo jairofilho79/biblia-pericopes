@@ -15,7 +15,7 @@ import { readingMinutes } from '../src/lib/reading-time'
 import type { Pericope } from '../src/lib/types'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const catalogoPath = join(root, 'public/data/pericopes.json')
+const catalogoPath = join(root, 'data/pericopes.json')
 const outDir = join(root, 'public/data')
 
 function precisaGerar(): boolean {

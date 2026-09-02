@@ -832,6 +832,12 @@ export default function Leitura() {
                 rows={4}
                 placeholder="Escreva pensamentos, orações, aplicações…"
               />
+              {/* Linha própria, colada no textarea: na de ações não cabe
+                  "Salvar anotação" + microfone + contador a 375px, e o
+                  microfone mudaria de lugar ao começar a gravar. */}
+              <div className="note-form-ditado">
+                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
+              </div>
               <div className="note-form-actions">
                 <button type="submit">{editingId ? 'Salvar alterações' : 'Salvar anotação'}</button>
                 {editingId && (
@@ -839,7 +845,6 @@ export default function Leitura() {
                     Cancelar
                   </button>
                 )}
-                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
               </div>
             </form>
             <ul className="note-list">

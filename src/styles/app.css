@@ -1674,16 +1674,26 @@ button.ghost {
   font-size: 0.9rem;
 }
 
-/* Ditado: microfone redondo na linha de ações do formulário de anotação.
+/* Ditado: microfone redondo numa linha própria, colada no textarea e
+   alinhada à direita — o texto de estado (contador, "Transcrevendo…", hora
+   da volta) cresce para a esquerda e o microfone nunca sai do lugar.
    `.note-form button` pinta todo botão do form; daqui a especificidade maior
    para o microfone escapar do estilo de "Salvar". */
+.note-form-ditado {
+  display: flex;
+  justify-content: flex-end;
+  /* o ditado só existe logado: sem o botão, a linha some junto com o gap. */
+  margin-top: -0.2rem;
+}
+
+.note-form-ditado:empty {
+  display: none;
+}
+
 .ditar {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  /* fica na ponta direita da linha, longe do "Salvar" — no celular os dois
-     não podem ser confundidos por um dedo. */
-  margin-left: auto;
 }
 
 .note-form .ditar-botao {
@@ -1720,7 +1730,7 @@ button.ghost {
   font-variant-numeric: tabular-nums;
 }
 
-.ditar-botao.gravando + .ditar-status {
+.ditar-status:has(+ .ditar-botao.gravando) {
   color: var(--rec);
 }
 

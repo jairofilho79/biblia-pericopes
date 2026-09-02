@@ -194,6 +194,11 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
 
   return (
     <span className="ditar">
+      {lado && (
+        <span className="ditar-status" role="status" aria-live="polite">
+          {lado}
+        </span>
+      )}
       <button
         type="button"
         className={`ditar-botao${gravando ? ' gravando' : ''}`}
@@ -210,11 +215,6 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
           />
         </svg>
       </button>
-      {lado && (
-        <span className="ditar-status" role="status" aria-live="polite">
-          {lado}
-        </span>
-      )}
     </span>
   )
 }

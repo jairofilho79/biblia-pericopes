@@ -25,8 +25,8 @@ let running = false
  * finito de páginas — este teto é só uma rede de segurança contra um bug de
  * servidor que sinalizasse `maisDados` pra sempre, o que sem este teto
  * giraria o cliente num loop infinito. Bem acima do que qualquer volume real
- * de usuário exigiria (500 páginas, no tamanho de página do Worker, cobrem
- * bem mais de um milhão de linhas por entidade).
+ * de usuário exigiria: 500 páginas de 2000 linhas (o tamanho de página do
+ * Worker) dão um milhão de linhas por entidade.
  */
 export const MAX_PAGINAS_PULL = 500
 

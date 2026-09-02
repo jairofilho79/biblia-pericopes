@@ -580,6 +580,45 @@ describe('syncNow — pull paginado', () => {
     warn.mockRestore()
   })
 
+  it('página 2 lança (rede instável) em vez de responder com status ruim: mesma garantia', async () => {
+    // Variante do teste acima que não é um corte por status HTTP: um `fetch`
+    // pode REJEITAR a promise — conexão caindo no meio, DNS falhando — em vez
+    // de resolver com um 500. Isso sobe pelo `await` até o catch()/finally()
+    // de syncNow(), sem passar pelos `break` do loop. É o caso mais provável
+    // por trás do "rede instável" do teste acima: uma rede que cai não costuma
+    // devolver um 500 educado, ela derruba a conexão.
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const avisos = vi.fn()
+    const desinscrever = onSync(avisos)
+
+    const CURSOR_PAGINA_1 = '2026-08-31T12:00:00.000Z'
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') return jsonResponse({ ok: true, agora: FUTURE })
+      if (url === '/api/sync?since=') {
+        return jsonResponse({
+          progresso: [{ pericopeOrdem: 90004, status: 'concluido', atualizadoEm: FUTURE }],
+          anotacoes: [],
+          destaques: [],
+          agora: CURSOR_PAGINA_1,
+          maisDados: true,
+        })
+      }
+      throw new TypeError('Failed to fetch')
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect((await getProgresso(90004))?.status).toBe('concluido')
+    expect(await getMeta('sync-cursor')).toBe(CURSOR_PAGINA_1)
+    expect(avisos).toHaveBeenCalledTimes(1)
+    desinscrever()
+    warn.mockRestore()
+  })
+
   it('respeita o teto de páginas mesmo se o servidor insistir em maisDados', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)

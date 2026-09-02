@@ -138,6 +138,11 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
 export async function syncNow(): Promise<void> {
   if (running || !navigator.onLine) return
   running = true
+  // Fora do try: precisa sobreviver a um `throw` no meio do pull (fetch
+  // rejeitando por instabilidade de rede, ou res.json()/applyRemote* dando
+  // erro) para o finally lá embaixo enxergar quantas linhas já entraram antes
+  // do estouro.
+  let totalAplicadas = 0
   try {
     const { data: session } = await authClient.getSession()
     if (!session) return
@@ -169,20 +174,21 @@ export async function syncNow(): Promise<void> {
     // Um servidor antigo nunca manda `maisDados`, então o loop sempre para na
     // primeira página para ele — o caminho de hoje continua intacto.
     let since = (await getMeta(CURSOR_KEY)) ?? ''
-    let totalAplicadas = 0
     for (let pagina = 0; ; pagina++) {
       const res = await fetch(`/api/sync?since=${encodeURIComponent(since)}`, {
         credentials: 'include',
       })
-      // Os dois cortes abaixo saem com `break`, não `return`, e a diferença
-      // importa desde que o pull virou um loop: a página 1 pode ter aplicado
-      // linhas antes da página 2 falhar, e `return` pularia o notificarSync()
-      // lá embaixo — as linhas ficariam no IndexedDB sem chegar nas telas
-      // abertas (useSyncRefresh só relê no evento), até o timer de 5 minutos.
-      // Nada acontece depois do loop além desse aviso, então sair por `break`
-      // não continua sincronizando nada: só entrega o que já foi gravado.
-      // Vale igual para o 401 — a sessão já foi derrubada, e as linhas que
-      // entraram antes dela morrer são tão válidas quanto quaisquer outras.
+      // Os dois cortes abaixo saem com `break`: nada acontece depois do loop
+      // além do notificarSync() do finally, então sair do loop não continua
+      // sincronizando nada, só entrega o que já foi gravado. O notificarSync()
+      // mora no finally exatamente para cobrir também os cortes que NÃO são um
+      // `break` daqui — um `fetch` que rejeita (rede caindo no meio) ou um
+      // res.json()/applyRemote* que estoura sobem como `throw` até lá embaixo,
+      // e a página 1 pode ter aplicado linhas antes disso: elas têm que chegar
+      // nas telas abertas (useSyncRefresh só relê no evento) sem esperar o
+      // timer de 5 minutos. Vale igual para o 401 abaixo — a sessão já foi
+      // derrubada, e as linhas que entraram antes dela morrer são tão válidas
+      // quanto quaisquer outras.
       if (res.status === 401) {
         derrubarSessao()
         break
@@ -217,14 +223,19 @@ export async function syncNow(): Promise<void> {
         break
       }
     }
-    // Depois do cursor: se o aviso disparar antes e uma tela reler na hora, ela
-    // já lê o estado final. Só sai quando algo mudou — o pull reentrega linhas
-    // e roda de 5 em 5 minutos.
-    if (totalAplicadas) notificarSync()
   } catch (err) {
     // offline/erro transitório: outbox preservado, próxima chance sincroniza
     console.warn('[sync] erro', err)
   } finally {
+    // No finally, não depois do loop: precisa disparar tanto no caminho feliz
+    // quanto quando o catch acima acabou de engolir um throw (fetch rejeitado
+    // por rede instável, por exemplo) — nos dois casos as linhas já aplicadas
+    // antes do corte já estão gravadas no cursor e no IndexedDB, então quem
+    // está com uma tela aberta precisa saber. Se o aviso disparar antes de uma
+    // tela reler, ela já lê o estado final. `totalAplicadas` começa em 0 e só
+    // sai do try antes de mexer no pull (sem sessão, push falhou) com esse
+    // valor, então dispara no máximo uma vez e só quando algo de fato mudou.
+    if (totalAplicadas) notificarSync()
     running = false
   }
 }

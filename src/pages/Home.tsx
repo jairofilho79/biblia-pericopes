@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SkeletonHome } from '../components/Skeleton'
 import { getPericope, loadPericopes, ordensDoTestamento, refLabel } from '../lib/content'
@@ -11,6 +11,7 @@ import {
 import { testamentLabel, type Testament } from '../lib/testament'
 import type { Pericope } from '../lib/types'
 import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
+import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type Track = {
   testament: Testament
@@ -26,38 +27,41 @@ export default function Home() {
   const [err, setErr] = useState('')
   const [streak, setStreak] = useState<Streak>({ atual: 0, recorde: 0 })
 
-  useEffect(() => {
-    ;(async () => {
-      try {
-        const all = await loadPericopes()
-        const built: Track[] = []
-        for (const testament of ['vt', 'nt'] as Testament[]) {
-          const ordens = ordensDoTestamento(all, testament)
-          const ordem = await getProximaOrdemNaSequencia(ordens)
-          const peri = await getPericope(ordem)
-          if (!peri) continue
-          const done = await countConcluidasNaSequencia(ordens)
-          built.push({
-            testament,
-            peri,
-            done,
-            total: ordens.length,
-            allDone: done >= ordens.length,
-            minutos: readingMinutes(peri.texto_naa),
-          })
-        }
-        setTracks(built)
-        // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
-        // entidade nova, e o streak segue o usuário para o celular novo.
-        // Limitação aceita por ora: calculado só na montagem — um pull de
-        // sync que chegue depois em segundo plano só aparece na próxima
-        // visita à Home, não nesta sessão já aberta.
-        setStreak(computeStreak(diasComConclusao(await listAllProgresso()), new Date()))
-      } catch (e) {
-        setErr(e instanceof Error ? e.message : 'Erro')
+  // Uma função só para as duas entradas: a montagem e o aviso de sync. O
+  // streak sai daqui junto das trilhas porque as duas coisas leem o mesmo
+  // progresso — separar faria a tela mostrar dois instantes diferentes.
+  const carregar = useCallback(async () => {
+    try {
+      const all = await loadPericopes()
+      const built: Track[] = []
+      for (const testament of ['vt', 'nt'] as Testament[]) {
+        const ordens = ordensDoTestamento(all, testament)
+        const ordem = await getProximaOrdemNaSequencia(ordens)
+        const peri = await getPericope(ordem)
+        if (!peri) continue
+        const done = await countConcluidasNaSequencia(ordens)
+        built.push({
+          testament,
+          peri,
+          done,
+          total: ordens.length,
+          allDone: done >= ordens.length,
+          minutos: readingMinutes(peri.texto_naa),
+        })
       }
-    })()
+      setTracks(built)
+      // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
+      // entidade nova, e o streak segue o usuário para o celular novo.
+      setStreak(computeStreak(diasComConclusao(await listAllProgresso()), new Date()))
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Erro')
+    }
   }, [])
+
+  useEffect(() => {
+    void carregar()
+  }, [carregar])
+  useSyncRefresh(() => void carregar())
 
   if (err) return <p className="muted">{err}</p>
   if (!tracks.length) return <SkeletonHome />

@@ -10,6 +10,7 @@ import {
   type LivroProgresso,
 } from '../lib/content'
 import { doneSet } from '../lib/user-db'
+import { useSyncRefresh } from '../lib/use-sync-refresh'
 import type { Pericope } from '../lib/types'
 
 function PeriLink({ p, done }: { p: Pericope; done: boolean }) {
@@ -77,6 +78,16 @@ export default function Indice() {
       vivo = false
     }
   }, [])
+
+  // Do sync só o `done` muda: livros, `todas` e `items` vêm do pericopes.json,
+  // que é conteúdo estático. Recarregar só ele evita piscar a lista e mexer no
+  // skeleton por causa de uma conclusão feita em outro aparelho.
+  useSyncRefresh(() => {
+    // Tropeço aqui é transitório: a próxima rodada de sync avisa de novo.
+    void doneSet()
+      .then(setDone)
+      .catch(() => {})
+  })
 
   useEffect(() => {
     listPericopes({ livro: livro || undefined, q: q || undefined }).then((r) => {

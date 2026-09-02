@@ -46,6 +46,7 @@ import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
+import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
 type Vizinha = { ordem: number; titulo: string }
@@ -222,6 +223,30 @@ export default function Leitura() {
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
   }
+
+  // Refresh estreito para o aviso de sync: mexe só no que vem do sync
+  // (destaques, notas e status) e não encosta em rascunho, seleção nem barra
+  // de ações. O efeito grande de troca de perícope reseta tudo isso — usá-lo
+  // aqui apagaria a anotação que o usuário está digitando neste instante.
+  useSyncRefresh(() => {
+    void (async () => {
+      try {
+        const hl = await listDestaques(ordem)
+        setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
+        // O IndexedDB já é a palavra final: o LWW resolveu quem ganhou antes
+        // de o aviso sair.
+        const prog = await getProgresso(ordem)
+        const proximo = prog?.status ?? 'em_andamento'
+        setStatus(proximo === 'nao_iniciado' ? 'em_andamento' : proximo)
+        doneRef.current = proximo === 'concluido'
+        await refreshNotes()
+      } catch (e) {
+        // Tropeço aqui é transitório e a próxima rodada de sync tenta de novo:
+        // não vale trocar uma tela que funciona por um estado de erro.
+        console.warn('[leitura] refresh pós-sync falhou', e)
+      }
+    })()
+  })
 
   useEffect(() => {
     ;(async () => {

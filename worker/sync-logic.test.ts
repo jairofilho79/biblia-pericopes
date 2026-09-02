@@ -115,3 +115,22 @@ describe('parseSyncPush — invariante do id do destaque', () => {
     expect(parseSyncPush({ destaques: [zero] })?.destaques).toEqual([zero])
   })
 })
+
+describe('parseSyncPush — pericopeOrdem', () => {
+  it('rejeita fracionário, fora do inteiro seguro, negativo e não-finito', () => {
+    for (const ordem of [1.5, 1e308, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(parseSyncPush({ progresso: [{ ...prog, pericopeOrdem: ordem }] })).toBeNull()
+      expect(parseSyncPush({ anotacoes: [{ ...nota, pericopeOrdem: ordem }] })).toBeNull()
+    }
+  })
+  it('rejeita destaque fracionário mesmo com id derivado coerente', () => {
+    expect(
+      parseSyncPush({ destaques: [{ ...destaque, pericopeOrdem: 1.5, id: '1.5:1:3' }] }),
+    ).toBeNull()
+  })
+  it('aceita 0 — é a ordem da primeira perícope de Gênesis', () => {
+    expect(parseSyncPush({ progresso: [{ ...prog, pericopeOrdem: 0 }] })?.progresso).toEqual([
+      { ...prog, pericopeOrdem: 0 },
+    ])
+  })
+})

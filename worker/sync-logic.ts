@@ -38,6 +38,13 @@ const ISO_CANONICAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 // "c:v" ou "c:v-c:v" cabem folgado; o limite existe só para barrar abuso.
 const MAX_VERSE_REF = 32
 
+// Ordem da perícope: inteiro seguro e não-negativo (o dado real vai de 0 a
+// 2646). Sem isto passavam `1.5` e `1e308`, que viram linha inalcançável pelo
+// cliente — ele só consulta por ordens inteiras vindas do pericopes.json.
+function isOrdem(v: unknown): v is number {
+  return typeof v === 'number' && Number.isSafeInteger(v) && v >= 0
+}
+
 function isIso(v: unknown): v is string {
   return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
 }
@@ -46,7 +53,7 @@ function validProgresso(v: unknown): v is PushProgresso {
   if (typeof v !== 'object' || v === null) return false
   const p = v as Record<string, unknown>
   return (
-    typeof p.pericopeOrdem === 'number' &&
+    isOrdem(p.pericopeOrdem) &&
     typeof p.status === 'string' &&
     STATUS.has(p.status) &&
     isIso(p.atualizadoEm)
@@ -60,7 +67,7 @@ function validAnotacao(v: unknown): v is Omit<PushAnotacao, 'verseRef'> & { vers
     typeof a.id === 'string' &&
     a.id.length > 0 &&
     a.id.length <= 64 &&
-    typeof a.pericopeOrdem === 'number' &&
+    isOrdem(a.pericopeOrdem) &&
     typeof a.texto === 'string' &&
     a.texto.length <= MAX_TEXTO &&
     (a.verseRef === undefined ||
@@ -78,7 +85,7 @@ function validDestaque(v: unknown): v is PushDestaque {
   return (
     typeof d.id === 'string' &&
     d.id.length <= 64 &&
-    typeof d.pericopeOrdem === 'number' &&
+    isOrdem(d.pericopeOrdem) &&
     typeof d.verseId === 'string' &&
     VERSE_ID.test(d.verseId) &&
     typeof d.cor === 'string' &&

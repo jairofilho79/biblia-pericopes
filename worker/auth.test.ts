@@ -8,6 +8,7 @@ function fakeEnv(overrides: Partial<Env> = {}): Env {
     // Nunca usados nestes testes: nenhum deles chega a executar uma query.
     DB: {} as Env['DB'],
     AUDIO: {} as Env['AUDIO'],
+    AI: {} as Env['AI'],
     BETTER_AUTH_SECRET: 'test-secret',
     APP_URL: 'http://localhost:8787',
     EMAIL_FROM: 'Perícopes <onboarding@resend.dev>',

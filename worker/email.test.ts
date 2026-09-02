@@ -37,6 +37,7 @@ describe('sendOtpEmail', () => {
     const env: Env = {
       DB: {} as D1Database,
       AUDIO: {} as R2Bucket,
+      AI: {} as Ai,
       BETTER_AUTH_SECRET: 'secret',
       APP_URL: 'https://app.dev',
       EMAIL_FROM: 'noreply@pericopes.dev',
@@ -57,6 +58,7 @@ describe('sendOtpEmail', () => {
     const env: Env = {
       DB: {} as D1Database,
       AUDIO: {} as R2Bucket,
+      AI: {} as Ai,
       BETTER_AUTH_SECRET: 'secret',
       APP_URL: 'https://app.dev',
       EMAIL_FROM: 'noreply@pericopes.dev',
@@ -95,6 +97,7 @@ describe('sendOtpEmail', () => {
     const env: Env = {
       DB: {} as D1Database,
       AUDIO: {} as R2Bucket,
+      AI: {} as Ai,
       BETTER_AUTH_SECRET: 'secret',
       APP_URL: 'https://app.dev',
       EMAIL_FROM: 'noreply@pericopes.dev',

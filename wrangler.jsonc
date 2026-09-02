@@ -23,6 +23,9 @@
       "migrations_dir": "migrations"
     }
   ],
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
     "APP_URL": "https://biblia-pericopes.jairofilho79.workers.dev",
     "EMAIL_FROM": "Perícopes <onboarding@resend.dev>"

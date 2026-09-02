@@ -2,6 +2,17 @@ import { Hono } from 'hono'
 import { cabecalhoContentRange, chaveAudio } from './audio'
 import { createAuth } from './auth'
 import { TAMANHO_PAGINA_PULL, corpoExcedeLimite, paginarPull, parseSyncPush } from './sync-logic'
+import {
+  MAX_BYTES,
+  MODELO,
+  decidirCota,
+  diaUtc,
+  montarInput,
+  paraBase64,
+  parseDuracao,
+  proximaMeiaNoiteUtc,
+  tipoAudioAceito,
+} from './transcrever'
 import type { Env } from './env.d'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -240,6 +251,71 @@ app.post('/api/sync', async (c) => {
   ]
   if (stmts.length) await c.env.DB.batch(stmts)
   return c.json({ ok: true, agora: serverEm })
+})
+
+// Ditado das anotações: o áudio gravado no navegador vira texto pelo Workers
+// AI (whisper). Só para quem está logado — é o que permite cobrar a cota por
+// usuário. A ordem das checagens vai do mais barato ao mais caro: sessão,
+// headers, tamanho, cota (uma query) e só então o modelo.
+app.post('/api/transcrever', async (c) => {
+  const userId = await requireUserId(c)
+  if (!userId) return c.json({ error: 'não autenticado' }, 401)
+  if (!tipoAudioAceito(c.req.header('content-type'))) {
+    return c.json({ erro: 'Formato de áudio não suportado' }, 415)
+  }
+  const declarado = Number(c.req.header('content-length'))
+  if (Number.isFinite(declarado) && declarado > MAX_BYTES) {
+    return c.json({ erro: 'Áudio grande demais' }, 413)
+  }
+  const duracao = parseDuracao(c.req.header('x-duracao-segundos'))
+  if (duracao === null) return c.json({ erro: 'Duração inválida' }, 400)
+  // Rede de segurança para o corpo chunked, que chega sem Content-Length.
+  const audio = await c.req.arrayBuffer().catch(() => new ArrayBuffer(0))
+  if (audio.byteLength > MAX_BYTES) return c.json({ erro: 'Áudio grande demais' }, 413)
+
+  const agora = new Date()
+  const dia = diaUtc(agora)
+  // Uma query só para as duas cotas: a linha do usuário e a soma do dia.
+  const uso = await c.env.DB.prepare(
+    `SELECT COALESCE(SUM(CASE WHEN user_id = ?1 THEN segundos END), 0) AS usuario,
+            COALESCE(SUM(segundos), 0) AS total
+     FROM transcricao_uso WHERE dia = ?2`,
+  )
+    .bind(userId, dia)
+    .first<{ usuario: number; total: number }>()
+  const decisao = decidirCota({
+    usoUsuario: uso?.usuario ?? 0,
+    usoGlobal: uso?.total ?? 0,
+    duracao,
+  })
+  if (decisao === 'usuario') {
+    return c.json({ erro: 'Cota diária de ditado esgotada', voltaEm: proximaMeiaNoiteUtc(agora) }, 429)
+  }
+  if (decisao === 'global') {
+    return c.json({ erro: 'Ditado indisponível hoje', voltaEm: proximaMeiaNoiteUtc(agora) }, 503)
+  }
+
+  let texto: string
+  try {
+    const saida: unknown = await c.env.AI.run(MODELO, montarInput(paraBase64(audio)))
+    const t = (saida as { text?: unknown } | null)?.text
+    if (typeof t !== 'string') throw new Error('resposta do modelo sem `text`')
+    texto = t.trim()
+  } catch (err) {
+    console.error('[transcrever]', err)
+    return c.json({ erro: 'Não foi possível transcrever' }, 502)
+  }
+
+  // Cobra só o que foi de fato transcrito: uma falha do modelo não come cota.
+  // A janela entre a leitura da cota e esta gravação deixa dois pedidos
+  // simultâneos passarem um pouco do teto — irrelevante para estes números.
+  await c.env.DB.prepare(
+    `INSERT INTO transcricao_uso (user_id, dia, segundos) VALUES (?1, ?2, ?3)
+     ON CONFLICT(user_id, dia) DO UPDATE SET segundos = segundos + excluded.segundos`,
+  )
+    .bind(userId, dia, duracao)
+    .run()
+  return c.json({ texto })
 })
 
 // Narração pré-gerada (R2). Pública como o texto que ela narra; imutável por

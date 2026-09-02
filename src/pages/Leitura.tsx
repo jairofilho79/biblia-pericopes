@@ -1,7 +1,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { tokens, type SecaoAlvos } from '../lib/alinhar-narracao'
-import NarracaoPlayer from '../components/NarracaoPlayer'
+import NarracaoPlayer, { type NarracaoPlayerHandle } from '../components/NarracaoPlayer'
+import { secaoDoChip } from '../lib/narracao-controles'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
 import { SkeletonLeitura } from '../components/Skeleton'
@@ -131,6 +132,8 @@ export default function Leitura() {
   // Último valor de `?v=` já rolado até — evita re-centralizar a cada toque
   // em versículo (ver efeito abaixo).
   const vAplicado = useRef<string | null>(null)
+  // Handle do player: os chips de seção mandam o áudio para o cabeçalho falado.
+  const playerRef = useRef<NarracaoPlayerHandle>(null)
   const [falando, setFalando] = useState<string | null>(null)
   const [contextoAberto, setContextoAbertoState] = useState(() => getContextoAberto())
 
@@ -616,10 +619,16 @@ export default function Leitura() {
         layout={prefs.layout}
         onIr={(id) => {
           if (id === 'contexto') abrirContexto()
+          // O chip rola a tela até a seção; com narração, o áudio vai junto
+          // para o cabeçalho falado dela. O `seeked` que resulta zera a
+          // suspensão de rolagem, então o acompanhamento volta a valer.
+          const secao = secaoDoChip(id)
+          if (secao) playerRef.current?.irParaSecao(secao)
         }}
       />
 
       <NarracaoPlayer
+        ref={playerRef}
         ordem={p.ordem}
         secoes={secoesNarracao}
         onAlvo={setFalando}

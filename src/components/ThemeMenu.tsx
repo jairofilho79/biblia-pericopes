@@ -12,7 +12,7 @@ const TEMAS: { id: ThemePref; label: string }[] = [
 /** Seletor de tema do header: o gatilho mostra a preferência atual, não a próxima. */
 export default function ThemeMenu() {
   const [pref, setPref] = useState<ThemePref>(() => getThemePref())
-  const { open, toggle, rootRef, btnRef, popRef } = usePopover()
+  const { open, toggle, close, rootRef, btnRef, popRef } = usePopover()
 
   useEffect(() => {
     const onTheme = () => setPref(getThemePref())
@@ -51,7 +51,12 @@ export default function ThemeMenu() {
                 type="button"
                 className={`read-tool${pref === t.id ? ' active' : ''}`}
                 aria-pressed={pref === t.id}
-                onClick={() => setThemePref(t.id)}
+                // Uma escolha só: fecha na hora, ao contrário do menu Aa, onde
+                // a pessoa mexe em várias coisas antes de sair.
+                onClick={() => {
+                  setThemePref(t.id)
+                  close()
+                }}
               >
                 {t.label}
               </button>

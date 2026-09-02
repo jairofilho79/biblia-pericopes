@@ -34,6 +34,12 @@ export function usePopover() {
 
   const toggle = useCallback(() => setOpen((v) => !v), [])
 
+  /** Fecha devolvendo o foco ao gatilho — para quem fecha ao escolher uma opção. */
+  const close = useCallback(() => {
+    setOpen(false)
+    btnRef.current?.focus()
+  }, [])
+
   useEffect(() => {
     if (!open) return
     const pop = popRef.current
@@ -66,5 +72,5 @@ export function usePopover() {
     }
   }, [open])
 
-  return { open, toggle, rootRef, btnRef, popRef }
+  return { open, toggle, close, rootRef, btnRef, popRef }
 }

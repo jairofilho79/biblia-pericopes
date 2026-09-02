@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { type SecaoAlvos } from '../lib/alinhar-narracao'
+import { tokens, type SecaoAlvos } from '../lib/alinhar-narracao'
 import NarracaoPlayer from '../components/NarracaoPlayer'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
@@ -52,7 +52,10 @@ function TextoFalado({ texto, ativo }: { texto: string; ativo: boolean }) {
   if (!ativo) return <>{texto}</>
   return (
     <>
-      {texto.split(' ').map((tk, k) => (
+      {/* `data-w` tem que numerar exatamente como `tokens()` — é a mesma
+          função que produz o campo `palavras` do manifesto (via
+          alinhar-narracao.ts), e as duas numerações precisam ser uma só. */}
+      {tokens(texto).map((tk, k) => (
         <Fragment key={k}>
           {k > 0 ? ' ' : ''}
           <span data-w={k}>{tk}</span>

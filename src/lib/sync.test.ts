@@ -22,7 +22,7 @@ vi.mock('./auth-client', () => ({
 
 // Imported after the mock so the mocked module is what sync.ts resolves.
 import { authClient } from './auth-client'
-import { signOutLocal, syncNow } from './sync'
+import { MAX_PAGINAS_PULL, signOutLocal, syncNow } from './sync'
 
 const FAKE_SESSION = { data: { user: { id: 'u1', email: 'user@example.com' } } }
 const NO_SESSION = { data: null }
@@ -486,6 +486,84 @@ describe('syncNow — destaques', () => {
     await syncNow()
 
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+})
+
+// P4: o pull vira um loop quando o servidor sinaliza `maisDados` — a resposta
+// foi truncada (worker/sync-logic.ts) e há mais páginas esperando pelo mesmo
+// cursor. Um servidor antigo nunca manda esse campo, então `!data.maisDados`
+// encerra o loop na primeira página — é assim que o caminho de hoje continua
+// intacto para quem não estourou a página.
+describe('syncNow — pull paginado', () => {
+  it('duas páginas: aplica linhas de ambas e termina com o cursor final', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    const urls: string[] = []
+    const CURSOR_PAGINA_1 = '2026-08-31T12:00:00.000Z'
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') return jsonResponse({ ok: true, agora: FUTURE })
+      urls.push(url)
+      if (url === '/api/sync?since=') {
+        return jsonResponse({
+          progresso: [{ pericopeOrdem: 90001, status: 'concluido', atualizadoEm: FUTURE }],
+          anotacoes: [],
+          destaques: [],
+          agora: CURSOR_PAGINA_1,
+          maisDados: true,
+        })
+      }
+      return jsonResponse({
+        progresso: [{ pericopeOrdem: 90002, status: 'concluido', atualizadoEm: FUTURE }],
+        anotacoes: [],
+        destaques: [],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    // a segunda página é pedida com o cursor devolvido pela primeira — não com
+    // o `since` original, e não com o `agora` (que não existiria se a
+    // primeira página não tivesse sido truncada)
+    expect(urls).toEqual([
+      '/api/sync?since=',
+      `/api/sync?since=${encodeURIComponent(CURSOR_PAGINA_1)}`,
+    ])
+    expect((await getProgresso(90001))?.status).toBe('concluido')
+    expect((await getProgresso(90002))?.status).toBe('concluido')
+    expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+
+  it('respeita o teto de páginas mesmo se o servidor insistir em maisDados', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    let n = 0
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') return jsonResponse({ ok: true, agora: FUTURE })
+      n += 1
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [],
+        agora: `cursor-pagina-${n}`,
+        maisDados: true,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(MAX_PAGINAS_PULL)
+    expect(await getMeta('sync-cursor')).toBe(`cursor-pagina-${MAX_PAGINAS_PULL}`)
+    expect(warn).toHaveBeenCalledWith(
+      '[sync] pull interrompido: teto de páginas atingido',
+      MAX_PAGINAS_PULL,
+    )
+    warn.mockRestore()
   })
 })
 

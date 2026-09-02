@@ -19,6 +19,17 @@ const CURSOR_KEY = 'sync-cursor'
 const USER_KEY = 'sync-user'
 let running = false
 
+/**
+ * Teto de páginas de um único pull (ver `maisDados` em worker/index.ts). Um
+ * servidor correto sempre para de sinalizar `maisDados` depois de um número
+ * finito de páginas — este teto é só uma rede de segurança contra um bug de
+ * servidor que sinalizasse `maisDados` pra sempre, o que sem este teto
+ * giraria o cliente num loop infinito. Bem acima do que qualquer volume real
+ * de usuário exigiria (500 páginas, no tamanho de página do Worker, cobrem
+ * bem mais de um milhão de linhas por entidade).
+ */
+export const MAX_PAGINAS_PULL = 500
+
 type PushProgresso = { pericopeOrdem: number; status: string; atualizadoEm: string }
 type PushAnotacao = {
   id: string
@@ -152,36 +163,54 @@ export async function syncNow(): Promise<void> {
       await clearOutbox(lastSeq)
     }
 
-    // pull incremental
-    const since = (await getMeta(CURSOR_KEY)) ?? ''
-    const res = await fetch(`/api/sync?since=${encodeURIComponent(since)}`, {
-      credentials: 'include',
-    })
-    if (res.status === 401) {
-      derrubarSessao()
-      return
+    // pull incremental — em loop: quando a resposta vem truncada
+    // (worker/index.ts, ver paginarPull em sync-logic.ts), ela sinaliza
+    // `maisDados` e o cursor devolvido é a fronteira do corte, não `agora`.
+    // Um servidor antigo nunca manda `maisDados`, então o loop sempre para na
+    // primeira página para ele — o caminho de hoje continua intacto.
+    let since = (await getMeta(CURSOR_KEY)) ?? ''
+    let totalAplicadas = 0
+    for (let pagina = 0; ; pagina++) {
+      const res = await fetch(`/api/sync?since=${encodeURIComponent(since)}`, {
+        credentials: 'include',
+      })
+      if (res.status === 401) {
+        derrubarSessao()
+        return
+      }
+      if (!res.ok) {
+        console.warn('[sync] pull falhou', res.status)
+        return
+      }
+      const data = (await res.json()) as {
+        progresso: Parameters<typeof applyRemoteProgresso>[0]
+        anotacoes: Parameters<typeof applyRemoteAnotacoes>[0]
+        // opcional: uma resposta sem a lista (servidor mais velho, ou um mock de
+        // teste) vira lista vazia em vez de estourar e abortar o pull inteiro.
+        destaques?: Parameters<typeof applyRemoteDestaques>[0]
+        agora: string
+        // opcional pelo mesmo motivo: um servidor antigo nunca manda este campo.
+        maisDados?: boolean
+      }
+      totalAplicadas +=
+        (await applyRemoteProgresso(data.progresso)) +
+        (await applyRemoteAnotacoes(data.anotacoes)) +
+        (await applyRemoteDestaques(data.destaques ?? []))
+      // Salva o cursor a cada página, não só no fim: um pull interrompido no
+      // meio (erro de rede na página seguinte, aba fechada) retoma da última
+      // página aplicada em vez de repetir tudo desde o início.
+      since = data.agora
+      await setMeta(CURSOR_KEY, since)
+      if (!data.maisDados) break
+      if (pagina + 1 >= MAX_PAGINAS_PULL) {
+        console.warn('[sync] pull interrompido: teto de páginas atingido', MAX_PAGINAS_PULL)
+        break
+      }
     }
-    if (!res.ok) {
-      console.warn('[sync] pull falhou', res.status)
-      return
-    }
-    const data = (await res.json()) as {
-      progresso: Parameters<typeof applyRemoteProgresso>[0]
-      anotacoes: Parameters<typeof applyRemoteAnotacoes>[0]
-      // opcional: uma resposta sem a lista (servidor mais velho, ou um mock de
-      // teste) vira lista vazia em vez de estourar e abortar o pull inteiro.
-      destaques?: Parameters<typeof applyRemoteDestaques>[0]
-      agora: string
-    }
-    const aplicadas =
-      (await applyRemoteProgresso(data.progresso)) +
-      (await applyRemoteAnotacoes(data.anotacoes)) +
-      (await applyRemoteDestaques(data.destaques ?? []))
-    await setMeta(CURSOR_KEY, data.agora)
     // Depois do cursor: se o aviso disparar antes e uma tela reler na hora, ela
     // já lê o estado final. Só sai quando algo mudou — o pull reentrega linhas
     // e roda de 5 em 5 minutos.
-    if (aplicadas) notificarSync()
+    if (totalAplicadas) notificarSync()
   } catch (err) {
     // offline/erro transitório: outbox preservado, próxima chance sincroniza
     console.warn('[sync] erro', err)

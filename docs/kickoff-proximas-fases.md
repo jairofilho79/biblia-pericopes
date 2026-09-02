@@ -10,8 +10,9 @@
   Worker já entregue.
 - Pacotes de UX 1–4 entregues (leitura, versículos, navegação, engajamento —
   specs e planos em `docs/superpowers/specs/` e `docs/superpowers/plans/`).
-- TTS por voz sintética em `Leitura` já funciona (Web Speech API) com realce
-  de versículo e wake lock.
+- A narração pré-gerada dirige a leitura em `Leitura` com realce de
+  versículo/parágrafo e de palavra em fala, tela acompanhando, e wake lock; o
+  TTS sintético (Web Speech API) foi removido em 2026-09-02.
 
 ## Em andamento NOUTRA sessão — não mexer
 

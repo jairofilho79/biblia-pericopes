@@ -20,6 +20,10 @@
   --hl-verde: #cfe9c8;
   --hl-azul: #cadff2;
   --hl-rosa: #f4d0dd;
+  /* candeia: a luz quente da narração. Âmbar escuro o bastante para AA em
+     texto normal sobre --paper (o .cap-label em fala é texto, não título grande). */
+  --candle: #9a6618;
+  --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
   --radius: 12px;
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Source Serif 4 Variable', Georgia, serif;
@@ -56,6 +60,10 @@
   --hl-verde: #24452c;
   --hl-azul: #1f3c58;
   --hl-rosa: #4e2437;
+  /* no escuro a candeia é mais clara e o halo um pouco mais forte: luz
+     translúcida sobre papel escuro some antes do que sobre papel claro. */
+  --candle: #e8b45a;
+  --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
   color-scheme: dark;
 }
 
@@ -79,6 +87,8 @@
   --hl-verde: #cfdcb4;
   --hl-azul: #c7d6e0;
   --hl-rosa: #ecc9cf;
+  --candle: #8f5c1c;
+  --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
   color-scheme: light;
 }
 
@@ -103,6 +113,8 @@
     --hl-verde: #24452c;
     --hl-azul: #1f3c58;
     --hl-rosa: #4e2437;
+    --candle: #e8b45a;
+    --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
     color-scheme: dark;
   }
 }
@@ -934,29 +946,191 @@ button.ghost {
   height: 34px;
 }
 
-/* realce da fala: sublinhado discreto, distinto do foco (fundo) e dos
-   destaques de cor — os três podem coexistir no mesmo versículo. */
-.verse.verse-speaking,
-.verse-inline.verse-speaking {
-  box-shadow: inset 0 -0.12em 0 var(--accent);
+/* ── Candeia: o realce da narração ──
+   A unidade em fala fica sob uma luz quente — um halo âmbar por trás, vindo
+   de uma chama à esquerda — e a palavra em fala é o ponteiro: um sublinhado
+   mais luminoso e menor, que anda de uma palavra para a seguinte. Os títulos
+   falados só ganham a cor da luz, sem halo: a candeia passa por eles.
+
+   Tudo isso coexiste com o foco (fundo + borda) e os destaques de cor
+   (fundo): chama e halo são pseudo-elementos atrás do texto, o foco e a cor
+   são `background-color` do próprio elemento. Nenhum apaga o outro.
+
+   Um desenho só para versículo em bloco, versículo corrido, parágrafo e
+   pergunta — o que muda é só ONDE a chama cabe. */
+
+/* `isolation: isolate` abre um contexto de empilhamento no próprio elemento:
+   assim os pseudo-elementos com z-index -1 ficam ATRÁS do texto mas ACIMA do
+   fundo de foco/destaque dele — sem isso, "-1" os mandaria para trás do papel.
+   `.verse-inline` entra aqui porque um <button> nunca é `inline` de verdade:
+   o navegador o trata como inline-block, uma caixa só, que pode ter várias
+   linhas dentro. */
+.verse,
+.verse-inline,
+.prose,
+.perguntas li {
+  position: relative;
+  isolation: isolate;
 }
 
-/* mesmo sublinhado no parágrafo/pergunta em fala (contexto, resenha, reflexão) */
-.prose-speaking {
-  box-shadow: inset 0 -0.12em 0 var(--accent);
+/* A chama (::before) e o halo (::after) existem sempre, apagados, para a
+   opacidade poder transitar nos dois sentidos — numa regra só de
+   `.verse-speaking` a saída seria seca. `background-image` não serviria
+   para o halo: gradiente não interpola. */
+.verse::before,
+.prose::before,
+.perguntas li::before,
+.verse::after,
+.verse-inline::after,
+.prose::after,
+.perguntas li::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
 }
 
-/* realce da PALAVRA em fala: fundo suave, sob o sublinhado da unidade — a
-   unidade é o contexto, a palavra é o ponteiro; mesmo peso nos dois cansa. */
+/* A chama: barra fina, arredondada, com o próprio brilho. */
+.verse::before,
+.prose::before,
+.perguntas li::before {
+  inset-block: 0.35em;
+  /* p e li não têm padding: a chama fica na margem do papel, à esquerda do
+     texto (e, na lista, à esquerda do número). No .verse, cabe no padding. */
+  inset-inline-start: var(--candle-x, -0.7em);
+  width: 0.22em;
+  border-radius: 999px;
+  background: var(--candle);
+  box-shadow: 0 0 0.45em var(--candle-glow);
+}
+
+.verse::before {
+  --candle-x: 0.12rem;
+}
+
+.perguntas li::before {
+  --candle-x: calc(-1.35rem - 0.5em);
+}
+
+/* O halo: luz que nasce na chama e se perde para a direita. */
+.verse::after,
+.verse-inline::after,
+.prose::after,
+.perguntas li::after {
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    var(--candle-glow),
+    color-mix(in srgb, var(--candle) 5%, transparent) 55%,
+    transparent
+  );
+}
+
+/* p, li e o versículo corrido não têm padding: o halo respira um pouco para
+   fora do texto (e, no p/li, vai ao encontro da chama na margem). */
+.prose::after,
+.perguntas li::after {
+  inset: -0.1em -0.4em;
+  border-radius: 6px;
+}
+
+/* na pergunta o halo abraça também o número da lista */
+.perguntas li::after {
+  inset-inline-start: -1.5rem;
+}
+
+/* menos que o anel de foco (3px), para o halo não vazar por fora dele */
+.verse-inline::after {
+  inset: -0.05em -0.15em;
+  border-radius: 4px;
+}
+
+/* `li.prose-speaking` explícito: `.perguntas li::before` pesa mais que
+   `.prose-speaking::before` e, sem isso, a pergunta nunca acenderia. */
+.verse.verse-speaking::before,
+.verse.verse-speaking::after,
+.verse-inline.verse-speaking::after,
+.prose-speaking::before,
+.prose-speaking::after,
+.perguntas li.prose-speaking::before,
+.perguntas li.prose-speaking::after {
+  opacity: 1;
+}
+
+/* No corrido não há margem onde pôr a chama — um versículo curto pode começar
+   no meio da linha, colado ao anterior. A chama vira um sublinhado sob CADA
+   linha do versículo: no `.verse-text`, que é inline de verdade (o botão
+   não é), com `box-decoration-break: clone` para repetir o traço em cada
+   fragmento em vez de o cortar na quebra. Translúcido, para a palavra por
+   cima continuar sendo a mais luminosa. Entra crescendo da esquerda por
+   `background-size`, que interpola. */
+.verse-inline .verse-text {
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--candle) 45%, transparent),
+    color-mix(in srgb, var(--candle) 45%, transparent)
+  );
+  background-size: 0% 0.12em;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 200ms ease;
+}
+
+.verse-inline.verse-speaking .verse-text {
+  background-size: 100% 0.12em;
+}
+
+/* Títulos falados (h1, h2 das seções, "Capítulo N"): só a cor e um brilho
+   suave, por cima do relevo de leitura — sem halo, o realce da unidade é mais
+   forte que o do título de propósito. `.leitura h2.` bate a regra
+   `.leitura > .block-plain > h2` do text-shadow. */
+[data-fala-id] {
+  transition: color 200ms ease, text-shadow 200ms ease;
+}
+
+.leitura h1.heading-speaking,
+.leitura h2.heading-speaking,
+.leitura h3.heading-speaking {
+  color: var(--candle);
+  text-shadow: var(--read-shadow), 0 0 0.6em var(--candle-glow);
+}
+
+/* A palavra que anda: o sublinhado nasce da esquerda na palavra nova e se
+   recolhe pela direita na anterior. É só ancoragem: em repouso o gradiente
+   está preso à direita com largura zero; em fala, preso à esquerda com
+   largura cheia. Como `background-position` NÃO transita, só o tamanho, a
+   luz cresce de um lado e some pelo outro. */
+[data-w] {
+  background-image: linear-gradient(var(--candle), var(--candle));
+  background-repeat: no-repeat;
+  background-size: 0% 0.14em;
+  background-position: 100% 100%;
+  border-radius: 0.1em;
+  transition: background-size 160ms ease-out, text-shadow 160ms ease-out;
+}
+
 [data-w].word-speaking {
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
-  border-radius: 0.2em;
-  box-shadow: 0 0 0 0.1em color-mix(in srgb, var(--accent) 18%, transparent);
+  background-size: 100% 0.14em;
+  background-position: 0 100%;
+  text-shadow: var(--read-shadow), 0 0 0.5em var(--candle-glow);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-w].word-speaking {
-    transition: background 90ms linear;
+@media (prefers-reduced-motion: reduce) {
+  .verse::before,
+  .prose::before,
+  .perguntas li::before,
+  .verse::after,
+  .verse-inline::after,
+  .prose::after,
+  .perguntas li::after,
+  .verse-inline .verse-text,
+  [data-fala-id],
+  [data-w] {
+    transition: none;
   }
 }
 

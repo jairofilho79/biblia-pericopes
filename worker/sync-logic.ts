@@ -34,6 +34,41 @@ const VERSE_ID = /^\d+:\d+$/
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 
+/**
+ * Teto do corpo bruto do POST /api/sync, em bytes.
+ *
+ * Não é o limite apertado — o aperto de verdade são MAX_ITENS e MAX_TEXTO,
+ * checados depois do parse. O papel deste teto é barrar o absurdo (um corpo
+ * de centenas de MB) antes de gastar CPU desserializando, e ele NUNCA pode
+ * rejeitar um payload legal: o cliente trata a rejeição como determinística e
+ * abandona o lote (src/lib/sync.ts), então um teto apertado demais viraria
+ * perda silenciosa de anotação.
+ *
+ * Pior caso legal: 500 anotações × 20.000 unidades UTF-16 de texto, cada
+ * unidade custando até 3 bytes em UTF-8 (~30 MB), mais ~0,3 MB de ids,
+ * timestamps e nomes de campo das três listas. 32 MiB cobre isso com folga e
+ * ainda corta bem abaixo do teto de corpo do próprio Workers.
+ */
+export const MAX_CORPO = 32 * 1024 * 1024
+
+/**
+ * Teto do corpo em dois estágios: `contentLength` é o header (quando presente,
+ * barra antes de bufferizar) e `tamanho` é o comprimento do corpo já lido —
+ * rede de segurança para o corpo chunked, que chega sem o header.
+ *
+ * `tamanho` vem em unidades UTF-16 e MAX_CORPO em bytes: como um caractere
+ * nunca ocupa menos bytes em UTF-8 do que unidades em UTF-16, a comparação erra
+ * sempre para o lado permissivo — que é o lado certo aqui.
+ */
+export function corpoExcedeLimite(
+  contentLength: string | null | undefined,
+  tamanho?: number,
+): boolean {
+  const declarado = contentLength == null ? Number.NaN : Number(contentLength)
+  if (Number.isFinite(declarado) && declarado > MAX_CORPO) return true
+  return tamanho !== undefined && tamanho > MAX_CORPO
+}
+
 const ISO_CANONICAL = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 // "c:v" ou "c:v-c:v" cabem folgado; o limite existe só para barrar abuso.
 const MAX_VERSE_REF = 32

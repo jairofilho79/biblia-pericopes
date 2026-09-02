@@ -305,6 +305,32 @@ describe('syncNow — push rejeitado com 400', () => {
     expect(errorSpy).toHaveBeenCalledWith('[sync] push rejeitado (400)', expect.any(String))
     errorSpy.mockRestore()
   })
+
+  // 413 é da mesma família: o corpo excede o teto do Worker e vai exceder de
+  // novo em toda retentativa. Cair no ramo de "tenta na próxima" travaria o
+  // outbox para sempre, que é justamente o que o escape do 400 evita.
+  it('POST retornando 413 → mesmo tratamento determinístico do 400', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    await setProgresso(80002, 'concluido')
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        return jsonResponse({ error: 'corpo grande demais' }, { status: 413, ok: false })
+      }
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2) // POST rejeitado + GET do pull
+    expect(await listOutbox()).toEqual([])
+    expect(await getMeta('sync-cursor')).toBe(FUTURE)
+    expect(errorSpy).toHaveBeenCalledWith('[sync] push rejeitado (413)', expect.any(String))
+    errorSpy.mockRestore()
+  })
 })
 
 describe('troca de conta e logout', () => {

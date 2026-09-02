@@ -1,8 +1,8 @@
 // Narração pré-gerada servida do R2: validação da chave e Content-Range.
 
-/** Chave válida: "<voz>/<ordem>.m4a" (ex.: "nt-ml/1600.m4a"); null caso contrário. */
+/** Chave válida: "<voz>/<ordem>.m4a" (áudio) ou "<voz>/<ordem>.json" (manifesto). */
 export function chaveAudio(caminho: string): string | null {
-  return /^[a-z][a-z0-9-]*\/\d+\.m4a$/.test(caminho) ? caminho : null
+  return /^[a-z][a-z0-9-]*\/\d+\.(m4a|json)$/.test(caminho) ? caminho : null
 }
 
 type FaixaR2 = { offset?: number; length?: number; suffix?: number }

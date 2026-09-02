@@ -21,11 +21,32 @@ não deve tocar** em:
 
 - `docs/superpowers/specs/2026-09-01-tts-batch-vozes-design.md`
 - `docs/superpowers/plans/2026-09-01-tts-batch-geracao.md`
-- qualquer pipeline de geração/upload de áudio (spike em `../tts-spike/`)
+- qualquer pipeline de geração/upload de áudio (spike em `../tts-spike/`,
+  corpus em `../tts-corpus/`)
 
-O player imersivo (fase 2 do TTS: áudio pré-gerado com manifesto de
-sincronização por unidade) depende dos áudios prontos — só entra aqui quando
-a outra sessão publicar os manifestos.
+## ✅ P6 DESBLOQUEADA (2026-09-02) — player imersivo (TTS fase 2)
+
+Os áudios E os manifestos de sincronização já estão publicados. Contrato
+(servido pelo Worker a partir do R2, mesmo domínio do app):
+
+- `GET /api/audio/nt-ml/<ordem>.m4a` — narração da perícope (AAC mono,
+  44,1 kHz). Aceita `Range` (seek funciona); cache imutável de 1 ano.
+- `GET /api/audio/nt-ml/<ordem>.json` — manifesto de sincronização:
+  `{ ordem, livro, abbrev, titulo, voz, motor, sr, pausa_unidade,
+  pausa_secao, dur_total, unidades: [{ i, secao, arquivo, texto, chars,
+  inicio, dur }] }`. `inicio`/`dur` em segundos DENTRO do m4a costurado —
+  é o eixo do realce/rolagem via `timeupdate`. `secao` ∈ {titulo, contexto,
+  texto, resenha, reflexoes}. Ignorar `arquivo` (mp3 interno não publicado).
+  As unidades da seção `texto` são os versículos na mesma ordem em que
+  `parse-texto` os produz (com "Capítulo N." fundido ao 1º verso do
+  capítulo); `texto` é o conteúdo normalizado que foi narrado.
+- Cobertura parcial e crescente (~309/1047 perícopes do NT em 2026-09-02;
+  lote diário adiciona mais): o player DEVE tratar 404 como "sem narração"
+  e cair no comportamento atual. `HEAD` no .m4a é a checagem barata.
+- Ponto de partida no código: `src/components/NarracaoPlayer.tsx` (player
+  simples de `<audio>`, commit `1ac5fa7`) — a fase 2 o substitui/estende
+  com realce de unidade e rolagem, nos moldes do realce do TTS sintético
+  já existente na Leitura (`verse-speaking`/`prose-speaking`).
 
 ## Candidatos a próxima fase (escolher com o usuário)
 

@@ -6,6 +6,10 @@ describe('chaveAudio', () => {
     expect(chaveAudio('nt-ml/1600.m4a')).toBe('nt-ml/1600.m4a')
   })
 
+  it('aceita o manifesto voz/ordem.json', () => {
+    expect(chaveAudio('nt-ml/1600.json')).toBe('nt-ml/1600.json')
+  })
+
   it('rejeita travessia de caminho', () => {
     expect(chaveAudio('../segredo.m4a')).toBeNull()
     expect(chaveAudio('nt-ml/../1600.m4a')).toBeNull()

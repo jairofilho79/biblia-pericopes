@@ -17,10 +17,13 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
   servidor, então truncar sem mudar o protocolo faz o cliente pular
   linhas. Precisa de cursor com chave composta (`server_em` + desempate)
   e laço de re-pull no cliente.
-- Sem live refresh após pull: dados sincronizados de outro aparelho só
-  aparecem ao navegar/remontar. Considerar um evento `pericopes-sync`
-  disparado após `applyRemote*` (o streak da Home tem a mesma limitação,
-  comentada em `Home.tsx`).
+- ~~Sem live refresh após pull: dados sincronizados de outro aparelho só
+  aparecem ao navegar/remontar.~~ Feito em 2026-09-02: os `applyRemote*`
+  devolvem quantas linhas mudaram, o pull avisa por `sync-event.ts` só
+  quando mudou algo, e Home, Índice e Leitura assinam via
+  `useSyncRefresh`. O evento anda num `EventTarget` do módulo, não na
+  `window`. Na Leitura o refresh é estreito (destaques, notas, status)
+  para não apagar rascunho em digitação.
 
 ## Leitura
 

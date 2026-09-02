@@ -536,6 +536,50 @@ describe('syncNow — pull paginado', () => {
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
   })
 
+  it('página 2 falha no meio do loop: o cursor fica na fronteira da página 1 E as telas são avisadas', async () => {
+    // O caso que a paginação criou e que não existia antes dela: um pull podia
+    // falhar sem ter aplicado nada, então sair sem avisar era inofensivo. Agora
+    // a página 1 pode entrar no IndexedDB e a página 2 falhar — as linhas já
+    // gravadas PRECISAM chegar nas telas abertas (useSyncRefresh só relê no
+    // evento; sem ele uma Leitura montada fica velha até o próximo timer, 5
+    // minutos). É exatamente o cenário-alvo da funcionalidade: primeira sync
+    // num aparelho novo, rede instável.
+    //
+    // O mesmo teste prende a retomada: o cursor tem que ser gravado A CADA
+    // página, não só no fim do loop. Se fosse só no fim, ele ficaria vazio aqui
+    // e a próxima rodada refaria a página 1 do zero.
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const avisos = vi.fn()
+    const desinscrever = onSync(avisos)
+
+    const CURSOR_PAGINA_1 = '2026-08-31T12:00:00.000Z'
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') return jsonResponse({ ok: true, agora: FUTURE })
+      if (url === '/api/sync?since=') {
+        return jsonResponse({
+          progresso: [{ pericopeOrdem: 90003, status: 'concluido', atualizadoEm: FUTURE }],
+          anotacoes: [],
+          destaques: [],
+          agora: CURSOR_PAGINA_1,
+          maisDados: true,
+        })
+      }
+      return jsonResponse({ error: 'erro interno' }, { status: 500 })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect((await getProgresso(90003))?.status).toBe('concluido')
+    expect(await getMeta('sync-cursor')).toBe(CURSOR_PAGINA_1)
+    expect(avisos).toHaveBeenCalledTimes(1)
+    desinscrever()
+    warn.mockRestore()
+  })
+
   it('respeita o teto de páginas mesmo se o servidor insistir em maisDados', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)

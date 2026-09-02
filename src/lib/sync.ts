@@ -174,13 +174,23 @@ export async function syncNow(): Promise<void> {
       const res = await fetch(`/api/sync?since=${encodeURIComponent(since)}`, {
         credentials: 'include',
       })
+      // Os dois cortes abaixo saem com `break`, não `return`, e a diferença
+      // importa desde que o pull virou um loop: a página 1 pode ter aplicado
+      // linhas antes da página 2 falhar, e `return` pularia o notificarSync()
+      // lá embaixo — as linhas ficariam no IndexedDB sem chegar nas telas
+      // abertas (useSyncRefresh só relê no evento), até o timer de 5 minutos.
+      // Nada acontece depois do loop além desse aviso, então sair por `break`
+      // não continua sincronizando nada: só entrega o que já foi gravado.
+      // Vale igual para o 401 — a sessão já foi derrubada, e as linhas que
+      // entraram antes dela morrer são tão válidas quanto quaisquer outras.
       if (res.status === 401) {
         derrubarSessao()
-        return
+        break
       }
       if (!res.ok) {
+        // o outbox já foi limpo lá em cima; não há nada a proteger saindo cedo
         console.warn('[sync] pull falhou', res.status)
-        return
+        break
       }
       const data = (await res.json()) as {
         progresso: Parameters<typeof applyRemoteProgresso>[0]

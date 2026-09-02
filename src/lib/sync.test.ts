@@ -14,6 +14,7 @@ import {
   setProgresso,
 } from './user-db'
 import { MAX_ITENS_POR_LOTE } from './sync-limits'
+import { onSync } from './sync-event'
 
 vi.mock('./auth-client', () => ({
   authClient: { getSession: vi.fn(), signOut: vi.fn() },
@@ -485,5 +486,71 @@ describe('syncNow — destaques', () => {
     await syncNow()
 
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+})
+
+// O evento é o gatilho do live refresh das telas abertas. Ele sai do pull, e
+// só quando o pull mudou alguma coisa: o servidor reentrega linhas de
+// propósito, e uma rodada de sync acontece de 5 em 5 minutos.
+describe('syncNow — evento de live refresh', () => {
+  it('avisa uma vez quando o pull aplicou linhas', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const avisos = vi.fn()
+    const desinscrever = onSync(avisos)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        jsonResponse({
+          progresso: [{ pericopeOrdem: 70001, status: 'concluido', atualizadoEm: FUTURE }],
+          anotacoes: [],
+          agora: FUTURE,
+        }),
+      ),
+    )
+
+    await syncNow()
+
+    expect(avisos).toHaveBeenCalledTimes(1)
+    expect((await getProgresso(70001))?.status).toBe('concluido')
+    desinscrever()
+  })
+
+  it('fica quieto quando o pull não muda nada', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const avisos = vi.fn()
+    const desinscrever = onSync(avisos)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })),
+    )
+
+    await syncNow()
+
+    expect(avisos).not.toHaveBeenCalled()
+    expect(await getMeta('sync-cursor')).toBe(FUTURE) // o cursor avança do mesmo jeito
+    desinscrever()
+  })
+
+  it('desinscrever corta o aviso', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+    const avisos = vi.fn()
+    onSync(avisos)()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        jsonResponse({
+          progresso: [{ pericopeOrdem: 70002, status: 'concluido', atualizadoEm: FUTURE }],
+          anotacoes: [],
+          agora: FUTURE,
+        }),
+      ),
+    )
+
+    await syncNow()
+
+    expect(avisos).not.toHaveBeenCalled()
   })
 })

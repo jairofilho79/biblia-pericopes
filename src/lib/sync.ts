@@ -1,5 +1,6 @@
 import { authClient } from './auth-client'
 import { MAX_ITENS_POR_LOTE } from './sync-limits'
+import { notificarSync } from './sync-event'
 import {
   applyRemoteDestaques,
   applyRemoteAnotacoes,
@@ -172,10 +173,15 @@ export async function syncNow(): Promise<void> {
       destaques?: Parameters<typeof applyRemoteDestaques>[0]
       agora: string
     }
-    await applyRemoteProgresso(data.progresso)
-    await applyRemoteAnotacoes(data.anotacoes)
-    await applyRemoteDestaques(data.destaques ?? [])
+    const aplicadas =
+      (await applyRemoteProgresso(data.progresso)) +
+      (await applyRemoteAnotacoes(data.anotacoes)) +
+      (await applyRemoteDestaques(data.destaques ?? []))
     await setMeta(CURSOR_KEY, data.agora)
+    // Depois do cursor: se o aviso disparar antes e uma tela reler na hora, ela
+    // já lê o estado final. Só sai quando algo mudou — o pull reentrega linhas
+    // e roda de 5 em 5 minutos.
+    if (aplicadas) notificarSync()
   } catch (err) {
     // offline/erro transitório: outbox preservado, próxima chance sincroniza
     console.warn('[sync] erro', err)

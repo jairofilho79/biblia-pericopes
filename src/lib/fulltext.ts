@@ -1,4 +1,6 @@
-import { loadPericopes, refLabel } from './content'
+import { loadIndex, refLabel } from './content'
+import { livroSlug } from './livro-slug'
+import { carregarTexto } from './shards'
 
 /** Abaixo disso a busca varre o corpus inteiro à toa. */
 export const MIN_CHARS = 3
@@ -151,6 +153,13 @@ export function indexPronto(): boolean {
   return indice !== null
 }
 
+let progresso = { feitos: 0, total: 0 }
+
+/** Quantos livros de texto já entraram no índice — alimenta o "Preparando busca…". */
+export function progressoDoIndice(): { feitos: number; total: number } {
+  return progresso
+}
+
 /**
  * Índice preguiçoso em cache de módulo: uma segunda cópia normalizada dos 2647
  * `texto_naa` (~13 MiB de heap extra, aceito de propósito). Construído na
@@ -161,16 +170,29 @@ async function buildIndex(): Promise<Entrada[]> {
   if (indice) return indice
   if (construindo) return construindo
   construindo = (async () => {
-    const all = await loadPericopes()
-    const out = all.map((p) => {
-      const linhas = indexarLinhas(p.texto_naa)
-      return {
-        ordem: p.ordem,
-        titulo: p.titulo_pericope_pt,
-        ref: refLabel(p),
-        textoNorm: linhas.map((l) => normalize(l.texto)).join('\n'),
-        linhas,
-      }
+    const meta = await loadIndex()
+    const slugs = [...new Set(meta.map((p) => livroSlug(p.livro)))]
+    progresso = { feitos: 0, total: slugs.length }
+    const textos = new Map<number, string>()
+    // Um livro por vez: a busca é a única coisa que o usuário está esperando
+    // aqui, mas 66 requisições paralelas afogariam uma conexão móvel.
+    for (const slug of slugs) {
+      for (const [ordem, texto] of await carregarTexto(slug)) textos.set(ordem, texto)
+      progresso = { feitos: progresso.feitos + 1, total: slugs.length }
+    }
+    const out = meta.flatMap((p) => {
+      const texto = textos.get(p.ordem)
+      if (texto === undefined) return []
+      const linhas = indexarLinhas(texto)
+      return [
+        {
+          ordem: p.ordem,
+          titulo: p.titulo_pericope_pt,
+          ref: refLabel(p),
+          textoNorm: linhas.map((l) => normalize(l.texto)).join('\n'),
+          linhas,
+        },
+      ]
     })
     indice = out
     construindo = null

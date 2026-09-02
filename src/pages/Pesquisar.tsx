@@ -18,6 +18,7 @@ import {
   LIMITE_RESULTADOS,
   marcarTrecho,
   MIN_CHARS,
+  progressoDoIndice,
   searchTexto,
   type FulltextHit,
 } from '../lib/fulltext'
@@ -68,6 +69,7 @@ export default function Pesquisar() {
   const [buscando, setBuscando] = useState(false)
   const [preparando, setPreparando] = useState(false)
   const [erro, setErro] = useState(false)
+  const [progressoBusca, setProgressoBusca] = useState({ feitos: 0, total: 0 })
 
   const termo = texto.trim()
 
@@ -127,6 +129,15 @@ export default function Pesquisar() {
       window.clearTimeout(timer)
     }
   }, [modo, termo])
+
+  // `progressoDoIndice()` é uma leitura de módulo, não um estado de React: sem
+  // uma amostragem periódica a barra ficaria congelada no valor do primeiro
+  // render. O intervalo só existe enquanto há o que mostrar.
+  useEffect(() => {
+    if (!preparando) return
+    const id = window.setInterval(() => setProgressoBusca(progressoDoIndice()), 300)
+    return () => window.clearInterval(id)
+  }, [preparando])
 
   function selectBook(book: BibleBook) {
     setSelected(book)
@@ -208,7 +219,12 @@ export default function Pesquisar() {
           )}
 
           <div aria-live="polite">
-            {preparando && <p className="muted">Preparando busca…</p>}
+            {preparando && (
+              <p className="muted">
+                Preparando busca
+                {progressoBusca.total > 0 && ` — ${progressoBusca.feitos} de ${progressoBusca.total} livros`}…
+              </p>
+            )}
             {!preparando && buscando && <p className="muted">Buscando…</p>}
 
             {!buscando && erro && (

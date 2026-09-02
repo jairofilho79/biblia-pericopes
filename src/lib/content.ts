@@ -29,16 +29,6 @@ export async function loadIndex(): Promise<PericopeIndex[]> {
   return carregando
 }
 
-let cache: Pericope[] | null = null
-
-export async function loadPericopes(): Promise<Pericope[]> {
-  if (cache) return cache
-  const res = await fetch(`${import.meta.env.BASE_URL}data/pericopes.json`)
-  if (!res.ok) throw new Error('Falha ao carregar perícopes')
-  cache = (await res.json()) as Pericope[]
-  return cache
-}
-
 export async function listPericopes(opts?: {
   livro?: string
   q?: string

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fatiarResultado, indexarLinhas, marcarTrecho, normalize, searchTexto, snippetAt, verseIdAtOffset } from './fulltext'
+import { livroSlug } from './livro-slug'
 import type { Pericope } from './types'
 
 const TEXTO =
@@ -31,8 +32,20 @@ const FIXTURES: Pericope[] = [
 
 vi.mock('./content', async (importOriginal) => {
   const real = await importOriginal<typeof import('./content')>()
-  return { ...real, loadPericopes: async () => FIXTURES }
+  return {
+    ...real,
+    loadIndex: async () => FIXTURES.map(({ texto_naa: _t, ...meta }) => meta),
+  }
 })
+
+vi.mock('./shards', () => ({
+  carregarTexto: async (slug: string) =>
+    new Map(
+      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, p.texto_naa]),
+    ),
+  carregarEstudo: async () => new Map(),
+  shardCarregado: () => true,
+}))
 
 const LONGO = `${'a'.repeat(60)} meio ${'b'.repeat(60)}`
 
@@ -160,10 +173,10 @@ describe('buildIndex — recuperação de falha', () => {
       const real = await importOriginal<typeof import('./content')>()
       return {
         ...real,
-        loadPericopes: async () => {
+        loadIndex: async () => {
           chamadas += 1
           if (chamadas === 1) throw new Error('offline')
-          return FIXTURES
+          return FIXTURES.map(({ texto_naa: _t, ...meta }) => meta)
         },
       }
     })

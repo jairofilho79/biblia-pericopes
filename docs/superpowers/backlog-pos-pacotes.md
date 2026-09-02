@@ -87,7 +87,20 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
   some durante a janela de debounce.~~ Feito em 2026-09-02: a busca pede
   `LIMITE_RESULTADOS + 1` e `fatiarResultado` decide o corte; o termo viaja
   junto dos hits no mesmo estado.
-- Flash de 1 frame da barra de chips antes de `--top-h` ser medido.
+- ~~Flash de 1 frame da barra de chips antes de `--top-h` ser medido.~~ Feito
+  em 2026-09-02: a medição virou `useLayoutEffect`, então roda antes da
+  pintura. **Mas ver o item abaixo** — o benefício visível não pôde ser
+  confirmado.
+- **Barra de chips sobrepõe o header ao rolar** (achado em 2026-09-02,
+  PRÉ-EXISTENTE, confirmado idêntico na base sem o P3). Com o header
+  visível, os chips grudam em `top: 0` e cobrem os 55px dele. A regra
+  vencedora é `.section-chips { top: var(--top-h, 0px) }`, ela casa com o
+  elemento, `--top-h` vale `55px` no `:root` e é visível pelos chips — e
+  mesmo assim o `top` computado resolve para `0px`. A regra
+  `.shell:has(.top-hidden)` não está casando. Causa não identificada em três
+  tentativas de investigação. Consequência colateral: enquanto o `top` não
+  consumir `--top-h`, a correção do flash acima está certa no código mas sem
+  efeito visível — as duas coisas precisam ser resolvidas juntas.
 - ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
   regras viraram uma (ambas no topo, sem `@media` em volta).
 

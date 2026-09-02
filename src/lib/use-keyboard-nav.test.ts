@@ -118,7 +118,7 @@ describe('shouldHandleKey — linha de chips', () => {
   })
 })
 
-// <audio controls> já usa ←/→ como seek nativo de ±5s. Engolir a seta ali
+// O player de narração usa ←/→ como salto de ±10 s. Engolir a seta ali
 // trocaria de perícope, desmontando o áudio e perdendo a posição.
 describe('isMediaTarget', () => {
   it('elemento audio é alvo de mídia', () => {
@@ -149,7 +149,7 @@ describe('shouldHandleKey — player de narração', () => {
     return audio
   }
 
-  it('foco no <audio> deixa a seta para o seek nativo', () => {
+  it('foco dentro do player deixa a seta para o salto dele', () => {
     expect(decidir('ArrowLeft', audioDoPlayer())).toBeNull()
     expect(decidir('ArrowRight', audioDoPlayer())).toBeNull()
   })

@@ -25,6 +25,11 @@ data/enrich-state.json
 data/NAA.json
 data/preach-sample/
 
+# Derivados do catálogo (gerados por scripts/shard-catalogo.ts no build)
+public/data/index.json
+public/data/texto/
+public/data/estudo/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

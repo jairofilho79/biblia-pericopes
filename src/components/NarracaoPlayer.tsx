@@ -7,6 +7,7 @@ type Props = {
   ordem: number
   /** Alvos renderizados, na ordem de leitura. Memoize na Leitura. */
   secoes: SecaoAlvos[]
+  /** Chamado só quando o alvo em fala muda. DEVE ser uma referência estável. */
   onAlvo: (id: string | null) => void
 }
 
@@ -96,6 +97,10 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo }: Props) {
 
     const w = indiceDaPalavra(alvo, t, iPalavra.current)
     if (w < 0) return
+    // Sai antes de tocar no DOM quando a palavra não mudou: o timeupdate
+    // dispara ~4x/s e a palavra troca ~2,5x/s, então boa parte dos ticks não
+    // tem nada a fazer. `spanAtual` cobre o caso de o span ainda não existir.
+    if (w === iPalavra.current && spanAtual.current) return
     iPalavra.current = w
     const el = document.querySelector<HTMLElement>(`[data-verse-id="${alvo.id}"] [data-w="${w}"]`)
     if (!el || el === spanAtual.current) return

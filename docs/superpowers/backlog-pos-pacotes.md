@@ -87,9 +87,10 @@ alcançável por um cliente normal. Registrados para não se perderem.
   em 2026-09-02: `onEnd` usa o mesmo `hasOpenDialog` do teclado, importado
   de lá em vez de duplicado, para as duas formas de navegar não poderem
   discordar.
-- TTS: `onerror` aborta a fila inteira (escolha de design registrada);
-  falta cobertura de teste para "play superseded" e para o hook de wake
-  lock (repo sem infra de teste de hooks).
+- Falta cobertura de teste para o hook de wake lock (repo sem infra de
+  teste de hooks). As outras duas metades deste item — o `onerror` que
+  abortava a fila inteira e a cobertura de "play superseded" — saíram em
+  2026-09-02 junto com a remoção do TTS sintético.
 - Espaçamento padrão de leitura mudou de 1.75 para 1.65 com a escala nova
   `[1.5, 1.65, 1.8, 1.95]` — deliberado (spec §6); quem preferir mais
   respiro ajusta no "Aa".

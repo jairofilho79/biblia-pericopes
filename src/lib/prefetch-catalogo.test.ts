@@ -109,4 +109,36 @@ describe('iniciarPrefetch', () => {
     // loadIndex foi chamado 2 vezes: primeira falha, segunda sucesso
     expect(contentModule.loadIndex).toHaveBeenCalledTimes(2)
   })
+
+  // Em alguns contextos (ex.: iframe sandboxed no Firefox) só ler
+  // `navigator.serviceWorker` já lança SecurityError. Sem tratamento, a
+  // promise da espera rejeita, `.then(executarFila)` nunca roda e `rodando`
+  // fica travado em `true` para sempre — os ouvintes de `online` e
+  // `visibilitychange` ficam inertes pelo resto da sessão.
+  it('falha ao acessar o service worker não trava a fila para sempre', async () => {
+    // Simula o SecurityError de um iframe sandboxed: só ler
+    // `navigator.serviceWorker` já lança.
+    vi.stubGlobal('navigator', {
+      get serviceWorker(): never {
+        throw new Error('SecurityError: acesso negado ao service worker')
+      },
+    })
+    vi.spyOn(contentModule, 'loadIndex').mockResolvedValue([{ livro: 'Gênesis' }] as any)
+    vi.spyOn(shardsModule, 'shardCarregado').mockReturnValue(true)
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    iniciarPrefetch()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(contentModule.loadIndex).not.toHaveBeenCalled()
+
+    // Um navegador "normal" volta a responder (ex.: a aba deixou de estar
+    // sandboxed, ou é só outro contexto). Uma nova chamada — ou o ouvinte de
+    // `online`/`visibilitychange` — precisa conseguir iniciar a fila de novo:
+    // ela não pode ter ficado presa em `rodando = true` por causa da falha
+    // anterior.
+    vi.stubGlobal('navigator', { serviceWorker: { ready: Promise.resolve() } })
+    iniciarPrefetch()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(contentModule.loadIndex).toHaveBeenCalledTimes(1)
+  })
 })

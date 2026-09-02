@@ -95,7 +95,17 @@ export function iniciarPrefetch(): void {
   registrarOuvintes()
 
   const comecar = () => {
-    void esperarServiceWorker().then(executarFila)
+    // Mesmo só ler `navigator.serviceWorker` pode lançar (ex.: SecurityError
+    // num iframe sandboxed no Firefox). Sem este catch, a promise rejeitada
+    // pula o `.then(executarFila)` e `rodando` fica travado em `true` para
+    // sempre — os ouvintes de `online`/`visibilitychange` nunca mais tentam
+    // de novo nesta sessão.
+    void esperarServiceWorker()
+      .then(executarFila)
+      .catch((err) => {
+        rodando = false
+        console.warn('[prefetch] falha ao aguardar o service worker', err)
+      })
   }
   if (typeof requestIdleCallback === 'function') requestIdleCallback(comecar, { timeout: 3000 })
   else setTimeout(comecar, 2000)

@@ -916,6 +916,24 @@ button.ghost {
   margin: -0.3rem 0 0.7rem;
 }
 
+.narracao {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: -0.3rem 0 0.7rem;
+}
+
+.narracao-rotulo {
+  font-size: 0.85rem;
+  color: var(--muted, #666);
+  white-space: nowrap;
+}
+
+.narracao audio {
+  width: 100%;
+  height: 34px;
+}
+
 /* realce da fala: sublinhado discreto, distinto do foco (fundo) e dos
    destaques de cor — os três podem coexistir no mesmo versículo. */
 .verse.verse-speaking,

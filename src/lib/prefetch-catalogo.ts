@@ -16,6 +16,50 @@ export function filaDePrefetch(slugs: string[]): ItemDaFila[] {
 }
 
 let rodando = false
+let ouvintesRegistrados = false
+
+// Só para testes: reseta o estado
+export function __resetStateForTesting(): void {
+  rodando = false
+  ouvintesRegistrados = false
+}
+
+async function executarFila(): Promise<void> {
+  try {
+    const slugs = [...new Set((await loadIndex()).map((p) => livroSlug(p.livro)))]
+    for (const { tipo, slug } of filaDePrefetch(slugs)) {
+      if (shardCarregado(tipo, slug)) continue
+      try {
+        if (tipo === 'texto') await carregarTexto(slug)
+        else await carregarEstudo(slug)
+      } catch (err) {
+        // Offline no meio da fila é rotina num PWA: para por aqui e a próxima
+        // visita retoma de onde o Cache Storage deixou.
+        rodando = false
+        console.warn('[prefetch] fila interrompida por falha de rede', err)
+        return
+      }
+    }
+    rodando = false
+  } catch (err) {
+    rodando = false
+    console.warn('[prefetch] falha ao carregar índice', err)
+  }
+}
+
+function registrarOuvintes(): void {
+  if (ouvintesRegistrados) return
+  if (typeof window === 'undefined') return // Não em ambiente navegador
+  ouvintesRegistrados = true
+
+  window.addEventListener('online', () => {
+    if (!rodando) iniciarPrefetch()
+  })
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !rodando) iniciarPrefetch()
+  })
+}
 
 /**
  * Baixa o catálogo inteiro em segundo plano, um arquivo por vez, para o app
@@ -25,21 +69,10 @@ let rodando = false
 export function iniciarPrefetch(): void {
   if (rodando) return
   rodando = true
+  registrarOuvintes()
+
   const comecar = () => {
-    void (async () => {
-      const slugs = [...new Set((await loadIndex()).map((p) => livroSlug(p.livro)))]
-      for (const { tipo, slug } of filaDePrefetch(slugs)) {
-        if (shardCarregado(tipo, slug)) continue
-        try {
-          if (tipo === 'texto') await carregarTexto(slug)
-          else await carregarEstudo(slug)
-        } catch {
-          // Offline no meio da fila é rotina num PWA: para por aqui e a próxima
-          // visita retoma de onde o Cache Storage deixou.
-          return
-        }
-      }
-    })()
+    void executarFila()
   }
   if (typeof requestIdleCallback === 'function') requestIdleCallback(comecar, { timeout: 3000 })
   else setTimeout(comecar, 2000)

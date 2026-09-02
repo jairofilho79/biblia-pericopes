@@ -377,7 +377,11 @@ export default function Leitura() {
     if (!el) return
     const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     el.scrollIntoView({ block: 'center', behavior: reduzido ? 'auto' : 'smooth' })
-  }, [falando, barOpen, editingId, draftRef])
+    // `contextoAberto` entra aqui porque o efeito que abre a seção Contexto
+    // ao entrar em fala roda no mesmo commit, mas o DOM só ganha caixa de
+    // layout no render seguinte: sem esta dependência, o scrollIntoView de
+    // cima teria rodado cedo demais e não rodaria de novo.
+  }, [falando, barOpen, editingId, draftRef, contextoAberto])
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()

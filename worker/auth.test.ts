@@ -5,8 +5,9 @@ import type { Env } from './env.d'
 
 function fakeEnv(overrides: Partial<Env> = {}): Env {
   return {
-    // Nunca usado nestes testes: nenhum deles chega a executar uma query.
+    // Nunca usados nestes testes: nenhum deles chega a executar uma query.
     DB: {} as Env['DB'],
+    AUDIO: {} as Env['AUDIO'],
     BETTER_AUTH_SECRET: 'test-secret',
     APP_URL: 'http://localhost:8787',
     EMAIL_FROM: 'Perícopes <onboarding@resend.dev>',

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { cabecalhoContentRange, chaveAudio } from './audio'
 import { createAuth } from './auth'
 import { corpoExcedeLimite, parseSyncPush } from './sync-logic'
 import type { Env } from './env.d'
@@ -133,6 +134,30 @@ app.post('/api/sync', async (c) => {
   ]
   if (stmts.length) await c.env.DB.batch(stmts)
   return c.json({ ok: true, agora: serverEm })
+})
+
+// Narração pré-gerada (R2). Pública como o texto que ela narra; imutável por
+// chave (regenerar uma voz ganha outro prefixo), então o cache pode ser eterno.
+app.on(['GET', 'HEAD'], '/api/audio/*', async (c) => {
+  const chave = chaveAudio(c.req.path.replace('/api/audio/', ''))
+  if (!chave) return c.json({ error: 'não encontrado' }, 404)
+  const cabecalhos = new Headers({
+    'accept-ranges': 'bytes',
+    'cache-control': 'public, max-age=31536000, immutable',
+  })
+  if (c.req.method === 'HEAD') {
+    const meta = await c.env.AUDIO.head(chave)
+    if (!meta) return c.json({ error: 'não encontrado' }, 404)
+    meta.writeHttpMetadata(cabecalhos)
+    cabecalhos.set('content-length', String(meta.size))
+    return new Response(null, { headers: cabecalhos })
+  }
+  const obj = await c.env.AUDIO.get(chave, { range: c.req.raw.headers })
+  if (!obj) return c.json({ error: 'não encontrado' }, 404)
+  obj.writeHttpMetadata(cabecalhos)
+  const contentRange = cabecalhoContentRange(obj.range, obj.size)
+  if (contentRange) cabecalhos.set('content-range', contentRange)
+  return new Response(obj.body, { status: contentRange ? 206 : 200, headers: cabecalhos })
 })
 
 app.notFound((c) => c.json({ error: 'não encontrado' }, 404))

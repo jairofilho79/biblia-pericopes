@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import NarracaoPlayer from '../components/NarracaoPlayer'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
 import { SkeletonLeitura } from '../components/Skeleton'
@@ -652,6 +653,8 @@ export default function Leitura() {
           if (id === 'contexto') abrirContexto()
         }}
       />
+
+      <NarracaoPlayer ordem={p.ordem} />
 
       {temTts && (
         <BarraOuvir

@@ -151,6 +151,9 @@ export const TAMANHO_PAGINA_PULL = 2000
 /** Uma linha do pull, na parte que paginarPull precisa: o carimbo do servidor. */
 export type LinhaPull = { serverEm: string }
 
+/** As três listas do pull, pelo nome. */
+export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques'
+
 export type ResultadoPaginacaoPull<
   P extends LinhaPull,
   A extends LinhaPull,
@@ -168,6 +171,24 @@ export type ResultadoPaginacaoPull<
   cursor: string | null
   /** true quando o cliente precisa pedir a próxima página imediatamente. */
   maisDados: boolean
+  /**
+   * Entidades cuja lista devolvida aqui pode ser só um PEDAÇO do grupo de
+   * `cursor` — a janela buscada acabou dentro do grupo, e daqui não dá pra
+   * saber quantas linhas dele ficaram de fora.
+   *
+   * O chamador é OBRIGADO a fechar cada um desses grupos antes de responder:
+   * rebuscar a entidade com `WHERE user_id = ? AND server_em = cursor` (sem
+   * LIMIT) e usar o resultado no lugar da lista daqui. Ignorar isto perde
+   * linha em silêncio, porque o cursor avança para `cursor` e a próxima
+   * página consulta `server_em > cursor` — o grupo nunca mais é visitado.
+   *
+   * Substituir (e não concatenar) é correto porque esta lista só entra aqui
+   * quando TODAS as linhas buscadas da entidade empatam em `cursor`: não há
+   * nenhuma linha abaixo dele para preservar.
+   *
+   * Vazio no caso normal, que é a esmagadora maioria dos pulls.
+   */
+  gruposIncompletos: EntidadePull[]
 }
 
 /**
@@ -185,19 +206,29 @@ export type ResultadoPaginacaoPull<
  *
  * Se TODAS as n+1 linhas empatarem — um grupo maior que a página inteira —
  * não sobra corte possível sem ficar parado (cursor == since, o cliente
- * giraria pedindo a mesma página pra sempre). Nesse caso o grupo inteiro é
- * entregue mesmo passando de n: ele é o próprio limite (server_em da sonda),
- * e o cursor avança de verdade. Isso é seguro porque um único server_em não
- * pode ter mais linhas do que um POST aceita por lista (MAX_ITENS = 500) —
- * salvo o caso raro de dois POSTs caindo no mesmíssimo milissegundo, que
- * ainda assim converge: a próxima rodada busca de novo esse server_em com
- * uma nova janela de n+1 e, se ainda estourar, repete o mesmo raciocínio.
+ * giraria pedindo a mesma página pra sempre). O único jeito de avançar é
+ * entregar o grupo INTEIRO e passar por cima dele; mas o grupo inteiro não
+ * está nesta janela, e a janela não sabe quanto dele sobrou de fora. Por
+ * isso o retorno marca `grupoIncompleto`: o limite é o server_em do grupo, e
+ * o chamador tem que rebuscar o grupo completo (`WHERE server_em = limite`,
+ * sem LIMIT) antes de responder. Sem essa rebusca o cursor avançaria por
+ * cima de linhas nunca entregues — e a próxima query, `server_em > cursor`,
+ * jamais voltaria a elas: perda permanente.
+ *
+ * A rebusca é barata e limitada na prática: um POST carimba no máximo
+ * MAX_ITENS = 500 linhas por lista com o mesmo server_em, então só POSTs
+ * concorrentes no mesmíssimo milissegundo empilham mais que isso.
  */
-function limiteDaEntidadeEstourada(linhas: readonly LinhaPull[]): string {
+function limiteDaEntidadeEstourada(linhas: readonly LinhaPull[]): {
+  limite: string
+  grupoIncompleto: boolean
+} {
   const maiorServerEm = linhas[linhas.length - 1].serverEm
   let corte = linhas.length
   while (corte > 0 && linhas[corte - 1].serverEm === maiorServerEm) corte--
-  return corte > 0 ? linhas[corte - 1].serverEm : maiorServerEm
+  return corte > 0
+    ? { limite: linhas[corte - 1].serverEm, grupoIncompleto: false }
+    : { limite: maiorServerEm, grupoIncompleto: true }
 }
 
 /**
@@ -218,20 +249,35 @@ function limiteDaEntidadeEstourada(linhas: readonly LinhaPull[]): string {
  * acima desse mínimo é descartada — inclusive de entidades que não
  * estouraram por si só. Essas linhas voltam sozinhas na próxima página,
  * porque o próximo pull consulta server_em > cursor.
+ *
+ * INVARIANTE: o cursor nunca avança por cima de um server_em cujas linhas não
+ * foram todas entregues. Nos cortes normais isso sai de graça — a janela
+ * enxerga o fim do grupo (é ele que faz o corte existir). No caso do grupo
+ * maior que a janela, quem fecha o buraco é `gruposIncompletos`, que o
+ * chamador PRECISA honrar.
  */
 export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends LinhaPull>(
   listas: { progresso: P[]; anotacoes: A[]; destaques: D[] },
   n: number,
 ): ResultadoPaginacaoPull<P, A, D> {
-  const fronteiras = [listas.progresso, listas.anotacoes, listas.destaques]
-    .filter((linhas) => linhas.length > n)
-    .map(limiteDaEntidadeEstourada)
+  const fronteiras = (
+    [
+      { nome: 'progresso', linhas: listas.progresso as LinhaPull[] },
+      { nome: 'anotacoes', linhas: listas.anotacoes as LinhaPull[] },
+      { nome: 'destaques', linhas: listas.destaques as LinhaPull[] },
+    ] satisfies { nome: EntidadePull; linhas: LinhaPull[] }[]
+  )
+    .filter(({ linhas }) => linhas.length > n)
+    .map(({ nome, linhas }) => ({ nome, ...limiteDaEntidadeEstourada(linhas) }))
 
   if (fronteiras.length === 0) {
-    return { ...listas, cursor: null, maisDados: false }
+    return { ...listas, cursor: null, maisDados: false, gruposIncompletos: [] }
   }
 
-  const cursor = fronteiras.reduce((menor, atual) => (atual < menor ? atual : menor))
+  const cursor = fronteiras.reduce(
+    (menor, atual) => (atual.limite < menor ? atual.limite : menor),
+    fronteiras[0].limite,
+  )
   const cortar = <T extends LinhaPull>(linhas: T[]): T[] =>
     linhas.filter((l) => l.serverEm <= cursor)
 
@@ -241,6 +287,14 @@ export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends 
     destaques: cortar(listas.destaques),
     cursor,
     maisDados: true,
+    // Só a entidade que empatou tudo E cuja fronteira virou o cursor tem
+    // grupo em aberto. Se a fronteira dela perdeu para um mínimo menor, as
+    // linhas dela foram cortadas fora por inteiro e voltam na próxima página.
+    // As demais entidades enxergam o fim do grupo do cursor dentro da própria
+    // janela (ela vai além dele), então já vieram completas.
+    gruposIncompletos: fronteiras
+      .filter((f) => f.grupoIncompleto && f.limite === cursor)
+      .map((f) => f.nome),
   }
 }
 

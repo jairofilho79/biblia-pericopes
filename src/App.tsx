@@ -6,14 +6,14 @@ import Indice from './pages/Indice'
 import Pesquisar from './pages/Pesquisar'
 import Entrar from './pages/Entrar'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
-import { getStoredTheme, resolveTheme, toggleTheme, type Theme } from './lib/theme'
+import { getStoredTheme, resolveTheme } from './lib/theme'
 import { authClient } from './lib/auth-client'
 import { initSyncTriggers, signOutLocal } from './lib/sync'
 import { useHideOnScroll } from './lib/use-hide-on-scroll'
 import { iniciarPrefetch } from './lib/prefetch-catalogo'
+import ThemeMenu from './components/ThemeMenu'
 
 function Shell() {
-  const [theme, setTheme] = useState<Theme>(() => resolveTheme())
   const { data: session } = authClient.useSession()
   const { pathname } = useLocation()
   const headerHidden = useHideOnScroll(pathname.startsWith('/leitura/'))
@@ -47,20 +47,13 @@ function Shell() {
     iniciarPrefetch()
   }, [])
 
-  useEffect(() => {
-    const onTheme = () => setTheme(resolveTheme())
-    window.addEventListener('pericopes-theme', onTheme)
-    return () => window.removeEventListener('pericopes-theme', onTheme)
-  }, [])
-
-  // Sem preferência gravada, o app segue o sistema em tempo real.
+  // Sem preferência gravada, o app segue o sistema em tempo real. Só o
+  // dataset muda: o ThemeMenu mostra a preferência ("Sistema"), não o resolvido.
   useEffect(() => {
     const mq = matchMedia('(prefers-color-scheme: dark)')
     const onSystem = () => {
       if (getStoredTheme() !== null) return
-      const t = resolveTheme()
-      document.documentElement.dataset.theme = t
-      setTheme(t)
+      document.documentElement.dataset.theme = resolveTheme()
     }
     mq.addEventListener('change', onSystem)
     return () => mq.removeEventListener('change', onSystem)
@@ -79,15 +72,7 @@ function Shell() {
           />
           <span>Perícopes</span>
         </NavLink>
-        <button
-          type="button"
-          className="theme-toggle"
-          onClick={() => setTheme(toggleTheme())}
-          aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
-          title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-        >
-          {theme === 'dark' ? 'Claro' : 'Escuro'}
-        </button>
+        <ThemeMenu />
         <nav>
           <NavLink to="/" end>
             Hoje

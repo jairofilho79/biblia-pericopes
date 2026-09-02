@@ -30,8 +30,11 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
 - Chip de vínculo de anotação navega via URL (`?v=`) e o load effect
   descarta rascunho/edição em andamento; virar handler local
   (seleção + scroll) ou preservar `draft` quando só o `verseParam` muda.
-- Barra de ações (`VerseActions`): `role="dialog"` sem foco movido para
-  dentro nem devolvido ao versículo ao fechar; alvo de melhoria de a11y.
+- ~~Barra de ações (`VerseActions`): `role="dialog"` sem foco movido para
+  dentro nem devolvido ao versículo ao fechar.~~ Feito em 2026-09-02: o foco
+  entra na caixa (que tem `aria-label`) e volta ao versículo ao fechar, com
+  guard de `isConnected`. Continua sem armadilha de foco (Tab sai da barra) —
+  ela não é modal, e uma armadilha sem `aria-modal` seria pior.
 - Swipe sem guard de diálogo aberto (assimetria com o teclado, que usa
   `hasOpenDialog`); hoje inócuo porque a barra fecha na navegação.
 - TTS: `onerror` aborta a fila inteira (escolha de design registrada);
@@ -43,18 +46,23 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
 
 ## Navegação / Índice / Busca
 
-- Após navegar por chip, o foco não move para a seção (adicionar
-  `tabindex="-1"` + `focus({ preventScroll: true })`).
-- ←/→ com foco na linha de chips: `preventDefault` impede a rolagem
-  horizontal por teclado da própria linha.
-- Referência viva muda de largura ("Gn 1:1" → "Gn 12:34") e faz a linha
-  de chips tremer; reservar `min-width` em `ch`.
-- Pesquisar: "(primeiros)" aparece com exatamente 50 resultados (buscar
-  `limit + 1` e fatiar); `<mark>` some durante a janela de debounce
-  (guardar o termo junto dos hits).
+- ~~Após navegar por chip, o foco não move para a seção.~~ Feito em
+  2026-09-02: as quatro seções têm `tabindex="-1"` e `irPara` faz
+  `focus({ preventScroll: true })` depois da rolagem suave.
+- ~~←/→ com foco na linha de chips: `preventDefault` impedia a rolagem
+  horizontal por teclado da própria linha.~~ Feito em 2026-09-02:
+  `shouldHandleKey` devolve `null` quando o alvo está dentro de
+  `.section-chips-row`.
+- ~~Referência viva muda de largura ("Gn 1:1" → "Gn 12:34") e faz a linha
+  de chips tremer.~~ Feito em 2026-09-02: `min-width: 10ch` em
+  `.section-ref`, medido do pior rótulo real ("1Sm 150:89").
+- ~~Pesquisar: "(primeiros)" aparece com exatamente 50 resultados; `<mark>`
+  some durante a janela de debounce.~~ Feito em 2026-09-02: a busca pede
+  `LIMITE_RESULTADOS + 1` e `fatiarResultado` decide o corte; o termo viaja
+  junto dos hits no mesmo estado.
 - Flash de 1 frame da barra de chips antes de `--top-h` ser medido.
-- Seletor `.book-group` duplicado no CSS (propriedades disjuntas; squash
-  cosmético).
+- ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
+  regras viraram uma (ambas no topo, sem `@media` em volta).
 
 ## UI geral
 

@@ -7,6 +7,7 @@ import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
 import { SkeletonLeitura } from '../components/Skeleton'
 import VerseActions from '../components/VerseActions'
+import DitarBotao from '../components/DitarBotao'
 import {
   anteriorNoTestamento,
   getPericope,
@@ -38,6 +39,7 @@ import { nextSelection, parseVerseRef, rangeLabel, rangeRef, verseRefLabel, vers
 import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
+import { inserirNoCursor } from '../lib/ditado'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
@@ -106,6 +108,7 @@ export default function Leitura() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const rootRef = useRef<HTMLElement>(null)
+  const notaRef = useRef<HTMLTextAreaElement>(null)
   const ordem = Number(ordemParam)
   const verseParam = searchParams.get('v')
   const [p, setP] = useState<Pericope | null>(null)
@@ -408,6 +411,27 @@ export default function Leitura() {
     } catch {
       flashAviso('Não foi possível salvar agora')
     }
+  }
+
+  /**
+   * O texto ditado entra onde o cursor estava (ou no lugar da seleção), e o
+   * foco volta pro textarea com o cursor logo depois — a pessoa revisa e
+   * salva como sempre; nada é gravado sozinho. Lê `el.value` em vez de
+   * `draft`: a transcrição chega segundos depois do render que criou este
+   * callback, e o valor do elemento é sempre o atual.
+   */
+  function inserirDitado(trecho: string) {
+    const el = notaRef.current
+    const atual = el?.value ?? draft
+    const inicio = el?.selectionStart ?? atual.length
+    const fim = el?.selectionEnd ?? atual.length
+    const { texto, cursor } = inserirNoCursor(atual, inicio, fim, trecho)
+    setDraft(texto)
+    // Depois do commit do React, senão o setSelectionRange cai no valor velho.
+    window.setTimeout(() => {
+      el?.focus()
+      el?.setSelectionRange(cursor, cursor)
+    }, 0)
   }
 
   function editarNota(n: Anotacao) {
@@ -802,6 +826,7 @@ export default function Leitura() {
                 </p>
               )}
               <textarea
+                ref={notaRef}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 rows={4}
@@ -814,6 +839,7 @@ export default function Leitura() {
                     Cancelar
                   </button>
                 )}
+                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
               </div>
             </form>
             <ul className="note-list">

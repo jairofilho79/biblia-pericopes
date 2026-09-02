@@ -24,6 +24,8 @@
      texto normal sobre --paper (o .cap-label em fala é texto, não título grande). */
   --candle: #9a6618;
   --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
+  /* gravando: o vermelho do microfone aberto. Um só tom para claro e sépia. */
+  --rec: #c0392b;
   --radius: 12px;
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Source Serif 4 Variable', Georgia, serif;
@@ -64,6 +66,8 @@
      translúcida sobre papel escuro some antes do que sobre papel claro. */
   --candle: #e8b45a;
   --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
+  /* no escuro o vermelho sobe um tom, senão afunda no papel. */
+  --rec: #e4655a;
   color-scheme: dark;
 }
 
@@ -89,6 +93,7 @@
   --hl-rosa: #ecc9cf;
   --candle: #8f5c1c;
   --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
+  --rec: #c0392b;
   color-scheme: light;
 }
 
@@ -115,6 +120,7 @@
     --hl-rosa: #4e2437;
     --candle: #e8b45a;
     --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
+    --rec: #e4655a;
     color-scheme: dark;
   }
 }
@@ -1666,6 +1672,76 @@ button.ghost {
   gap: 0.9rem;
   font-family: var(--font-ui);
   font-size: 0.9rem;
+}
+
+/* Ditado: microfone redondo na linha de ações do formulário de anotação.
+   `.note-form button` pinta todo botão do form; daqui a especificidade maior
+   para o microfone escapar do estilo de "Salvar". */
+.ditar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* fica na ponta direita da linha, longe do "Salvar" — no celular os dois
+     não podem ser confundidos por um dedo. */
+  margin-left: auto;
+}
+
+.note-form .ditar-botao {
+  width: 2.5rem;
+  min-height: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--accent);
+}
+
+.note-form .ditar-botao:disabled {
+  color: var(--muted);
+  cursor: default;
+  opacity: 0.7;
+}
+
+.note-form .ditar-botao.gravando {
+  background: var(--rec);
+  border-color: var(--rec);
+  color: #fff;
+  animation: ditar-pulso 1.4s ease-out infinite;
+}
+
+.ditar-status {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+  /* dígitos de largura fixa: o contador não "treme" a cada segundo. */
+  font-variant-numeric: tabular-nums;
+}
+
+.ditar-botao.gravando + .ditar-status {
+  color: var(--rec);
+}
+
+@keyframes ditar-pulso {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--rec) 50%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 0.6rem transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-form .ditar-botao.gravando {
+    animation: none;
+    /* sem o pulso, o anel parado ainda diz "aberto". */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--rec) 35%, transparent);
+  }
 }
 
 .linkish {

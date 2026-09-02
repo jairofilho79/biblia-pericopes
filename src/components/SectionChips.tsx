@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import type { ReadingLayout } from '../lib/reading-prefs'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
@@ -21,7 +21,6 @@ function rolagemSuave(): ScrollBehavior {
 type Props = {
   /** Muda a cada perícope: força re-observar o DOM novo. */
   ordem: number
-  abbrev: string
   /** Corrido↔Blocos troca a subárvore de versículos: precisa re-observar. */
   layout: ReadingLayout
   /** Avisa a página ANTES de rolar — é assim que o chip Contexto expande a
@@ -29,10 +28,9 @@ type Props = {
   onIr?: (id: string) => void
 }
 
-export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
+export default function SectionChips({ ordem, layout, onIr }: Props) {
   const [ativo, setAtivo] = useState<string>(SECTIONS[0].id)
   const [refViva, setRefViva] = useState<string | null>(null)
-  const rowRef = useRef<HTMLDivElement>(null)
 
   // O header é sticky e some ao rolar: os chips precisam saber a altura dele
   // para encostar embaixo sem sobrepor. O CSS zera esse offset quando o header
@@ -105,8 +103,10 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
       raf = 0
       const primeiro = alvos.find((el) => visiveis.has(el))
       const id = primeiro?.dataset.verseId ?? ''
-      // Versículos órfãos do parser ("x:N") não viram referência.
-      setRefViva(VERSE_ID.test(id) ? `${abbrev} ${id}` : null)
+      // Só "cap:vers": o livro já está no h1 logo acima, repetir a abreviação
+      // dentro do chip só roubaria largura. Versículos órfãos do parser
+      // ("x:N") não viram referência.
+      setRefViva(VERSE_ID.test(id) ? id : null)
     }
     const obs = new IntersectionObserver(
       (entries) => {
@@ -125,16 +125,7 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
       if (raf) cancelAnimationFrame(raf)
       obs.disconnect()
     }
-  }, [ativo, abbrev, ordem, layout])
-
-  // Chip ativo pode ficar fora da faixa visível da barra (ela rola de lado):
-  // traz ele pra dentro sem mexer na rolagem da página.
-  useEffect(() => {
-    const row = rowRef.current
-    if (!row) return
-    const chipEl = row.querySelector<HTMLElement>('.section-chip.active')
-    chipEl?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'auto' })
-  }, [ativo])
+  }, [ativo, ordem, layout])
 
   function irPara(id: string) {
     onIr?.(id)
@@ -153,22 +144,43 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
 
   return (
     <nav className="section-chips" aria-label="Seções da perícope">
-      <div className="section-chips-row" ref={rowRef}>
-        {SECTIONS.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            className={`section-chip${ativo === s.id ? ' active' : ''}`}
-            aria-current={ativo === s.id ? 'true' : undefined}
-            onClick={() => irPara(s.id)}
-          >
-            {s.label}
-          </button>
-        ))}
+      {/* Controle segmentado: os quatro chips dividem a largura em partes
+          iguais, então nunca há rolagem lateral nem chip cortado — e não há
+          mais faixa para trazer o chip ativo "para dentro". */}
+      <div className="section-chips-row">
+        {SECTIONS.map((s) => {
+          const ativoAqui = ativo === s.id
+          // A referência viva mora dentro do chip Texto, e só enquanto ele
+          // está ativo: nos outros momentos o chip é só "Texto".
+          const mostrarRef = ativoAqui && s.id === 'texto' && refViva !== null
+          return (
+            <button
+              key={s.id}
+              type="button"
+              className={`section-chip${ativoAqui ? ' active' : ''}${
+                mostrarRef ? ' section-chip-com-ref' : ''
+              }`}
+              aria-current={ativoAqui ? 'true' : undefined}
+              onClick={() => irPara(s.id)}
+            >
+              <span className="section-chip-label">{s.label}</span>
+              {/* Sem aria-live de propósito: o rótulo muda a cada rolagem e
+                  viraria tagarelice para o leitor de tela. */}
+              {mostrarRef && (
+                <>
+                  {/* Sem espaços em volta do "·": o chip é inline-flex, cada
+                      span vira item e o espaço nas bordas seria descartado.
+                      O respiro vem do `gap` do chip. */}
+                  <span className="section-chip-sep" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="section-chip-ref">{refViva}</span>
+                </>
+              )}
+            </button>
+          )
+        })}
       </div>
-      {/* Sem aria-live de propósito: o rótulo muda a cada rolagem e viraria
-          tagarelice para o leitor de tela. */}
-      <span className="section-ref">{refViva ?? ''}</span>
     </nav>
   )
 }

@@ -26,8 +26,10 @@ export function isChipsRowTarget(el: EventTarget | null): boolean {
 }
 
 /**
- * Foco no player de narração: ←/→ ali são o seek nativo de ±5 s. Engolir a
- * seta trocaria de perícope, desmontando o áudio e perdendo a posição.
+ * Foco no player de narração: ←/→ ali são o salto de ±10 s do próprio player
+ * (ver NarracaoPlayer). Engolir a seta trocaria de perícope, desmontando o
+ * áudio e perdendo a posição. `audio`/`video` ficam por um player nativo que
+ * apareça noutro lugar.
  */
 export function isMediaTarget(el: EventTarget | null): boolean {
   return el instanceof HTMLElement && el.closest('audio, video, .narracao') !== null

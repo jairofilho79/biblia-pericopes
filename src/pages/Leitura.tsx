@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { type SecaoAlvos } from '../lib/alinhar-narracao'
 import NarracaoPlayer from '../components/NarracaoPlayer'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
@@ -54,6 +55,25 @@ type Vizinha = { ordem: number; titulo: string }
 
 /** Qual fila é dona da fala corrente: cada seção tem a sua, mais o "tudo". */
 type FonteFala = 'tudo' | 'contexto' | 'texto' | 'resenha' | 'reflexao'
+
+/**
+ * Quebra em palavras só a unidade em fala — o resto da página fica com o nó de
+ * texto único de sempre. O espaço entre os spans é um nó de texto real: é o
+ * que faz "selecionar e copiar" continuar devolvendo o versículo legível.
+ */
+function TextoFalado({ texto, ativo }: { texto: string; ativo: boolean }) {
+  if (!ativo) return <>{texto}</>
+  return (
+    <>
+      {texto.split(' ').map((tk, k) => (
+        <Fragment key={k}>
+          {k > 0 ? ' ' : ''}
+          <span data-w={k}>{tk}</span>
+        </Fragment>
+      ))}
+    </>
+  )
+}
 
 /**
  * Controles de fala de uma fila (▶/⏸/retomar + ⏹). O estado global do TTS só
@@ -219,6 +239,25 @@ export default function Leitura() {
   const filaTudo = useMemo(
     () => [...filaContexto, ...versesParaFala, ...filaResenha, ...filaReflexao],
     [filaContexto, versesParaFala, filaResenha, filaReflexao],
+  )
+  // Os mesmos arrays que a página renderiza viram os alvos do alinhamento —
+  // é isso que garante que o realce valide o que o olho vê.
+  const secoesNarracao = useMemo<SecaoAlvos[]>(
+    () => [
+      { secao: 'contexto', alvos: parasContexto.map((t, i) => ({ id: `contexto-${i}`, texto: t })) },
+      {
+        secao: 'texto',
+        alvos: blocks
+          .filter((b): b is VerseBlock => b.kind === 'verse')
+          .map((b) => ({ id: b.id, texto: b.text })),
+      },
+      { secao: 'resenha', alvos: parasResenha.map((t, i) => ({ id: `resenha-${i}`, texto: t })) },
+      {
+        secao: 'reflexoes',
+        alvos: (p?.perguntas_reflexao ?? []).map((q, i) => ({ id: `reflexao-${i}`, texto: q })),
+      },
+    ],
+    [parasContexto, blocks, parasResenha, p],
   )
 
   async function refreshNotes() {
@@ -408,11 +447,44 @@ export default function Leitura() {
     ttsRef.current?.play(fila)
   }
 
+  // Realçar parágrafo escondido não serve para nada: se o contexto entra em
+  // fala com a seção colapsada, ela abre.
+  useEffect(() => {
+    if (falando?.startsWith('contexto-') && !contextoAberto) {
+      setContextoAbertoState(true)
+      setContextoAberto(true)
+    }
+  }, [falando, contextoAberto])
+
+  // Rolagem automática cede à mão do usuário: qualquer rolagem que não veio
+  // do scrollIntoView suspende o acompanhamento por 10s. NUNCA escutar
+  // `scroll` aqui — o próprio scrollIntoView o dispara e desligaria o
+  // acompanhamento para sempre no primeiro realce.
+  const cedeuAte = useRef(0)
+
+  useEffect(() => {
+    const ceder = () => {
+      cedeuAte.current = Date.now() + 10_000
+    }
+    const tecla = (e: KeyboardEvent) => {
+      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder()
+    }
+    window.addEventListener('wheel', ceder, { passive: true })
+    window.addEventListener('touchmove', ceder, { passive: true })
+    window.addEventListener('keydown', tecla)
+    return () => {
+      window.removeEventListener('wheel', ceder)
+      window.removeEventListener('touchmove', ceder)
+      window.removeEventListener('keydown', tecla)
+    }
+  }, [])
+
   useEffect(() => {
     // Ouvir continua, mas a rolagem cede quando o leitor está interagindo:
     // barra de ações aberta, nota em edição ou vínculo de versículo pendente
     // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
     if (!falando || barOpen || editingId || draftRef) return
+    if (Date.now() < cedeuAte.current) return
     const el = document.querySelector<HTMLElement>(`[data-verse-id="${falando}"]`)
     if (!el) return
     const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
@@ -654,7 +726,7 @@ export default function Leitura() {
         }}
       />
 
-      <NarracaoPlayer ordem={p.ordem} secoes={[]} onAlvo={setFalando} />
+      <NarracaoPlayer ordem={p.ordem} secoes={secoesNarracao} onAlvo={setFalando} />
 
       {temTts && (
         <BarraOuvir
@@ -698,7 +770,7 @@ export default function Leitura() {
           )}
           {parasContexto.map((para, i) => (
             <p key={i} className={falaClass('prose', `contexto-${i}`)} data-verse-id={`contexto-${i}`}>
-              {para}
+              <TextoFalado texto={para} ativo={falando === `contexto-${i}`} />
             </p>
           ))}
         </div>
@@ -736,7 +808,9 @@ export default function Leitura() {
                           onClick={() => selectVerse(b.id)}
                         >
                           {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
-                          <span className="verse-text">{b.text}</span>
+                          <span className="verse-text">
+                            <TextoFalado texto={b.text} ativo={falando === b.id} />
+                          </span>
                         </button>{' '}
                       </Fragment>
                     ))}
@@ -759,7 +833,9 @@ export default function Leitura() {
                     onClick={() => selectVerse(b.id)}
                   >
                     {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
-                    <span className="verse-text">{b.text}</span>
+                    <span className="verse-text">
+                      <TextoFalado texto={b.text} ativo={falando === b.id} />
+                    </span>
                   </button>
                 ),
               )}
@@ -781,7 +857,7 @@ export default function Leitura() {
         )}
         {parasResenha.map((para, i) => (
           <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
-            {para}
+            <TextoFalado texto={para} ativo={falando === `resenha-${i}`} />
           </p>
         ))}
       </section>
@@ -802,7 +878,7 @@ export default function Leitura() {
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
             <li key={i} className={falaClass('', `reflexao-${i}`)} data-verse-id={`reflexao-${i}`}>
-              {q}
+              <TextoFalado texto={q} ativo={falando === `reflexao-${i}`} />
             </li>
           ))}
         </ol>

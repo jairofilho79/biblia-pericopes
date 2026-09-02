@@ -347,15 +347,17 @@ export default function Leitura() {
   }, [])
 
   useEffect(() => {
-    const ceder = (e: Event) => {
-      // Arrastar a barra do player emite touchmove que sobe até a window: isso
-      // é operar o áudio, não rolar a página, e não deve suspender o
-      // acompanhamento.
-      if (e.target instanceof HTMLElement && e.target.closest('.narracao')) return
+    // Sem exceção para gestos que nascem no player: o `target` de um
+    // `touchmove` fica fixado no elemento do `touchstart`, então ignorar o que
+    // vem de `.narracao` também ignoraria uma rolagem de página inteira cujo
+    // dedo apenas pousou sobre ele — e a tela voltaria a ser puxada debaixo da
+    // mão do leitor. Arrastar a barra do player já é resolvido pelo `onSeek`,
+    // que zera a suspensão quando o seek termina.
+    const ceder = () => {
       cedeuAte.current = Date.now() + 10_000
     }
     const tecla = (e: KeyboardEvent) => {
-      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder(e)
+      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder()
     }
     window.addEventListener('wheel', ceder, { passive: true })
     window.addEventListener('touchmove', ceder, { passive: true })

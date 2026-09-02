@@ -27,16 +27,21 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
 
 ## Leitura
 
-- Chip de vínculo de anotação navega via URL (`?v=`) e o load effect
-  descarta rascunho/edição em andamento; virar handler local
-  (seleção + scroll) ou preservar `draft` quando só o `verseParam` muda.
+- ~~Chip de vínculo de anotação navega via URL (`?v=`) e o load effect
+  descarta rascunho/edição em andamento.~~ Feito em 2026-09-02: o efeito
+  virou dois — a carga pesada depende só de `ordem` (e é lá que rascunho,
+  edição e confirmação zeram), e um efeito síncrono separado cuida do foco
+  do versículo em `[ordem, verseParam]`. Manteve o `?v=` como deep-link,
+  que a Pesquisa usa.
 - ~~Barra de ações (`VerseActions`): `role="dialog"` sem foco movido para
   dentro nem devolvido ao versículo ao fechar.~~ Feito em 2026-09-02: o foco
   entra na caixa (que tem `aria-label`) e volta ao versículo ao fechar, com
   guard de `isConnected`. Continua sem armadilha de foco (Tab sai da barra) —
   ela não é modal, e uma armadilha sem `aria-modal` seria pior.
-- Swipe sem guard de diálogo aberto (assimetria com o teclado, que usa
-  `hasOpenDialog`); hoje inócuo porque a barra fecha na navegação.
+- ~~Swipe sem guard de diálogo aberto (assimetria com o teclado).~~ Feito
+  em 2026-09-02: `onEnd` usa o mesmo `hasOpenDialog` do teclado, importado
+  de lá em vez de duplicado, para as duas formas de navegar não poderem
+  discordar.
 - TTS: `onerror` aborta a fila inteira (escolha de design registrada);
   falta cobertura de teste para "play superseded" e para o hook de wake
   lock (repo sem infra de teste de hooks).

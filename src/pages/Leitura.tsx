@@ -271,18 +271,14 @@ export default function Leitura() {
         setPrev(vizinha(anteriorNoTestamento(all, ordem)))
         setNext(vizinha(proximaNoTestamento(all, ordem)))
         setCopied(false)
-        const fromQuery =
-          verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
-        const focus = fromQuery ?? getVerseFocus(ordem)
-        // Restaurar foco seleciona só aquele versículo e NÃO abre a barra:
-        // a barra é resposta a toque, não a navegação.
-        setSelection(focus ? { start: focus, end: focus } : null)
-        setBarOpen(false)
+        // Rascunho, edição e confirmação zeram por TROCA DE PERÍCOPE, não por
+        // mudança de `?v=`: navegar pelo chip de vínculo de uma anotação é
+        // movimento dentro da mesma perícope e não pode apagar o que a pessoa
+        // está escrevendo. Quem cuida do `?v=` é o efeito logo abaixo.
         setDraftRef(null)
         setEditingId(null)
         setConfirmarId(null)
         setDraft('')
-        if (fromQuery) setVerseFocus(ordem, fromQuery)
         const hl = await listDestaques(ordem)
         setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
         const prog = await getProgresso(ordem)
@@ -297,6 +293,20 @@ export default function Leitura() {
         setErr(e instanceof Error ? e.message : 'Erro')
       }
     })()
+  }, [ordem])
+
+  // Foco do versículo: `?v=` na URL, senão o foco salvo da perícope. Fica
+  // separado da carga acima porque muda muito mais vezes que a perícope — e
+  // porque é síncrono: a carga é `async`, e se ela também mexesse em
+  // `selection` sobrescreveria o que este efeito acabou de decidir.
+  useEffect(() => {
+    const fromQuery = verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
+    const focus = fromQuery ?? getVerseFocus(ordem)
+    // Restaurar foco seleciona só aquele versículo e NÃO abre a barra:
+    // a barra é resposta a toque, não a navegação.
+    setSelection(focus ? { start: focus, end: focus } : null)
+    setBarOpen(false)
+    if (fromQuery) setVerseFocus(ordem, fromQuery)
   }, [ordem, verseParam])
 
   // Prioridade de rolagem ao abrir: ?v= na URL > posição salva > topo.

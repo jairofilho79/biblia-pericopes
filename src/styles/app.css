@@ -833,9 +833,6 @@ button.ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Respiro entre "Texto", "·" e a referência (espaços no texto seriam
-     descartados: cada span é um item do flex). */
-  gap: 0.3em;
   min-width: 0;
   min-height: 2.25rem;
   padding: 0.2rem 0.3rem;
@@ -867,35 +864,14 @@ button.ghost {
   color: var(--cta-ink);
 }
 
-/* Referência viva ("1:5") dentro do chip Texto. Largura reservada para o
-   pior caso real — Salmo 119 vai a "119:176", 7 caracteres — e tabular-nums:
-   assim "1:9" → "1:10" não empurra o "Texto ·" nem faz o chip tremer. A
-   largura do chip em si já é fixa pela grade; a reserva é para o que está
-   dentro dele ficar parado. Cor herdada: no chip ativo é o --cta-ink. */
-.section-chip-ref {
-  display: inline-block;
-  min-width: 7ch;
-  text-align: start;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Celular: "Texto · 119:176" não cabe num quarto de 375px (~73px) em fonte
-   legível, então a referência desce para uma segunda linha, menor, sob o
-   rótulo. Duas linhas cabem na altura de 2.25rem do chip — a barra sticky não
-   cresce quando o Texto fica ativo. Centralizada, porque numa caixa curta o
-   alinhamento à esquerda deixaria "1:5" pendurado sob o "T". */
+/* Celular: "Texto Bíblico" não cabe num quarto de 375px (~73px) em fonte
+   legível, então só esse chip pode quebrar — vira "Texto" / "Bíblico", em
+   duas linhas que cabem na altura de 2.25rem (0.78rem × 1.15 × 2 ≈ 1.8rem).
+   A coluna é minmax(0, 1fr): a quebra acontece dentro dela, nada alarga. Os
+   outros três chips continuam em nowrap. */
 @media (max-width: 639.98px) {
-  .section-chip-com-ref {
-    flex-direction: column;
-    gap: 0.1em;
-  }
-
-  .section-chip-sep {
-    display: none;
-  }
-
-  .section-chip-ref {
-    font-size: 0.7rem;
+  .section-chip-texto {
+    white-space: normal;
     text-align: center;
   }
 }
@@ -1287,8 +1263,16 @@ button.ghost {
   --candle-x: 0.12rem;
 }
 
+/* Em `em` porque a fonte de leitura vai de 0.95rem a 1.58rem: o número da
+   lista cresce com ela, e uma distância em rem ficaria para trás dele. O
+   padding-left do `ol` (1.7em, ver `.perguntas`) tira a chama de dentro da
+   lista; os 0.7em restantes são a mesma folga que o `.prose` tem da margem.
+   Pior caso, 375px com fonte 1.58rem (li ≈ 1.52rem): 2.4em ≈ 3.6rem à
+   esquerda do li, dos quais 1.7em ≈ 2.6rem ainda dentro do `ol` — sobra
+   ~1.06rem além da borda do conteúdo, dentro dos 2.15rem de margem
+   (--shell-pad 1.1rem + padding 1.05rem do .leitura). Não sai da tela. */
 .perguntas li::before {
-  --candle-x: calc(-1.35rem - 0.5em);
+  --candle-x: calc(-1.7em - 0.7em);
 }
 
 /* O halo: luz que nasce na chama e se perde para a direita. */
@@ -1314,9 +1298,10 @@ button.ghost {
   border-radius: 6px;
 }
 
-/* na pergunta o halo abraça também o número da lista */
+/* na pergunta o halo abraça também o número da lista: -1.7em é exatamente o
+   padding-left do `ol` — chega ao número sem passar dele nem tocar a chama */
 .perguntas li::after {
-  inset-inline-start: -1.5rem;
+  inset-inline-start: -1.7em;
 }
 
 /* menos que o anel de foco (3px), para o halo não vazar por fora dele */
@@ -1578,7 +1563,9 @@ button.ghost {
 
 .perguntas {
   margin: 0;
-  padding-left: 1.2rem;
+  /* em `em`, não rem: o marcador "10." escala com a fonte da lista e precisa
+     caber no padding em qualquer tamanho — é aqui que a candeia se apoia. */
+  padding-left: 1.7em;
   font-family: var(--read-font);
   font-size: calc(var(--read-size) * 0.96);
   line-height: var(--read-leading, 1.65);

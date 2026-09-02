@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Leitura from './pages/Leitura'
@@ -19,6 +19,7 @@ function Shell() {
   const headerHidden = useHideOnScroll(pathname.startsWith('/leitura/'))
   const [saindo, setSaindo] = useState(false)
   const [erroSaida, setErroSaida] = useState('')
+  const erroSaidaTimer = useRef<number | undefined>(undefined)
 
   async function sair() {
     if (saindo) return
@@ -29,8 +30,9 @@ function Shell() {
     } catch {
       // nunca deixar virar rejeição não tratada: o usuário precisa saber
       // (some sozinho depois de um tempo, como o flashAviso da Leitura)
+      window.clearTimeout(erroSaidaTimer.current)
       setErroSaida('Não foi possível sair. Tente de novo.')
-      window.setTimeout(() => setErroSaida(''), 4000)
+      erroSaidaTimer.current = window.setTimeout(() => setErroSaida(''), 4000)
     } finally {
       setSaindo(false)
     }
@@ -103,14 +105,16 @@ function Shell() {
               >
                 {saindo ? 'Saindo…' : 'Sair'}
               </button>
-              {/* Popover em vez de aria-live sozinho: quem usa toque não vê
-                  `title` (precisa de hover), então a falha precisa aparecer
-                  na tela, não só ser lida em voz alta. */}
-              {erroSaida && (
-                <span className="nav-conta-erro" role="status" aria-live="polite">
-                  {erroSaida}
-                </span>
-              )}
+              {/* Sempre montado (mesmo padrão de .verse-actions-aviso): uma
+                  região aria-live só anuncia mudança de conteúdo se já
+                  existir no DOM antes da mudança. Criar o nó já populado
+                  no mesmo update não é confiável em leitores de tela. Quem
+                  usa toque também não vê `title` (precisa de hover), então
+                  a falha precisa aparecer na tela, não só ser lida em voz
+                  alta — por isso o texto fica visível, não .sr-only. */}
+              <span className="nav-conta-erro" role="status" aria-live="polite">
+                {erroSaida}
+              </span>
             </span>
           ) : (
             <NavLink to="/entrar">Entrar</NavLink>

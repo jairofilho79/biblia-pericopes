@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReadingLayout } from '../lib/reading-prefs'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
@@ -37,7 +37,10 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
   // O header é sticky e some ao rolar: os chips precisam saber a altura dele
   // para encostar embaixo sem sobrepor. O CSS zera esse offset quando o header
   // está escondido (`.shell:has(.top-hidden)`).
-  useEffect(() => {
+  // useLayoutEffect (não useEffect): mede e aplica `--top-h` antes do browser
+  // pintar o frame, senão os chips desenham um frame no offset errado (0px)
+  // até a medição rodar — o flash que este efeito existe para evitar.
+  useLayoutEffect(() => {
     const top = document.querySelector<HTMLElement>('.top')
     const raiz = document.documentElement
     if (!top) return

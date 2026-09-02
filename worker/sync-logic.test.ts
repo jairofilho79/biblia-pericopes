@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_CORPO, corpoExcedeLimite, parseSyncPush } from './sync-logic'
+import { MAX_CORPO, corpoExcedeLimite, paginarPull, parseSyncPush } from './sync-logic'
 
 const prog = { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-08-31T10:00:00.000Z' }
 const nota = {
@@ -156,5 +156,83 @@ describe('corpoExcedeLimite', () => {
     // pior que não ter teto: o cliente abandona o lote e a linha nunca sobe.
     const piorCasoLegal = 500 * 20_000 * 3 + 500 * 280 + 500 * 250 + 500 * 90
     expect(corpoExcedeLimite(String(piorCasoLegal))).toBe(false)
+  })
+})
+
+// Helper: uma "linha" mínima com o server_em que paginarPull precisa para
+// decidir o corte. `v` é só um marcador pra dar pra reconhecer cada linha
+// nas asserções — o conteúdo de verdade (id, cor, etc.) é irrelevante aqui.
+function linha(serverEm: string, v: number) {
+  return { serverEm, v }
+}
+
+describe('paginarPull', () => {
+  it('sem estouro em nenhuma entidade: devolve tudo, cursor null, maisDados false', () => {
+    const listas = {
+      progresso: [linha('2026-01-01T00:00:00.000Z', 1), linha('2026-01-01T00:00:01.000Z', 2)],
+      anotacoes: [linha('2026-01-01T00:00:00.500Z', 3)],
+      destaques: [] as ReturnType<typeof linha>[],
+    }
+    const resultado = paginarPull(listas, 3)
+    expect(resultado).toEqual({ ...listas, cursor: null, maisDados: false })
+  })
+
+  it('uma entidade estourando (n+1 linhas): corta essa entidade em n e usa o server_em da última mantida como cursor', () => {
+    const destaques = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2),
+      linha('2026-01-01T00:00:03.000Z', 3),
+      linha('2026-01-01T00:00:04.000Z', 4), // a (n+1)-ésima: só serve pra provar que há mais
+    ]
+    const listas = {
+      progresso: [linha('2026-01-01T00:00:00.000Z', 10)],
+      anotacoes: [] as ReturnType<typeof linha>[],
+      destaques,
+    }
+    const resultado = paginarPull(listas, 3)
+    expect(resultado.cursor).toBe('2026-01-01T00:00:03.000Z')
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.destaques.map((d) => d.v)).toEqual([1, 2, 3])
+    // progresso não estourou, mas seu server_em já cabe dentro do cursor —
+    // continua intacto.
+    expect(resultado.progresso).toEqual(listas.progresso)
+  })
+
+  it('duas entidades estourando em fronteiras diferentes: o cursor é o mínimo, e a outra entidade é recortada por ele também', () => {
+    // progresso estoura e a última linha mantida por ele fica em T2 (a menor
+    // das duas fronteiras). destaques estoura com fronteira maior, T4.
+    const progresso = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2), // T2 — fronteira do progresso
+      linha('2026-01-01T00:00:03.000Z', 3), // a (n+1)-ésima
+    ]
+    const destaques = [
+      linha('2026-01-01T00:00:01.500Z', 10),
+      linha('2026-01-01T00:00:02.500Z', 11), // > T2, deve ser cortada mesmo sem estourar por si só
+      linha('2026-01-01T00:00:04.000Z', 12), // T4 — fronteira do destaques
+      linha('2026-01-01T00:00:05.000Z', 13), // a (n+1)-ésima
+    ]
+    const listas = { progresso, anotacoes: [] as ReturnType<typeof linha>[], destaques }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe('2026-01-01T00:00:02.000Z') // T2, o mínimo das duas fronteiras
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.progresso.map((p) => p.v)).toEqual([1, 2])
+    // destaques é recortado pelo cursor global (T2), não pela própria fronteira (T4)
+    expect(resultado.destaques.map((d) => d.v)).toEqual([10])
+  })
+
+  it('grupo de mesmo server_em maior que a página inteira: entrega o grupo inteiro e avança o cursor (sem travar)', () => {
+    // As n+1=3 linhas buscadas de destaques compartilham o MESMO server_em —
+    // não dá pra saber, sem outra query, se o grupo continua além da janela.
+    // Recortar aqui produziria cursor == since (nenhum progresso, loop
+    // infinito no cliente). Em vez disso entrega o grupo inteiro, mesmo
+    // passando de n, e avança o cursor até o valor do grupo.
+    const T = '2026-01-01T00:00:05.000Z'
+    const destaques = [linha(T, 1), linha(T, 2), linha(T, 3)]
+    const listas = { progresso: [] as ReturnType<typeof linha>[], anotacoes: [], destaques }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe(T)
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.destaques.map((d) => d.v)).toEqual([1, 2, 3])
   })
 })

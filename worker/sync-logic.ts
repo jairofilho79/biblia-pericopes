@@ -137,6 +137,113 @@ function validDestaque(v: unknown): v is PushDestaque {
   )
 }
 
+/**
+ * Tamanho de página do pull (GET /api/sync), por entidade. Cada query busca
+ * TAMANHO_PAGINA_PULL + 1 linhas: a linha extra é só pra provar que existe
+ * mais sem precisar de uma segunda query. Na esmagadora maioria dos pulls
+ * (histórico normal de um usuário) nenhuma entidade chega perto disso — a
+ * página cabe tudo numa resposta só, igual hoje. Só destaques (uma linha por
+ * versículo destacado) tem volume real; alguns milhares cobrem um usuário
+ * extremo com folga e ainda mantêm a resposta num tamanho saudável.
+ */
+export const TAMANHO_PAGINA_PULL = 2000
+
+/** Uma linha do pull, na parte que paginarPull precisa: o carimbo do servidor. */
+export type LinhaPull = { serverEm: string }
+
+export type ResultadoPaginacaoPull<
+  P extends LinhaPull,
+  A extends LinhaPull,
+  D extends LinhaPull,
+> = {
+  progresso: P[]
+  anotacoes: A[]
+  destaques: D[]
+  /**
+   * `null` quando nenhuma entidade estourou: o chamador usa `agora` (o
+   * instante gerado antes dos SELECTs) como cursor, exatamente como antes
+   * desta funcionalidade existir. Uma string é o limite de truncamento — ver
+   * `maisDados`.
+   */
+  cursor: string | null
+  /** true quando o cliente precisa pedir a próxima página imediatamente. */
+  maisDados: boolean
+}
+
+/**
+ * Acha, para UMA entidade que estourou (chegaram n+1 linhas, ordenadas por
+ * server_em ascendente), o server_em da última linha que pode ser entregue
+ * sem partir um grupo de mesmo server_em ao meio.
+ *
+ * Um POST grava todas as linhas do lote com o MESMO server_em (index.ts —
+ * `serverEm` é carimbado uma vez por lote). Corte no meio de um grupo faria o
+ * cliente avançar o cursor por cima de linhas irmãs que nunca foram
+ * entregues — perda silenciosa. Por isso o corte anda de trás pra frente
+ * descartando linhas que empatam com a última buscada (a "sonda", a
+ * (n+1)-ésima): não dá pra saber, só com essa janela, se o grupo dela some
+ * além do que buscamos.
+ *
+ * Se TODAS as n+1 linhas empatarem — um grupo maior que a página inteira —
+ * não sobra corte possível sem ficar parado (cursor == since, o cliente
+ * giraria pedindo a mesma página pra sempre). Nesse caso o grupo inteiro é
+ * entregue mesmo passando de n: ele é o próprio limite (server_em da sonda),
+ * e o cursor avança de verdade. Isso é seguro porque um único server_em não
+ * pode ter mais linhas do que um POST aceita por lista (MAX_ITENS = 500) —
+ * salvo o caso raro de dois POSTs caindo no mesmíssimo milissegundo, que
+ * ainda assim converge: a próxima rodada busca de novo esse server_em com
+ * uma nova janela de n+1 e, se ainda estourar, repete o mesmo raciocínio.
+ */
+function limiteDaEntidadeEstourada(linhas: readonly LinhaPull[]): string {
+  const maiorServerEm = linhas[linhas.length - 1].serverEm
+  let corte = linhas.length
+  while (corte > 0 && linhas[corte - 1].serverEm === maiorServerEm) corte--
+  return corte > 0 ? linhas[corte - 1].serverEm : maiorServerEm
+}
+
+/**
+ * Decide se a resposta do pull precisa ser truncada e, se sim, onde.
+ *
+ * Pré-condição (garantida pelo chamador via `WHERE server_em > since ORDER
+ * BY server_em LIMIT n+1`): cada lista tem no máximo n+1 linhas, já
+ * ordenadas ascendentemente por server_em, e toda linha tem server_em >
+ * since. É essa pré-condição que garante que o cursor devolvido aqui SEMPRE
+ * avança em relação a since — nunca fica parado.
+ *
+ * Sem estouro em nenhuma lista: devolve tudo como veio, cursor null (o
+ * chamador usa `agora`) — o caminho de hoje, intacto.
+ *
+ * Com estouro em uma ou mais listas: o cursor final é o MÍNIMO das
+ * fronteiras individuais (nenhuma entidade pode avançar além do ponto que
+ * outra ainda não alcançou), e toda linha de toda entidade com server_em
+ * acima desse mínimo é descartada — inclusive de entidades que não
+ * estouraram por si só. Essas linhas voltam sozinhas na próxima página,
+ * porque o próximo pull consulta server_em > cursor.
+ */
+export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends LinhaPull>(
+  listas: { progresso: P[]; anotacoes: A[]; destaques: D[] },
+  n: number,
+): ResultadoPaginacaoPull<P, A, D> {
+  const fronteiras = [listas.progresso, listas.anotacoes, listas.destaques]
+    .filter((linhas) => linhas.length > n)
+    .map(limiteDaEntidadeEstourada)
+
+  if (fronteiras.length === 0) {
+    return { ...listas, cursor: null, maisDados: false }
+  }
+
+  const cursor = fronteiras.reduce((menor, atual) => (atual < menor ? atual : menor))
+  const cortar = <T extends LinhaPull>(linhas: T[]): T[] =>
+    linhas.filter((l) => l.serverEm <= cursor)
+
+  return {
+    progresso: cortar(listas.progresso),
+    anotacoes: cortar(listas.anotacoes),
+    destaques: cortar(listas.destaques),
+    cursor,
+    maisDados: true,
+  }
+}
+
 export function parseSyncPush(
   body: unknown,
 ): { progresso: PushProgresso[]; anotacoes: PushAnotacao[]; destaques: PushDestaque[] } | null {

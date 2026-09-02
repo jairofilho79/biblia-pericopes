@@ -99,3 +99,19 @@ describe('parseSyncPush — verseRef da anotação', () => {
     expect(parseSyncPush({ anotacoes: [{ ...nota, verseRef: 'x'.repeat(33) }] })).toBeNull()
   })
 })
+
+describe('parseSyncPush — invariante do id do destaque', () => {
+  // Um id que não deriva de (pericopeOrdem, verseId) vira destaque indeletável:
+  // a Leitura pinta o versículo pelo verseId mas apaga pelo id derivado, então
+  // o "remover" não acha a linha e o pull seguinte traz a marca de volta.
+  it('rejeita id que não é `${pericopeOrdem}:${verseId}`', () => {
+    expect(parseSyncPush({ destaques: [{ ...destaque, id: '99:1:3' }] })).toBeNull()
+    expect(parseSyncPush({ destaques: [{ ...destaque, id: '12:9:9' }] })).toBeNull()
+    expect(parseSyncPush({ destaques: [{ ...destaque, id: 'qualquer-coisa' }] })).toBeNull()
+    expect(parseSyncPush({ destaques: [{ ...destaque, id: ' 12:1:3' }] })).toBeNull()
+  })
+  it('aceita o id derivado, inclusive na perícope de ordem 0', () => {
+    const zero = { ...destaque, id: '0:1:3', pericopeOrdem: 0 }
+    expect(parseSyncPush({ destaques: [zero] })?.destaques).toEqual([zero])
+  })
+})

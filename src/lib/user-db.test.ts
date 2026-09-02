@@ -337,3 +337,73 @@ describe('anotações com vínculo a versículo', () => {
     expect((await listAnotacoes(9200)).map((n) => n.id)).toEqual(['ord-b', 'ord-c', 'ord-a'])
   })
 })
+
+// A contagem é o que decide se o pull emite o evento de live refresh: sem ela,
+// toda rodada de sync (5 em 5 minutos) recarregaria as telas abertas à toa.
+// Só conta mutação de verdade — em particular, a lápide reentregue de uma
+// linha que já não existe localmente não conta, e o pull do servidor reentrega
+// linhas de propósito (o cursor `agora` é generoso).
+describe('applyRemote* — contagem de linhas aplicadas', () => {
+  it('progresso: conta só o que o LWW deixou entrar', async () => {
+    expect(await applyRemoteProgresso([])).toBe(0)
+    expect(
+      await applyRemoteProgresso([
+        { pericopeOrdem: 9101, status: 'concluido', atualizadoEm: FUTURE },
+      ]),
+    ).toBe(1)
+    // reentrega do mesmo timestamp: LWW é estrito (>), então não muda nada
+    expect(
+      await applyRemoteProgresso([
+        { pericopeOrdem: 9101, status: 'concluido', atualizadoEm: FUTURE },
+      ]),
+    ).toBe(0)
+    await setProgresso(9102, 'concluido')
+    expect(
+      await applyRemoteProgresso([
+        { pericopeOrdem: 9102, status: 'nao_iniciado', atualizadoEm: PAST },
+      ]),
+    ).toBe(0)
+  })
+
+  it('anotações: upsert conta, lápide de linha existente conta, lápide reentregue não', async () => {
+    const nota = await saveAnotacao(9103, 'nota local')
+    const lapide = {
+      id: nota.id,
+      pericopeOrdem: 9103,
+      texto: 'irrelevante',
+      criadoEm: nota.criadoEm,
+      atualizadoEm: FUTURE,
+      apagadoEm: FUTURE,
+    }
+    expect(await applyRemoteAnotacoes([lapide])).toBe(1)
+    // mesma lápide de novo: a linha já sumiu, deletar não muda nada
+    expect(await applyRemoteAnotacoes([{ ...lapide, atualizadoEm: FUTURE_2 }])).toBe(0)
+    expect(
+      await applyRemoteAnotacoes([
+        {
+          id: 'remota-9104',
+          pericopeOrdem: 9104,
+          texto: 'do servidor',
+          criadoEm: PAST,
+          atualizadoEm: FUTURE,
+          apagadoEm: null,
+        },
+      ]),
+    ).toBe(1)
+  })
+
+  it('destaques: mesma regra da lápide reentregue', async () => {
+    await setDestaque(9105, '1:1', 'amarelo')
+    const lapide = {
+      id: '9105:1:1',
+      pericopeOrdem: 9105,
+      verseId: '1:1',
+      cor: 'amarelo' as const,
+      criadoEm: PAST,
+      atualizadoEm: FUTURE,
+      apagadoEm: FUTURE,
+    }
+    expect(await applyRemoteDestaques([lapide])).toBe(1)
+    expect(await applyRemoteDestaques([{ ...lapide, atualizadoEm: FUTURE_2 }])).toBe(0)
+  })
+})

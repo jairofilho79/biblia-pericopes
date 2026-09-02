@@ -47,6 +47,29 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
   `window`. Na Leitura o refresh é estreito (destaques, notas, status)
   para não apagar rascunho em digitação.
 
+## Sync — achados pré-existentes (levantados na revisão do P4, 2026-09-02)
+
+Nenhum foi introduzido pela paginação; todos precedem a branch e nenhum é
+alcançável por um cliente normal. Registrados para não se perderem.
+
+- **Corrida de um milissegundo no cursor.** O comentário de `worker/index.ts`
+  afirma que uma linha gravada entre o `agora` e a resposta "entra no próximo
+  pull". Isso vale para `server_em > agora`, mas não para `== agora`: uma linha
+  carimbada exatamente no `agora` e commitada depois do SELECT nunca é
+  revisitada, porque a consulta seguinte é `>` estrita.
+- **Relógio entre colos da Cloudflare.** `server_em` é `new Date()` por
+  requisição, e colos não têm monotonicidade garantida entre si. Um POST
+  atendido num colo atrasado pode carimbar abaixo de um cursor já avançado e
+  ficar invisível para sempre. É inerente ao cursor por timestamp; a saída
+  seria cursor composto `(server_em, id)`.
+- **Backfill da migration 0003** define `server_em` com `DEFAULT ''`. Linha que
+  tenha ficado com `''` é invisível a todo pull incremental (`> since` estrito).
+- **A rota `GET /api/sync` não tem teste.** A lógica de paginação é pura e bem
+  coberta, mas o teste de ida-e-volta exercita um espelho da rota escrito no
+  próprio arquivo de teste. Uma regressão em `worker/index.ts` — pôr um LIMIT no
+  fechamento de grupo, concatenar em vez de substituir, fechar só a primeira
+  entidade sinalizada — passaria verde.
+
 ## Leitura
 
 - ~~Chip de vínculo de anotação navega via URL (`?v=`) e o load effect

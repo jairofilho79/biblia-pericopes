@@ -25,12 +25,21 @@ export function isChipsRowTarget(el: EventTarget | null): boolean {
   return el instanceof HTMLElement && el.closest('.section-chips-row') !== null
 }
 
+/**
+ * Foco no player de narração: ←/→ ali são o seek nativo de ±5 s. Engolir a
+ * seta trocaria de perícope, desmontando o áudio e perdendo a posição.
+ */
+export function isMediaTarget(el: EventTarget | null): boolean {
+  return el instanceof HTMLElement && el.closest('audio, video, .narracao') !== null
+}
+
 /** Decisão pura do atalho, sem tocar em nada do DOM além do alvo do evento. */
 export function shouldHandleKey(ev: KeyboardEvent): 'prev' | 'next' | null {
   if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) return null
   if (ev.defaultPrevented) return null
   if (isTypingTarget(ev.target)) return null
   if (isChipsRowTarget(ev.target)) return null
+  if (isMediaTarget(ev.target)) return null
   if (ev.key === 'ArrowLeft') return 'prev'
   if (ev.key === 'ArrowRight') return 'next'
   return null

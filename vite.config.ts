@@ -51,8 +51,29 @@ function limpezaDeShardsAntigos(cacheAtual: string): Plugin {
       order: 'post',
       handler() {
         const sw = join(saida, 'sw.js')
-        if (!existsSync(sw)) return
+        // Falhar em silêncio aqui deixaria o build passar sem o listener de
+        // limpeza: o service worker publicado ficaria com um cache versionado
+        // (cacheAtual) e ninguém nunca apagando as gerações antigas — cada
+        // deploy acumularia mais ~13,7 MB no dispositivo de cada usuário, sem
+        // erro nenhum. Melhor quebrar o build do que publicar isso.
+        if (!existsSync(sw)) {
+          throw new Error(
+            `[limpeza-de-shards-antigos] ${sw} não existe depois do build do vite-plugin-pwa. ` +
+              'O plugin deve ter mudado onde/quando escreve o service worker (opção `filename`, ' +
+              'estratégia `injectManifest`, ou um hook que roda depois de `closeBundle`) — ajuste ' +
+              'este plugin para acompanhar antes de publicar.',
+          )
+        }
         const nome = JSON.stringify(cacheAtual)
+        const conteudo = readFileSync(sw, 'utf8')
+        if (!conteudo.includes(cacheAtual)) {
+          throw new Error(
+            `[limpeza-de-shards-antigos] ${sw} não contém o nome do cache atual (${cacheAtual}). ` +
+              'O vite-plugin-pwa deve ter parado de honrar a opção `runtimeCaching`, o que quebraria ' +
+              'o pareamento entre o cache versionado dos shards e este listener de limpeza — ajuste ' +
+              'este plugin (ou a config do workbox) antes de publicar.',
+          )
+        }
         appendFileSync(
           sw,
           `\nself.addEventListener('activate',(evento)=>{evento.waitUntil(caches.keys().then((nomes)=>Promise.all(nomes.filter((n)=>n.startsWith('catalogo-shards-')&&n!==${nome}).map((n)=>caches.delete(n)))))});\n`,

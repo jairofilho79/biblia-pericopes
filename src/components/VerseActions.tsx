@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import type { DestaqueCor } from '../lib/types'
 
 const CORES: { id: DestaqueCor; label: string }[] = [
@@ -35,6 +35,8 @@ export default function VerseActions({
   onAnotar,
   onFechar,
 }: Props) {
+  const caixaRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onFechar()
@@ -43,8 +45,35 @@ export default function VerseActions({
     return () => document.removeEventListener('keydown', onKey)
   }, [onFechar])
 
+  // Foco entra na barra ao abrir e volta para o versículo ao fechar. Sem isso
+  // a barra se anuncia como `role="dialog"` mas deixa o foco lá fora: quem usa
+  // teclado ou leitor de tela precisaria tabular a página inteira para chegar
+  // nos botões, e ao fechar perderia o lugar na leitura.
+  //
+  // O foco vai para a caixa (que tem aria-label), não para o primeiro botão:
+  // assim o leitor de tela anuncia de quais versículos são estas ações antes
+  // de ler a primeira opção.
+  useEffect(() => {
+    // O versículo é um <button>, então é ele que está com o foco aqui.
+    const anterior = document.activeElement
+    caixaRef.current?.focus()
+    return () => {
+      // `isConnected` porque a barra também fecha ao trocar de perícope, e aí
+      // o versículo de origem já saiu da página.
+      if (anterior instanceof HTMLElement && anterior.isConnected) {
+        anterior.focus({ preventScroll: true })
+      }
+    }
+  }, [])
+
   return (
-    <div className="verse-actions" role="dialog" aria-label={`Ações para ${label}`}>
+    <div
+      className="verse-actions"
+      role="dialog"
+      aria-label={`Ações para ${label}`}
+      ref={caixaRef}
+      tabIndex={-1}
+    >
       <div className="verse-actions-head">
         <strong className="verse-actions-ref">{label}</strong>
         <button type="button" className="linkish" onClick={onFechar}>

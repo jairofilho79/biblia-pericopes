@@ -10,6 +10,7 @@ import { getStoredTheme, resolveTheme, toggleTheme, type Theme } from './lib/the
 import { authClient } from './lib/auth-client'
 import { initSyncTriggers, signOutLocal } from './lib/sync'
 import { useHideOnScroll } from './lib/use-hide-on-scroll'
+import { iniciarPrefetch } from './lib/prefetch-catalogo'
 
 function Shell() {
   const [theme, setTheme] = useState<Theme>(() => resolveTheme())
@@ -39,6 +40,7 @@ function Shell() {
 
   useEffect(() => {
     initSyncTriggers()
+    iniciarPrefetch()
   }, [])
 
   useEffect(() => {

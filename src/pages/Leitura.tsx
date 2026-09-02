@@ -613,7 +613,6 @@ export default function Leitura() {
 
       <SectionChips
         ordem={p.ordem}
-        abbrev={p.abbrev}
         layout={prefs.layout}
         onIr={(id) => {
           if (id === 'contexto') abrirContexto()

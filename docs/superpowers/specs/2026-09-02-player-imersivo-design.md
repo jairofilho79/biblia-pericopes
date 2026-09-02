@@ -80,43 +80,70 @@ Este é o risco central. Um erro de um índice desloca o realce da perícope
 inteira, e o sintoma é sutil: tudo parece funcionar, só que no versículo
 errado.
 
-**O mapeamento não é posicional puro.** As duas listas têm elementos que a
-outra não tem:
+**O mapeamento não é posicional.** As duas listas têm elementos que a outra
+não tem, e — medido em 2026-09-02 sobre os manifestos republicados — as
+contagens de unidade nem sempre batem com as de elemento na tela:
 
-- Cada seção do manifesto começa com uma unidade de **cabeçalho falado** —
-  `"Contexto."`, `"Resenha."`, `"Reflexões."`, `"Texto Bíblico."` — que não
-  corresponde a nenhum bloco de conteúdo na tela.
-- `parseTextoNaa` emite blocos `{ kind: 'chapter' }` (marcadores "Capítulo N")
-  que não são narrados como unidade própria — o `"Capítulo N."` vem **fundido**
-  ao primeiro versículo do capítulo.
-- As unidades de `reflexoes` vêm prefixadas com `"Reflexão N. "`.
+- Cada seção de conteúdo começa com uma unidade de **cabeçalho falado** —
+  `"Contexto."`, `"Texto Bíblico."`, `"Resenha."`, `"Reflexões."` — que não
+  corresponde a nada na tela.
+- A seção `titulo` tem **duas** unidades (o título e a referência falada) e
+  nenhuma delas é cabeçalho. Não tem alvo na tela: toca sem realce.
+- `parseTextoNaa` emite blocos `{ kind: 'chapter' }` que não são narrados como
+  unidade própria — o `"Capítulo N."` vem **fundido** ao primeiro versículo do
+  capítulo. As unidades de `reflexoes` vêm prefixadas com `"Reflexão N. "`.
+- **`contexto` tem 1 unidade e a tela mostra 2 parágrafos.** O gerador quebra
+  a prosa pelos `\n\n` do dado bruto; o `contexto_historico_literario` não tem
+  nenhum, então vira uma unidade só, enquanto `paragraphize` na tela cai no
+  caminho de quebra por frases e produz 2. Verificado em 7 de 7 manifestos.
+  A `resenha` tem 2 `\n\n` e por isso bate: 2 unidades, 2 parágrafos.
 
-Contagens medidas na ordem 1600, depois de descontar o cabeçalho de cada seção:
+Uma regra posicional descartaria o realce do `contexto` em **toda** perícope —
+justamente a seção que toca primeiro.
 
-| Seção | Tela | Manifesto (sem cabeçalho) |
-|---|---|---|
-| `contexto` | 2 parágrafos | 2 |
-| `texto` | 17 versículos (+1 marcador de capítulo) | 17 |
-| `resenha` | 2 parágrafos | 2 |
-| `reflexoes` | 2 itens | 2 |
+### A regra: alinhamento por fluxo de tokens
 
-**A regra:**
+Em vez de casar unidade com elemento, casar **token com token**, por seção:
 
-1. Descartar a primeira unidade de cada seção (o cabeçalho falado).
-2. `texto` → os blocos `kind === 'verse'`, na ordem, ignorando os marcadores de
-   capítulo. O alvo no DOM é `[data-verse-id="<c:v>"]`.
-3. `contexto` → `[data-verse-id="contexto-<n>"]`; `resenha` →
-   `resenha-<n>`; `reflexoes` → `reflexao-<n>`.
-4. `titulo` → sem alvo no DOM; toca sem realce.
+1. Pular a seção `titulo` inteira; nas outras, descartar a primeira unidade (o
+   cabeçalho falado).
+2. Montar o fluxo do manifesto: a concatenação, na ordem, dos tokens de cada
+   unidade restante — cada token carregando seu `{ i, d }` de `palavras`.
+   Descartar o prefixo `"Capítulo N."` / `"Reflexão N. "` (e os itens de
+   `palavras` correspondentes) **apenas quando o descarte faz o token seguinte
+   coincidir** com o próximo token pendente da tela; assim um versículo que
+   legitimamente comece com essa forma não é mutilado.
+3. Montar o fluxo da tela: a concatenação, na ordem, dos tokens de cada alvo —
+   `contexto` → `[data-verse-id="contexto-<n>"]`; `texto` → os blocos
+   `kind === 'verse'` (ignorando os marcadores de capítulo), alvo
+   `[data-verse-id="<c:v>"]`; `resenha` → `resenha-<n>`; `reflexoes` →
+   `reflexao-<n>`.
+4. Se os dois fluxos tiverem o mesmo comprimento **e os mesmos tokens**, o
+   alinhamento é exato: cada token do manifesto sabe a qual alvo pertence e
+   qual é sua posição dentro dele. Senão, a seção toca **sem realce**.
 
-**E validar, nunca presumir.** Depois de montar o mapa, conferir por seção que
-a contagem de unidades bate com a contagem de alvos no DOM. Se não bater, essa
-seção toca **sem realce** em vez de realçar por chute. O mesmo vale se um alvo
-não existir no DOM.
+Isso resolve as duas escalas de uma vez — o alvo em curso é o dono do token em
+curso, e a palavra em curso é a posição desse token dentro do alvo — e cobre o
+caso 1-unidade-para-N-parágrafos sem exceção nenhuma.
 
-A validação é o que transforma um desalinhamento futuro — outra versão do
-`paragraphize`, uma mudança no gerador — em "o realce sumiu nesta seção" em vez
-de "o realce está mentindo".
+### Por que isso é mais seguro que contar
+
+Comparar contagens aceita duas listas do mesmo tamanho e conteúdo diferente.
+Comparar tokens não: um `paragraphize` diferente, uma normalização nova no
+gerador ou uma edição no catálogo derrubam o realce **daquela seção** em vez de
+deslocá-lo. Na dúvida, realce nenhum — nunca realce mentiroso.
+
+Medido sobre os manifestos publicados das ordens 1600, 1601, 1605, 1610, 1620,
+1650 e 1700 (134 unidades):
+
+| Verificação | Resultado |
+|---|---|
+| Unidades sem `palavras` | **0** |
+| `palavras[k].t` diferente de `texto.split(' ')[k]` | **0** |
+| Tempos de palavra não monotônicos dentro da unidade | **0** |
+| Palavras fora da janela `[inicio, inicio+dur]` da unidade | **0** |
+| Seções cujo fluxo de tokens não bate com a tela (após a regra acima) | **0 de 28** |
+| Formas de prefixo encontradas | só `Capítulo N.` e `Reflexão N.` |
 
 ## Realce e rolagem
 
@@ -137,14 +164,18 @@ unidade em fala e aplica `verse-speaking` / `prose-speaking` (sublinhado em
 
 ## Realce por palavra
 
-Dentro da unidade em curso, a palavra é a que satisfaz `i <= t < i + d`.
+A palavra em curso é o token que satisfaz `i <= t < i + d`. O alinhamento por
+fluxo de tokens já entregou, para cada token do manifesto, o alvo a que ele
+pertence e sua posição dentro dele — não há um segundo mapeamento a fazer nem
+uma segunda validação a aplicar: **a mesma checagem de fluxo governa as duas
+escalas**. Uma seção que passou realça palavra e alvo; uma que não passou não
+realça nem um nem outro.
 
-O texto renderizado precisa ser tokenizável do mesmo jeito que o manifesto:
-`texto.split(' ')`. Como o contrato garante mesma contagem e mesma ordem, o
-n-ésimo token do DOM corresponde ao n-ésimo item de `palavras` — **desde que a
-mesma validação de contagem seja aplicada por unidade**. Unidade cujo texto
-renderizado não produza a mesma contagem de tokens realça só no nível da
-unidade.
+Entre uma palavra e a seguinte há silêncio (o `d` termina antes do `i` do
+próximo token). Nesse vão, mantém-se a **última** palavra realçada em vez de
+apagar o realce: apagar produziria uma piscada a cada palavra, que é
+exatamente o desconforto que a feature existe para remover. O realce só sai
+quando o alvo muda ou o áudio para.
 
 ### Quebrar o versículo em palavras
 
@@ -167,9 +198,15 @@ página. O custo é uma remontagem pequena a cada troca de unidade (~6 s pela
 mediana medida) — barata, e fora do caminho do `timeupdate`, que só troca uma
 classe.
 
-**Fallback obrigatório:** manifesto sem o campo `palavras` (ainda não
-realinhado) cai no realce por unidade, sem erro visível. O campo estava sendo
-republicado em 2026-09-02, então as duas formas convivem por um tempo.
+**Fallback obrigatório:** manifesto sem o campo `palavras` toca **sem realce
+nenhum**, sem erro visível. Não existe meio-termo útil: sem `palavras` não há
+como saber a qual parágrafo do `contexto` a unidade única corresponde, e
+realçar os dois seria a mentira que a validação existe para evitar.
+
+A republicação com `palavras` já terminou — nas 134 unidades medidas o campo
+está em todas. O fallback é defesa contra um caso real, porém: o manifesto é
+servido com `cache-control: immutable, max-age=31536000`, então um aparelho que
+tenha buscado a versão antiga pode carregá-la do cache por um ano.
 
 O realce por palavra deve ser visualmente mais leve que o do versículo — dois
 realces de mesmo peso competem e cansam. Peso exato fica para a implementação,
@@ -228,9 +265,11 @@ player toca sem realce em vez de sumir — o áudio é o valor principal.
    para trás.
 4. Perícope sem narração não mostra player nem qualquer menção a áudio, e não
    oferece TTS.
-5. Manifesto sem `palavras` realça por unidade, sem erro visível.
-6. Uma seção cuja contagem não bate toca sem realce naquela seção, e as outras
-   seções seguem realçando.
+5. Manifesto sem `palavras` (ainda não realinhado) toca sem realce nenhum,
+   sem erro visível — o áudio é o valor principal.
+6. Uma seção cujo fluxo de tokens não bate toca sem realce naquela seção, e as
+   outras seções seguem realçando. Verificado com um manifesto adulterado.
+   Em particular, `contexto` (1 unidade, 2 parágrafos na tela) DEVE realçar.
 7. Nenhum resquício do TTS sintético: `grep -rn "tts" src/` não retorna código
    vivo, e o backlog não lista mais itens sobre ele.
 8. Selecionar e copiar um versículo durante a reprodução devolve o texto com

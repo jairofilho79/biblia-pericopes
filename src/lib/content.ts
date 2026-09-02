@@ -1,5 +1,7 @@
 import type { Pericope, PericopeIndex } from './types'
 import { testamentOf, type Testament } from './testament'
+import { livroSlug } from './livro-slug'
+import { carregarEstudo, carregarTexto } from './shards'
 
 let indice: PericopeIndex[] | null = null
 let carregando: Promise<PericopeIndex[]> | null = null
@@ -58,8 +60,16 @@ export async function listPericopes(opts?: {
 }
 
 export async function getPericope(ordem: number): Promise<Pericope | undefined> {
-  const list = await loadPericopes()
-  return list.find((p) => p.ordem === ordem)
+  const meta = (await loadIndex()).find((p) => p.ordem === ordem)
+  if (!meta) return undefined
+  const slug = livroSlug(meta.livro)
+  // Os dois shards do livro em paralelo: são requisições de usuário, não de
+  // fundo, e a leitura só desenha com as duas.
+  const [texto, estudo] = await Promise.all([carregarTexto(slug), carregarEstudo(slug)])
+  const bloco = estudo.get(ordem)
+  const corpo = texto.get(ordem)
+  if (bloco === undefined || corpo === undefined) return undefined
+  return { ...meta, texto_naa: corpo, ...bloco }
 }
 
 export async function listLivros(testament?: Testament): Promise<string[]> {

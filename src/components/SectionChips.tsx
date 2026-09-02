@@ -135,9 +135,17 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
 
   function irPara(id: string) {
     onIr?.(id)
+    const alvo = document.getElementById(id)
     // Expandir o Contexto não move o topo dele — é a primeira seção da página
     // —, então rolar na mesma volta do evento já chega no lugar certo.
-    document.getElementById(id)?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
+    alvo?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
+    // O foco tem que acompanhar a rolagem: sem isso, quem navega por teclado
+    // ou leitor de tela continua lá atrás, e o próximo Tab volta para o começo
+    // da página em vez de seguir dentro da seção. `preventScroll` porque a
+    // rolagem já foi feita acima, suave — deixar o foco rolar de novo daria um
+    // salto seco por cima dela. As seções levam tabindex="-1" para poder
+    // receber foco sem entrar na ordem de tabulação.
+    alvo?.focus({ preventScroll: true })
   }
 
   return (

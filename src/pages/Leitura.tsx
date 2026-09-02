@@ -656,7 +656,7 @@ export default function Leitura() {
         />
       )}
 
-      <section className="block block-plain" id="contexto">
+      <section className="block block-plain" id="contexto" tabIndex={-1}>
         <h2 className="collapse-h">
           <button
             type="button"
@@ -691,7 +691,7 @@ export default function Leitura() {
         </div>
       </section>
 
-      <section className="block block-plain" id="texto">
+      <section className="block block-plain" id="texto" tabIndex={-1}>
         <h2>Texto (NAA)</h2>
         {temTts && (
           <BarraOuvir
@@ -753,7 +753,7 @@ export default function Leitura() {
         </div>
       </section>
 
-      <section className="block block-plain" id="resenha">
+      <section className="block block-plain" id="resenha" tabIndex={-1}>
         <h2>Resenha</h2>
         {temTts && (
           <BarraOuvir
@@ -773,7 +773,7 @@ export default function Leitura() {
         ))}
       </section>
 
-      <section className="block block-plain" id="reflexao">
+      <section className="block block-plain" id="reflexao" tabIndex={-1}>
         <h2>Reflexão</h2>
         {temTts && (
           <BarraOuvir

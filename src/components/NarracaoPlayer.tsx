@@ -41,14 +41,18 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek }: Props)
     let vivo = true
     setSrc(null)
     setManifesto(null)
+    // Serializado: cobertura de narração é parcial, então buscar o manifesto
+    // incondicionalmente seria um GET garantidamente 404 em quase toda
+    // perícope aberta. Só vale a pena depois de o HEAD confirmar o áudio.
     fetch(url, { method: 'HEAD', signal: ac.signal })
       .then((r) => {
-        if (vivo && r.ok) setSrc(url)
+        if (!vivo || !r.ok) return
+        setSrc(url)
+        return carregarManifesto(ordem, ac.signal).then((m) => {
+          if (vivo) setManifesto(m)
+        })
       })
       .catch(() => {})
-    carregarManifesto(ordem, ac.signal).then((m) => {
-      if (vivo) setManifesto(m)
-    })
     return () => {
       vivo = false
       ac.abort()

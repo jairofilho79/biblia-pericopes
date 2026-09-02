@@ -8,6 +8,11 @@ import {
   msAteVolta,
   transcrever,
 } from '../lib/ditado'
+import {
+  criarDitadoNativo,
+  obterReconhecimento,
+  type DitadoNativo,
+} from '../lib/reconhecimento-fala'
 
 type Props = {
   /** Recebe o texto transcrito; quem chama decide onde ele entra. */
@@ -18,6 +23,9 @@ type Props = {
 
 type Fase =
   | { tipo: 'ocioso' }
+  /** Modo nativo: ouvindo, com a prévia do que está sendo dito. */
+  | { tipo: 'ouvindo'; parcial: string }
+  /** Modo fallback (Whisper). */
   | { tipo: 'gravando'; segundos: number }
   | { tipo: 'transcrevendo' }
   | { tipo: 'esgotado'; voltaEm: string }
@@ -27,15 +35,27 @@ function temMicrofoneNoNavegador(): boolean {
 }
 
 /**
- * Microfone do formulário de anotação: toque grava, toque de novo para e
- * manda para o Worker transcrever. Só existe para quem está logado (a rota
- * cobra cota por usuário) e com rede — offline não tem como transcrever, e um
- * botão que só dá erro é pior que nenhum.
+ * Microfone do formulário de anotação: toque começa a ouvir, toque de novo
+ * para. Dois caminhos:
+ *
+ * - Nativo (Web Speech API — o ditado da Apple no iPhone, o do Google no
+ *   Android/Chrome): sem login, sem cota, sem teto de tempo. O texto entra no
+ *   textarea a cada frase fechada; o que ainda está sendo dito aparece como
+ *   prévia ao lado do botão.
+ * - Fallback (Firefox e afins, sem a API): grava com MediaRecorder e manda
+ *   para o Worker transcrever. Só para quem está logado (a rota cobra cota
+ *   por usuário) e com teto de 60 s.
+ *
+ * Nos dois casos só com rede — o nativo do Chrome manda o áudio para o
+ * Google — e um botão que só dá erro é pior que nenhum.
  */
 export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   const { data: session } = authClient.useSession()
   const [online, setOnline] = useState(() => navigator.onLine)
   const [fase, setFase] = useState<Fase>({ tipo: 'ocioso' })
+  // Decidido uma vez: a API não aparece nem some no meio da vida do botão.
+  const [Reconhecimento] = useState(() => obterReconhecimento())
+  const nativo = Reconhecimento !== null
 
   // A transcrição termina bem depois do render que criou o callback: os refs
   // garantem que o texto chega na versão mais recente de onTexto/onAviso (a
@@ -44,6 +64,11 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   const onAvisoRef = useRef(onAviso)
   onTextoRef.current = onTexto
   onAvisoRef.current = onAviso
+
+  const ditado = useRef<DitadoNativo | null>(null)
+  // A intenção da pessoa: o iOS encerra a sessão sozinho depois de uma pausa
+  // mesmo com `continuous`; enquanto ela não tocou em parar, o onFim reinicia.
+  const querOuvir = useRef(false)
 
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
@@ -77,6 +102,8 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   // deixar o microfone aberto nem timers pendurados.
   useEffect(
     () => () => {
+      querOuvir.current = false
+      ditado.current?.parar()
       const rec = recorder.current
       if (rec?.state === 'recording') {
         // Descarta em vez de transcrever: não há mais textarea para receber
@@ -174,31 +201,81 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
     rec.stop() // onstop → terminar()
   }
 
-  if (!session || !online || !temMicrofoneNoNavegador()) return null
+  function comecarNativo() {
+    ditado.current ??= criarDitadoNativo(
+      {
+        onFinal: (texto) => onTextoRef.current(texto),
+        onParcial: (parcial) =>
+          setFase((f) => (f.tipo === 'ouvindo' ? { tipo: 'ouvindo', parcial } : f)),
+        onErro: (msg) => {
+          // Microfone negado, sem rede: reiniciar só repetiria o erro.
+          querOuvir.current = false
+          onAvisoRef.current(msg)
+        },
+        onFim: () => {
+          if (querOuvir.current) ditado.current?.iniciar()
+          else setFase({ tipo: 'ocioso' })
+        },
+      },
+      Reconhecimento,
+    )
+    if (!ditado.current) return
+    querOuvir.current = true
+    setFase({ tipo: 'ouvindo', parcial: '' })
+    ditado.current.iniciar()
+  }
 
-  const gravando = fase.tipo === 'gravando'
+  function pararNativo() {
+    querOuvir.current = false
+    // Ocioso já: o onend pode demorar, e o botão precisa responder na hora.
+    // A última frase ainda chega por onFinal, que não depende da fase.
+    setFase({ tipo: 'ocioso' })
+    ditado.current?.parar()
+  }
+
+  if (!online) return null
+  if (!nativo && (!session || !temMicrofoneNoNavegador())) return null
+
+  const ouvindo = fase.tipo === 'ouvindo'
+  const gravando = ouvindo || fase.tipo === 'gravando'
   const rotulo =
     fase.tipo === 'esgotado'
       ? mensagemEsgotado(fase.voltaEm)
-      : gravando
-        ? 'Parar e transcrever'
-        : 'Ditar anotação'
+      : ouvindo
+        ? 'Parar ditado'
+        : gravando
+          ? 'Parar e transcrever'
+          : 'Ditar anotação'
   const lado =
-    fase.tipo === 'gravando'
-      ? formatarContador(fase.segundos)
-      : fase.tipo === 'transcrevendo'
-        ? 'Transcrevendo…'
-        : fase.tipo === 'esgotado'
-          ? mensagemEsgotado(fase.voltaEm)
-          : null
+    fase.tipo === 'ouvindo'
+      ? fase.parcial
+        ? `${fase.parcial}…`
+        : 'Ouvindo…'
+      : fase.tipo === 'gravando'
+        ? formatarContador(fase.segundos)
+        : fase.tipo === 'transcrevendo'
+          ? 'Transcrevendo…'
+          : fase.tipo === 'esgotado'
+            ? mensagemEsgotado(fase.voltaEm)
+            : null
 
   return (
     <span className="ditar">
-      {lado && (
-        <span className="ditar-status" role="status" aria-live="polite">
-          {lado}
-        </span>
-      )}
+      {lado &&
+        (ouvindo ? (
+          // Prévia muda a cada sílaba: sem aria-live, senão o leitor de tela
+          // tagarela; o texto de verdade chega pelo textarea.
+          <span
+            className={`ditar-status${fase.parcial ? ' ditar-previa' : ''}`}
+            title={fase.parcial || undefined}
+          >
+            {lado}
+          </span>
+        ) : (
+          <span className="ditar-status" role="status" aria-live="polite">
+            {lado}
+          </span>
+        ))}
       <button
         type="button"
         className={`ditar-botao${gravando ? ' gravando' : ''}`}
@@ -206,7 +283,9 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
         title={rotulo}
         aria-pressed={gravando}
         disabled={disabled || fase.tipo === 'transcrevendo' || fase.tipo === 'esgotado'}
-        onClick={() => (gravando ? parar() : void comecar())}
+        onClick={() =>
+          nativo ? (ouvindo ? pararNativo() : comecarNativo()) : gravando ? parar() : void comecar()
+        }
       >
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
           <path

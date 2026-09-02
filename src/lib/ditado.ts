@@ -1,6 +1,9 @@
 /**
- * Ditado das anotações: escolha do formato de gravação, inserção do texto
- * transcrito no rascunho e a chamada a POST /api/transcrever. Tudo puro (ou
+ * Ditado das anotações — caminho de fallback. O principal é o reconhecimento
+ * nativo do aparelho (reconhecimento-fala.ts); onde a Web Speech API não
+ * existe (Firefox), o DitarBotao grava e manda para POST /api/transcrever, e
+ * é isso que vive aqui: escolha do formato de gravação, a chamada ao Worker e
+ * o contador/cota. `inserirNoCursor` serve aos dois caminhos. Tudo puro (ou
  * só com `fetch`) para o DitarBotao ficar com o mínimo de lógica.
  */
 

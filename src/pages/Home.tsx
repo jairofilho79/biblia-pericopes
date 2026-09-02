@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SkeletonHome } from '../components/Skeleton'
-import { getPericope, loadPericopes, ordensDoTestamento, refLabel } from '../lib/content'
-import { readingMinutes } from '../lib/reading-time'
+import { getPericope, loadIndex, ordensDoTestamento, refLabel } from '../lib/content'
 import {
   countConcluidasNaSequencia,
   getProximaOrdemNaSequencia,
@@ -32,7 +31,7 @@ export default function Home() {
   // progresso — separar faria a tela mostrar dois instantes diferentes.
   const carregar = useCallback(async () => {
     try {
-      const all = await loadPericopes()
+      const all = await loadIndex()
       const built: Track[] = []
       for (const testament of ['vt', 'nt'] as Testament[]) {
         const ordens = ordensDoTestamento(all, testament)
@@ -46,7 +45,7 @@ export default function Home() {
           done,
           total: ordens.length,
           allDone: done >= ordens.length,
-          minutos: readingMinutes(peri.texto_naa),
+          minutos: peri.minutos,
         })
       }
       setTracks(built)

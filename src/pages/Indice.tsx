@@ -4,14 +4,14 @@ import { SkeletonIndice } from '../components/Skeleton'
 import {
   listLivros,
   listPericopes,
-  loadPericopes,
+  loadIndex,
   progressoPorLivro,
   refLabel,
   type LivroProgresso,
 } from '../lib/content'
 import { doneSet } from '../lib/user-db'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
-import type { Pericope, PericopeIndex } from '../lib/types'
+import type { PericopeIndex } from '../lib/types'
 
 function PeriLink({ p, done }: { p: PericopeIndex; done: boolean }) {
   return (
@@ -51,7 +51,7 @@ export default function Indice() {
   const [done, setDone] = useState<Set<number>>(new Set())
   // Lista completa (sem filtro de busca): a barra de progresso do livro
   // aberto precisa do total do livro inteiro, não do que sobrou da busca.
-  const [todas, setTodas] = useState<Pericope[]>([])
+  const [todas, setTodas] = useState<PericopeIndex[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   // Só desliga o skeleton depois que a lista de perícopes chegou pela
@@ -61,7 +61,7 @@ export default function Indice() {
 
   useEffect(() => {
     let vivo = true
-    Promise.all([listLivros(), doneSet(), loadPericopes()])
+    Promise.all([listLivros(), doneSet(), loadIndex()])
       .then(([ls, feitas, tudo]) => {
         if (!vivo) return
         setLivros(ls)

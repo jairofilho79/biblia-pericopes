@@ -7,7 +7,7 @@ import VerseActions from '../components/VerseActions'
 import {
   anteriorNoTestamento,
   getPericope,
-  loadPericopes,
+  loadIndex,
   proximaNoTestamento,
   refLabel,
 } from '../lib/content'
@@ -256,7 +256,7 @@ export default function Leitura() {
       // a troca de perícope.
       vAplicado.current = null
       try {
-        const all = await loadPericopes()
+        const all = await loadIndex()
         const peri = await getPericope(ordem)
         if (!peri) {
           setErr('Perícope não encontrada')

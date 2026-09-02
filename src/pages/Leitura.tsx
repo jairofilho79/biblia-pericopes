@@ -384,9 +384,9 @@ export default function Leitura() {
     // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
     if (!falando || barOpen || editingId || draftRef) return
     if (Date.now() < cedeuAte.current) return
-    // Títulos em fala carregam `data-fala-id`, não `data-verse-id`: o
-    // SectionChips conta todos os `[data-verse-id]` para a referência viva, e
-    // um <h1> ali entraria na conta.
+    // Títulos em fala carregam `data-fala-id`, não `data-verse-id`: esse
+    // atributo é das unidades de texto realçáveis (versículo, parágrafo,
+    // pergunta), e um <h1> não é uma delas.
     const el = document.querySelector<HTMLElement>(
       `[data-verse-id="${falando}"], [data-fala-id="${falando}"]`,
     )
@@ -658,7 +658,6 @@ export default function Leitura() {
 
       <SectionChips
         ordem={p.ordem}
-        layout={prefs.layout}
         onIr={(id) => {
           if (id === 'contexto') abrirContexto()
           // O chip rola a tela até a seção; com narração, o áudio vai junto
@@ -781,7 +780,7 @@ export default function Leitura() {
         {/* a section chama-se `reflexao`, mas o manifesto chama a seção de
             `reflexoes` — o id do alvo segue o manifesto. */}
         <h2 className={tituloClass('', 'cabecalho-reflexoes') || undefined} data-fala-id="cabecalho-reflexoes">
-          Reflexão
+          Reflexões
         </h2>
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (

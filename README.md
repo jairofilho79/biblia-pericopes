@@ -10,14 +10,23 @@ npm run pipeline   # ETL + enrich local → data/pericopes.json
 npm run dev
 ```
 
+O catálogo (`data/pericopes.json`) não é servido direto: `npm run shard` fatia ele em
+`public/data/index.json` (metadados enxutos das perícopes — o que a Home e a busca
+precisam de cara) mais `public/data/texto/<livro>.json` e `public/data/estudo/<livro>.json`
+(texto NAA e material de estudo, um arquivo por livro, baixados sob demanda). `predev` e
+`prebuild` já rodam `npm run shard` sozinhos antes de `dev`/`build`; ele só regenera se
+`data/pericopes.json` for mais novo que a saída (ou com `--force`). Os três destinos em
+`public/data/` são derivados e não são versionados.
+
 ## Scripts
 
 | Comando | Função |
 |---------|--------|
 | `npm run etl` | Cruza KJV_Pericopes × NAA → `data/raw-pericopes.jsonl` |
 | `npm run enrich` | Enriquecimento local (títulos/contexto template) |
-| `npm run enrich:openai` | Enriquecimento via OpenAI (`OPENAI_API_KEY`) |
-| `npm run enrich:genesis` | OpenAI só em Gênesis |
+| `npm run enrich:openrouter` | Enriquecimento via OpenRouter (`OPENROUTER_API_KEY`) |
+| `npm run enrich:genesis` | OpenRouter só em Gênesis |
+| `npm run shard` | Fatia `data/pericopes.json` em `public/data/index.json` + `texto/` + `estudo/` |
 
 ## Dados do usuário
 

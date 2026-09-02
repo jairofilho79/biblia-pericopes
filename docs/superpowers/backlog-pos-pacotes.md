@@ -3,6 +3,28 @@
 Achados não-bloqueantes das revisões finais, adjudicados como melhorias
 futuras. Nenhum corrompe dados nem quebra fluxo principal.
 
+## Carga de dados
+
+- ~~Primeira tela bloqueada pelo catálogo monolítico (`pericopes.json`, 13,7 MB
+  crus / 4.446.987 bytes comprimidos).~~ Feito em 2026-09-02: `npm run shard`
+  fatia o catálogo em `public/data/index.json` (metadados enxutos, servidos
+  de cara) mais `texto/` e `estudo/` por livro, baixados por uma fila de
+  fundo depois da primeira tela. Medido no build de produção servido local:
+  a primeira tela cai de 4.446.987 para 70.739 bytes comprimidos — cerca de
+  63× menos payload bloqueante (os tempos não são comparáveis entre as duas
+  medições: a antiga foi pela internet contra o Cloudflare, a nova é
+  servidor local — só a comparação de bytes, ambos comprimidos, é justa). O
+  precache do service worker cai de ~15,7 MB para 2.271 KiB (49 entradas),
+  com `index.json` como única entrada JSON. Migração de cliente com o SW da
+  versão anterior instalado, offline completo em perícopes nunca visitadas
+  e busca full-text sobre os shards seguem funcionando — a busca não chegou
+  a ser observada progredindo ao vivo (shards já estavam em cache na sessão
+  de verificação), mas está coberta por teste e revisão. Spec:
+  `docs/superpowers/specs/2026-09-02-carga-progressiva-dados-design.md`.
+- Precache do service worker hoje é dominado por ~25 variantes woff2 de
+  subset das 5 famílias de fonte (fontsource); carregar só os subsets
+  realmente usados cortaria a maior parte dos 2.271 KiB restantes.
+
 ## Sync / Worker (endurecimento)
 
 - ~~Validações do Worker: inteiro em `pericopeOrdem`; invariante

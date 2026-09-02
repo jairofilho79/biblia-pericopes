@@ -16,11 +16,21 @@ export function hasOpenDialog(doc: Document): boolean {
   return doc.querySelector('[role="dialog"]') !== null
 }
 
+/**
+ * Foco dentro da linha de chips: ←/→ ali são a rolagem horizontal da própria
+ * linha. Engolir a seta deixaria quem usa teclado sem alcançar os chips que
+ * estão fora da faixa visível.
+ */
+export function isChipsRowTarget(el: EventTarget | null): boolean {
+  return el instanceof HTMLElement && el.closest('.section-chips-row') !== null
+}
+
 /** Decisão pura do atalho, sem tocar em nada do DOM além do alvo do evento. */
 export function shouldHandleKey(ev: KeyboardEvent): 'prev' | 'next' | null {
   if (ev.altKey || ev.ctrlKey || ev.metaKey || ev.shiftKey) return null
   if (ev.defaultPrevented) return null
   if (isTypingTarget(ev.target)) return null
+  if (isChipsRowTarget(ev.target)) return null
   if (ev.key === 'ArrowLeft') return 'prev'
   if (ev.key === 'ArrowRight') return 'next'
   return null

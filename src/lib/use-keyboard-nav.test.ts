@@ -92,3 +92,28 @@ describe('hasOpenDialog', () => {
     expect(hasOpenDialog(document)).toBe(false)
   })
 })
+
+// A linha de chips rola de lado, e ←/→ é como se rola ela pelo teclado. Se a
+// navegação entre perícopes engolir a seta ali, quem usa teclado fica sem
+// alcançar os chips que estão fora da faixa visível.
+describe('shouldHandleKey — linha de chips', () => {
+  function chipNaLinha(): HTMLElement {
+    const linha = montar('div')
+    linha.className = 'section-chips-row'
+    const chip = document.createElement('button')
+    chip.className = 'section-chip'
+    linha.append(chip)
+    return chip
+  }
+
+  it('deixa a seta para a rolagem da própria linha', () => {
+    expect(decidir('ArrowLeft', chipNaLinha())).toBeNull()
+    expect(decidir('ArrowRight', chipNaLinha())).toBeNull()
+  })
+
+  it('fora da linha, a seta continua navegando entre perícopes', () => {
+    const solto = montar('button')
+    expect(decidir('ArrowLeft', solto)).toBe('prev')
+    expect(decidir('ArrowRight', solto)).toBe('next')
+  })
+})

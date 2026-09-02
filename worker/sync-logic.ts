@@ -77,7 +77,6 @@ function validDestaque(v: unknown): v is PushDestaque {
   const d = v as Record<string, unknown>
   return (
     typeof d.id === 'string' &&
-    d.id.length > 0 &&
     d.id.length <= 64 &&
     typeof d.pericopeOrdem === 'number' &&
     typeof d.verseId === 'string' &&
@@ -86,7 +85,13 @@ function validDestaque(v: unknown): v is PushDestaque {
     CORES.has(d.cor) &&
     isIso(d.criadoEm) &&
     isIso(d.atualizadoEm) &&
-    (d.apagadoEm === null || isIso(d.apagadoEm))
+    (d.apagadoEm === null || isIso(d.apagadoEm)) &&
+    // Por último, com as partes já validadas: o id TEM que ser o derivado de
+    // (pericopeOrdem, verseId) — o mesmo que destaqueId() monta no cliente.
+    // A Leitura pinta o versículo pelo verseId mas remove pelo id derivado;
+    // um id divergente vira destaque que o usuário não consegue apagar, e que
+    // o pull seguinte traz de volta.
+    d.id === `${d.pericopeOrdem}:${d.verseId}`
   )
 }
 

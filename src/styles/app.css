@@ -1672,7 +1672,32 @@ button.ghost {
   color: var(--muted);
 }
 
-/* visível só para leitores de tela: usado no aviso de erro do "Sair" */
+.nav-conta-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Popover de erro do "Sair": mesmo padrão visual do .readmenu-pop
+   (flutuante, ancorado no botão), cor de erro igual à do .entrar-erro. */
+.nav-conta-erro {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  right: 0;
+  z-index: 6;
+  max-width: 14rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.14);
+  color: #b3564d;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+/* visível só para leitores de tela */
 .sr-only {
   position: absolute;
   width: 1px;

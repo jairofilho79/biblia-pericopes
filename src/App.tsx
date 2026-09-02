@@ -28,7 +28,9 @@ function Shell() {
       await signOutLocal()
     } catch {
       // nunca deixar virar rejeição não tratada: o usuário precisa saber
+      // (some sozinho depois de um tempo, como o flashAviso da Leitura)
       setErroSaida('Não foi possível sair. Tente de novo.')
+      window.setTimeout(() => setErroSaida(''), 4000)
     } finally {
       setSaindo(false)
     }
@@ -91,20 +93,25 @@ function Shell() {
           <NavLink to="/indice">Índice</NavLink>
           <NavLink to="/pesquisar">Pesquisar</NavLink>
           {session ? (
-            <>
+            <span className="nav-conta-wrap">
               <button
                 type="button"
                 className="linkish nav-conta"
                 onClick={() => void sair()}
                 disabled={saindo}
-                title={erroSaida || session.user.email}
+                title={session.user.email}
               >
                 {saindo ? 'Saindo…' : 'Sair'}
               </button>
-              <span className="sr-only" role="status" aria-live="polite">
-                {erroSaida}
-              </span>
-            </>
+              {/* Popover em vez de aria-live sozinho: quem usa toque não vê
+                  `title` (precisa de hover), então a falha precisa aparecer
+                  na tela, não só ser lida em voz alta. */}
+              {erroSaida && (
+                <span className="nav-conta-erro" role="status" aria-live="polite">
+                  {erroSaida}
+                </span>
+              )}
+            </span>
           ) : (
             <NavLink to="/entrar">Entrar</NavLink>
           )}

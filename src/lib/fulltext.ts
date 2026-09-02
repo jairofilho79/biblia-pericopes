@@ -190,6 +190,21 @@ async function buildIndex(): Promise<Entrada[]> {
  * Roda síncrona no main thread: 2647 `indexOf` num corpus já normalizado é
  * rápido o bastante para o debounce de 300 ms da UI absorver.
  */
+/**
+ * Corta a página de resultados e diz se ficou coisa de fora.
+ *
+ * Espera uma busca feita com `limite + 1`: é a única forma de separar "achou
+ * exatamente o limite" de "achou o limite e tem mais". Sem isso, uma busca com
+ * 50 resultados cravados se anunciava como "(primeiros)" — dizendo ao leitor
+ * que faltava resultado quando não faltava.
+ */
+export function fatiarResultado<T>(
+  achados: T[],
+  limite = LIMITE_RESULTADOS,
+): { hits: T[]; truncado: boolean } {
+  return { hits: achados.slice(0, limite), truncado: achados.length > limite }
+}
+
 export async function searchTexto(q: string, limit = LIMITE_RESULTADOS): Promise<FulltextHit[]> {
   const agulha = normalize(q.trim())
   if (agulha.length < MIN_CHARS) return []

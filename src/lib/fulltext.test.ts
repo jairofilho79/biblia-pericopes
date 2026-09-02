@@ -1,12 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import {
-  indexarLinhas,
-  marcarTrecho,
-  normalize,
-  searchTexto,
-  snippetAt,
-  verseIdAtOffset,
-} from './fulltext'
+import { fatiarResultado, indexarLinhas, marcarTrecho, normalize, searchTexto, snippetAt, verseIdAtOffset } from './fulltext'
 import type { Pericope } from './types'
 
 const TEXTO =
@@ -183,5 +176,27 @@ describe('buildIndex — recuperação de falha', () => {
 
     vi.doUnmock('./content')
     vi.resetModules()
+  })
+})
+
+// "(primeiros)" só faz sentido quando existe um segundo lote. Buscando
+// exatamente o limite não dá para saber — daí a busca pedir `limite + 1`.
+describe('fatiarResultado', () => {
+  const lista = (n: number) => Array.from({ length: n }, (_, i) => i)
+
+  it('menos que o limite: entrega tudo e não anuncia corte', () => {
+    expect(fatiarResultado(lista(3), 50)).toEqual({ hits: [0, 1, 2], truncado: false })
+  })
+
+  it('exatamente o limite não é corte', () => {
+    const r = fatiarResultado(lista(50), 50)
+    expect(r.hits).toHaveLength(50)
+    expect(r.truncado).toBe(false)
+  })
+
+  it('limite + 1 é corte, e o extra não vaza para a lista', () => {
+    const r = fatiarResultado(lista(51), 50)
+    expect(r.hits).toHaveLength(50)
+    expect(r.truncado).toBe(true)
   })
 })

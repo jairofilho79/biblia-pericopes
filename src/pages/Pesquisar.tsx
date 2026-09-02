@@ -13,6 +13,7 @@ import {
   refLabel,
 } from '../lib/content'
 import {
+  fatiarResultado,
   indexPronto,
   LIMITE_RESULTADOS,
   marcarTrecho,
@@ -55,7 +56,15 @@ export default function Pesquisar() {
   const [miss, setMiss] = useState('')
   const [modo, setModo] = useState<'ref' | 'texto'>('ref')
   const [texto, setTexto] = useState('')
-  const [hits, setHits] = useState<FulltextHit[]>([])
+  // O termo viaja junto dos resultados: durante os 300 ms de debounce, `termo`
+  // já é o que está sendo digitado enquanto `hits` ainda é do termo anterior.
+  // Marcar o trecho com o termo novo não achava nada e o <mark> sumia da lista
+  // a cada tecla.
+  const [resultado, setResultado] = useState<{
+    termo: string
+    hits: FulltextHit[]
+    truncado: boolean
+  }>({ termo: '', hits: [], truncado: false })
   const [buscando, setBuscando] = useState(false)
   const [preparando, setPreparando] = useState(false)
   const [erro, setErro] = useState(false)
@@ -83,7 +92,7 @@ export default function Pesquisar() {
   // Debounce de 300 ms: digitar não pode disparar uma varredura por tecla.
   useEffect(() => {
     if (modo !== 'texto' || termo.length < MIN_CHARS) {
-      setHits([])
+      setResultado({ termo: '', hits: [], truncado: false })
       setBuscando(false)
       setPreparando(false)
       setErro(false)
@@ -95,13 +104,15 @@ export default function Pesquisar() {
     // A primeira busca paga a construção do índice; as seguintes, não.
     setPreparando(!indexPronto())
     const timer = window.setTimeout(() => {
-      searchTexto(termo)
+      // `+ 1` de propósito: é o item extra que distingue "achou 50" de
+      // "achou 50 e tem mais". fatiarResultado descarta ele da lista.
+      searchTexto(termo, LIMITE_RESULTADOS + 1)
         .then((r) => {
-          if (vivo) setHits(r)
+          if (vivo) setResultado({ termo, ...fatiarResultado(r, LIMITE_RESULTADOS) })
         })
         .catch(() => {
           if (vivo) {
-            setHits([])
+            setResultado({ termo, hits: [], truncado: false })
             setErro(true)
           }
         })
@@ -208,18 +219,18 @@ export default function Pesquisar() {
 
             {!buscando && !erro && termo.length >= MIN_CHARS && (
               <p className="peri-count">
-                {hits.length === 0
+                {resultado.hits.length === 0
                   ? 'Nenhum resultado'
-                  : `${hits.length} resultado${hits.length === 1 ? '' : 's'}${
-                      hits.length === LIMITE_RESULTADOS ? ' (primeiros)' : ''
-                    }`}
+                  : `${resultado.hits.length} resultado${
+                      resultado.hits.length === 1 ? '' : 's'
+                    }${resultado.truncado ? ' (primeiros)' : ''}`}
               </p>
             )}
           </div>
 
           <ul className="peri-list">
-            {hits.map((h) => {
-              const { antes, marcado, depois } = marcarTrecho(h.snippet, termo)
+            {resultado.hits.map((h) => {
+              const { antes, marcado, depois } = marcarTrecho(h.snippet, resultado.termo)
               return (
                 <li key={h.ordem}>
                   <Link to={`/leitura/${h.ordem}${h.verseId ? `?v=${h.verseId}` : ''}`}>

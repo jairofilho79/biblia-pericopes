@@ -1,5 +1,5 @@
 /**
- * Enrich raw pericopes → public/data/pericopes.json
+ * Enrich raw pericopes → data/pericopes.json
  *
  * Modes:
  *   --local              heuristic PT titles + didactic templates (default)
@@ -25,7 +25,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const rawPath = join(root, 'data/raw-pericopes.jsonl')
 const enrichedDir = join(root, 'data/enriched')
 const statePath = join(root, 'data/enrich-state.json')
-const outPath = join(root, 'public/data/pericopes.json')
+const outPath = join(root, 'data/pericopes.json')
 
 const SYSTEM_PROMPT = `Você escreve como um teólogo especialista que ama a Escritura e respeita o tempo do leitor — com a clareza de Carl Sagan, mas falando com jovens e adolescentes.
 
@@ -544,7 +544,7 @@ function gitPublish(ordems: number[], push: boolean) {
   const a = Math.min(...ordems)
   const b = Math.max(...ordems)
   const msg = `enrich: ${ordems.length} perícopes via OpenRouter (${a}–${b})`
-  runGit(['add', 'public/data/pericopes.json', 'data/cost-run.json'])
+  runGit(['add', 'data/pericopes.json', 'data/cost-run.json'])
   const staged = spawnSync('git', ['diff', '--cached', '--quiet'], { cwd: root })
   if (staged.status === 0) {
     console.log('  etapa: git → nada a commitar')

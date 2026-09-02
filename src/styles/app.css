@@ -797,6 +797,12 @@ button.ghost {
 
 .section-ref {
   flex: 0 0 auto;
+  /* Largura reservada para o pior rótulo real: abreviação de 3 ("1Sm"),
+     capítulo de 3 (Salmos vai a 150) e versículo de 2 — "1Sm 150:89", 10
+     caracteres. Sem a reserva a referência engorda ao rolar ("Gn 1:1" →
+     "Gn 12:34"), rouba espaço da linha de chips (que é flex:1) e faz a linha
+     inteira tremer. tabular-nums abaixo já mantém os dígitos do mesmo tamanho. */
+  min-width: 10ch;
   font-size: 0.8rem;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
@@ -910,12 +916,6 @@ button.ghost {
   border-color: var(--focus-line);
 }
 
-.tts-bar {
-  display: flex;
-  gap: 0.35rem;
-  margin: -0.3rem 0 0.7rem;
-}
-
 .narracao {
   display: flex;
   align-items: center;
@@ -946,36 +946,18 @@ button.ghost {
   box-shadow: inset 0 -0.12em 0 var(--accent);
 }
 
-/* o gatilho ⚙ fica à ESQUERDA da coluna: o popover abre para a direita,
-   senão escaparia do conteúdo (o readmenu-pop original alinha à direita) */
-.ttsmenu-pop {
-  left: 0;
-  right: auto;
+/* realce da PALAVRA em fala: fundo suave, sob o sublinhado da unidade — a
+   unidade é o contexto, a palavra é o ponteiro; mesmo peso nos dois cansa. */
+[data-w].word-speaking {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 0.2em;
+  box-shadow: 0 0 0 0.1em color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
-/* ajustes de voz: a linha do seletor divide o espaço com o botão de prévia */
-.ttsmenu-voz-row {
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.ttsmenu-label {
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.ttsmenu-voz {
-  flex: 1;
-  min-width: 0;
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  color: var(--ink);
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.35rem 0.4rem;
-  min-height: 2.25rem;
+@media (prefers-reduced-motion: no-preference) {
+  [data-w].word-speaking {
+    transition: background 90ms linear;
+  }
 }
 
 .verse-num {
@@ -1329,6 +1311,8 @@ button.ghost {
 
 .book-group {
   margin-bottom: 1.5rem;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }
 
 .pesquisar .testament-h {
@@ -1579,11 +1563,6 @@ button.ghost {
   contain-intrinsic-size: auto 48px;
 }
 
-.book-group {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 320px;
-}
-
 .book-group-head {
   display: flex;
   align-items: baseline;
@@ -1687,7 +1666,28 @@ button.ghost {
   color: var(--muted);
 }
 
-/* visível só para leitores de tela: usado no aviso de erro do "Sair" */
+.nav-conta-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra,
+   com min-height reservado para não deslocar o layout quando o aviso
+   aparece e some. Cor de erro igual à do .entrar-erro. */
+.nav-conta-erro {
+  margin: 0;
+  min-height: 1.1rem;
+  max-width: 12rem;
+  color: #b3564d;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* visível só para leitores de tela */
 .sr-only {
   position: absolute;
   width: 1px;

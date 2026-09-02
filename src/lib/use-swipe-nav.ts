@@ -1,4 +1,5 @@
 import { useEffect, useRef, type RefObject } from 'react'
+import { hasOpenDialog } from './use-keyboard-nav'
 
 /** Deslocamento horizontal mínimo para o gesto valer como navegação. */
 export const SWIPE_MIN_X = 70
@@ -74,6 +75,11 @@ export function useSwipeNav(
       if (!ativo) return
       ativo = false
       if (dentroDosChips) return
+      // Mesmo guard do teclado (por isso vem de lá, e não duplicado aqui): com
+      // a barra de ações ou o popover de preferências abertos, o gesto é da
+      // caixa aberta. Hoje o efeito seria inócuo — a barra fecha na navegação
+      // —, mas as duas formas de navegar não podem discordar sobre isso.
+      if (hasOpenDialog(document)) return
       if (e.changedTouches.length !== 1) return
       // Seleção de texto viva: o dedo estava arrastando as alças da seleção,
       // não pedindo a próxima perícope.

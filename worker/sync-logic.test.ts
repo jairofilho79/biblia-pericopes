@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_CORPO, corpoExcedeLimite, parseSyncPush } from './sync-logic'
+import { MAX_CORPO, corpoExcedeLimite, paginarPull, parseSyncPush } from './sync-logic'
 
 const prog = { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-08-31T10:00:00.000Z' }
 const nota = {
@@ -156,5 +156,268 @@ describe('corpoExcedeLimite', () => {
     // pior que não ter teto: o cliente abandona o lote e a linha nunca sobe.
     const piorCasoLegal = 500 * 20_000 * 3 + 500 * 280 + 500 * 250 + 500 * 90
     expect(corpoExcedeLimite(String(piorCasoLegal))).toBe(false)
+  })
+})
+
+// Helper: uma "linha" mínima com o server_em que paginarPull precisa para
+// decidir o corte. `v` é só um marcador pra dar pra reconhecer cada linha
+// nas asserções — o conteúdo de verdade (id, cor, etc.) é irrelevante aqui.
+function linha(serverEm: string, v: number) {
+  return { serverEm, v }
+}
+
+describe('paginarPull', () => {
+  it('sem estouro em nenhuma entidade: devolve tudo, cursor null, maisDados false', () => {
+    const listas = {
+      progresso: [linha('2026-01-01T00:00:00.000Z', 1), linha('2026-01-01T00:00:01.000Z', 2)],
+      anotacoes: [linha('2026-01-01T00:00:00.500Z', 3)],
+      destaques: [] as ReturnType<typeof linha>[],
+    }
+    const resultado = paginarPull(listas, 3)
+    expect(resultado).toEqual({
+      ...listas,
+      cursor: null,
+      maisDados: false,
+      gruposIncompletos: [],
+    })
+  })
+
+  it('uma entidade estourando (n+1 linhas): corta essa entidade em n e usa o server_em da última mantida como cursor', () => {
+    const destaques = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2),
+      linha('2026-01-01T00:00:03.000Z', 3),
+      linha('2026-01-01T00:00:04.000Z', 4), // a (n+1)-ésima: só serve pra provar que há mais
+    ]
+    const listas = {
+      progresso: [linha('2026-01-01T00:00:00.000Z', 10)],
+      anotacoes: [] as ReturnType<typeof linha>[],
+      destaques,
+    }
+    const resultado = paginarPull(listas, 3)
+    expect(resultado.cursor).toBe('2026-01-01T00:00:03.000Z')
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.destaques.map((d) => d.v)).toEqual([1, 2, 3])
+    // progresso não estourou, mas seu server_em já cabe dentro do cursor —
+    // continua intacto.
+    expect(resultado.progresso).toEqual(listas.progresso)
+  })
+
+  it('duas entidades estourando em fronteiras diferentes: o cursor é o mínimo, e a outra entidade é recortada por ele também', () => {
+    // progresso estoura e a última linha mantida por ele fica em T2 (a menor
+    // das duas fronteiras). destaques estoura com fronteira maior, T4.
+    const progresso = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2), // T2 — fronteira do progresso
+      linha('2026-01-01T00:00:03.000Z', 3), // a (n+1)-ésima
+    ]
+    const destaques = [
+      linha('2026-01-01T00:00:01.500Z', 10),
+      linha('2026-01-01T00:00:02.500Z', 11), // > T2, deve ser cortada mesmo sem estourar por si só
+      linha('2026-01-01T00:00:04.000Z', 12), // T4 — fronteira do destaques
+      linha('2026-01-01T00:00:05.000Z', 13), // a (n+1)-ésima
+    ]
+    const listas = { progresso, anotacoes: [] as ReturnType<typeof linha>[], destaques }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe('2026-01-01T00:00:02.000Z') // T2, o mínimo das duas fronteiras
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.progresso.map((p) => p.v)).toEqual([1, 2])
+    // destaques é recortado pelo cursor global (T2), não pela própria fronteira (T4)
+    expect(resultado.destaques.map((d) => d.v)).toEqual([10])
+  })
+
+  it('grupo de mesmo server_em maior que a página inteira: avança o cursor (sem travar) e exige o fechamento do grupo', () => {
+    // As n+1=3 linhas buscadas de destaques compartilham o MESMO server_em —
+    // não dá pra saber, sem outra query, se o grupo continua além da janela.
+    // Recortar aqui produziria cursor == since (nenhum progresso, loop
+    // infinito no cliente). Em vez disso o cursor avança até o valor do grupo
+    // e a entidade é marcada em `gruposIncompletos`: o chamador TEM que
+    // rebuscar o grupo inteiro, senão o resto dele some pra sempre.
+    const T = '2026-01-01T00:00:05.000Z'
+    const destaques = [linha(T, 1), linha(T, 2), linha(T, 3)]
+    const listas = { progresso: [] as ReturnType<typeof linha>[], anotacoes: [], destaques }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe(T)
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.gruposIncompletos).toEqual(['destaques'])
+  })
+
+  it('a entidade que empatou tudo mas perdeu o mínimo não pede fechamento (foi cortada fora inteira)', () => {
+    // destaques empata tudo em T5, mas progresso estoura com fronteira T2 <
+    // T5: o cursor é T2, todas as linhas de destaques ficam acima dele e são
+    // descartadas. Nada de grupo em aberto — elas voltam na próxima página.
+    const progresso = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2),
+      linha('2026-01-01T00:00:03.000Z', 3),
+    ]
+    const T5 = '2026-01-01T00:00:05.000Z'
+    const listas = {
+      progresso,
+      anotacoes: [] as ReturnType<typeof linha>[],
+      destaques: [linha(T5, 10), linha(T5, 11), linha(T5, 12)],
+    }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe('2026-01-01T00:00:02.000Z')
+    expect(resultado.gruposIncompletos).toEqual([])
+    expect(resultado.destaques).toEqual([])
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Ida-e-volta completa: o que os testes unitários acima NÃO pegam.
+//
+// Eles olham UMA chamada de paginarPull sobre a janela que ela recebeu. O que
+// mata dado de verdade é o ciclo: o cliente guarda o cursor devolvido e a
+// próxima página consulta `server_em > cursor` — ESTRITAMENTE maior. Se o
+// cursor avançar por cima de um `server_em` cujas linhas não foram todas
+// entregues, essas linhas nunca mais são consultadas. Nenhum teste de uma
+// chamada só consegue ver isso, porque a perda mora nas linhas que ficaram
+// FORA da janela buscada.
+//
+// Os testes abaixo simulam a rota inteira (a query real + paginarPull + o
+// fechamento do grupo incompleto) sobre um conjunto FIXO de linhas, rodando
+// até `maisDados` ser falso, e cobram a única invariante que importa: toda
+// linha entregue exatamente uma vez.
+// ---------------------------------------------------------------------------
+
+type LinhaRT = { serverEm: string; v: number }
+type BancoRT = { progresso: LinhaRT[]; anotacoes: LinhaRT[]; destaques: LinhaRT[] }
+
+const ENTIDADES_RT = ['progresso', 'anotacoes', 'destaques'] as const
+
+/** `SELECT ... WHERE server_em > since ORDER BY server_em LIMIT n+1`, em memória. */
+function janela(linhas: LinhaRT[], since: string, n: number): LinhaRT[] {
+  return linhas
+    .filter((l) => l.serverEm > since)
+    .sort((a, b) => (a.serverEm < b.serverEm ? -1 : a.serverEm > b.serverEm ? 1 : 0))
+    .slice(0, n + 1)
+}
+
+/** `SELECT ... WHERE server_em = ?` (sem LIMIT), em memória. */
+function grupo(linhas: LinhaRT[], serverEm: string): LinhaRT[] {
+  return linhas.filter((l) => l.serverEm === serverEm)
+}
+
+/**
+ * Uma rodada de GET /api/sync: as três queries paginadas, paginarPull, e —
+ * para cada entidade que voltou em `gruposIncompletos` — a rebusca do grupo
+ * inteiro do cursor. É o mesmo desenho de worker/index.ts.
+ */
+function rodadaDePull(banco: BancoRT, since: string, n: number) {
+  const paginado = paginarPull(
+    {
+      progresso: janela(banco.progresso, since, n),
+      anotacoes: janela(banco.anotacoes, since, n),
+      destaques: janela(banco.destaques, since, n),
+    },
+    n,
+  )
+  const entregue: BancoRT = {
+    progresso: paginado.progresso,
+    anotacoes: paginado.anotacoes,
+    destaques: paginado.destaques,
+  }
+  for (const nome of paginado.gruposIncompletos) {
+    entregue[nome] = grupo(banco[nome], paginado.cursor as string)
+  }
+  // `agora` do servidor no caminho sem truncamento: posterior a tudo.
+  return { ...entregue, cursor: paginado.cursor ?? '9999-12-31T23:59:59.999Z', maisDados: paginado.maisDados }
+}
+
+/** Roda o loop de páginas do cliente até o fim e devolve tudo o que chegou. */
+function pullCompleto(banco: BancoRT, n: number): BancoRT {
+  const entregues: BancoRT = { progresso: [], anotacoes: [], destaques: [] }
+  let since = ''
+  for (let pagina = 0; pagina < 200; pagina++) {
+    const res = rodadaDePull(banco, since, n)
+    for (const nome of ENTIDADES_RT) entregues[nome].push(...res[nome])
+    expect(res.cursor > since).toBe(true) // o cursor SEMPRE avança — nunca trava
+    since = res.cursor
+    if (!res.maisDados) return entregues
+  }
+  throw new Error('o pull não convergiu em 200 páginas')
+}
+
+/** Cobra a invariante: cada linha do banco entregue exatamente uma vez. */
+function esperaEntregaExata(banco: BancoRT, n: number) {
+  const entregues = pullCompleto(banco, n)
+  for (const nome of ENTIDADES_RT) {
+    expect(entregues[nome].map((l) => l.v).sort((a, b) => a - b)).toEqual(
+      banco[nome].map((l) => l.v).sort((a, b) => a - b),
+    )
+  }
+}
+
+function serie(inicio: number, quantidade: number, serverEm: string): LinhaRT[] {
+  return Array.from({ length: quantidade }, (_, i) => ({ serverEm, v: inicio + i }))
+}
+
+describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
+  it('grupo de mesmo server_em maior que a janela: entrega o grupo INTEIRO, não só a janela', () => {
+    // 25 linhas num único server_em, página de 10 → a janela busca 11. Sem
+    // fechar o grupo, o cursor avança para T tendo entregue 11 linhas, e as
+    // outras 14 nunca mais são consultadas (a próxima query é server_em > T).
+    const banco: BancoRT = {
+      progresso: [],
+      anotacoes: [],
+      destaques: serie(1, 25, '2026-01-01T00:00:05.000Z'),
+    }
+    esperaEntregaExata(banco, 10)
+    expect(pullCompleto(banco, 10).destaques).toHaveLength(25)
+  })
+
+  it('grupo gigante entre grupos normais: nem o grupo nem os vizinhos se perdem', () => {
+    const banco: BancoRT = {
+      progresso: [],
+      anotacoes: [],
+      destaques: [
+        ...serie(1, 4, '2026-01-01T00:00:01.000Z'),
+        ...serie(100, 25, '2026-01-01T00:00:02.000Z'), // maior que a página inteira
+        ...serie(200, 7, '2026-01-01T00:00:03.000Z'),
+      ],
+    }
+    esperaEntregaExata(banco, 10)
+  })
+
+  it('três entidades com grupos de tamanhos diferentes: ninguém fica pra trás', () => {
+    const banco: BancoRT = {
+      progresso: [
+        ...serie(1, 3, '2026-01-01T00:00:01.000Z'),
+        ...serie(10, 12, '2026-01-01T00:00:04.000Z'), // estoura n=5 sozinho
+        ...serie(30, 2, '2026-01-01T00:00:09.000Z'),
+      ],
+      anotacoes: [
+        ...serie(50, 6, '2026-01-01T00:00:02.000Z'),
+        ...serie(60, 6, '2026-01-01T00:00:05.000Z'),
+        ...serie(70, 1, '2026-01-01T00:00:08.000Z'),
+      ],
+      destaques: [
+        ...serie(80, 1, '2026-01-01T00:00:03.000Z'),
+        ...serie(90, 20, '2026-01-01T00:00:06.000Z'),
+        ...serie(120, 4, '2026-01-01T00:00:07.000Z'),
+      ],
+    }
+    esperaEntregaExata(banco, 5)
+  })
+
+  it('duas entidades empatando TODAS no mesmo server_em: os dois grupos são fechados', () => {
+    const T = '2026-01-01T00:00:05.000Z'
+    const banco: BancoRT = {
+      progresso: serie(1, 9, T),
+      anotacoes: [],
+      destaques: serie(100, 14, T),
+    }
+    esperaEntregaExata(banco, 3)
+  })
+
+  it('caminho comum (tudo cabe numa página) continua entregando tudo de uma vez', () => {
+    const banco: BancoRT = {
+      progresso: serie(1, 3, '2026-01-01T00:00:01.000Z'),
+      anotacoes: serie(10, 2, '2026-01-01T00:00:02.000Z'),
+      destaques: serie(20, 4, '2026-01-01T00:00:03.000Z'),
+    }
+    const entregues = pullCompleto(banco, 100)
+    expect(entregues).toEqual(banco)
   })
 })

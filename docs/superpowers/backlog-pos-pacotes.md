@@ -3,6 +3,28 @@
 Achados não-bloqueantes das revisões finais, adjudicados como melhorias
 futuras. Nenhum corrompe dados nem quebra fluxo principal.
 
+## Carga de dados
+
+- ~~Primeira tela bloqueada pelo catálogo monolítico (`pericopes.json`, 13,7 MB
+  crus / 4.446.987 bytes comprimidos).~~ Feito em 2026-09-02: `npm run shard`
+  fatia o catálogo em `public/data/index.json` (metadados enxutos, servidos
+  de cara) mais `texto/` e `estudo/` por livro, baixados por uma fila de
+  fundo depois da primeira tela. Medido no build de produção servido local:
+  a primeira tela cai de 4.446.987 para 70.739 bytes comprimidos — cerca de
+  63× menos payload bloqueante (os tempos não são comparáveis entre as duas
+  medições: a antiga foi pela internet contra o Cloudflare, a nova é
+  servidor local — só a comparação de bytes, ambos comprimidos, é justa). O
+  precache do service worker cai de ~15,7 MB para 2.271 KiB (49 entradas),
+  com `index.json` como única entrada JSON. Migração de cliente com o SW da
+  versão anterior instalado, offline completo em perícopes nunca visitadas
+  e busca full-text sobre os shards seguem funcionando — a busca não chegou
+  a ser observada progredindo ao vivo (shards já estavam em cache na sessão
+  de verificação), mas está coberta por teste e revisão. Spec:
+  `docs/superpowers/specs/2026-09-02-carga-progressiva-dados-design.md`.
+- Precache do service worker hoje é dominado por ~25 variantes woff2 de
+  subset das 5 famílias de fonte (fontsource); carregar só os subsets
+  realmente usados cortaria a maior parte dos 2.271 KiB restantes.
+
 ## Sync / Worker (endurecimento)
 
 - ~~Validações do Worker: inteiro em `pericopeOrdem`; invariante
@@ -17,41 +39,94 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
   servidor, então truncar sem mudar o protocolo faz o cliente pular
   linhas. Precisa de cursor com chave composta (`server_em` + desempate)
   e laço de re-pull no cliente.
-- Sem live refresh após pull: dados sincronizados de outro aparelho só
-  aparecem ao navegar/remontar. Considerar um evento `pericopes-sync`
-  disparado após `applyRemote*` (o streak da Home tem a mesma limitação,
-  comentada em `Home.tsx`).
+- ~~Sem live refresh após pull: dados sincronizados de outro aparelho só
+  aparecem ao navegar/remontar.~~ Feito em 2026-09-02: os `applyRemote*`
+  devolvem quantas linhas mudaram, o pull avisa por `sync-event.ts` só
+  quando mudou algo, e Home, Índice e Leitura assinam via
+  `useSyncRefresh`. O evento anda num `EventTarget` do módulo, não na
+  `window`. Na Leitura o refresh é estreito (destaques, notas, status)
+  para não apagar rascunho em digitação.
+
+## Sync — achados pré-existentes (levantados na revisão do P4, 2026-09-02)
+
+Nenhum foi introduzido pela paginação; todos precedem a branch e nenhum é
+alcançável por um cliente normal. Registrados para não se perderem.
+
+- **Corrida de um milissegundo no cursor.** O comentário de `worker/index.ts`
+  afirma que uma linha gravada entre o `agora` e a resposta "entra no próximo
+  pull". Isso vale para `server_em > agora`, mas não para `== agora`: uma linha
+  carimbada exatamente no `agora` e commitada depois do SELECT nunca é
+  revisitada, porque a consulta seguinte é `>` estrita.
+- **Relógio entre colos da Cloudflare.** `server_em` é `new Date()` por
+  requisição, e colos não têm monotonicidade garantida entre si. Um POST
+  atendido num colo atrasado pode carimbar abaixo de um cursor já avançado e
+  ficar invisível para sempre. É inerente ao cursor por timestamp; a saída
+  seria cursor composto `(server_em, id)`.
+- **Backfill da migration 0003** define `server_em` com `DEFAULT ''`. Linha que
+  tenha ficado com `''` é invisível a todo pull incremental (`> since` estrito).
+- **A rota `GET /api/sync` não tem teste.** A lógica de paginação é pura e bem
+  coberta, mas o teste de ida-e-volta exercita um espelho da rota escrito no
+  próprio arquivo de teste. Uma regressão em `worker/index.ts` — pôr um LIMIT no
+  fechamento de grupo, concatenar em vez de substituir, fechar só a primeira
+  entidade sinalizada — passaria verde.
 
 ## Leitura
 
-- Chip de vínculo de anotação navega via URL (`?v=`) e o load effect
-  descarta rascunho/edição em andamento; virar handler local
-  (seleção + scroll) ou preservar `draft` quando só o `verseParam` muda.
-- Barra de ações (`VerseActions`): `role="dialog"` sem foco movido para
-  dentro nem devolvido ao versículo ao fechar; alvo de melhoria de a11y.
-- Swipe sem guard de diálogo aberto (assimetria com o teclado, que usa
-  `hasOpenDialog`); hoje inócuo porque a barra fecha na navegação.
-- TTS: `onerror` aborta a fila inteira (escolha de design registrada);
-  falta cobertura de teste para "play superseded" e para o hook de wake
-  lock (repo sem infra de teste de hooks).
+- ~~Chip de vínculo de anotação navega via URL (`?v=`) e o load effect
+  descarta rascunho/edição em andamento.~~ Feito em 2026-09-02: o efeito
+  virou dois — a carga pesada depende só de `ordem` (e é lá que rascunho,
+  edição e confirmação zeram), e um efeito síncrono separado cuida do foco
+  do versículo em `[ordem, verseParam]`. Manteve o `?v=` como deep-link,
+  que a Pesquisa usa.
+- ~~Barra de ações (`VerseActions`): `role="dialog"` sem foco movido para
+  dentro nem devolvido ao versículo ao fechar.~~ Feito em 2026-09-02: o foco
+  entra na caixa (que tem `aria-label`) e volta ao versículo ao fechar, com
+  guard de `isConnected`. Continua sem armadilha de foco (Tab sai da barra) —
+  ela não é modal, e uma armadilha sem `aria-modal` seria pior.
+- ~~Swipe sem guard de diálogo aberto (assimetria com o teclado).~~ Feito
+  em 2026-09-02: `onEnd` usa o mesmo `hasOpenDialog` do teclado, importado
+  de lá em vez de duplicado, para as duas formas de navegar não poderem
+  discordar.
+- Falta cobertura de teste para o hook de wake lock (repo sem infra de
+  teste de hooks). As outras duas metades deste item — o `onerror` que
+  abortava a fila inteira e a cobertura de "play superseded" — saíram em
+  2026-09-02 junto com a remoção do TTS sintético.
 - Espaçamento padrão de leitura mudou de 1.75 para 1.65 com a escala nova
   `[1.5, 1.65, 1.8, 1.95]` — deliberado (spec §6); quem preferir mais
   respiro ajusta no "Aa".
 
 ## Navegação / Índice / Busca
 
-- Após navegar por chip, o foco não move para a seção (adicionar
-  `tabindex="-1"` + `focus({ preventScroll: true })`).
-- ←/→ com foco na linha de chips: `preventDefault` impede a rolagem
-  horizontal por teclado da própria linha.
-- Referência viva muda de largura ("Gn 1:1" → "Gn 12:34") e faz a linha
-  de chips tremer; reservar `min-width` em `ch`.
-- Pesquisar: "(primeiros)" aparece com exatamente 50 resultados (buscar
-  `limit + 1` e fatiar); `<mark>` some durante a janela de debounce
-  (guardar o termo junto dos hits).
-- Flash de 1 frame da barra de chips antes de `--top-h` ser medido.
-- Seletor `.book-group` duplicado no CSS (propriedades disjuntas; squash
-  cosmético).
+- ~~Após navegar por chip, o foco não move para a seção.~~ Feito em
+  2026-09-02: as quatro seções têm `tabindex="-1"` e `irPara` faz
+  `focus({ preventScroll: true })` depois da rolagem suave.
+- ~~←/→ com foco na linha de chips: `preventDefault` impedia a rolagem
+  horizontal por teclado da própria linha.~~ Feito em 2026-09-02:
+  `shouldHandleKey` devolve `null` quando o alvo está dentro de
+  `.section-chips-row`.
+- ~~Referência viva muda de largura ("Gn 1:1" → "Gn 12:34") e faz a linha
+  de chips tremer.~~ Feito em 2026-09-02: `min-width: 10ch` em
+  `.section-ref`, medido do pior rótulo real ("1Sm 150:89").
+- ~~Pesquisar: "(primeiros)" aparece com exatamente 50 resultados; `<mark>`
+  some durante a janela de debounce.~~ Feito em 2026-09-02: a busca pede
+  `LIMITE_RESULTADOS + 1` e `fatiarResultado` decide o corte; o termo viaja
+  junto dos hits no mesmo estado.
+- ~~Flash de 1 frame da barra de chips antes de `--top-h` ser medido.~~ Feito
+  em 2026-09-02: a medição virou `useLayoutEffect`, então roda antes da
+  pintura. **Mas ver o item abaixo** — o benefício visível não pôde ser
+  confirmado.
+- **Barra de chips sobrepõe o header ao rolar** (achado em 2026-09-02,
+  PRÉ-EXISTENTE, confirmado idêntico na base sem o P3). Com o header
+  visível, os chips grudam em `top: 0` e cobrem os 55px dele. A regra
+  vencedora é `.section-chips { top: var(--top-h, 0px) }`, ela casa com o
+  elemento, `--top-h` vale `55px` no `:root` e é visível pelos chips — e
+  mesmo assim o `top` computado resolve para `0px`. A regra
+  `.shell:has(.top-hidden)` não está casando. Causa não identificada em três
+  tentativas de investigação. Consequência colateral: enquanto o `top` não
+  consumir `--top-h`, a correção do flash acima está certa no código mas sem
+  efeito visível — as duas coisas precisam ser resolvidas juntas.
+- ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
+  regras viraram uma (ambas no topo, sem `@media` em volta).
 
 ## UI geral
 

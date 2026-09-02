@@ -4,15 +4,16 @@ import { SkeletonIndice } from '../components/Skeleton'
 import {
   listLivros,
   listPericopes,
-  loadPericopes,
+  loadIndex,
   progressoPorLivro,
   refLabel,
   type LivroProgresso,
 } from '../lib/content'
 import { doneSet } from '../lib/user-db'
-import type { Pericope } from '../lib/types'
+import { useSyncRefresh } from '../lib/use-sync-refresh'
+import type { PericopeIndex } from '../lib/types'
 
-function PeriLink({ p, done }: { p: Pericope; done: boolean }) {
+function PeriLink({ p, done }: { p: PericopeIndex; done: boolean }) {
   return (
     <Link to={`/leitura/${p.ordem}`} className={done ? 'done' : undefined}>
       <span className="peri-row">
@@ -46,11 +47,11 @@ export default function Indice() {
   const [livros, setLivros] = useState<string[]>([])
   const [livro, setLivro] = useState('')
   const [q, setQ] = useState('')
-  const [items, setItems] = useState<Pericope[]>([])
+  const [items, setItems] = useState<PericopeIndex[]>([])
   const [done, setDone] = useState<Set<number>>(new Set())
   // Lista completa (sem filtro de busca): a barra de progresso do livro
   // aberto precisa do total do livro inteiro, não do que sobrou da busca.
-  const [todas, setTodas] = useState<Pericope[]>([])
+  const [todas, setTodas] = useState<PericopeIndex[]>([])
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   // Só desliga o skeleton depois que a lista de perícopes chegou pela
@@ -60,7 +61,7 @@ export default function Indice() {
 
   useEffect(() => {
     let vivo = true
-    Promise.all([listLivros(), doneSet(), loadPericopes()])
+    Promise.all([listLivros(), doneSet(), loadIndex()])
       .then(([ls, feitas, tudo]) => {
         if (!vivo) return
         setLivros(ls)
@@ -78,6 +79,16 @@ export default function Indice() {
     }
   }, [])
 
+  // Do sync só o `done` muda: livros, `todas` e `items` vêm do pericopes.json,
+  // que é conteúdo estático. Recarregar só ele evita piscar a lista e mexer no
+  // skeleton por causa de uma conclusão feita em outro aparelho.
+  useSyncRefresh(() => {
+    // Tropeço aqui é transitório: a próxima rodada de sync avisa de novo.
+    void doneSet()
+      .then(setDone)
+      .catch(() => {})
+  })
+
   useEffect(() => {
     listPericopes({ livro: livro || undefined, q: q || undefined }).then((r) => {
       setItems(r)
@@ -87,7 +98,7 @@ export default function Indice() {
 
   const grouped = useMemo(() => {
     if (livro) return null
-    const map = new Map<string, Pericope[]>()
+    const map = new Map<string, PericopeIndex[]>()
     for (const p of items) {
       const arr = map.get(p.livro) ?? []
       arr.push(p)

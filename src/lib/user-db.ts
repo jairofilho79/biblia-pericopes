@@ -254,16 +254,26 @@ export async function clearAllUserData(): Promise<void> {
   ])
 }
 
+/**
+ * Aplica o progresso vindo do pull e devolve quantas linhas mudaram de fato.
+ *
+ * A contagem alimenta o evento de live refresh (src/lib/sync-event.ts): o pull
+ * reentrega linhas de propósito, então "veio no payload" não é o mesmo que
+ * "mudou aqui" — só o que o LWW deixou entrar conta.
+ */
 export async function applyRemoteProgresso(
   items: { pericopeOrdem: number; status: ProgressoStatus; atualizadoEm: string }[],
-): Promise<void> {
+): Promise<number> {
   const d = await db()
+  let aplicadas = 0
   for (const item of items) {
     const local = await d.get('progresso', item.pericopeOrdem)
     if (remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) {
       await d.put('progresso', item)
+      aplicadas++
     }
   }
+  return aplicadas
 }
 
 export async function applyRemoteAnotacoes(
@@ -276,20 +286,28 @@ export async function applyRemoteAnotacoes(
     atualizadoEm: string
     apagadoEm: string | null
   }[],
-): Promise<void> {
+): Promise<number> {
   const d = await db()
+  let aplicadas = 0
   for (const item of items) {
     const local = await d.get('anotacoes', item.id)
     if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
     if (item.apagadoEm) {
+      // Lápide de linha que já não existe aqui: deletar não muda nada, e
+      // reentrega de lápide é rotina no pull — contar isso acordaria as telas
+      // por nada.
+      if (!local) continue
       await d.delete('anotacoes', item.id)
+      aplicadas++
     } else {
       const { apagadoEm: _apagadoEm, ...nota } = item
       // Linha vinda de servidor sem a coluna (ou de antes da migration) entra
       // como null: o tipo local exige o campo presente.
       await d.put('anotacoes', { ...nota, verseRef: nota.verseRef ?? null })
+      aplicadas++
     }
   }
+  return aplicadas
 }
 
 export async function applyRemoteDestaques(
@@ -302,16 +320,21 @@ export async function applyRemoteDestaques(
     atualizadoEm: string
     apagadoEm: string | null
   }[],
-): Promise<void> {
+): Promise<number> {
   const d = await db()
+  let aplicadas = 0
   for (const item of items) {
     const local = await d.get('destaques', item.id)
     if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
     if (item.apagadoEm) {
+      if (!local) continue
       await d.delete('destaques', item.id)
+      aplicadas++
     } else {
       const { apagadoEm: _apagadoEm, ...destaque } = item
       await d.put('destaques', destaque)
+      aplicadas++
     }
   }
+  return aplicadas
 }

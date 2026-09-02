@@ -25,7 +25,7 @@ function Linhas({ n, curta = false }: { n: number; curta?: boolean }) {
 export function SkeletonLeitura() {
   return (
     <article className="leitura skeleton-page" role="status">
-      <span className="sr-only">Carregando…</span>
+      <span className="sr-only">Carregando perícope…</span>
       <span className="skeleton skeleton-crumb" />
       <span className="skeleton skeleton-title" />
       <span className="skeleton skeleton-ref" />
@@ -45,7 +45,7 @@ export function SkeletonLeitura() {
 export function SkeletonHome() {
   return (
     <section className="home skeleton-page" role="status">
-      <span className="sr-only">Carregando…</span>
+      <span className="sr-only">Carregando leituras de hoje…</span>
       <span className="skeleton skeleton-title" />
       <div className="track-grid">
         {[0, 1].map((i) => (
@@ -62,7 +62,7 @@ export function SkeletonHome() {
 export function SkeletonIndice() {
   return (
     <div className="skeleton-page" role="status">
-      <span className="sr-only">Carregando…</span>
+      <span className="sr-only">Carregando índice…</span>
       {[0, 1, 2].map((g) => (
         <div key={g} className="skeleton-block">
           <span className="skeleton skeleton-subtitle" />

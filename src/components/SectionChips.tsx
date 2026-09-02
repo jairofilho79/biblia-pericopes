@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReadingLayout } from '../lib/reading-prefs'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
@@ -37,7 +37,10 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
   // O header é sticky e some ao rolar: os chips precisam saber a altura dele
   // para encostar embaixo sem sobrepor. O CSS zera esse offset quando o header
   // está escondido (`.shell:has(.top-hidden)`).
-  useEffect(() => {
+  // useLayoutEffect (não useEffect): mede e aplica `--top-h` antes do browser
+  // pintar o frame, senão os chips desenham um frame no offset errado (0px)
+  // até a medição rodar — o flash que este efeito existe para evitar.
+  useLayoutEffect(() => {
     const top = document.querySelector<HTMLElement>('.top')
     const raiz = document.documentElement
     if (!top) return
@@ -135,9 +138,17 @@ export default function SectionChips({ ordem, abbrev, layout, onIr }: Props) {
 
   function irPara(id: string) {
     onIr?.(id)
+    const alvo = document.getElementById(id)
     // Expandir o Contexto não move o topo dele — é a primeira seção da página
     // —, então rolar na mesma volta do evento já chega no lugar certo.
-    document.getElementById(id)?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
+    alvo?.scrollIntoView({ behavior: rolagemSuave(), block: 'start' })
+    // O foco tem que acompanhar a rolagem: sem isso, quem navega por teclado
+    // ou leitor de tela continua lá atrás, e o próximo Tab volta para o começo
+    // da página em vez de seguir dentro da seção. `preventScroll` porque a
+    // rolagem já foi feita acima, suave — deixar o foco rolar de novo daria um
+    // salto seco por cima dela. As seções levam tabindex="-1" para poder
+    // receber foco sem entrar na ordem de tabulação.
+    alvo?.focus({ preventScroll: true })
   }
 
   return (

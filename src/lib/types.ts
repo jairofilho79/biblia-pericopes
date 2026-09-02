@@ -1,4 +1,5 @@
-export type Pericope = {
+/** Metadados de uma perícope: o que o índice de boot carrega. */
+export type PericopeIndex = {
   ordem: number
   livro: string
   abbrev: string
@@ -7,6 +8,12 @@ export type Pericope = {
   capitulo_fim: number
   versiculo_fim: number
   titulo_pericope_pt: string
+  /** Minutos de leitura, pré-calculados pelo gerador de shards. */
+  minutos: number
+}
+
+/** Perícope completa: índice + o conteúdo que vem dos shards do livro. */
+export type Pericope = PericopeIndex & {
   texto_naa: string
   /** O que saber ANTES de ler o texto */
   contexto_historico_literario: string

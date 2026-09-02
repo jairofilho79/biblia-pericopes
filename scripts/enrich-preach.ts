@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url'
 import type { Pericope } from '../src/lib/types.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const catalogPath = join(root, 'public/data/pericopes.json')
+const catalogPath = join(root, 'data/pericopes.json')
 const enrichedDir = join(root, 'data/enriched')
 const sampleDir = join(root, 'data/preach-sample')
 
@@ -242,7 +242,7 @@ function gitPublish(ordems: number[], push: boolean) {
   const a = Math.min(...ordems)
   const b = Math.max(...ordems)
   const msg = `preach: ${ordems.length} perícopes (${a}–${b})`
-  runGit(['add', 'public/data/pericopes.json'])
+  runGit(['add', 'data/pericopes.json'])
   const staged = spawnSync('git', ['diff', '--cached', '--quiet'], { cwd: root })
   if (staged.status === 0) {
     console.log('  etapa: git → nada a commitar')

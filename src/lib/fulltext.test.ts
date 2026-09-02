@@ -1,12 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import {
-  indexarLinhas,
-  marcarTrecho,
-  normalize,
-  searchTexto,
-  snippetAt,
-  verseIdAtOffset,
-} from './fulltext'
+import { fatiarResultado, indexarLinhas, marcarTrecho, normalize, searchTexto, snippetAt, verseIdAtOffset } from './fulltext'
+import { livroSlug } from './livro-slug'
 import type { Pericope } from './types'
 
 const TEXTO =
@@ -22,6 +16,7 @@ function peri(ordem: number, livro: string, abbrev: string, texto: string): Peri
     capitulo_fim: 2,
     versiculo_fim: 1,
     titulo_pericope_pt: `Título ${ordem}`,
+    minutos: 1,
     texto_naa: texto,
     contexto_historico_literario: '',
     resenha: '',
@@ -37,8 +32,20 @@ const FIXTURES: Pericope[] = [
 
 vi.mock('./content', async (importOriginal) => {
   const real = await importOriginal<typeof import('./content')>()
-  return { ...real, loadPericopes: async () => FIXTURES }
+  return {
+    ...real,
+    loadIndex: async () => FIXTURES.map(({ texto_naa: _t, ...meta }) => meta),
+  }
 })
+
+vi.mock('./shards', () => ({
+  carregarTexto: async (slug: string) =>
+    new Map(
+      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, p.texto_naa]),
+    ),
+  carregarEstudo: async () => new Map(),
+  shardCarregado: () => true,
+}))
 
 const LONGO = `${'a'.repeat(60)} meio ${'b'.repeat(60)}`
 
@@ -166,10 +173,10 @@ describe('buildIndex — recuperação de falha', () => {
       const real = await importOriginal<typeof import('./content')>()
       return {
         ...real,
-        loadPericopes: async () => {
+        loadIndex: async () => {
           chamadas += 1
           if (chamadas === 1) throw new Error('offline')
-          return FIXTURES
+          return FIXTURES.map(({ texto_naa: _t, ...meta }) => meta)
         },
       }
     })
@@ -183,5 +190,27 @@ describe('buildIndex — recuperação de falha', () => {
 
     vi.doUnmock('./content')
     vi.resetModules()
+  })
+})
+
+// "(primeiros)" só faz sentido quando existe um segundo lote. Buscando
+// exatamente o limite não dá para saber — daí a busca pedir `limite + 1`.
+describe('fatiarResultado', () => {
+  const lista = (n: number) => Array.from({ length: n }, (_, i) => i)
+
+  it('menos que o limite: entrega tudo e não anuncia corte', () => {
+    expect(fatiarResultado(lista(3), 50)).toEqual({ hits: [0, 1, 2], truncado: false })
+  })
+
+  it('exatamente o limite não é corte', () => {
+    const r = fatiarResultado(lista(50), 50)
+    expect(r.hits).toHaveLength(50)
+    expect(r.truncado).toBe(false)
+  })
+
+  it('limite + 1 é corte, e o extra não vaza para a lista', () => {
+    const r = fatiarResultado(lista(51), 50)
+    expect(r.hits).toHaveLength(50)
+    expect(r.truncado).toBe(true)
   })
 })

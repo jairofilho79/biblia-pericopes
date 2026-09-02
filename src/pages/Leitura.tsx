@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { tokens, type SecaoAlvos } from '../lib/alinhar-narracao'
 import NarracaoPlayer from '../components/NarracaoPlayer'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
@@ -8,22 +9,12 @@ import VerseActions from '../components/VerseActions'
 import {
   anteriorNoTestamento,
   getPericope,
-  loadPericopes,
+  loadIndex,
   proximaNoTestamento,
   refLabel,
 } from '../lib/content'
 import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
-import {
-  createTtsController,
-  filaDeTextos,
-  ttsSupported,
-  type TtsController,
-  type TtsState,
-  type TtsVerse,
-} from '../lib/tts'
-import { getVelocidade, getVozPreferida, rateDaVelocidade } from '../lib/tts-prefs'
-import TtsMenu from '../components/TtsMenu'
 import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
 import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
@@ -47,70 +38,30 @@ import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
+import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
 type Vizinha = { ordem: number; titulo: string }
 
-/** Qual fila é dona da fala corrente: cada seção tem a sua, mais o "tudo". */
-type FonteFala = 'tudo' | 'contexto' | 'texto' | 'resenha' | 'reflexao'
-
 /**
- * Controles de fala de uma fila (▶/⏸/retomar + ⏹). O estado global do TTS só
- * vale para a barra DONA da sessão; as outras seguem mostrando ▶ Ouvir — e
- * apertar ▶ nelas troca de fila (o controller cancela a anterior sozinho).
+ * Quebra em palavras só a unidade em fala — o resto da página fica com o nó de
+ * texto único de sempre. O espaço entre os spans é um nó de texto real: é o
+ * que faz "selecionar e copiar" continuar devolvendo o versículo legível.
  */
-function BarraOuvir(props: {
-  dona: boolean
-  state: TtsState
-  assunto: string
-  rotulo?: string
-  onPlay: () => void
-  onPause: () => void
-  onResume: () => void
-  onStop: () => void
-  children?: ReactNode
-}) {
-  const estado = props.dona ? props.state : 'idle'
+function TextoFalado({ texto, ativo }: { texto: string; ativo: boolean }) {
+  if (!ativo) return <>{texto}</>
   return (
-    <div className="tts-bar">
-      {/* Sempre o mesmo nó de botão primário nos três estados — só
-          rótulo/handler mudam — para o foco de teclado/leitor de tela
-          não cair pro <body> a cada transição (fragmento vs. elemento
-          remontava a árvore). O botão de parar é irmão condicional. */}
-      <button
-        type="button"
-        className={estado === 'idle' ? 'read-tool' : 'read-tool active'}
-        aria-label={
-          estado === 'idle'
-            ? `Ouvir ${props.assunto} em voz alta`
-            : estado === 'playing'
-              ? 'Pausar a leitura em voz alta'
-              : 'Retomar a leitura em voz alta'
-        }
-        onClick={() => {
-          if (estado === 'idle') props.onPlay()
-          else if (estado === 'playing') props.onPause()
-          else props.onResume()
-        }}
-      >
-        {estado === 'idle'
-          ? (props.rotulo ?? '▶ Ouvir')
-          : estado === 'playing'
-            ? '⏸ Pausar'
-            : '▶ Retomar'}
-      </button>
-      {estado !== 'idle' && (
-        <button
-          type="button"
-          className="read-tool"
-          aria-label="Parar a leitura em voz alta"
-          onClick={props.onStop}
-        >
-          ⏹
-        </button>
-      )}
-      {props.children}
-    </div>
+    <>
+      {/* `data-w` tem que numerar exatamente como `tokens()` — é a mesma
+          função que produz o campo `palavras` do manifesto (via
+          alinhar-narracao.ts), e as duas numerações precisam ser uma só. */}
+      {tokens(texto).map((tk, k) => (
+        <Fragment key={k}>
+          {k > 0 ? ' ' : ''}
+          <span data-w={k}>{tk}</span>
+        </Fragment>
+      ))}
+    </>
   )
 }
 
@@ -180,12 +131,7 @@ export default function Leitura() {
   // Último valor de `?v=` já rolado até — evita re-centralizar a cada toque
   // em versículo (ver efeito abaixo).
   const vAplicado = useRef<string | null>(null)
-  const ttsRef = useRef<TtsController | null>(null)
-  const [ttsState, setTtsState] = useState<TtsState>('idle')
-  const [fonteFala, setFonteFala] = useState<FonteFala | null>(null)
   const [falando, setFalando] = useState<string | null>(null)
-  // Uma vez só: a capacidade do browser não muda no meio da sessão.
-  const [temTts] = useState(() => ttsSupported())
   const [contextoAberto, setContextoAbertoState] = useState(() => getContextoAberto())
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
@@ -198,31 +144,61 @@ export default function Leitura() {
   // Só o texto bíblico entra na conta: contexto, resenha e reflexão são
   // leitura de primeira classe, mas o "~N min" é do texto da NAA.
   const minutos = useMemo(() => (p ? readingMinutes(p.texto_naa) : 1), [p])
-  const versesParaFala = useMemo(
-    () =>
-      blocks
-        .filter((b): b is VerseBlock => b.kind === 'verse')
-        .map((b) => ({ id: b.id, text: b.text })),
-    [blocks],
-  )
   // Os MESMOS parágrafos que a página mostra (paragraphize com os mesmos
-  // limites) viram as filas de fala das seções em prosa.
+  // limites) alimentam os alvos de alinhamento da narração das seções em
+  // prosa.
   const parasContexto = useMemo(
     () => (p ? paragraphize(p.contexto_historico_literario, { maxParas: 2 }) : []),
     [p],
   )
   const parasResenha = useMemo(() => (p ? paragraphize(p.resenha, { maxParas: 3 }) : []), [p])
-  const filaContexto = useMemo(() => filaDeTextos('contexto', parasContexto), [parasContexto])
-  const filaResenha = useMemo(() => filaDeTextos('resenha', parasResenha), [parasResenha])
-  const filaReflexao = useMemo(() => filaDeTextos('reflexao', p?.perguntas_reflexao ?? []), [p])
-  const filaTudo = useMemo(
-    () => [...filaContexto, ...versesParaFala, ...filaResenha, ...filaReflexao],
-    [filaContexto, versesParaFala, filaResenha, filaReflexao],
+  // Os mesmos arrays que a página renderiza viram os alvos do alinhamento —
+  // é isso que garante que o realce valide o que o olho vê.
+  const secoesNarracao = useMemo<SecaoAlvos[]>(
+    () => [
+      { secao: 'contexto', alvos: parasContexto.map((t, i) => ({ id: `contexto-${i}`, texto: t })) },
+      {
+        secao: 'texto',
+        alvos: blocks
+          .filter((b): b is VerseBlock => b.kind === 'verse')
+          .map((b) => ({ id: b.id, texto: b.text })),
+      },
+      { secao: 'resenha', alvos: parasResenha.map((t, i) => ({ id: `resenha-${i}`, texto: t })) },
+      {
+        secao: 'reflexoes',
+        alvos: (p?.perguntas_reflexao ?? []).map((q, i) => ({ id: `reflexao-${i}`, texto: q })),
+      },
+    ],
+    [parasContexto, blocks, parasResenha, p],
   )
 
   async function refreshNotes() {
     setNotes(await listAnotacoes(ordem))
   }
+
+  // Refresh estreito para o aviso de sync: mexe só no que vem do sync
+  // (destaques, notas e status) e não encosta em rascunho, seleção nem barra
+  // de ações. O efeito grande de troca de perícope reseta tudo isso — usá-lo
+  // aqui apagaria a anotação que o usuário está digitando neste instante.
+  useSyncRefresh(() => {
+    void (async () => {
+      try {
+        const hl = await listDestaques(ordem)
+        setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
+        // O IndexedDB já é a palavra final: o LWW resolveu quem ganhou antes
+        // de o aviso sair.
+        const prog = await getProgresso(ordem)
+        const proximo = prog?.status ?? 'em_andamento'
+        setStatus(proximo === 'nao_iniciado' ? 'em_andamento' : proximo)
+        doneRef.current = proximo === 'concluido'
+        await refreshNotes()
+      } catch (e) {
+        // Tropeço aqui é transitório e a próxima rodada de sync tenta de novo:
+        // não vale trocar uma tela que funciona por um estado de erro.
+        console.warn('[leitura] refresh pós-sync falhou', e)
+      }
+    })()
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -232,7 +208,7 @@ export default function Leitura() {
       // a troca de perícope.
       vAplicado.current = null
       try {
-        const all = await loadPericopes()
+        const all = await loadIndex()
         const peri = await getPericope(ordem)
         if (!peri) {
           setErr('Perícope não encontrada')
@@ -247,18 +223,14 @@ export default function Leitura() {
         setPrev(vizinha(anteriorNoTestamento(all, ordem)))
         setNext(vizinha(proximaNoTestamento(all, ordem)))
         setCopied(false)
-        const fromQuery =
-          verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
-        const focus = fromQuery ?? getVerseFocus(ordem)
-        // Restaurar foco seleciona só aquele versículo e NÃO abre a barra:
-        // a barra é resposta a toque, não a navegação.
-        setSelection(focus ? { start: focus, end: focus } : null)
-        setBarOpen(false)
+        // Rascunho, edição e confirmação zeram por TROCA DE PERÍCOPE, não por
+        // mudança de `?v=`: navegar pelo chip de vínculo de uma anotação é
+        // movimento dentro da mesma perícope e não pode apagar o que a pessoa
+        // está escrevendo. Quem cuida do `?v=` é o efeito logo abaixo.
         setDraftRef(null)
         setEditingId(null)
         setConfirmarId(null)
         setDraft('')
-        if (fromQuery) setVerseFocus(ordem, fromQuery)
         const hl = await listDestaques(ordem)
         setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
         const prog = await getProgresso(ordem)
@@ -273,6 +245,20 @@ export default function Leitura() {
         setErr(e instanceof Error ? e.message : 'Erro')
       }
     })()
+  }, [ordem])
+
+  // Foco do versículo: `?v=` na URL, senão o foco salvo da perícope. Fica
+  // separado da carga acima porque muda muito mais vezes que a perícope — e
+  // porque é síncrono: a carga é `async`, e se ela também mexesse em
+  // `selection` sobrescreveria o que este efeito acabou de decidir.
+  useEffect(() => {
+    const fromQuery = verseParam && /^\d+:\d+$/.test(verseParam) ? verseParam : null
+    const focus = fromQuery ?? getVerseFocus(ordem)
+    // Restaurar foco seleciona só aquele versículo e NÃO abre a barra:
+    // a barra é resposta a toque, não a navegação.
+    setSelection(focus ? { start: focus, end: focus } : null)
+    setBarOpen(false)
+    if (fromQuery) setVerseFocus(ordem, fromQuery)
   }, [ordem, verseParam])
 
   // Prioridade de rolagem ao abrir: ?v= na URL > posição salva > topo.
@@ -338,51 +324,66 @@ export default function Leitura() {
   // Ler é o caso de uso: com a perícope aberta a tela fica acesa, sem toggle.
   useWakeLock(p !== null)
 
+  // Realçar parágrafo escondido não serve para nada: se o contexto entra em
+  // fala com a seção colapsada, ela abre.
   useEffect(() => {
-    if (!temTts) return
-    const ctrl = createTtsController({
-      onVerse: setFalando,
-      onState: setTtsState,
-      // Direto do storage a cada play: mudar voz/velocidade no menu vale na
-      // próxima fala sem recriar o controller.
-      prefs: () => ({ voz: getVozPreferida(), rate: rateDaVelocidade(getVelocidade()) }),
-    })
-    ttsRef.current = ctrl
-    return () => {
-      // Sair da leitura cala a fala: nada de voz órfã lendo o que já saiu da tela.
-      ctrl.stop()
-      ttsRef.current = null
+    if (falando?.startsWith('contexto-') && !contextoAberto) {
+      setContextoAbertoState(true)
+      setContextoAberto(true)
     }
-  }, [temTts])
+  }, [falando, contextoAberto])
+
+  // Rolagem automática cede à mão do usuário: qualquer rolagem que não veio
+  // do scrollIntoView suspende o acompanhamento por 10s. NUNCA escutar
+  // `scroll` aqui — o próprio scrollIntoView o dispara e desligaria o
+  // acompanhamento para sempre no primeiro realce.
+  const cedeuAte = useRef(0)
+
+  // A intenção do seek é mais recente que a de uma rolagem anterior: arrastar
+  // a barra do player para ouvir um trecho vence a suspensão que uma rolagem
+  // manual tenha armado.
+  const onSeekNarracao = useCallback(() => {
+    cedeuAte.current = 0
+  }, [])
 
   useEffect(() => {
-    // Trocar de perícope também para: continuar lendo o texto anterior sobre a
-    // página nova seria desorientador.
-    return () => ttsRef.current?.stop()
-  }, [ordem])
-
-  useEffect(() => {
-    // Fim (ou parada) da fala devolve todas as barras ao ▶ Ouvir.
-    if (ttsState === 'idle') setFonteFala(null)
-  }, [ttsState])
-
-  function tocar(fonte: FonteFala, fila: TtsVerse[]) {
-    // Falar o contexto colapsado realçaria parágrafos invisíveis.
-    if (fonte === 'contexto' || fonte === 'tudo') abrirContexto()
-    setFonteFala(fonte)
-    ttsRef.current?.play(fila)
-  }
+    // Sem exceção para gestos que nascem no player: o `target` de um
+    // `touchmove` fica fixado no elemento do `touchstart`, então ignorar o que
+    // vem de `.narracao` também ignoraria uma rolagem de página inteira cujo
+    // dedo apenas pousou sobre ele — e a tela voltaria a ser puxada debaixo da
+    // mão do leitor. Arrastar a barra do player já é resolvido pelo `onSeek`,
+    // que zera a suspensão quando o seek termina.
+    const ceder = () => {
+      cedeuAte.current = Date.now() + 10_000
+    }
+    const tecla = (e: KeyboardEvent) => {
+      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder()
+    }
+    window.addEventListener('wheel', ceder, { passive: true })
+    window.addEventListener('touchmove', ceder, { passive: true })
+    window.addEventListener('keydown', tecla)
+    return () => {
+      window.removeEventListener('wheel', ceder)
+      window.removeEventListener('touchmove', ceder)
+      window.removeEventListener('keydown', tecla)
+    }
+  }, [])
 
   useEffect(() => {
     // Ouvir continua, mas a rolagem cede quando o leitor está interagindo:
     // barra de ações aberta, nota em edição ou vínculo de versículo pendente
     // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
     if (!falando || barOpen || editingId || draftRef) return
+    if (Date.now() < cedeuAte.current) return
     const el = document.querySelector<HTMLElement>(`[data-verse-id="${falando}"]`)
     if (!el) return
     const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     el.scrollIntoView({ block: 'center', behavior: reduzido ? 'auto' : 'smooth' })
-  }, [falando, barOpen, editingId, draftRef])
+    // `contextoAberto` entra aqui porque o efeito que abre a seção Contexto
+    // ao entrar em fala roda no mesmo commit, mas o DOM só ganha caixa de
+    // layout no render seguinte: sem esta dependência, o scrollIntoView de
+    // cima teria rodado cedo demais e não rodaria de novo.
+  }, [falando, barOpen, editingId, draftRef, contextoAberto])
 
   async function onSaveNote(e: FormEvent) {
     e.preventDefault()
@@ -619,22 +620,14 @@ export default function Leitura() {
         }}
       />
 
-      <NarracaoPlayer ordem={p.ordem} />
+      <NarracaoPlayer
+        ordem={p.ordem}
+        secoes={secoesNarracao}
+        onAlvo={setFalando}
+        onSeek={onSeekNarracao}
+      />
 
-      {temTts && (
-        <BarraOuvir
-          dona={fonteFala === 'tudo'}
-          state={ttsState}
-          assunto="a página inteira, do contexto às reflexões,"
-          rotulo="▶ Ouvir tudo"
-          onPlay={() => tocar('tudo', filaTudo)}
-          onPause={() => ttsRef.current?.pause()}
-          onResume={() => ttsRef.current?.resume()}
-          onStop={() => ttsRef.current?.stop()}
-        />
-      )}
-
-      <section className="block block-plain" id="contexto">
+      <section className="block block-plain" id="contexto" tabIndex={-1}>
         <h2 className="collapse-h">
           <button
             type="button"
@@ -650,40 +643,16 @@ export default function Leitura() {
           </button>
         </h2>
         <div id="contexto-corpo" hidden={!contextoAberto}>
-          {temTts && (
-            <BarraOuvir
-              dona={fonteFala === 'contexto'}
-              state={ttsState}
-              assunto="o contexto"
-              onPlay={() => tocar('contexto', filaContexto)}
-              onPause={() => ttsRef.current?.pause()}
-              onResume={() => ttsRef.current?.resume()}
-              onStop={() => ttsRef.current?.stop()}
-            />
-          )}
           {parasContexto.map((para, i) => (
             <p key={i} className={falaClass('prose', `contexto-${i}`)} data-verse-id={`contexto-${i}`}>
-              {para}
+              <TextoFalado texto={para} ativo={falando === `contexto-${i}`} />
             </p>
           ))}
         </div>
       </section>
 
-      <section className="block block-plain" id="texto">
+      <section className="block block-plain" id="texto" tabIndex={-1}>
         <h2>Texto (NAA)</h2>
-        {temTts && (
-          <BarraOuvir
-            dona={fonteFala === 'texto'}
-            state={ttsState}
-            assunto="a perícope"
-            onPlay={() => tocar('texto', versesParaFala)}
-            onPause={() => ttsRef.current?.pause()}
-            onResume={() => ttsRef.current?.resume()}
-            onStop={() => ttsRef.current?.stop()}
-          >
-            <TtsMenu />
-          </BarraOuvir>
-        )}
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
             ? groupCorrido(blocks).map((g, gi) => (
@@ -701,7 +670,9 @@ export default function Leitura() {
                           onClick={() => selectVerse(b.id)}
                         >
                           {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
-                          <span className="verse-text">{b.text}</span>
+                          <span className="verse-text">
+                            <TextoFalado texto={b.text} ativo={falando === b.id} />
+                          </span>
                         </button>{' '}
                       </Fragment>
                     ))}
@@ -724,50 +695,30 @@ export default function Leitura() {
                     onClick={() => selectVerse(b.id)}
                   >
                     {b.verse > 0 && <sup className="verse-num">{b.verse}</sup>}
-                    <span className="verse-text">{b.text}</span>
+                    <span className="verse-text">
+                      <TextoFalado texto={b.text} ativo={falando === b.id} />
+                    </span>
                   </button>
                 ),
               )}
         </div>
       </section>
 
-      <section className="block block-plain" id="resenha">
+      <section className="block block-plain" id="resenha" tabIndex={-1}>
         <h2>Resenha</h2>
-        {temTts && (
-          <BarraOuvir
-            dona={fonteFala === 'resenha'}
-            state={ttsState}
-            assunto="a resenha"
-            onPlay={() => tocar('resenha', filaResenha)}
-            onPause={() => ttsRef.current?.pause()}
-            onResume={() => ttsRef.current?.resume()}
-            onStop={() => ttsRef.current?.stop()}
-          />
-        )}
         {parasResenha.map((para, i) => (
           <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
-            {para}
+            <TextoFalado texto={para} ativo={falando === `resenha-${i}`} />
           </p>
         ))}
       </section>
 
-      <section className="block block-plain" id="reflexao">
+      <section className="block block-plain" id="reflexao" tabIndex={-1}>
         <h2>Reflexão</h2>
-        {temTts && (
-          <BarraOuvir
-            dona={fonteFala === 'reflexao'}
-            state={ttsState}
-            assunto="as perguntas de reflexão"
-            onPlay={() => tocar('reflexao', filaReflexao)}
-            onPause={() => ttsRef.current?.pause()}
-            onResume={() => ttsRef.current?.resume()}
-            onStop={() => ttsRef.current?.stop()}
-          />
-        )}
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
             <li key={i} className={falaClass('', `reflexao-${i}`)} data-verse-id={`reflexao-${i}`}>
-              {q}
+              <TextoFalado texto={q} ativo={falando === `reflexao-${i}`} />
             </li>
           ))}
         </ol>

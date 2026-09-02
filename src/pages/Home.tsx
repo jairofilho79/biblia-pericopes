@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SkeletonHome } from '../components/Skeleton'
-import { getPericope, loadIndex, ordensDoTestamento, refLabel } from '../lib/content'
+import { loadIndex, ordensDoTestamento, refLabel } from '../lib/content'
 import {
   countConcluidasNaSequencia,
   getProximaOrdemNaSequencia,
   listAllProgresso,
 } from '../lib/user-db'
 import { testamentLabel, type Testament } from '../lib/testament'
-import type { Pericope } from '../lib/types'
+import type { PericopeIndex } from '../lib/types'
 import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type Track = {
   testament: Testament
-  peri: Pericope
+  peri: PericopeIndex
   done: number
   total: number
   allDone: boolean
@@ -36,7 +36,10 @@ export default function Home() {
       for (const testament of ['vt', 'nt'] as Testament[]) {
         const ordens = ordensDoTestamento(all, testament)
         const ordem = await getProximaOrdemNaSequencia(ordens)
-        const peri = await getPericope(ordem)
+        // Não usar getPericope aqui: puxar a perícope inteira baixaria os
+        // dois shards do livro (~1,1 MB) só para escrever um título e uma
+        // referência que já estão no índice.
+        const peri = all.find((p) => p.ordem === ordem)
         if (!peri) continue
         const done = await countConcluidasNaSequencia(ordens)
         built.push({

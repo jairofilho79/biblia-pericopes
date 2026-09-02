@@ -40,6 +40,14 @@ Os áudios E os manifestos de sincronização já estão publicados. Contrato
   As unidades da seção `texto` são os versículos na mesma ordem em que
   `parse-texto` os produz (com "Capítulo N." fundido ao 1º verso do
   capítulo); `texto` é o conteúdo normalizado que foi narrado.
+- **Realce por palavra**: cada unidade também traz
+  `palavras: [{ t, i, d }]` — um item por token de `texto.split(' ')`
+  (mesma contagem, mesma ordem; `t` é o token com pontuação), com `i` =
+  instante ABSOLUTO no m4a e `d` = duração, em segundos (alinhamento
+  forçado MMS; pontuação isolada herda `i` do fim da palavra anterior com
+  `d` = 0). Manifestos estão sendo republicados com o campo em 2026-09-02;
+  um manifesto sem `palavras` ainda não foi realinhado — o player deve cair
+  no realce por unidade nesse caso.
 - Cobertura parcial e crescente (~309/1047 perícopes do NT em 2026-09-02;
   lote diário adiciona mais): o player DEVE tratar 404 como "sem narração"
   e cair no comportamento atual. `HEAD` no .m4a é a checagem barata.

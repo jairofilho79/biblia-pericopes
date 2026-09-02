@@ -20,6 +20,26 @@ export function shardCarregado(tipo: Tipo, slug: string): boolean {
   return prontos.has(chave(tipo, slug))
 }
 
+/**
+ * `res.ok` não basta: o Cloudflare serve o index.html com HTTP 200 para
+ * qualquer caminho inexistente (not_found_handling: single-page-application).
+ * Sem esta checagem o HTML passaria pelo guard e estouraria no res.json(),
+ * levando um SyntaxError em inglês até a tela de leitura.
+ */
+async function lerLinhas(res: Response, tipo: Tipo, slug: string): Promise<{ ordem: number }[]> {
+  const falha = (): Error => new Error(`Falha ao carregar ${tipo} de ${slug}`)
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('json')) throw falha()
+  let corpo: unknown
+  try {
+    corpo = await res.json()
+  } catch {
+    throw falha()
+  }
+  if (!Array.isArray(corpo)) throw falha()
+  return corpo as { ordem: number }[]
+}
+
 async function carregar(tipo: Tipo, slug: string): Promise<Map<number, unknown>> {
   const k = chave(tipo, slug)
   const pronto = prontos.get(k)
@@ -30,7 +50,7 @@ async function carregar(tipo: Tipo, slug: string): Promise<Map<number, unknown>>
   const p = (async () => {
     const res = await fetch(`${import.meta.env.BASE_URL}data/${tipo}/${slug}.json`)
     if (!res.ok) throw new Error(`Falha ao carregar ${tipo} de ${slug}`)
-    const linhas = (await res.json()) as { ordem: number }[]
+    const linhas = await lerLinhas(res, tipo, slug)
     const mapa = new Map<number, unknown>()
     for (const linha of linhas) {
       const { ordem, ...resto } = linha

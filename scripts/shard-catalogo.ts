@@ -1,13 +1,15 @@
 /**
- * Fatia o catálogo em três conjuntos servíveis:
+ * Fatia o catálogo em quatro conjuntos servíveis:
  *   public/data/index.json        — metadados de todas as perícopes (~480 KB)
  *   public/data/texto/<slug>.json — texto_naa por livro (4,3 MB no total)
  *   public/data/estudo/<slug>.json— contexto/resenha/perguntas/tópicos (9,0 MB)
+ *   public/data/versao.json       — hash desta geração, lido pelo vite.config
  *
- * Roda antes do vite (build e dev). É função pura do catálogo: os derivados
- * não são versionados.
+ * Roda antes do vite (build e dev). É função pura das fontes abaixo: os
+ * derivados não são versionados.
  */
-import { mkdirSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { livroSlug } from '../src/lib/livro-slug'
@@ -17,15 +19,43 @@ import type { Pericope } from '../src/lib/types'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const catalogoPath = join(root, 'data/pericopes.json')
 const outDir = join(root, 'public/data')
+const indexPath = join(outDir, 'index.json')
+const versaoPath = join(outDir, 'versao.json')
+
+/**
+ * O que decide o conteúdo dos shards não é só o catálogo: mudar o cálculo de
+ * minutos, o slug do livro ou este próprio script muda os arquivos gerados sem
+ * encostar em data/pericopes.json.
+ */
+const fontes = [
+  catalogoPath,
+  join(root, 'scripts/shard-catalogo.ts'),
+  join(root, 'src/lib/livro-slug.ts'),
+  join(root, 'src/lib/reading-time.ts'),
+]
 
 function precisaGerar(): boolean {
   if (process.argv.includes('--force')) return true
   try {
-    const catalogo = statSync(catalogoPath).mtimeMs
-    return statSync(join(outDir, 'index.json')).mtimeMs < catalogo
+    if (!existsSync(versaoPath)) return true
+    // index.json é escrito por último: o mtime dele é a marca de "geração
+    // completa", não de "geração começada".
+    const saida = statSync(indexPath).mtimeMs
+    return fontes.some((fonte) => statSync(fonte).mtimeMs > saida)
   } catch {
     return true // saída ausente: gera
   }
+}
+
+/**
+ * Identidade desta geração de shards. Vai para o nome do cache de runtime do
+ * service worker, então precisa mudar sempre que o conteúdo dos shards mudar —
+ * e nunca quando ele não muda (senão todo deploy rebaixaria 13,7 MB de novo).
+ */
+function versaoDosShards(): string {
+  const hash = createHash('sha256')
+  for (const fonte of fontes) hash.update(readFileSync(fonte))
+  return hash.digest('hex').slice(0, 8)
 }
 
 function main(): void {
@@ -64,7 +94,6 @@ function main(): void {
     rmSync(join(outDir, sub), { recursive: true, force: true })
     mkdirSync(join(outDir, sub), { recursive: true })
   }
-  writeFileSync(join(outDir, 'index.json'), JSON.stringify(indice))
 
   for (const [slug, { itens }] of porSlug) {
     writeFileSync(
@@ -84,7 +113,14 @@ function main(): void {
       ),
     )
   }
-  console.log(`[shard] ${indice.length} perícopes em ${porSlug.size} livros`)
+
+  const versao = versaoDosShards()
+  writeFileSync(versaoPath, JSON.stringify({ hash: versao }))
+  // index.json por último, de propósito: um Ctrl-C no meio da geração deixaria
+  // um index.json novo apontando para um diretório de shards vazio, e o
+  // precisaGerar() diria "em dia" para sempre.
+  writeFileSync(indexPath, JSON.stringify(indice))
+  console.log(`[shard] ${indice.length} perícopes em ${porSlug.size} livros (versão ${versao})`)
 }
 
 main()

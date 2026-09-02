@@ -62,6 +62,26 @@ describe('iniciarPrefetch', () => {
     expect(contentModule.loadIndex).toHaveBeenCalledTimes(1)
   })
 
+  // Sem o service worker no controle, os shards baixados aqui iriam parar só na
+  // memória do módulo — nunca no Cache Storage — e o app não abriria offline.
+  it('espera o service worker assumir antes de encher a fila', async () => {
+    let assumiu: () => void = () => {}
+    const pronto = new Promise<void>((resolve) => {
+      assumiu = resolve
+    })
+    vi.stubGlobal('navigator', { serviceWorker: { ready: pronto } })
+    vi.spyOn(contentModule, 'loadIndex').mockResolvedValue([{ livro: 'Gênesis' }] as any)
+    vi.spyOn(shardsModule, 'shardCarregado').mockReturnValue(true)
+
+    iniciarPrefetch()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(contentModule.loadIndex).not.toHaveBeenCalled()
+
+    assumiu()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(contentModule.loadIndex).toHaveBeenCalledTimes(1)
+  })
+
   it('após falha, pode retomar sem re-fazer downloads', async () => {
     const fakeIndex = [
       { livro: 'Gênesis', capitulos: 50 },

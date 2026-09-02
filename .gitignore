@@ -27,6 +27,7 @@ data/preach-sample/
 
 # Derivados do catálogo (gerados por scripts/shard-catalogo.ts no build)
 public/data/index.json
+public/data/versao.json
 public/data/texto/
 public/data/estudo/
 

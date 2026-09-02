@@ -1,8 +1,19 @@
+// ATENÇÃO: os caches de módulo de shards.ts nunca são resetados entre os
+// testes. Cada teste precisa usar um slug de livro diferente — repetir um slug
+// faz o teste passar sem chegar a exercitar o código (falso positivo silencioso).
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { carregarEstudo, carregarTexto, shardCarregado } from './shards'
 
+function resposta(body: unknown, contentType = 'application/json'): Response {
+  return {
+    ok: true,
+    headers: { get: (nome: string) => (nome === 'content-type' ? contentType : null) },
+    json: async () => body,
+  } as unknown as Response
+}
+
 function respostaJson(body: unknown): Response {
-  return { ok: true, json: async () => body } as Response
+  return resposta(body)
 }
 
 beforeEach(() => {
@@ -43,6 +54,46 @@ describe('carregarTexto', () => {
     await expect(carregarTexto('levitico')).rejects.toThrow('offline')
     expect(shardCarregado('texto', 'levitico')).toBe(false)
     expect((await carregarTexto('levitico')).get(2)).toBe('b')
+  })
+})
+
+describe('resposta que não é um shard', () => {
+  // O Cloudflare devolve o index.html com HTTP 200 para caminhos inexistentes
+  // (not_found_handling: single-page-application): o guard de res.ok passa e o
+  // parse explodiria com um SyntaxError em inglês na tela de leitura.
+  it('HTML com status 200 vira erro em pt-BR, não SyntaxError', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => resposta('<!doctype html><html lang="pt-BR">', 'text/html; charset=utf-8')),
+    )
+
+    await expect(carregarTexto('deuteronomio')).rejects.toThrow('Falha ao carregar texto de deuteronomio')
+    expect(shardCarregado('texto', 'deuteronomio')).toBe(false)
+  })
+
+  it('JSON que não é uma lista de linhas também é recusado', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => respostaJson({ erro: 'nao é um shard' })))
+
+    await expect(carregarTexto('josue')).rejects.toThrow('Falha ao carregar texto de josue')
+    expect(shardCarregado('texto', 'josue')).toBe(false)
+  })
+
+  it('corpo que não parseia como JSON vira erro em pt-BR', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          ({
+            ok: true,
+            headers: { get: () => 'application/json' },
+            json: async () => {
+              throw new SyntaxError('Unexpected end of JSON input')
+            },
+          }) as unknown as Response,
+      ),
+    )
+
+    await expect(carregarEstudo('juizes')).rejects.toThrow('Falha ao carregar estudo de juizes')
   })
 })
 

@@ -47,6 +47,29 @@ async function executarFila(): Promise<void> {
   }
 }
 
+/**
+ * Os shards que a fila baixa só chegam ao Cache Storage se o service worker já
+ * estiver no controle da página. Na primeira visita ele ainda está instalando
+ * (2,27 MB de precache) quando o primeiro momento ocioso chega: sem esperar,
+ * a fila iria direto à rede e o download se perderia ao fechar a aba.
+ */
+async function esperarServiceWorker(): Promise<void> {
+  if (typeof navigator === 'undefined' || !navigator.serviceWorker) return
+  // Em dev (sem service worker registrado) `ready` nunca resolve: o teto de
+  // 10 s garante que a fila rode do mesmo jeito.
+  let teto: ReturnType<typeof setTimeout> | undefined
+  try {
+    await Promise.race([
+      navigator.serviceWorker.ready.catch(() => undefined),
+      new Promise((resolve) => {
+        teto = setTimeout(resolve, 10_000)
+      }),
+    ])
+  } finally {
+    clearTimeout(teto)
+  }
+}
+
 function registrarOuvintes(): void {
   if (ouvintesRegistrados) return
   if (typeof window === 'undefined') return // Não em ambiente navegador
@@ -72,7 +95,7 @@ export function iniciarPrefetch(): void {
   registrarOuvintes()
 
   const comecar = () => {
-    void executarFila()
+    void esperarServiceWorker().then(executarFila)
   }
   if (typeof requestIdleCallback === 'function') requestIdleCallback(comecar, { timeout: 3000 })
   else setTimeout(comecar, 2000)

@@ -2,14 +2,10 @@ import type { Manifesto, SecaoManifesto } from './manifesto'
 
 /**
  * Lógica pura dos controles do player de narração — o que dá para testar sem
- * um `<audio>` de verdade: mostrador de tempo, ciclo de velocidade e o salto
- * para o cabeçalho falado de uma seção.
+ * um `<audio>` de verdade: mostrador de tempo e o salto para o cabeçalho
+ * falado de uma seção. Não há controle de velocidade de propósito: a leitura
+ * é momento de descanso, e fora de 1× o realce da palavra perderia o passo.
  */
-
-const KEY = 'pericopes-narracao-rate'
-
-/** Rápido o bastante para reouvir, devagar o bastante para acompanhar. */
-export const VELOCIDADES: readonly number[] = [1, 1.25, 1.5]
 
 /**
  * `m:ss`, e `h:mm:ss` só se passar de uma hora — nenhuma narração chega lá,
@@ -26,35 +22,6 @@ export function formatarTempo(segundos: number): string {
   const ss = String(s).padStart(2, '0')
   if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${ss}`
   return `${m}:${ss}`
-}
-
-/** O passo seguinte do ciclo; qualquer valor estranho volta ao normal. */
-export function proximaVelocidade(atual: number): number {
-  const i = VELOCIDADES.indexOf(atual)
-  if (i < 0) return VELOCIDADES[0]!
-  return VELOCIDADES[(i + 1) % VELOCIDADES.length]!
-}
-
-/** "1,25×" — vírgula decimal e sinal de vezes, como se escreve em pt-BR. */
-export function rotuloVelocidade(v: number): string {
-  return `${String(v).replace('.', ',')}×`
-}
-
-export function lerVelocidade(): number {
-  try {
-    const v = Number(localStorage.getItem(KEY))
-    return VELOCIDADES.includes(v) ? v : VELOCIDADES[0]!
-  } catch {
-    return VELOCIDADES[0]!
-  }
-}
-
-export function gravarVelocidade(v: number): void {
-  try {
-    localStorage.setItem(KEY, String(v))
-  } catch {
-    // modo privado ou cota cheia: a velocidade vale só nesta sessão
-  }
 }
 
 /**

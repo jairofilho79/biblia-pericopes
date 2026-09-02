@@ -384,9 +384,9 @@ export default function Leitura() {
     // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
     if (!falando || barOpen || editingId || draftRef) return
     if (Date.now() < cedeuAte.current) return
-    // Títulos em fala carregam `data-fala-id`, não `data-verse-id`: o
-    // SectionChips conta todos os `[data-verse-id]` para a referência viva, e
-    // um <h1> ali entraria na conta.
+    // Títulos em fala carregam `data-fala-id`, não `data-verse-id`: esse
+    // atributo é das unidades de texto realçáveis (versículo, parágrafo,
+    // pergunta), e um <h1> não é uma delas.
     const el = document.querySelector<HTMLElement>(
       `[data-verse-id="${falando}"], [data-fala-id="${falando}"]`,
     )
@@ -628,7 +628,9 @@ export default function Leitura() {
         {p.titulo_pericope_pt}
       </h1>
       <div className="ref-row">
-        <p className="ref">
+        {/* A referência também é falada ("Mateus, capítulo 1, versículos 1 a
+            17.") logo depois do título: acende na sua vez, como o <h1>. */}
+        <p className={tituloClass('ref', 'referencia')} data-fala-id="referencia">
           {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
         </p>
         <div className="ref-nav">
@@ -658,7 +660,6 @@ export default function Leitura() {
 
       <SectionChips
         ordem={p.ordem}
-        layout={prefs.layout}
         onIr={(id) => {
           if (id === 'contexto') abrirContexto()
           // O chip rola a tela até a seção; com narração, o áudio vai junto
@@ -781,7 +782,7 @@ export default function Leitura() {
         {/* a section chama-se `reflexao`, mas o manifesto chama a seção de
             `reflexoes` — o id do alvo segue o manifesto. */}
         <h2 className={tituloClass('', 'cabecalho-reflexoes') || undefined} data-fala-id="cabecalho-reflexoes">
-          Reflexão
+          Reflexões
         </h2>
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
@@ -832,12 +833,6 @@ export default function Leitura() {
                 rows={4}
                 placeholder="Escreva pensamentos, orações, aplicações…"
               />
-              {/* Linha própria, colada no textarea: na de ações não cabe
-                  "Salvar anotação" + microfone + contador a 375px, e o
-                  microfone mudaria de lugar ao começar a gravar. */}
-              <div className="note-form-ditado">
-                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
-              </div>
               <div className="note-form-actions">
                 <button type="submit">{editingId ? 'Salvar alterações' : 'Salvar anotação'}</button>
                 {editingId && (
@@ -845,6 +840,10 @@ export default function Leitura() {
                     Cancelar
                   </button>
                 )}
+                {/* Último da linha e encostado à direita (margin-left:auto no
+                    CSS): o estado do ditado cresce para a esquerda e o
+                    microfone nunca sai do lugar. */}
+                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
               </div>
             </form>
             <ul className="note-list">
@@ -941,9 +940,7 @@ export default function Leitura() {
             >
               ← {prev.titulo}
             </Link>
-          ) : (
-            <span aria-hidden />
-          )}
+          ) : null}
           {next ? (
             <Link
               className="ghost pager-link pager-next"
@@ -953,9 +950,7 @@ export default function Leitura() {
             >
               {next.titulo} →
             </Link>
-          ) : (
-            <span aria-hidden />
-          )}
+          ) : null}
         </nav>
       </section>
 

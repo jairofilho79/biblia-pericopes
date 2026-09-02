@@ -52,10 +52,3 @@ export function setThemePref(pref: ThemePref): Theme {
   window.dispatchEvent(new Event('pericopes-theme'))
   return resolvido
 }
-
-/** Alternância explícita do header: claro↔escuro (a partir de sépia vai para escuro). */
-export function toggleTheme(): Theme {
-  const next: Theme = resolveTheme() === 'dark' ? 'light' : 'dark'
-  applyTheme(next)
-  return next
-}

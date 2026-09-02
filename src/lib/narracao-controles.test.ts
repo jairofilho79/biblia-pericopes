@@ -1,20 +1,7 @@
-// @vitest-environment happy-dom
-import { afterEach, describe, expect, it } from 'vitest'
-import {
-  VELOCIDADES,
-  formatarTempo,
-  inicioDaSecao,
-  lerVelocidade,
-  gravarVelocidade,
-  proximaVelocidade,
-  rotuloVelocidade,
-  secaoDoChip,
-} from './narracao-controles'
+import { describe, expect, it } from 'vitest'
+import { formatarTempo, inicioDaSecao, secaoDoChip } from './narracao-controles'
 import bruto from './__fixtures__/manifesto-1600.json'
 import type { Manifesto } from './manifesto'
-import { installLocalStorageMock } from './testing/storage-mock'
-
-installLocalStorageMock()
 
 const manifesto = bruto as Manifesto
 
@@ -39,49 +26,6 @@ describe('formatarTempo', () => {
     expect(formatarTempo(Number.NaN)).toBe('–:––')
     expect(formatarTempo(Number.POSITIVE_INFINITY)).toBe('–:––')
     expect(formatarTempo(-1)).toBe('–:––')
-  })
-})
-
-describe('velocidade', () => {
-  it('cicla 1 → 1,25 → 1,5 → 1', () => {
-    expect(VELOCIDADES).toEqual([1, 1.25, 1.5])
-    expect(proximaVelocidade(1)).toBe(1.25)
-    expect(proximaVelocidade(1.25)).toBe(1.5)
-    expect(proximaVelocidade(1.5)).toBe(1)
-  })
-
-  it('valor fora do ciclo volta ao normal', () => {
-    expect(proximaVelocidade(2)).toBe(1)
-    expect(proximaVelocidade(Number.NaN)).toBe(1)
-  })
-
-  it('rótulo em pt-BR, com vírgula e sinal de vezes', () => {
-    expect(rotuloVelocidade(1)).toBe('1×')
-    expect(rotuloVelocidade(1.25)).toBe('1,25×')
-    expect(rotuloVelocidade(1.5)).toBe('1,5×')
-  })
-})
-
-describe('velocidade persistida', () => {
-  afterEach(() => {
-    localStorage.clear()
-  })
-
-  it('sem nada gravado, é 1', () => {
-    expect(lerVelocidade()).toBe(1)
-  })
-
-  it('grava e lê de volta', () => {
-    gravarVelocidade(1.5)
-    expect(localStorage.getItem('pericopes-narracao-rate')).toBe('1.5')
-    expect(lerVelocidade()).toBe(1.5)
-  })
-
-  it('valor gravado fora do ciclo cai em 1', () => {
-    localStorage.setItem('pericopes-narracao-rate', '3')
-    expect(lerVelocidade()).toBe(1)
-    localStorage.setItem('pericopes-narracao-rate', 'lixo')
-    expect(lerVelocidade()).toBe(1)
   })
 })
 

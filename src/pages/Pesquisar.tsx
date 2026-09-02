@@ -22,7 +22,7 @@ import {
   type FulltextHit,
 } from '../lib/fulltext'
 import { testamentLabel } from '../lib/testament'
-import type { Pericope } from '../lib/types'
+import type { PericopeIndex } from '../lib/types'
 
 type Group = {
   testament: 'vt' | 'nt'
@@ -50,9 +50,9 @@ export default function Pesquisar() {
   const [selected, setSelected] = useState<BibleBook | null>(null)
   const [cap, setCap] = useState('')
   const [ver, setVer] = useState('')
-  const [peris, setPeris] = useState<Pericope[]>([])
+  const [peris, setPeris] = useState<PericopeIndex[]>([])
   const [capFilter, setCapFilter] = useState<number | null>(null)
-  const [hit, setHit] = useState<Pericope | null>(null)
+  const [hit, setHit] = useState<PericopeIndex | null>(null)
   const [miss, setMiss] = useState('')
   const [modo, setModo] = useState<'ref' | 'texto'>('ref')
   const [texto, setTexto] = useState('')

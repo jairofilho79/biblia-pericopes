@@ -1,5 +1,31 @@
-import type { Pericope } from './types'
+import type { Pericope, PericopeIndex } from './types'
 import { testamentOf, type Testament } from './testament'
+
+let indice: PericopeIndex[] | null = null
+let carregando: Promise<PericopeIndex[]> | null = null
+
+/**
+ * Índice de metadados: ~480 KB que destravam Home, Índice e Pesquisa por
+ * referência. O conteúdo pesado vem depois, por livro (shards.ts).
+ *
+ * Chamadas concorrentes compartilham a mesma promessa — três telas montando
+ * juntas não podem virar três downloads.
+ */
+export async function loadIndex(): Promise<PericopeIndex[]> {
+  if (indice) return indice
+  if (carregando) return carregando
+  carregando = (async () => {
+    const res = await fetch(`${import.meta.env.BASE_URL}data/index.json`)
+    if (!res.ok) throw new Error('Falha ao carregar o índice de perícopes')
+    indice = (await res.json()) as PericopeIndex[]
+    carregando = null
+    return indice
+  })().catch((err: unknown) => {
+    carregando = null
+    throw err
+  })
+  return carregando
+}
 
 let cache: Pericope[] | null = null
 
@@ -15,8 +41,8 @@ export async function listPericopes(opts?: {
   livro?: string
   q?: string
   testament?: Testament
-}): Promise<Pericope[]> {
-  let list = await loadPericopes()
+}): Promise<PericopeIndex[]> {
+  let list = await loadIndex()
   if (opts?.testament) list = list.filter((p) => testamentOf(p) === opts.testament)
   if (opts?.livro) list = list.filter((p) => p.livro === opts.livro)
   if (opts?.q) {
@@ -37,7 +63,7 @@ export async function getPericope(ordem: number): Promise<Pericope | undefined> 
 }
 
 export async function listLivros(testament?: Testament): Promise<string[]> {
-  const list = testament ? await listPericopes({ testament }) : await loadPericopes()
+  const list = testament ? await listPericopes({ testament }) : await loadIndex()
   const seen = new Set<string>()
   const books: string[] = []
   for (const p of list) {
@@ -49,18 +75,18 @@ export async function listLivros(testament?: Testament): Promise<string[]> {
   return books
 }
 
-export function refLabel(p: Pericope): string {
+export function refLabel(p: PericopeIndex): string {
   if (p.capitulo_inicio === p.capitulo_fim && p.versiculo_inicio === p.versiculo_fim) {
     return `${p.livro} ${p.capitulo_inicio}:${p.versiculo_inicio}`
   }
   return `${p.livro} ${p.capitulo_inicio}:${p.versiculo_inicio}–${p.capitulo_fim}:${p.versiculo_fim}`
 }
 
-export function ordensDoTestamento(all: Pericope[], t: Testament): number[] {
+export function ordensDoTestamento(all: PericopeIndex[], t: Testament): number[] {
   return all.filter((p) => testamentOf(p) === t).map((p) => p.ordem)
 }
 
-export function proximaNoTestamento(all: Pericope[], ordem: number): number | null {
+export function proximaNoTestamento(all: PericopeIndex[], ordem: number): number | null {
   const found = all.find((p) => p.ordem === ordem)
   if (!found) return null
   const seq = ordensDoTestamento(all, testamentOf(found))
@@ -69,7 +95,7 @@ export function proximaNoTestamento(all: Pericope[], ordem: number): number | nu
   return seq[i + 1]
 }
 
-export function anteriorNoTestamento(all: Pericope[], ordem: number): number | null {
+export function anteriorNoTestamento(all: PericopeIndex[], ordem: number): number | null {
   const found = all.find((p) => p.ordem === ordem)
   if (!found) return null
   const seq = ordensDoTestamento(all, testamentOf(found))
@@ -78,13 +104,13 @@ export function anteriorNoTestamento(all: Pericope[], ordem: number): number | n
   return seq[i - 1]
 }
 
-function matchesBook(p: Pericope, livroOrAbbrev: string): boolean {
+function matchesBook(p: PericopeIndex, livroOrAbbrev: string): boolean {
   return p.livro === livroOrAbbrev || p.abbrev === livroOrAbbrev
 }
 
 /** Inclusive range check across multi-chapter pericopes. */
 export function containsRef(
-  p: Pericope,
+  p: PericopeIndex,
   livroOrAbbrev: string,
   cap: number,
   ver: number,
@@ -100,16 +126,16 @@ export async function findPericopeByRef(
   livroOrAbbrev: string,
   cap: number,
   ver: number,
-): Promise<Pericope | null> {
-  const list = await loadPericopes()
+): Promise<PericopeIndex | null> {
+  const list = await loadIndex()
   return list.find((p) => containsRef(p, livroOrAbbrev, cap, ver)) ?? null
 }
 
 export async function listPericopesByBookChapter(
   livroOrAbbrev: string,
   cap?: number,
-): Promise<Pericope[]> {
-  const list = await loadPericopes()
+): Promise<PericopeIndex[]> {
+  const list = await loadIndex()
   return list.filter((p) => {
     if (!matchesBook(p, livroOrAbbrev)) return false
     if (cap == null) return true
@@ -130,7 +156,7 @@ export type LivroProgresso = {
  * ordem em que o Índice agrupa, então o mapa serve direto para os cabeçalhos.
  */
 export function progressoPorLivro(
-  all: Pericope[],
+  all: PericopeIndex[],
   done: Set<number>,
 ): Map<string, LivroProgresso> {
   const out = new Map<string, LivroProgresso>()

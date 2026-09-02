@@ -11,9 +11,9 @@ import {
 } from '../lib/content'
 import { doneSet } from '../lib/user-db'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
-import type { Pericope } from '../lib/types'
+import type { Pericope, PericopeIndex } from '../lib/types'
 
-function PeriLink({ p, done }: { p: Pericope; done: boolean }) {
+function PeriLink({ p, done }: { p: PericopeIndex; done: boolean }) {
   return (
     <Link to={`/leitura/${p.ordem}`} className={done ? 'done' : undefined}>
       <span className="peri-row">
@@ -47,7 +47,7 @@ export default function Indice() {
   const [livros, setLivros] = useState<string[]>([])
   const [livro, setLivro] = useState('')
   const [q, setQ] = useState('')
-  const [items, setItems] = useState<Pericope[]>([])
+  const [items, setItems] = useState<PericopeIndex[]>([])
   const [done, setDone] = useState<Set<number>>(new Set())
   // Lista completa (sem filtro de busca): a barra de progresso do livro
   // aberto precisa do total do livro inteiro, não do que sobrou da busca.
@@ -98,7 +98,7 @@ export default function Indice() {
 
   const grouped = useMemo(() => {
     if (livro) return null
-    const map = new Map<string, Pericope[]>()
+    const map = new Map<string, PericopeIndex[]>()
     for (const p of items) {
       const arr = map.get(p.livro) ?? []
       arr.push(p)

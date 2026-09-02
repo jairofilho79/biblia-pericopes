@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { anteriorNoTestamento, progressoPorLivro, proximaNoTestamento } from './content'
-import type { Pericope } from './types'
+import { describe, expect, it, vi } from 'vitest'
+import { anteriorNoTestamento, loadIndex, progressoPorLivro, proximaNoTestamento } from './content'
+import type { Pericope, PericopeIndex } from './types'
+
+function respostaJson(body: unknown): Response {
+  return { ok: true, json: async () => body } as Response
+}
 
 function peri(ordem: number, abbrev: string): Pericope {
   return { ordem, abbrev, livro: abbrev, titulo_pericope_pt: `P${ordem}` } as Pericope
@@ -52,5 +56,24 @@ describe('progressoPorLivro', () => {
 
   it('lista vazia devolve mapa vazio', () => {
     expect(progressoPorLivro([], new Set([1]))).toEqual(new Map())
+  })
+})
+
+describe('loadIndex', () => {
+  it('busca o índice uma vez só e reaproveita', async () => {
+    const idx: PericopeIndex[] = [
+      {
+        ordem: 0, livro: 'Gênesis', abbrev: 'Gn',
+        capitulo_inicio: 1, versiculo_inicio: 1, capitulo_fim: 2, versiculo_fim: 3,
+        titulo_pericope_pt: 'A criação', minutos: 5,
+      },
+    ]
+    const fetchMock = vi.fn(async (_url: string) => respostaJson(idx))
+    vi.stubGlobal('fetch', fetchMock)
+
+    expect(await loadIndex()).toEqual(idx)
+    expect(await loadIndex()).toEqual(idx)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0][0]).toContain('data/index.json')
   })
 })

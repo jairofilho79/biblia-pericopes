@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getStoredTheme, getThemePref, resolveTheme, setThemePref, toggleTheme } from './theme'
+import { getStoredTheme, getThemePref, resolveTheme, setThemePref } from './theme'
 import { installLocalStorageMock } from './testing/storage-mock'
 
 installLocalStorageMock()
@@ -40,9 +40,20 @@ describe('theme', () => {
     expect(getThemePref()).toBe('system')
   })
 
-  it('toggleTheme a partir de sépia vai para escuro', () => {
+  it('setThemePref avisa quem escuta o evento, inclusive ao voltar para o sistema', () => {
+    let avisos = 0
+    const onTheme = () => avisos++
+    window.addEventListener('pericopes-theme', onTheme)
+    setThemePref('dark')
+    setThemePref('system')
+    window.removeEventListener('pericopes-theme', onTheme)
+    expect(avisos).toBe(2)
+  })
+
+  it('trocar de tema gravado sobrescreve o anterior', () => {
     setThemePref('sepia')
-    expect(toggleTheme()).toBe('dark')
+    expect(setThemePref('dark')).toBe('dark')
+    expect(localStorage.getItem('pericopes-theme')).toBe('dark')
     expect(getThemePref()).toBe('dark')
   })
 })

@@ -237,9 +237,22 @@ a {
   font-weight: 600;
 }
 
-.theme-toggle {
+.theme-menu {
   grid-column: 2;
   grid-row: 1;
+  position: relative;
+  justify-self: end;
+}
+
+/* Alinha à direita, abaixo do gatilho; a borda direita do header já é a
+   do botão, então o popover nunca sai da tela em 375px. */
+.theme-pop {
+  min-width: 0;
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--shell-pad));
+}
+
+.theme-toggle {
   font-family: var(--font-ui);
   font-size: 0.8rem;
   font-weight: 600;
@@ -284,7 +297,7 @@ a {
     gap: 0.35rem 0.85rem;
   }
 
-  .theme-toggle {
+  .theme-menu {
     grid-column: 3;
   }
 }
@@ -1664,27 +1677,47 @@ button.ghost {
 .nav-conta {
   font-size: inherit;
   color: var(--muted);
+  /* mesma altura e respiro dos links ao lado, senão "Sair" fica deslocado */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding-inline: 0.15rem;
 }
 
 .nav-conta-wrap {
+  position: relative;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.1rem;
 }
 
-/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra,
-   com min-height reservado para não deslocar o layout quando o aviso
-   aparece e some. Cor de erro igual à do .entrar-erro. */
+/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra.
+   Fora do fluxo (abaixo do botão) para não reservar altura nem empurrar
+   o "Sair" para cima; é transitório (4 s), pode sobrepor o que vem abaixo.
+   Cor de erro igual à do .entrar-erro. */
 .nav-conta-erro {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0;
-  min-height: 1.1rem;
-  max-width: 12rem;
+  min-height: 0;
+  white-space: nowrap;
   color: #b3564d;
   font-family: var(--font-ui);
   font-size: 0.75rem;
   line-height: 1.25;
   text-align: center;
+}
+
+/* tablet+: "Sair" é o último item na borda direita; centralizar o aviso
+   nele faria o texto vazar a viewport, então ele cresce para a esquerda */
+@media (min-width: 640px) {
+  .nav-conta-erro {
+    left: auto;
+    right: 0;
+    transform: none;
+    text-align: end;
+  }
 }
 
 /* visível só para leitores de tela */

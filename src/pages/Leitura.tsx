@@ -330,7 +330,10 @@ export default function Leitura() {
   // Realçar parágrafo escondido não serve para nada: se o contexto entra em
   // fala com a seção colapsada, ela abre.
   useEffect(() => {
-    if (falando?.startsWith('contexto-') && !contextoAberto) {
+    // O cabeçalho falado ("Contexto.") conta como entrar em fala: abrir aí
+    // dá à seção o tempo do cabeçalho para ganhar caixa antes do 1º parágrafo.
+    const emContexto = falando?.startsWith('contexto-') || falando === 'cabecalho-contexto'
+    if (emContexto && !contextoAberto) {
       setContextoAbertoState(true)
       setContextoAberto(true)
     }
@@ -378,7 +381,12 @@ export default function Leitura() {
     // são sinais de que a tela não pode ser puxada de baixo dos dedos dele.
     if (!falando || barOpen || editingId || draftRef) return
     if (Date.now() < cedeuAte.current) return
-    const el = document.querySelector<HTMLElement>(`[data-verse-id="${falando}"]`)
+    // Títulos em fala carregam `data-fala-id`, não `data-verse-id`: o
+    // SectionChips conta todos os `[data-verse-id]` para a referência viva, e
+    // um <h1> ali entraria na conta.
+    const el = document.querySelector<HTMLElement>(
+      `[data-verse-id="${falando}"], [data-fala-id="${falando}"]`,
+    )
     if (!el) return
     const reduzido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     el.scrollIntoView({ block: 'center', behavior: reduzido ? 'auto' : 'smooth' })
@@ -559,6 +567,14 @@ export default function Leitura() {
     return base ? `${base} prose-speaking` : 'prose-speaking'
   }
 
+  // Títulos e subtítulos também são narrados ("Contexto.", "Capítulo 1."):
+  // ganham um realce mais leve que o da unidade — a candeia passa por eles,
+  // não para neles.
+  function tituloClass(base: string, id: string): string {
+    if (falando !== id) return base
+    return base ? `${base} heading-speaking` : 'heading-speaking'
+  }
+
   function verseClass(base: string, id: string): string {
     const cor = destaques.get(id)
     const foco = selecionadosIds.has(id) ? ' verse-focus' : ''
@@ -584,7 +600,9 @@ export default function Leitura() {
         <Link to="/">Hoje</Link> · {testamentLabel(testamentOf(p))} ·{' '}
         <Link to="/indice">{p.livro}</Link>
       </p>
-      <h1>{p.titulo_pericope_pt}</h1>
+      <h1 className={tituloClass('', 'titulo') || undefined} data-fala-id="titulo">
+        {p.titulo_pericope_pt}
+      </h1>
       <div className="ref-row">
         <p className="ref">
           {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
@@ -636,7 +654,9 @@ export default function Leitura() {
       />
 
       <section className="block block-plain" id="contexto" tabIndex={-1}>
-        <h2 className="collapse-h">
+        {/* o realce vai no h2, não no botão: o botão é o controle, o título é o
+            que a narração está lendo. */}
+        <h2 className={tituloClass('collapse-h', 'cabecalho-contexto')} data-fala-id="cabecalho-contexto">
           <button
             type="button"
             className="collapse-btn"
@@ -660,12 +680,18 @@ export default function Leitura() {
       </section>
 
       <section className="block block-plain" id="texto" tabIndex={-1}>
-        <h2>Texto (NAA)</h2>
+        <h2 className={tituloClass('', 'cabecalho-texto') || undefined} data-fala-id="cabecalho-texto">
+          Texto (NAA)
+        </h2>
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
             ? groupCorrido(blocks).map((g, gi) => (
                 <div key={g.label ? `c-${g.chapter}` : `orfao-${gi}`} className="corrido-group">
-                  {g.label && <h3 className="cap-label">{g.label}</h3>}
+                  {g.label && (
+                    <h3 className={tituloClass('cap-label', `cap-${g.chapter}`)} data-fala-id={`cap-${g.chapter}`}>
+                      {g.label}
+                    </h3>
+                  )}
                   <p className="corrido">
                     {g.verses.map((b) => (
                       <Fragment key={b.id}>
@@ -689,7 +715,11 @@ export default function Leitura() {
               ))
             : blocks.map((b) =>
                 b.kind === 'chapter' ? (
-                  <h3 key={`c-${b.chapter}`} className="cap-label">
+                  <h3
+                    key={`c-${b.chapter}`}
+                    className={tituloClass('cap-label', `cap-${b.chapter}`)}
+                    data-fala-id={`cap-${b.chapter}`}
+                  >
                     {b.label}
                   </h3>
                 ) : (
@@ -713,7 +743,9 @@ export default function Leitura() {
       </section>
 
       <section className="block block-plain" id="resenha" tabIndex={-1}>
-        <h2>Resenha</h2>
+        <h2 className={tituloClass('', 'cabecalho-resenha') || undefined} data-fala-id="cabecalho-resenha">
+          Resenha
+        </h2>
         {parasResenha.map((para, i) => (
           <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
             <TextoFalado texto={para} ativo={falando === `resenha-${i}`} />
@@ -722,7 +754,11 @@ export default function Leitura() {
       </section>
 
       <section className="block block-plain" id="reflexao" tabIndex={-1}>
-        <h2>Reflexão</h2>
+        {/* a section chama-se `reflexao`, mas o manifesto chama a seção de
+            `reflexoes` — o id do alvo segue o manifesto. */}
+        <h2 className={tituloClass('', 'cabecalho-reflexoes') || undefined} data-fala-id="cabecalho-reflexoes">
+          Reflexão
+        </h2>
         <ol className="perguntas">
           {p.perguntas_reflexao.map((q, i) => (
             <li key={i} className={falaClass('', `reflexao-${i}`)} data-verse-id={`reflexao-${i}`}>

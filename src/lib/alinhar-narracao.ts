@@ -12,8 +12,8 @@ export type AlvoAlinhado = {
   fim: number
   /**
    * Uma janela por token de `alvo.texto.split(' ')`, na mesma ordem. Vazio nos
-   * cabeçalhos falados (`titulo`, `cabecalho-<secao>`, `cap-N`): eles realçam
-   * o título inteiro, sem ponteiro de palavra.
+   * cabeçalhos falados (`titulo`, `referencia`, `cabecalho-<secao>`, `cap-N`):
+   * eles realçam o título inteiro, sem ponteiro de palavra.
    */
   palavras: { inicio: number; fim: number }[]
 }
@@ -165,18 +165,26 @@ function cabecalho(secao: string, unidade: UnidadeManifesto, conteudo: AlvoAlinh
 /**
  * Casa o manifesto com o que a tela renderizou, token a token. Uma seção cujo
  * fluxo não bata exatamente fica de fora: toca sem realce, e as outras seguem.
- * Os cabeçalhos falados (título, "Contexto.", "Capítulo N.") entram sempre,
- * como alvos sem palavras — a tela os realça inteiros.
+ * Os cabeçalhos falados (título, referência, "Contexto.", "Capítulo N.")
+ * entram sempre, como alvos sem palavras — a tela os realça inteiros.
  */
 export function alinhar(manifesto: Manifesto, secoes: SecaoAlvos[]): Alinhamento {
   const saida: AlvoAlinhado[] = []
 
-  // A seção `titulo` são duas unidades (título e referência falada) e um
-  // elemento só na tela, o <h1>: uma janela da 1ª à última.
+  // A seção `titulo` são duas unidades: o título ("A genealogia de Jesus.")
+  // e a referência falada ("Mateus, capítulo 1, versículos 1 a 17."). Na tela
+  // são dois elementos — o <h1> e o `.ref` — e cada um acende na sua vez;
+  // fundir os dois deixaria o <h1> aceso enquanto a voz lê a referência. O
+  // título vai até o começo da referência, para não apagar no vão.
   const titulo = manifesto.unidades.filter((u) => u.secao === 'titulo')
   if (titulo.length) {
+    const cabeca = titulo[0]!
     const ultima = titulo[titulo.length - 1]!
-    saida.push({ id: 'titulo', inicio: titulo[0]!.inicio, fim: ultima.inicio + ultima.dur, palavras: [] })
+    const fimTitulo = titulo.length > 1 ? titulo[1]!.inicio : cabeca.inicio + cabeca.dur
+    saida.push({ id: 'titulo', inicio: cabeca.inicio, fim: fimTitulo, palavras: [] })
+    if (titulo.length > 1) {
+      saida.push({ id: 'referencia', inicio: fimTitulo, fim: ultima.inicio + ultima.dur, palavras: [] })
+    }
   }
 
   for (const { secao, alvos } of secoes) {

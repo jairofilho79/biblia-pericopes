@@ -628,7 +628,9 @@ export default function Leitura() {
         {p.titulo_pericope_pt}
       </h1>
       <div className="ref-row">
-        <p className="ref">
+        {/* A referência também é falada ("Mateus, capítulo 1, versículos 1 a
+            17.") logo depois do título: acende na sua vez, como o <h1>. */}
+        <p className={tituloClass('ref', 'referencia')} data-fala-id="referencia">
           {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
         </p>
         <div className="ref-nav">

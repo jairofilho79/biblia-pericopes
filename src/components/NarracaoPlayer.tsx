@@ -11,15 +11,7 @@ import {
 } from 'react'
 import { alinhar, type SecaoAlvos } from '../lib/alinhar-narracao'
 import { carregarManifesto, type Manifesto } from '../lib/manifesto'
-import {
-  type SecaoNarrada,
-  formatarTempo,
-  gravarVelocidade,
-  inicioDaSecao,
-  lerVelocidade,
-  proximaVelocidade,
-  rotuloVelocidade,
-} from '../lib/narracao-controles'
+import { type SecaoNarrada, formatarTempo, inicioDaSecao } from '../lib/narracao-controles'
 import { indiceDaPalavra, indiceEm } from '../lib/narracao-timeline'
 
 export type NarracaoPlayerHandle = {
@@ -46,10 +38,22 @@ type Props = {
 const SALTO = 10
 
 /**
+ * Quanto o realce corre à frente do `currentTime`, em segundos. Compensa o
+ * que o ouvido percebe como atraso: a latência entre ler o relógio e pintar
+ * o quadro, mais a transição de 160 ms do sublinhado da palavra (`[data-w]`
+ * no CSS), que só chega ao meio do caminho ~80 ms depois de começar. É o
+ * único lugar para afinar de ouvido — nada mais no realce tem constante de
+ * tempo.
+ */
+export const ADIANTO_S = 0.15
+
+/**
  * Narração pré-gerada (voz clonada, servida do R2 via /api/audio). Só aparece
  * quando o áudio da perícope existe — um HEAD barato decide. O manifesto,
- * quando existe e casa com a tela, transforma o `timeupdate` em realce do
- * alvo e da palavra em fala.
+ * quando existe e casa com a tela, transforma o relógio do áudio em realce
+ * do alvo e da palavra em fala — lido a cada quadro enquanto toca, e não no
+ * `timeupdate`, que dispara só ~4×/s e deixaria a palavra até 250 ms atrás
+ * da voz.
  *
  * O `<audio>` fica sem `controls`: a UI é do app, para caber no tema e para
  * os chips de seção poderem mandar o áudio para o cabeçalho de cada uma.
@@ -62,10 +66,9 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
   const [tocando, setTocando] = useState(false)
   const [tempo, setTempo] = useState(0)
   const [duracao, setDuracao] = useState(Number.NaN)
-  const [velocidade, setVelocidade] = useState(() => lerVelocidade())
   const [erro, setErro] = useState(false)
 
-  // Índices da última busca: o timeupdate anda para frente quase sempre.
+  // Índices da última busca: o relógio anda para frente quase sempre.
   const iAlvo = useRef(0)
   const iPalavra = useRef(0)
   const alvoAtual = useRef<string | null>(null)
@@ -104,13 +107,6 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
     }
   }, [ordem])
 
-  // A velocidade é do elemento, e o elemento nasce de novo a cada perícope
-  // (`src` volta a null no meio): reaplicar quando qualquer um dos dois muda.
-  useEffect(() => {
-    const a = audioRef.current
-    if (a) a.playbackRate = velocidade
-  }, [velocidade, src])
-
   const limparPalavra = useCallback(() => {
     spanAtual.current?.classList.remove('word-speaking')
     spanAtual.current = null
@@ -136,10 +132,12 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
     }
   }, [ordem, limparPalavra, onAlvo])
 
-  function aoTempo() {
+  const aoTempo = useCallback(() => {
     const a = audioRef.current
     if (!a || !alinhamento.length) return
-    const t = a.currentTime
+    // Adiantado de propósito (ver ADIANTO_S). Fora de qualquer janela — antes
+    // da 1ª, no fim — a busca devolve -1 e nada acende, como sempre.
+    const t = a.currentTime + ADIANTO_S
 
     const i = indiceEm(alinhamento, t, iAlvo.current)
     if (i >= 0) iAlvo.current = i
@@ -147,17 +145,18 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
 
     if ((alvo?.id ?? null) !== alvoAtual.current) {
       trocarAlvo(alvo?.id ?? null)
-      // Os spans do alvo novo só existem depois do render — o próximo
-      // timeupdate marca a palavra.
+      // Os spans do alvo novo só existem depois do render — o próximo quadro
+      // marca a palavra.
       return
     }
     if (!alvo) return
 
     const w = indiceDaPalavra(alvo, t, iPalavra.current)
     if (w < 0) return
-    // Sai antes de tocar no DOM quando a palavra não mudou: o timeupdate
-    // dispara ~4x/s e a palavra troca ~2,5x/s, então boa parte dos ticks não
-    // tem nada a fazer. `spanAtual` cobre o caso de o span ainda não existir.
+    // Sai antes de tocar no DOM quando a palavra não mudou: o loop roda a
+    // cada quadro (~60×/s) e a palavra troca ~2,5×/s, então quase todo quadro
+    // não tem nada a fazer. `spanAtual` cobre o caso de o span ainda não
+    // existir.
     if (w === iPalavra.current && spanAtual.current) return
     iPalavra.current = w
     const el = document.querySelector<HTMLElement>(`[data-verse-id="${alvo.id}"] [data-w="${w}"]`)
@@ -165,7 +164,22 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
     limparPalavra()
     el.classList.add('word-speaking')
     spanAtual.current = el
-  }
+  }, [alinhamento, trocarAlvo, limparPalavra])
+
+  // Enquanto toca, o realce segue o relógio quadro a quadro. Começa no
+  // `play`, para no `pause`/`ended` (os dois zeram `tocando`) e na
+  // desmontagem; `aoTempo` na lista de dependências faz o loop nascer de novo
+  // com o alinhamento fresco quando o manifesto chega no meio da reprodução.
+  useEffect(() => {
+    if (!tocando) return
+    let quadro = 0
+    const passo = () => {
+      aoTempo()
+      quadro = requestAnimationFrame(passo)
+    }
+    quadro = requestAnimationFrame(passo)
+    return () => cancelAnimationFrame(quadro)
+  }, [tocando, aoTempo])
 
   function alternar() {
     const a = audioRef.current
@@ -188,12 +202,6 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
   function saltar(delta: number) {
     const a = audioRef.current
     if (a) irPara(a.currentTime + delta)
-  }
-
-  function mudarVelocidade() {
-    const v = proximaVelocidade(velocidade)
-    setVelocidade(v)
-    gravarVelocidade(v)
   }
 
   useImperativeHandle(
@@ -235,10 +243,12 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         preload="metadata"
         src={src}
         hidden
+        // Só o mostrador: o realce vem do loop de quadros. Um setState por
+        // quadro seria desperdício para uma barra que muda a olho a cada
+        // segundo.
         onTimeUpdate={() => {
           const a = audioRef.current
           if (a) setTempo(a.currentTime)
-          aoTempo()
         }}
         onSeeked={() => {
           // A tela precisa estar liberada antes de calcular o novo alvo,
@@ -247,6 +257,7 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
           aoTempo()
         }}
         onEnded={() => {
+          setTocando(false)
           limparPalavra()
           trocarAlvo(null)
         }}
@@ -254,9 +265,7 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         onPause={() => setTocando(false)}
         onLoadedMetadata={() => {
           const a = audioRef.current
-          if (!a) return
-          setDuracao(a.duration)
-          a.playbackRate = velocidade
+          if (a) setDuracao(a.duration)
         }}
         onDurationChange={() => {
           const a = audioRef.current
@@ -320,16 +329,6 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         <span className="narracao-tempo-sep">/</span>
         <span>{duracaoTexto}</span>
       </span>
-
-      <button
-        type="button"
-        className="narracao-btn narracao-velocidade"
-        aria-label={`Velocidade ${rotuloVelocidade(velocidade)}. Mudar velocidade`}
-        title="Velocidade"
-        onClick={mudarVelocidade}
-      >
-        {rotuloVelocidade(velocidade)}
-      </button>
 
       {erro && (
         <p className="narracao-erro" role="status">

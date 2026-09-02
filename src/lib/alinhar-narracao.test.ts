@@ -45,11 +45,11 @@ describe('alinhar — manifesto real 1600', () => {
       { id: 'contexto-1', texto: tk.slice(corte).join(' ') },
     ]
     const r = alinhar(real, [{ secao: 'contexto', alvos }])
-    expect(r.map((a) => a.id)).toEqual(['titulo', 'cabecalho-contexto', 'contexto-0', 'contexto-1'])
-    expect(r[2]!.palavras).toHaveLength(corte)
-    expect(r[3]!.palavras).toHaveLength(tk.length - corte)
+    expect(r.map((a) => a.id)).toEqual(['titulo', 'referencia', 'cabecalho-contexto', 'contexto-0', 'contexto-1'])
+    expect(r[3]!.palavras).toHaveLength(corte)
+    expect(r[4]!.palavras).toHaveLength(tk.length - corte)
     // contíguo: o fim do primeiro é o início do segundo.
-    expect(r[2]!.fim).toBe(r[3]!.inicio)
+    expect(r[3]!.fim).toBe(r[4]!.inicio)
   })
 
   it('descarta o prefixo "Reflexão N."', () => {
@@ -59,7 +59,7 @@ describe('alinhar — manifesto real 1600', () => {
     expect(perguntas).toHaveLength(2)
     expect(perguntas[0]!.palavras).toHaveLength(tokens(alvos[0]!.texto).length)
     // "Reflexão N." não tem elemento na tela: não vira alvo nenhum.
-    expect(r.map((a) => a.id)).toEqual(['titulo', 'cabecalho-reflexoes', 'reflexoes-0', 'reflexoes-1'])
+    expect(r.map((a) => a.id)).toEqual(['titulo', 'referencia', 'cabecalho-reflexoes', 'reflexoes-0', 'reflexoes-1'])
   })
 
   it('as janelas de palavra são contíguas e cobrem o alvo inteiro', () => {
@@ -81,21 +81,35 @@ describe('alinhar — manifesto real 1600', () => {
     )
     // o contexto real tem 1 unidade só; aqui isso vira 1 alvo, e alinha igual.
     const r = alinhar(real, secoes)
-    // título + 4 cabeçalhos + "Capítulo 1." + conteúdo (1 + 17 + 2 + 2)
-    expect(r.length).toBe(1 + 4 + 1 + (1 + 17 + 2 + 2))
+    // título + referência + 4 cabeçalhos + "Capítulo 1." + conteúdo (1 + 17 + 2 + 2)
+    expect(r.length).toBe(2 + 4 + 1 + (1 + 17 + 2 + 2))
     for (let k = 1; k < r.length; k++) expect(r[k]!.inicio).toBeGreaterThanOrEqual(r[k - 1]!.fim)
   })
 
-  it('a seção titulo vira um alvo só, sem palavras, mesmo sem alvos de conteúdo', () => {
+  it('a seção titulo vira "titulo" e "referencia", sem palavras, mesmo sem alvos de conteúdo', () => {
     const r = alinhar(real, [])
-    expect(r).toHaveLength(1)
+    expect(r.map((a) => a.id)).toEqual(['titulo', 'referencia'])
     const t = r[0]!
-    expect(t.id).toBe('titulo')
+    const ref = r[1]!
     expect(t.palavras).toEqual([])
-    // cobre da 1ª unidade do título ao fim da última (a referência falada).
+    expect(ref.palavras).toEqual([])
     const uni = real.unidades.filter((u) => u.secao === 'titulo')
+    // o título vai até o COMEÇO da referência (sem apagar no vão), não até o
+    // fim da própria fala; a referência vai até o fim da última unidade.
     expect(t.inicio).toBe(uni[0]!.inicio)
-    expect(t.fim).toBe(uni[1]!.inicio + uni[1]!.dur)
+    expect(t.fim).toBe(uni[1]!.inicio)
+    expect(t.fim).toBeGreaterThan(uni[0]!.inicio + uni[0]!.dur)
+    expect(ref.inicio).toBe(t.fim)
+    expect(ref.fim).toBe(uni[1]!.inicio + uni[1]!.dur)
+  })
+
+  it('manifesto com uma unidade só de título não emite "referencia"', () => {
+    const uni = real.unidades.filter((u) => u.secao === 'titulo')
+    const so: Manifesto = { ...real, unidades: [uni[0]!, ...real.unidades.filter((u) => u.secao !== 'titulo')] }
+    const r = alinhar(so, [])
+    expect(r.map((a) => a.id)).toEqual(['titulo'])
+    // sem 2ª unidade a janela é a da própria fala do título.
+    expect(r[0]!).toMatchObject({ inicio: uni[0]!.inicio, fim: uni[0]!.inicio + uni[0]!.dur, palavras: [] })
   })
 
   it('o cabeçalho falado de cada seção vira "cabecalho-<secao>" até o 1º alvo de conteúdo', () => {
@@ -119,22 +133,22 @@ describe('alinhar — manifesto real 1600', () => {
   it('o "Capítulo N." descartado vira um alvo "cap-N" entre o cabeçalho e o 1º versículo', () => {
     const alvos = alvosDoManifesto(real, 'texto')
     const r = alinhar(real, [{ secao: 'texto', alvos }])
-    expect(r.map((a) => a.id).slice(0, 4)).toEqual(['titulo', 'cabecalho-texto', 'cap-1', 'texto-0'])
-    const cap = r[2]!
+    expect(r.map((a) => a.id).slice(0, 5)).toEqual(['titulo', 'referencia', 'cabecalho-texto', 'cap-1', 'texto-0'])
+    const cap = r[3]!
     const v1 = real.unidades.find((u) => u.secao === 'texto' && /^Capítulo/.test(u.texto))!
     expect(cap.palavras).toEqual([])
     expect(cap.inicio).toBe(v1.palavras![0]!.i)
     expect(cap.fim).toBe(v1.palavras![2]!.i) // "Livro", o 1º token que sobrou
-    expect(r[3]!.inicio).toBe(cap.fim)
+    expect(r[4]!.inicio).toBe(cap.fim)
   })
 
   it('o cabeçalho é emitido mesmo quando o conteúdo da seção não alinha', () => {
     const r = alinhar(real, [{ secao: 'resenha', alvos: [{ id: 'r-0', texto: 'nao bate' }] }])
-    expect(r.map((a) => a.id)).toEqual(['titulo', 'cabecalho-resenha'])
+    expect(r.map((a) => a.id)).toEqual(['titulo', 'referencia', 'cabecalho-resenha'])
     const hdr = real.unidades.find((u) => u.secao === 'resenha')!
     // sem conteúdo alinhado a janela é a da própria unidade falada.
-    expect(r[1]!.inicio).toBe(hdr.inicio)
-    expect(r[1]!.fim).toBe(hdr.inicio + hdr.dur)
+    expect(r[2]!.inicio).toBe(hdr.inicio)
+    expect(r[2]!.fim).toBe(hdr.inicio + hdr.dur)
   })
 })
 

@@ -1013,11 +1013,11 @@ button.ghost {
    embaixo — a barra ganha a largura inteira, que é onde o dedo precisa dela. */
 .narracao {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   grid-template-areas:
-    'rotulo tempo velocidade'
-    'barra barra barra'
-    'controles controles controles';
+    'rotulo tempo'
+    'barra barra'
+    'controles controles';
   align-items: center;
   column-gap: 0.6rem;
   row-gap: 0.15rem;
@@ -1092,17 +1092,6 @@ button.ghost {
 
 .narracao-play:hover {
   background: color-mix(in srgb, var(--accent) 88%, var(--ink));
-}
-
-.narracao-velocidade {
-  grid-area: velocidade;
-  min-width: 2.75rem;
-  padding: 0 0.5rem;
-  border-color: var(--line);
-  font-size: 0.78rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
 }
 
 .narracao-tempo {
@@ -1216,8 +1205,8 @@ button.ghost {
 /* desktop: tudo numa linha só, a barra ocupando o que sobrar */
 @media (min-width: 40rem) {
   .narracao {
-    grid-template-columns: auto auto 1fr auto auto;
-    grid-template-areas: 'rotulo controles barra tempo velocidade';
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas: 'rotulo controles barra tempo';
     column-gap: 0.75rem;
     padding: 0.4rem 0.9rem 0.4rem 0.8rem;
   }
@@ -1372,17 +1361,19 @@ button.ghost {
   background-size: 100% 0.12em;
 }
 
-/* Títulos falados (h1, h2 das seções, "Capítulo N"): só a cor e um brilho
-   suave, por cima do relevo de leitura — sem halo, o realce da unidade é mais
-   forte que o do título de propósito. `.leitura h2.` bate a regra
-   `.leitura > .block-plain > h2` do text-shadow. */
+/* Títulos falados (h1, a referência abaixo dele, h2 das seções, "Capítulo
+   N"): só a cor e um brilho suave, por cima do relevo de leitura — sem halo,
+   o realce da unidade é mais forte que o do título de propósito. `.leitura
+   h2.` bate a regra `.leitura > .block-plain > h2` do text-shadow; `.leitura
+   .ref.` bate o `.ref, .muted` da cor. */
 [data-fala-id] {
   transition: color 200ms ease, text-shadow 200ms ease;
 }
 
 .leitura h1.heading-speaking,
 .leitura h2.heading-speaking,
-.leitura h3.heading-speaking {
+.leitura h3.heading-speaking,
+.leitura .ref.heading-speaking {
   color: var(--candle);
   text-shadow: var(--read-shadow), 0 0 0.6em var(--candle-glow);
 }

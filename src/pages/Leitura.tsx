@@ -654,7 +654,7 @@ export default function Leitura() {
         }}
       />
 
-      <NarracaoPlayer ordem={p.ordem} />
+      <NarracaoPlayer ordem={p.ordem} secoes={[]} onAlvo={setFalando} />
 
       {temTts && (
         <BarraOuvir

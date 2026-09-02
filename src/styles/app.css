@@ -1750,7 +1750,9 @@ button.ghost {
   text-overflow: ellipsis;
 }
 
-.ditar-status:has(+ .ditar-botao.gravando) {
+/* "Ouvindo…"/contador na cor de gravação; a prévia do que está sendo dito
+   fica muted, é rascunho e não alarme. */
+.ditar-status:has(+ .ditar-botao.gravando):not(.ditar-previa) {
   color: var(--rec);
 }
 

@@ -10,6 +10,7 @@ vi.mock('../lib/auth-client', () => ({
 }))
 
 import DitarBotao from './DitarBotao'
+import { FakeReconhecimento } from '../lib/testing/reconhecimento-fake'
 
 /**
  * MediaRecorder de mentira: registra start/stop, entrega um chunk no stop e
@@ -60,6 +61,7 @@ beforeEach(() => {
   sessao = { user: { id: 'u1' } }
   FakeRecorder.instancias = []
   tracks[0].stop.mockClear()
+  FakeReconhecimento.instancias = []
   onTexto.mockClear()
   onAviso.mockClear()
   getUserMedia.mockClear()
@@ -78,7 +80,9 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('DitarBotao — quando aparece', () => {
+// happy-dom não tem Web Speech API: por padrão os testes cobrem o fallback
+// (MediaRecorder + Worker). O bloco "modo nativo" liga a API de mentira.
+describe('DitarBotao — quando aparece (fallback)', () => {
   it('renderiza o microfone para quem está logado', () => {
     montar()
     expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
@@ -112,7 +116,7 @@ describe('DitarBotao — quando aparece', () => {
   })
 })
 
-describe('DitarBotao — fluxo', () => {
+describe('DitarBotao — fluxo (fallback)', () => {
   it('toque grava (contador), toque de novo para, transcreve e entrega o texto', async () => {
     vi.stubGlobal(
       'fetch',
@@ -249,6 +253,104 @@ describe('DitarBotao — fluxo', () => {
     expect(fetchMock).not.toHaveBeenCalled()
     expect(onTexto).not.toHaveBeenCalled()
     // afterEach desmonta de novo: precisa de um root vivo.
+    root = createRoot(host)
+  })
+})
+
+describe('DitarBotao — modo nativo', () => {
+  const rec = () => FakeReconhecimento.instancias[0]
+  const previa = () => host.querySelector('.ditar-status')
+
+  beforeEach(() => {
+    vi.stubGlobal('SpeechRecognition', FakeReconhecimento)
+  })
+
+  it('aparece sem sessão e sem MediaRecorder, mas não offline', () => {
+    sessao = null
+    vi.stubGlobal('MediaRecorder', undefined)
+    montar()
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true })
+    act(() => window.dispatchEvent(new Event('offline')))
+    expect(host.innerHTML).toBe('')
+  })
+
+  it('toque começa a ouvir em pt-BR; finais vão para onTexto, parciais para a prévia', () => {
+    sessao = null
+    montar()
+    act(() => botao()!.click())
+    expect(rec().starts).toBe(1)
+    expect(rec().lang).toBe('pt-BR')
+    expect(rec().continuous).toBe(true)
+    expect(botao()?.getAttribute('aria-label')).toBe('Parar ditado')
+    expect(botao()?.getAttribute('aria-pressed')).toBe('true')
+    expect(botao()?.classList.contains('gravando')).toBe(true)
+    expect(previa()?.textContent).toBe('Ouvindo…')
+    // Sem contador nem aria-live: a prévia muda a cada sílaba.
+    expect(previa()?.getAttribute('aria-live')).toBeNull()
+
+    act(() => rec().resultado([['o senhor é o meu', false]]))
+    expect(previa()?.textContent).toBe('o senhor é o meu…')
+    expect(previa()?.classList.contains('ditar-previa')).toBe(true)
+    expect(onTexto).not.toHaveBeenCalled()
+
+    act(() => rec().resultado([['O Senhor é o meu pastor', true]]))
+    expect(onTexto).toHaveBeenCalledWith('O Senhor é o meu pastor')
+    expect(previa()?.textContent).toBe('Ouvindo…')
+    // Sem teto: um minuto depois continua ouvindo.
+    act(() => {
+      vi.advanceTimersByTime(60_000)
+    })
+    expect(rec().stops).toBe(0)
+    expect(botao()?.getAttribute('aria-label')).toBe('Parar ditado')
+  })
+
+  it('reinicia quando o aparelho encerra sozinho, e não depois de parar', () => {
+    montar()
+    act(() => botao()!.click())
+    // iOS encerra depois de uma pausa: a pessoa não pediu, então volta a ouvir.
+    act(() => rec().fim())
+    expect(rec().starts).toBe(2)
+    expect(botao()?.getAttribute('aria-label')).toBe('Parar ditado')
+
+    act(() => botao()!.click())
+    expect(rec().stops).toBe(1)
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+    expect(previa()).toBeNull()
+    // O último final ainda chega depois do stop e entra no texto.
+    act(() => rec().resultado([['amém', true]]))
+    expect(onTexto).toHaveBeenCalledWith('amém')
+    act(() => rec().fim())
+    expect(rec().starts).toBe(2)
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+  })
+
+  it('microfone negado vira aviso e não reinicia', () => {
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().erro('not-allowed'))
+    expect(onAviso).toHaveBeenCalledWith('Permita o microfone para ditar')
+    act(() => rec().fim())
+    expect(rec().starts).toBe(1)
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+  })
+
+  it('silêncio não avisa nem para', () => {
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().erro('no-speech'))
+    expect(onAviso).not.toHaveBeenCalled()
+    act(() => rec().fim())
+    expect(rec().starts).toBe(2)
+  })
+
+  it('desmontar no meio do ditado chama stop() e não reinicia', () => {
+    montar()
+    act(() => botao()!.click())
+    act(() => root.unmount())
+    expect(rec().stops).toBe(1)
+    rec().fim()
+    expect(rec().starts).toBe(1)
     root = createRoot(host)
   })
 })

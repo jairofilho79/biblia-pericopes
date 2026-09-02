@@ -9,6 +9,8 @@ type Props = {
   secoes: SecaoAlvos[]
   /** Chamado só quando o alvo em fala muda. DEVE ser uma referência estável. */
   onAlvo: (id: string | null) => void
+  /** Avisa que o usuário reposicionou o áudio. DEVE ser referência estável. */
+  onSeek?: () => void
 }
 
 /**
@@ -17,7 +19,7 @@ type Props = {
  * quando existe e casa com a tela, transforma o `timeupdate` em realce do
  * alvo e da palavra em fala.
  */
-export default function NarracaoPlayer({ ordem, secoes, onAlvo }: Props) {
+export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek }: Props) {
   const [src, setSrc] = useState<string | null>(null)
   const [manifesto, setManifesto] = useState<Manifesto | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -120,7 +122,12 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo }: Props) {
         src={src}
         aria-label="Narração da perícope"
         onTimeUpdate={aoTempo}
-        onSeeked={aoTempo}
+        onSeeked={() => {
+          // A tela precisa estar liberada antes de calcular o novo alvo,
+          // senão o realce salta para o lugar certo mas fora da tela.
+          onSeek?.()
+          aoTempo()
+        }}
         onEnded={() => {
           limparPalavra()
           trocarAlvo(null)

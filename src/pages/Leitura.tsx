@@ -339,12 +339,23 @@ export default function Leitura() {
   // acompanhamento para sempre no primeiro realce.
   const cedeuAte = useRef(0)
 
+  // A intenção do seek é mais recente que a de uma rolagem anterior: arrastar
+  // a barra do player para ouvir um trecho vence a suspensão que uma rolagem
+  // manual tenha armado.
+  const onSeekNarracao = useCallback(() => {
+    cedeuAte.current = 0
+  }, [])
+
   useEffect(() => {
-    const ceder = () => {
+    const ceder = (e: Event) => {
+      // Arrastar a barra do player emite touchmove que sobe até a window: isso
+      // é operar o áudio, não rolar a página, e não deve suspender o
+      // acompanhamento.
+      if (e.target instanceof HTMLElement && e.target.closest('.narracao')) return
       cedeuAte.current = Date.now() + 10_000
     }
     const tecla = (e: KeyboardEvent) => {
-      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder()
+      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) ceder(e)
     }
     window.addEventListener('wheel', ceder, { passive: true })
     window.addEventListener('touchmove', ceder, { passive: true })
@@ -603,7 +614,12 @@ export default function Leitura() {
         }}
       />
 
-      <NarracaoPlayer ordem={p.ordem} secoes={secoesNarracao} onAlvo={setFalando} />
+      <NarracaoPlayer
+        ordem={p.ordem}
+        secoes={secoesNarracao}
+        onAlvo={setFalando}
+        onSeek={onSeekNarracao}
+      />
 
       <section className="block block-plain" id="contexto" tabIndex={-1}>
         <h2 className="collapse-h">

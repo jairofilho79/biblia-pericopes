@@ -5,11 +5,18 @@ futuras. Nenhum corrompe dados nem quebra fluxo principal.
 
 ## Sync / Worker (endurecimento)
 
-- Validações do Worker: exigir inteiro em `pericopeOrdem` (hoje aceita
-  `1.5`/`1e308`); validar o invariante `id === "${ordem}:${verseId}"` nos
-  destaques (um id divergente vira destaque indeletável pela UI); `LIMIT`/
-  paginação no pull de `destaques` (entidade mais volumosa); cap de tamanho
-  do corpo bruto do POST `/api/sync` (hoje ~10 MB teóricos).
+- ~~Validações do Worker: inteiro em `pericopeOrdem`; invariante
+  `id === "${ordem}:${verseId}"` nos destaques; cap do corpo bruto do POST
+  `/api/sync`.~~ Feito em 2026-09-01 (`worker/sync-logic.ts`): `isOrdem`
+  exige inteiro seguro `>= 0` nas três listas, `validDestaque` recusa id
+  divergente, e `corpoExcedeLimite` barra corpo acima de `MAX_CORPO`
+  (32 MiB) com 413 — que o cliente trata como rejeição determinística,
+  junto do 400.
+- `LIMIT`/paginação no pull de `destaques` (entidade mais volumosa) —
+  pendente, e é pacote próprio: o cursor hoje é o `agora` opaco do
+  servidor, então truncar sem mudar o protocolo faz o cliente pular
+  linhas. Precisa de cursor com chave composta (`server_em` + desempate)
+  e laço de re-pull no cliente.
 - Sem live refresh após pull: dados sincronizados de outro aparelho só
   aparecem ao navegar/remontar. Considerar um evento `pericopes-sync`
   disparado após `applyRemote*` (o streak da Home tem a mesma limitação,

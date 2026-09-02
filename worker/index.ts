@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { createAuth } from './auth'
-import { parseSyncPush } from './sync-logic'
+import { corpoExcedeLimite, parseSyncPush } from './sync-logic'
 import type { Env } from './env.d'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -11,6 +11,14 @@ async function requireUserId(c: { env: Env; req: { raw: Request } }): Promise<st
   const auth = createAuth(c.env)
   const session = await auth.api.getSession({ headers: c.req.raw.headers })
   return session?.user.id ?? null
+}
+
+function parseJson(bruto: string): unknown {
+  try {
+    return JSON.parse(bruto)
+  } catch {
+    return null
+  }
 }
 
 app.get('/api/sync', async (c) => {
@@ -53,7 +61,17 @@ app.get('/api/sync', async (c) => {
 app.post('/api/sync', async (c) => {
   const userId = await requireUserId(c)
   if (!userId) return c.json({ error: 'não autenticado' }, 401)
-  const parsed = parseSyncPush(await c.req.json().catch(() => null))
+  if (corpoExcedeLimite(c.req.header('content-length'))) {
+    return c.json({ error: 'corpo grande demais' }, 413)
+  }
+  // Lê como texto para medir o corpo antes de desserializar: um corpo chunked
+  // chega sem Content-Length e escaparia do estágio acima. Falha de leitura
+  // vira string vazia, que o JSON.parse rejeita e cai no 400 de sempre.
+  const bruto = await c.req.text().catch(() => '')
+  if (corpoExcedeLimite(null, bruto.length)) {
+    return c.json({ error: 'corpo grande demais' }, 413)
+  }
+  const parsed = parseSyncPush(parseJson(bruto))
   if (!parsed) return c.json({ error: 'payload inválido' }, 400)
 
   // Um único carimbo de servidor para o lote inteiro: é o que alimenta o

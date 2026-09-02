@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseSyncPush } from './sync-logic'
+import { MAX_CORPO, corpoExcedeLimite, parseSyncPush } from './sync-logic'
 
 const prog = { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-08-31T10:00:00.000Z' }
 const nota = {
@@ -132,5 +132,29 @@ describe('parseSyncPush — pericopeOrdem', () => {
     expect(parseSyncPush({ progresso: [{ ...prog, pericopeOrdem: 0 }] })?.progresso).toEqual([
       { ...prog, pericopeOrdem: 0 },
     ])
+  })
+})
+
+describe('corpoExcedeLimite', () => {
+  it('barra pelo Content-Length, antes de bufferizar o corpo', () => {
+    expect(corpoExcedeLimite(String(MAX_CORPO + 1))).toBe(true)
+    expect(corpoExcedeLimite(String(MAX_CORPO))).toBe(false)
+  })
+  it('deixa passar header ausente ou não numérico — quem mede é o segundo estágio', () => {
+    expect(corpoExcedeLimite(null)).toBe(false)
+    expect(corpoExcedeLimite(undefined)).toBe(false)
+    expect(corpoExcedeLimite('abacaxi')).toBe(false)
+  })
+  it('barra pelo corpo já lido, para o chunked que chega sem header', () => {
+    expect(corpoExcedeLimite(null, MAX_CORPO + 1)).toBe(true)
+    expect(corpoExcedeLimite(null, MAX_CORPO)).toBe(false)
+    expect(corpoExcedeLimite(null, 42)).toBe(false)
+  })
+  it('cabe o pior payload legal do protocolo, com folga', () => {
+    // 500 anotações × 20.000 unidades UTF-16, cada uma custando até 3 bytes em
+    // UTF-8, mais o overhead das três listas. Rejeitar um payload legal seria
+    // pior que não ter teto: o cliente abandona o lote e a linha nunca sobe.
+    const piorCasoLegal = 500 * 20_000 * 3 + 500 * 280 + 500 * 250 + 500 * 90
+    expect(corpoExcedeLimite(String(piorCasoLegal))).toBe(false)
   })
 })

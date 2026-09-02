@@ -103,14 +103,15 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
       derrubarSessao()
       return false
     }
-    if (res.status === 400) {
-      // 400 é validação determinística (payload inválido): reenviar o mesmo
-      // lote nunca muda o resultado, e insistir travaria o outbox — e com ele
-      // o pull e TODAS as outras entidades — para sempre. Abandona o lote em
-      // vez de retentar: as linhas continuam intactas e visíveis no IndexedDB
-      // local, só a sincronização delas é que é desistida. Pior seria um
-      // travamento permanente por causa de um único item ruim.
-      console.error('[sync] push rejeitado (400)', await res.text().catch(() => ''))
+    if (res.status === 400 || res.status === 413) {
+      // 400 (payload inválido) e 413 (corpo acima do teto do Worker) são
+      // rejeições determinísticas: reenviar o mesmo lote nunca muda o
+      // resultado, e insistir travaria o outbox — e com ele o pull e TODAS as
+      // outras entidades — para sempre. Abandona o lote em vez de retentar: as
+      // linhas continuam intactas e visíveis no IndexedDB local, só a
+      // sincronização delas é que é desistida. Pior seria um travamento
+      // permanente por causa de um único item ruim.
+      console.error(`[sync] push rejeitado (${res.status})`, await res.text().catch(() => ''))
       return true
     }
     if (!res.ok) {

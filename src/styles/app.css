@@ -2431,6 +2431,34 @@ button.ghost {
   }
 }
 
+/* Task 6 (jornadas): Home mostra a jornada ativa em vez das trilhas VT/NT.
+   Reaproveita .track-label/.track-progress/.book-progress/.cta — só o
+   invólucro do card e o convite abaixo das trilhas são novos. */
+.jornada-card {
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.4rem;
+  max-width: 28rem;
+}
+
+.jornada-card .book-progress {
+  width: 100%;
+  height: 6px;
+  margin: 0 0 1rem;
+}
+
+.jornada-card .cta {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+/* "Comece uma jornada" / "Entre para criar jornadas", abaixo das trilhas
+   VT/NT — convite, não obrigação, por isso .ghost e não .cta. */
+.jornada-convite {
+  margin: 1rem 0 0;
+}
+
 /* visível só para leitores de tela */
 .sr-only {
   position: absolute;

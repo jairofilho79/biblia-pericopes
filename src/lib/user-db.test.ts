@@ -565,6 +565,26 @@ describe('progresso: historico e paraReler', () => {
     expect(p?.paraReler).toBe(true)
   })
 
+  it('applyRemoteProgresso PRESERVA historico e paraReler locais ao aplicar o pull', async () => {
+    // O payload remoto ainda não carrega historico/paraReler (migration do D1 é
+    // tarefa futura); o pull não pode esvaziar o que já está aqui.
+    await setProgresso(9302, 'em_andamento')
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', {
+      ...(await getProgresso(9302))!,
+      historico: ['2026-02-01T00:00:00.000Z', '2026-01-10T12:00:00.000Z'],
+      paraReler: true,
+    })
+    d.close()
+
+    await applyRemoteProgresso([{ pericopeOrdem: 9302, status: 'concluido', atualizadoEm: FUTURE }])
+    const p = await getProgresso(9302)
+    // LWW ainda vale para status: o remoto mais novo venceu.
+    expect(p?.status).toBe('concluido')
+    expect(p?.historico).toEqual(['2026-02-01T00:00:00.000Z', '2026-01-10T12:00:00.000Z'])
+    expect(p?.paraReler).toBe(true)
+  })
+
   it('MAX_HISTORICO é 50', () => {
     expect(MAX_HISTORICO).toBe(50)
   })

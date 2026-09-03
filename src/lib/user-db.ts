@@ -1,10 +1,12 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { remoteWinsLocal } from './sync-merge'
-import { MAX_TEXTO } from './sync-limits'
+import { LIMITE_NOME, MAX_TEXTO } from './sync-limits'
 import type {
   Anotacao,
   Destaque,
   DestaqueCor,
+  Jornada,
+  JornadaTipo,
   PosicaoLeitura,
   PosicaoTipo,
   Progresso,
@@ -12,13 +14,14 @@ import type {
 } from './types'
 
 const DB_NAME = 'biblia-pericopes'
-const DB_VERSION = 4
+const DB_VERSION = 5
 
 export type OutboxItem =
   | { seq?: number; kind: 'progresso'; ordem: number; status: ProgressoStatus; atualizadoEm: string }
   | { seq?: number; kind: 'anotacao'; nota: Anotacao; apagadoEm: string | null }
   | { seq?: number; kind: 'destaque'; destaque: Destaque; apagadoEm: string | null }
   | { seq?: number; kind: 'posicao'; posicao: PosicaoLeitura; apagadoEm: string | null }
+  | { seq?: number; kind: 'jornada'; jornada: Jornada; apagadoEm: string | null }
 
 type Schema = {
   progresso: {
@@ -38,6 +41,10 @@ type Schema = {
   posicoes: {
     key: number
     value: PosicaoLeitura
+  }
+  jornadas: {
+    key: string
+    value: Jornada
   }
   outbox: {
     key: number
@@ -70,6 +77,9 @@ function db() {
         }
         if (oldVersion < 4) {
           database.createObjectStore('posicoes', { keyPath: 'pericopeOrdem' })
+        }
+        if (oldVersion < 5) {
+          database.createObjectStore('jornadas', { keyPath: 'id' })
         }
       },
     })
@@ -298,6 +308,11 @@ export async function clearPosicao(ordem: number): Promise<void> {
   await tx.done
 }
 
+/** Todas as posições, sem filtro — acessor cru do store, consumido pelo cursor da jornada (Task 6). */
+export async function listAllPosicoes(): Promise<PosicaoLeitura[]> {
+  return (await db()).getAll('posicoes')
+}
+
 /** A posição mais nova dentro de um conjunto de ordens (a trilha de um testamento). */
 export async function getPosicaoMaisRecente(ordens: number[]): Promise<PosicaoLeitura | undefined> {
   const conjunto = new Set(ordens)
@@ -342,12 +357,16 @@ export async function deleteMeta(key: string): Promise<void> {
  */
 export async function clearAllUserData(): Promise<void> {
   const d = await db()
-  const tx = d.transaction(['progresso', 'anotacoes', 'destaques', 'posicoes', 'outbox'], 'readwrite')
+  const tx = d.transaction(
+    ['progresso', 'anotacoes', 'destaques', 'posicoes', 'jornadas', 'outbox'],
+    'readwrite',
+  )
   await Promise.all([
     tx.objectStore('progresso').clear(),
     tx.objectStore('anotacoes').clear(),
     tx.objectStore('destaques').clear(),
     tx.objectStore('posicoes').clear(),
+    tx.objectStore('jornadas').clear(),
     tx.objectStore('outbox').clear(),
     tx.done,
   ])
@@ -460,6 +479,118 @@ export async function applyRemoteDestaques(
     } else {
       const { apagadoEm: _apagadoEm, ...destaque } = item
       await d.put('destaques', destaque)
+      aplicadas++
+    }
+  }
+  return aplicadas
+}
+
+export async function listJornadas(): Promise<Jornada[]> {
+  const todas = await (await db()).getAll('jornadas')
+  // Mais recente primeiro: a ativa (se houver) tende ao topo, e o histórico
+  // desce em ordem de uso.
+  return todas.sort((a, b) => (a.criadoEm < b.criadoEm ? 1 : a.criadoEm > b.criadoEm ? -1 : 0))
+}
+
+/** A única ativa, ou undefined. Ver criarJornada para a invariante. */
+export async function getJornadaAtiva(): Promise<Jornada | undefined> {
+  return (await listJornadas()).find((j) => j.arquivadaEm === null && j.concluidaEm === null)
+}
+
+/**
+ * Cria uma jornada e arquiva a ativa anterior NA MESMA TRANSAÇÃO.
+ *
+ * A atomicidade é a invariante "no máximo uma ativa": duas abas criando ao
+ * mesmo tempo não podem produzir duas ativas. Se ainda assim o pull trouxer
+ * duas de aparelhos diferentes, quem resolve é a reconciliação da carga
+ * (a mais recente por atualizadoEm vence).
+ */
+export async function criarJornada(input: {
+  nome: string
+  tipo: JornadaTipo
+  escopo: string
+  inicioOrdem: number
+  contaDesde: string | null
+}): Promise<Jornada> {
+  const now = new Date().toISOString()
+  const nova: Jornada = {
+    id: crypto.randomUUID(),
+    // Trunca no ponto de escrita: o Worker rejeita o lote inteiro acima do
+    // teto, e um item ruim travaria o outbox para sempre.
+    nome: input.nome.slice(0, LIMITE_NOME),
+    tipo: input.tipo,
+    escopo: input.escopo,
+    inicioOrdem: input.inicioOrdem,
+    contaDesde: input.contaDesde,
+    criadoEm: now,
+    atualizadoEm: now,
+    arquivadaEm: null,
+    concluidaEm: null,
+  }
+
+  const d = await db()
+  const tx = d.transaction(['jornadas', 'outbox'], 'readwrite')
+  const store = tx.objectStore('jornadas')
+  const outbox = tx.objectStore('outbox')
+
+  for (const j of await store.getAll()) {
+    if (j.arquivadaEm !== null || j.concluidaEm !== null) continue
+    const arquivada: Jornada = { ...j, arquivadaEm: now, atualizadoEm: now }
+    await store.put(arquivada)
+    await outbox.put({ kind: 'jornada', jornada: arquivada, apagadoEm: null } as OutboxItem)
+  }
+
+  await store.put(nova)
+  await outbox.put({ kind: 'jornada', jornada: nova, apagadoEm: null } as OutboxItem)
+  await tx.done
+  return nova
+}
+
+export async function atualizarJornada(
+  id: string,
+  patch: Partial<Pick<Jornada, 'nome' | 'contaDesde' | 'arquivadaEm' | 'concluidaEm'>>,
+): Promise<Jornada | undefined> {
+  const d = await db()
+  const tx = d.transaction(['jornadas', 'outbox'], 'readwrite')
+  const store = tx.objectStore('jornadas')
+  const atual = await store.get(id)
+  if (!atual) {
+    await tx.done
+    return undefined
+  }
+  const nova: Jornada = {
+    ...atual,
+    ...patch,
+    nome: (patch.nome ?? atual.nome).slice(0, LIMITE_NOME),
+    atualizadoEm: new Date().toISOString(),
+  }
+  await store.put(nova)
+  await tx.objectStore('outbox').put({
+    kind: 'jornada',
+    jornada: nova,
+    apagadoEm: null,
+  } as OutboxItem)
+  await tx.done
+  return nova
+}
+
+export async function applyRemoteJornadas(
+  items: (Jornada & { apagadoEm: string | null })[],
+): Promise<number> {
+  const d = await db()
+  let aplicadas = 0
+  for (const item of items) {
+    const local = await d.get('jornadas', item.id)
+    if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
+    if (item.apagadoEm) {
+      // Lápide de linha que já não existe aqui não muda nada, e reentrega de
+      // lápide é rotina no pull — contar isso acordaria as telas por nada.
+      if (!local) continue
+      await d.delete('jornadas', item.id)
+      aplicadas++
+    } else {
+      const { apagadoEm: _apagadoEm, ...jornada } = item
+      await d.put('jornadas', jornada)
       aplicadas++
     }
   }

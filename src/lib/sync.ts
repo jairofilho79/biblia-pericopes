@@ -75,9 +75,13 @@ function toPush(items: OutboxItem[]) {
       anotacoes.set(item.nota.id, { ...item.nota, apagadoEm: item.apagadoEm })
     } else if (item.kind === 'destaque') {
       destaques.set(item.destaque.id, { ...item.destaque, apagadoEm: item.apagadoEm })
-    } else {
+    } else if (item.kind === 'posicao') {
       posicoes.set(item.posicao.pericopeOrdem, { ...item.posicao, apagadoEm: item.apagadoEm })
     }
+    // 'jornada' ainda não tem lote de push aqui — essa fiação é de uma task
+    // futura (a Task 3 só grava local + outbox). Ignorar em vez de um `else`
+    // catch-all evita que um item de jornada caia por engano no lote de
+    // posições, como aconteceria antes desta entidade existir.
   }
   return {
     progresso: [...progresso.values()],

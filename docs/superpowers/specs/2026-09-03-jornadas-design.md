@@ -293,6 +293,14 @@ problema de paginação de pull que o backlog registra em destaques.
   chamada — "Comece uma jornada" se logado, "Entre para criar jornadas" se
   não. O funcionamento offline sem login não regride em nada.
 
+### Onde encaixa o "Vale reler" da fase paralela
+
+Esta fase é dona da estrutura da Home, então decide o lugar: o bloco **"Vale
+reler"** entra **abaixo** do conteúdo principal, nos dois estados da Home
+(card da jornada ativa, ou trilhas VT/NT quando não há jornada), e fica oculto
+quando vazio. Abaixo, e não acima, porque a Home responde primeiro "para onde
+eu vou agora" — releitura é oferta, não instrução.
+
 ### `/jornada`
 
 1. A jornada ativa: progresso, **Reiniciar** (`contaDesde = agora`) e
@@ -348,26 +356,58 @@ depende dela apenas em não introduzir um 5º item — e não introduz.
 
 ## Fronteira com releitura e esquecimento
 
-A feature de desmarcar / zerar em massa / esquecer está sendo desenhada em
-paralelo. Ela pode reescrever `progresso` (por exemplo, trocando a linha única
-por um histórico de eventos de leitura). O contrato que protege as duas:
+Contrato **acordado** com a sessão paralela em 2026-09-03 (spec de lá:
+`docs/superpowers/specs/2026-09-03-releitura-esquecimento-design.md`,
+commit `dc447d8`). Não é mais hipótese — está fechado dos dois lados.
 
 > Jornadas consomem **apenas** o predicado "existe uma conclusão da perícope
-> `o` com timestamp `>= desde`", exposto como função pura em `src/lib/`. Nunca
-> tocam no formato de armazenamento de `progresso`.
+> `o` com timestamp `>= desde`". Nunca tocam no formato de armazenamento de
+> `progresso`.
 
-`contaComoLida` **é** esse seam. Se o modelo mudar, ela é reimplementada sobre
-o novo formato e jornadas não mudam uma linha.
+**Onde o predicado mora.** `contaComoLida(p, desde)` — assinatura exatamente a
+desta spec — sai de `src/lib/jornadas.ts` e passa a viver em
+**`src/lib/conclusao.ts`**, arquivo da outra fase. Jornadas importa de lá. Isso
+é o que permite trocarem o corpo da função sem abrir nenhum arquivo desta fase.
+Ela sai na primeira fatia de lá, sobre o modelo atual e sem migration — então
+esta fase não fica bloqueada em momento nenhum.
 
-Distinção que precisa sobreviver à interface, porque as duas ações vão aparecer
-perto uma da outra:
+`conclusao.ts` também expõe `concluidaDesde(ordem, desde)` e
+`concluidasDesde(ordens, desde)` (async, uma varredura só). Esta fase **não as
+usa**: `progressoDaJornada(rota, Map, desde)` já recebe o `Map` pronto da
+carga única da Home, o que é estritamente melhor. O açúcar existe para outros
+consumidores.
 
-- **Reiniciar jornada** (`contaDesde`) é uma âncora de visão. Reversível, e o
-  ✓ do Índice e o streak continuam intactos.
-- **Esquecer** (feature paralela) é destrutivo. O ✓ some do Índice e o streak é
-  afetado.
+**`progresso` não muda de forma.** Continua uma linha por perícope, com
+`status` e `atualizadoEm` como hoje, e `atualizadoEm` continua sendo a chave do
+LWW. A outra fase acrescenta dois campos **aditivos** — `historico: string[]`
+(conclusões em ISO, mais nova primeiro, teto 50) e `paraReler: boolean`. O
+`Map<number, Progresso>` desta fase segue funcionando sem uma linha de
+mudança; depois da fatia 1 de lá, o corpo de `contaComoLida` troca
+`p.atualizadoEm` por `p.historico[0]`, que é o máximo e mantém o predicado
+O(1).
 
-Nomes e consequências têm que ser visivelmente diferentes.
+**O streak.** `computeStreak` continua puro e intacto; quem muda de fonte é
+`diasComConclusao`, e só na última fatia de lá. Para a Home desta fase não
+sentir isso, `streak.ts` passa a expor `streakAtual(): Promise<Streak>` e a
+Home chama só isso — recíproca exata do seam `contaComoLida`.
+`progressoPorLivro` não é tocado por nenhuma das duas fases.
+
+**Numeração, confirmada com a outra sessão:** esta fase fica com
+`migrations/0009` e `DB_VERSION` 4 → 5; a outra fase fica com `0010` e 5 → 6.
+Os blocos `if (oldVersion < N)` compõem sem conflito.
+
+### A distinção que precisa sobreviver à interface
+
+- **Reiniciar jornada** (`contaDesde`) é uma **âncora de visão**. Não muda nada
+  visível fora da barra da própria jornada.
+- **Zerar / esquecer** (fase paralela) é **destrutivo**: tira o ✓ de centenas
+  de linhas do Índice e derruba as barras por livro.
+
+Correção registrada: uma versão anterior desta spec afirmava que zerar também
+derrubaria o streak. **Está errado** — o usuário decidiu o contrário, e o
+histórico de conclusões nunca é apagado, então streak e recorde sobrevivem a
+"zerar tudo". A diferença entre as duas ações continua gritante sem sacrificar
+o streak.
 
 ## Riscos
 
@@ -377,9 +417,12 @@ Nomes e consequências têm que ser visivelmente diferentes.
    (`indexOf` = -1). Degrada para o escopo inteiro, nunca para vazio.
 4. **Duas ativas vindas de aparelhos diferentes.** Resolvido na reconciliação
    da carga por `atualizadoEm` mais recente.
-5. **Colisão com a feature paralela.** Mitigado pelo seam `contaComoLida`. Se a
-   outra sessão mudar `progresso` **sem** expor o predicado, esta fase quebra —
-   é o único acoplamento real, e está explicitado nos dois lados.
+5. **Colisão com a fase paralela.** Rebaixado em 2026-09-03: o seam
+   `contaComoLida` foi acordado, `progresso` mantém a forma atual (campos novos
+   são aditivos), a numeração de migration e de `DB_VERSION` está dividida, e
+   `streak.ts` ganha o seam recíproco `streakAtual()`. Resta apenas coordenação
+   de merge nos arquivos compartilhados de sync, quando a fatia 3 de lá subir
+   `paginarPull` de 4 para 5 listas — e eles avisam antes de encostar.
 
 ## Critérios de aceite
 
@@ -395,10 +438,10 @@ Nomes e consequências têm que ser visivelmente diferentes.
 6. Barra e cursor nunca se contradizem: com a barra em `0 de N`, `Continuar`
    aponta para `inicioOrdem`.
 7. Iniciar uma segunda jornada arquiva a primeira; o histórico a mostra.
-8. Concluir a última perícope da rota marca `concluidaEm`. A outra metade —
-   desmarcar depois e ver a jornada reabrir — só é verificável quando a feature
-   paralela existir; até lá, cobre-se a reconciliação por teste unitário sobre
-   `progressoDaJornada`.
+8. Concluir a última perícope da rota marca `concluidaEm`; desmarcá-la depois
+   reabre a jornada. Confirmado com a fase paralela: o predicado exige
+   `status === 'concluido'` além da data, então desmarcar faz a jornada
+   regredir. Testável por unidade sobre `progressoDaJornada` desde já.
 9. A jornada sincroniza entre dois aparelhos logados na mesma conta.
 10. Deslogado, a Home é exatamente a de hoje e nada quebra offline.
 11. Teste de partição: os 8 blocos cobrem os 66 livros do `index.json`, sem

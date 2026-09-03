@@ -1740,7 +1740,8 @@ export const BIBLE_BOOKS: BibleBook[] = [
   }
 ]
 
-function norm(s: string) {
+/** Minúsculas sem diacríticos — o casamento de NOME de livro ignora acento. */
+export function normalizarNome(s: string) {
   return s
     .toLowerCase()
     .normalize('NFD')
@@ -1748,10 +1749,10 @@ function norm(s: string) {
 }
 
 export function filterBooks(q: string): BibleBook[] {
-  const needle = norm(q.trim())
+  const needle = normalizarNome(q.trim())
   if (!needle) return BIBLE_BOOKS
   return BIBLE_BOOKS.filter(
-    (b) => norm(b.name).includes(needle) || norm(b.abbrev).includes(needle),
+    (b) => normalizarNome(b.name).startsWith(needle) || normalizarNome(b.abbrev).startsWith(needle),
   )
 }
 

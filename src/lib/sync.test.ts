@@ -1,7 +1,9 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  atualizarJornada,
   clearAllUserData,
+  criarJornada,
   deleteMeta,
   enqueuePosicao,
   getMeta,
@@ -9,6 +11,7 @@ import {
   getProgresso,
   listAnotacoes,
   listDestaques,
+  listJornadas,
   listOutbox,
   saveAnotacao,
   setDestaque,
@@ -541,6 +544,75 @@ describe('syncNow — destaques', () => {
     await syncNow()
 
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+})
+
+describe('syncNow — jornadas', () => {
+  it('push envia jornadas deduplicadas por id e o pull aplica as remotas', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // mesma jornada criada e depois renomeada: só o último nome sobe
+    const jornada = await criarJornada({
+      nome: 'Salmos',
+      tipo: 'livro',
+      escopo: 'Salmos',
+      inicioOrdem: 2,
+      contaDesde: null,
+    })
+    await atualizarJornada(jornada.id, { nome: 'Salmos (releitura)' })
+
+    const posts: { jornadas: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [],
+        posicoes: [],
+        jornadas: [
+          {
+            id: 'remota-1',
+            nome: 'Pentateuco',
+            tipo: 'bloco',
+            escopo: 'pentateuco',
+            inicioOrdem: 1,
+            contaDesde: null,
+            criadoEm: FUTURE,
+            atualizadoEm: FUTURE,
+            arquivadaEm: null,
+            concluidaEm: null,
+            apagadoEm: null,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts).toHaveLength(1)
+    expect(posts[0].jornadas).toEqual([
+      {
+        id: jornada.id,
+        nome: 'Salmos (releitura)',
+        tipo: 'livro',
+        escopo: 'Salmos',
+        inicioOrdem: 2,
+        contaDesde: null,
+        criadoEm: expect.any(String),
+        atualizadoEm: expect.any(String),
+        arquivadaEm: null,
+        concluidaEm: null,
+        apagadoEm: null,
+      },
+    ])
+    expect((await listJornadas()).map((j) => j.id)).toContain('remota-1')
+    expect(await listOutbox()).toEqual([])
   })
 })
 

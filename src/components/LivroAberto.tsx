@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { maxChapter, maxVerse, type BibleBook } from '../lib/bible-books'
 import type { FiltroLeitura, LivroProgresso } from '../lib/content'
-import ListaPericopes, { type ItemPericope } from './ListaPericopes'
+import type { ItemPericope } from '../lib/item-pericope'
+import ListaPericopes from './ListaPericopes'
 
 export default function LivroAberto({
   livro,

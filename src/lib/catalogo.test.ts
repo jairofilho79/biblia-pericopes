@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest'
-import { agruparLivros, rotuloContagem } from './CatalogoLivros'
-import { BIBLE_BOOKS } from '../lib/bible-books'
+import { agruparLivros, rotuloContagem } from './catalogo'
+import { BIBLE_BOOKS } from './bible-books'
 
 describe('agruparLivros', () => {
   it('separa os dois testamentos e preserva a ordem canônica', () => {

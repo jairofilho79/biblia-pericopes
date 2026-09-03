@@ -4,6 +4,7 @@ import { notificarSync } from './sync-event'
 import {
   applyRemoteDestaques,
   applyRemoteAnotacoes,
+  applyRemotePosicoes,
   applyRemoteProgresso,
   clearAllUserData,
   clearOutbox,
@@ -49,11 +50,20 @@ type PushDestaque = {
   atualizadoEm: string
   apagadoEm: string | null
 }
+type PushPosicao = {
+  pericopeOrdem: number
+  tipo: string
+  ref: string
+  tempo: number | null
+  atualizadoEm: string
+  apagadoEm: string | null
+}
 
 function toPush(items: OutboxItem[]) {
   const progresso = new Map<number, PushProgresso>()
   const anotacoes = new Map<string, PushAnotacao>()
   const destaques = new Map<string, PushDestaque>()
+  const posicoes = new Map<number, PushPosicao>()
   for (const item of items) {
     if (item.kind === 'progresso') {
       progresso.set(item.ordem, {
@@ -63,14 +73,17 @@ function toPush(items: OutboxItem[]) {
       })
     } else if (item.kind === 'anotacao') {
       anotacoes.set(item.nota.id, { ...item.nota, apagadoEm: item.apagadoEm })
-    } else {
+    } else if (item.kind === 'destaque') {
       destaques.set(item.destaque.id, { ...item.destaque, apagadoEm: item.apagadoEm })
+    } else {
+      posicoes.set(item.posicao.pericopeOrdem, { ...item.posicao, apagadoEm: item.apagadoEm })
     }
   }
   return {
     progresso: [...progresso.values()],
     anotacoes: [...anotacoes.values()],
     destaques: [...destaques.values()],
+    posicoes: [...posicoes.values()],
   }
 }
 
@@ -94,11 +107,17 @@ function derrubarSessao() {
  * Reenviar um lote já aceito é inofensivo: o upsert no servidor é idempotente.
  */
 async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
-  const { progresso, anotacoes, destaques } = toPush(outbox)
+  const { progresso, anotacoes, destaques, posicoes } = toPush(outbox)
   const lotesProgresso = chunk(progresso, MAX_ITENS_POR_LOTE)
   const lotesAnotacoes = chunk(anotacoes, MAX_ITENS_POR_LOTE)
   const lotesDestaques = chunk(destaques, MAX_ITENS_POR_LOTE)
-  const total = Math.max(lotesProgresso.length, lotesAnotacoes.length, lotesDestaques.length)
+  const lotesPosicoes = chunk(posicoes, MAX_ITENS_POR_LOTE)
+  const total = Math.max(
+    lotesProgresso.length,
+    lotesAnotacoes.length,
+    lotesDestaques.length,
+    lotesPosicoes.length,
+  )
 
   for (let i = 0; i < total; i++) {
     const res = await fetch('/api/sync', {
@@ -109,6 +128,7 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
         progresso: lotesProgresso[i] ?? [],
         anotacoes: lotesAnotacoes[i] ?? [],
         destaques: lotesDestaques[i] ?? [],
+        posicoes: lotesPosicoes[i] ?? [],
       }),
     })
     if (res.status === 401) {
@@ -204,6 +224,7 @@ export async function syncNow(): Promise<void> {
         // opcional: uma resposta sem a lista (servidor mais velho, ou um mock de
         // teste) vira lista vazia em vez de estourar e abortar o pull inteiro.
         destaques?: Parameters<typeof applyRemoteDestaques>[0]
+        posicoes?: Parameters<typeof applyRemotePosicoes>[0]
         agora: string
         // opcional pelo mesmo motivo: um servidor antigo nunca manda este campo.
         maisDados?: boolean
@@ -211,7 +232,8 @@ export async function syncNow(): Promise<void> {
       totalAplicadas +=
         (await applyRemoteProgresso(data.progresso)) +
         (await applyRemoteAnotacoes(data.anotacoes)) +
-        (await applyRemoteDestaques(data.destaques ?? []))
+        (await applyRemoteDestaques(data.destaques ?? [])) +
+        (await applyRemotePosicoes(data.posicoes ?? []))
       // Salva o cursor a cada página, não só no fim: um pull interrompido no
       // meio (erro de rede na página seguinte, aba fechada) retoma da última
       // página aplicada em vez de repetir tudo desde o início.

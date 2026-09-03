@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   clearAllUserData,
   deleteMeta,
+  enqueuePosicao,
   getMeta,
+  getPosicao,
   getProgresso,
   listAnotacoes,
   listDestaques,
@@ -11,6 +13,7 @@ import {
   saveAnotacao,
   setDestaque,
   setMeta,
+  setPosicaoLocal,
   setProgresso,
 } from './user-db'
 import { MAX_ITENS_POR_LOTE } from './sync-limits'
@@ -472,6 +475,58 @@ describe('syncNow — destaques', () => {
       },
     ])
     expect((await listDestaques(70002)).map((d) => d.cor)).toEqual(['azul'])
+    expect(await listOutbox()).toEqual([])
+  })
+
+  it('push envia posições deduplicadas por perícope e o pull aplica as remotas', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // duas escritas locais e dois enqueues: só o último estado sobe
+    await setPosicaoLocal(75001, 'secao', 'texto')
+    await enqueuePosicao(75001)
+    await setPosicaoLocal(75001, 'versiculo', '2:9')
+    await enqueuePosicao(75001)
+
+    const posts: { posicoes: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [],
+        posicoes: [
+          {
+            pericopeOrdem: 75002,
+            tipo: 'narracao',
+            ref: 'resenha-1',
+            tempo: 88.5,
+            atualizadoEm: FUTURE,
+            apagadoEm: null,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts).toHaveLength(1)
+    expect(posts[0].posicoes).toEqual([
+      {
+        pericopeOrdem: 75001,
+        tipo: 'versiculo',
+        ref: '2:9',
+        tempo: null,
+        atualizadoEm: expect.any(String),
+        apagadoEm: null,
+      },
+    ])
+    expect((await getPosicao(75002))?.tempo).toBe(88.5)
     expect(await listOutbox()).toEqual([])
   })
 

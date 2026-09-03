@@ -1,7 +1,11 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { tokens, type SecaoAlvos } from '../lib/alinhar-narracao'
-import NarracaoPlayer, { type NarracaoPlayerHandle } from '../components/NarracaoPlayer'
+import NarracaoPlayer, {
+  IconePausa,
+  IconePlay,
+  type NarracaoPlayerHandle,
+} from '../components/NarracaoPlayer'
 import { secaoDoChip } from '../lib/narracao-controles'
 import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
@@ -19,19 +23,28 @@ import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
 import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
-import { clearReadingPosition, getReadingPosition, setReadingPosition } from '../lib/reading-position'
+import {
+  blocoDeRolagem,
+  fracaoLida,
+  refNoContexto,
+  seletorDaPosicao,
+} from '../lib/posicao-restauracao'
 import { useSwipeNav } from '../lib/use-swipe-nav'
 import { useKeyboardNav } from '../lib/use-keyboard-nav'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
+  clearPosicao,
   deleteAnotacao,
   destaqueId,
+  enqueuePosicao,
+  getPosicao,
   getProgresso,
   listAnotacoes,
   listDestaques,
   removeDestaque,
   saveAnotacao,
   setDestaque,
+  setPosicaoLocal,
   setProgresso,
 } from '../lib/user-db'
 import { getVerseFocus, setVerseFocus } from '../lib/verse-highlight'
@@ -139,6 +152,22 @@ export default function Leitura() {
   const playerRef = useRef<NarracaoPlayerHandle>(null)
   const [falando, setFalando] = useState<string | null>(null)
   const [contextoAberto, setContextoAbertoState] = useState(() => getContextoAberto())
+  // Estado do controle compacto de narração no header: `narracaoUsada` mantém
+  // o botão visível depois do primeiro play (pausou? o botão vira "continuar").
+  const [tocandoNarracao, setTocandoNarracao] = useState(false)
+  const [narracaoUsada, setNarracaoUsada] = useState(false)
+  // Checkpoint de narração restaurado: o player posiciona o áudio aqui e o
+  // play do usuário retoma do ponto salvo.
+  const [tempoInicialNarracao, setTempoInicialNarracao] = useState<number | null>(null)
+  // Espelhos para handlers que não podem renascer a cada render.
+  const tocandoRef = useRef(false)
+  // A rolagem automática da restauração dispara o observer de seções — a
+  // janela de supressão impede que esse eco vire um checkpoint mais grosso
+  // por cima do fino que acabou de ser restaurado.
+  const supressaoSecaoAte = useRef(0)
+  // Barra de progresso do header: pintada direto no DOM (CSS var), sem
+  // setState — um render de página inteira por evento de scroll seria caro.
+  const barraRef = useRef<HTMLDivElement>(null)
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
   // handlers de seleção precisam dos blocos antes dos returns antecipados.
@@ -213,6 +242,9 @@ export default function Leitura() {
       // valer para outra perícope, então a marca de "já rolei" não atravessa
       // a troca de perícope.
       vAplicado.current = null
+      // Checkpoint e controle de narração também são por perícope.
+      setTempoInicialNarracao(null)
+      setNarracaoUsada(false)
       try {
         const all = await loadIndex()
         const peri = await getPericope(ordem)
@@ -267,11 +299,47 @@ export default function Leitura() {
     if (fromQuery) setVerseFocus(ordem, fromQuery)
   }, [ordem, verseParam])
 
-  // Prioridade de rolagem ao abrir: ?v= na URL > posição salva > topo.
+  // Prioridade de rolagem ao abrir: ?v= na URL > checkpoint salvo > topo.
+  // O checkpoint ancora num ELEMENTO (seção/versículo/alvo de narração), não
+  // em pixels: sobrevive a troca de fonte, de layout e de aparelho — é o que
+  // permite sincronizá-lo.
   useEffect(() => {
     if (!p || p.ordem !== ordem) return
     if (verseParam && /^\d+:\d+$/.test(verseParam)) return
-    window.scrollTo(0, getReadingPosition(ordem) ?? 0)
+    let vivo = true
+    void (async () => {
+      const pos = await getPosicao(ordem)
+      if (!vivo) return
+      if (!pos) {
+        window.scrollTo(0, 0)
+        return
+      }
+      if (pos.tipo === 'narracao') setTempoInicialNarracao(pos.tempo)
+      // Direto nos setters (idempotentes e estáveis) em vez de abrirContexto():
+      // a função nasce de novo a cada render e entraria nas dependências.
+      if (refNoContexto(pos.ref)) {
+        setContextoAbertoState(true)
+        setContextoAberto(true)
+      }
+      // A rolagem vai disparar o observer de seções: sem a supressão, o eco
+      // gravaria um checkpoint de seção por cima do fino recém-restaurado.
+      supressaoSecaoAte.current = Date.now() + 2500
+      // Um quadro de espera: se o Contexto acabou de abrir, o alvo ainda não
+      // tem caixa de layout neste commit.
+      requestAnimationFrame(() => {
+        if (!vivo) return
+        const el = document.querySelector<HTMLElement>(seletorDaPosicao(pos))
+        if (!el) return
+        el.scrollIntoView({ block: blocoDeRolagem(pos), behavior: 'auto' })
+        // Leve destaque de "você parou aqui": a animação CSS morre sozinha,
+        // a classe sai depois para o próximo retorno poder pulsar de novo.
+        el.classList.add('retomada-flash')
+        window.setTimeout(() => el.classList.remove('retomada-flash'), 2100)
+      })
+    })()
+    return () => {
+      vivo = false
+    }
   }, [ordem, p, verseParam])
 
   useEffect(() => {
@@ -289,32 +357,106 @@ export default function Leitura() {
     pRef.current = p
   }, [p])
 
+  // Barra de progresso do header: pinta a fração rolada direto na CSS var do
+  // filete, um quadro por rajada de scroll (rAF), sem passar pelo React.
+  // Enquanto a narração toca, quem manda na barra é o áudio (onProgresso).
   useEffect(() => {
-    let last = 0
-    let timer: number | undefined
-    const save = () => {
-      if (doneRef.current) return
-      // Durante o skeleton (`!p`) a rolagem pode vir clampada ao conteúdo
-      // ainda vazio: gravar aqui sobrescreveria a posição real salva antes.
-      if (!pRef.current) return
-      setReadingPosition(ordem, window.scrollY)
+    let quadro = 0
+    const pintar = () => {
+      quadro = 0
+      if (tocandoRef.current) return
+      const el = barraRef.current
+      if (!el) return
+      const fracao = fracaoLida(
+        window.scrollY,
+        window.innerHeight,
+        document.documentElement.scrollHeight,
+      )
+      el.style.setProperty('--pct-lida', `${fracao * 100}%`)
+      el.setAttribute('aria-valuenow', String(Math.round(fracao * 100)))
     }
     const onScroll = () => {
-      const now = Date.now()
-      if (now - last > 500) {
-        last = now
-        save()
-      } else {
-        window.clearTimeout(timer)
-        timer = window.setTimeout(save, 500)
-      }
+      if (!quadro) quadro = requestAnimationFrame(pintar)
     }
+    pintar()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
-      window.clearTimeout(timer)
+      cancelAnimationFrame(quadro)
       window.removeEventListener('scroll', onScroll)
     }
+    // `p` nas dependências: a fração inicial só está certa depois que o
+    // conteúdo real deu altura à página (no skeleton ela seria 1).
+  }, [ordem, p])
+
+  const pintarBarra = useCallback((fracao: number) => {
+    const el = barraRef.current
+    if (!el) return
+    el.style.setProperty('--pct-lida', `${fracao * 100}%`)
+    el.setAttribute('aria-valuenow', String(Math.round(fracao * 100)))
+  }, [])
+
+  // ——— Checkpoint de leitura: eventos discretos, o último vence ———
+
+  // 1/3 — a seção em leitura mudou (observer dos chips). Não grava com a
+  // narração tocando (o alvo narrado é mais fino e já grava) nem no eco da
+  // rolagem de restauração.
+  const salvarSecaoAtiva = useCallback(
+    (id: string) => {
+      if (doneRef.current || !pRef.current) return
+      if (tocandoRef.current) return
+      if (Date.now() < supressaoSecaoAte.current) return
+      void setPosicaoLocal(ordem, 'secao', id)
+    },
+    [ordem],
+  )
+
+  // 2/3 — o item narrado mudou: alvo + relógio do áudio, para o play seguinte
+  // retomar do ponto. (O 3/3, versículo tocado, mora em selectVerse.)
+  useEffect(() => {
+    if (!falando || doneRef.current) return
+    void setPosicaoLocal(ordem, 'narracao', falando, playerRef.current?.tempoAtual() ?? null)
+  }, [falando, ordem])
+
+  // O outbox só recebe o checkpoint ao SAIR (aba escondida, pagehide, troca
+  // de rota/perícope) — uma linha por perícope, upsert idempotente. É a
+  // exceção deliberada ao "linha + outbox juntos" das outras entidades: os
+  // eventos acima são frequentes demais para encher o outbox.
+  useEffect(() => {
+    const subir = () => void enqueuePosicao(ordem)
+    const aoEsconder = () => {
+      if (document.visibilityState === 'hidden') subir()
+    }
+    document.addEventListener('visibilitychange', aoEsconder)
+    window.addEventListener('pagehide', subir)
+    return () => {
+      document.removeEventListener('visibilitychange', aoEsconder)
+      window.removeEventListener('pagehide', subir)
+      subir()
+    }
   }, [ordem])
+
+  const onTocandoNarracao = useCallback(
+    (tocando: boolean) => {
+      tocandoRef.current = tocando
+      setTocandoNarracao(tocando)
+      if (tocando) {
+        setNarracaoUsada(true)
+      } else {
+        // pausou: a barra volta a mostrar o scroll sem esperar o próximo gesto
+        pintarBarra(
+          fracaoLida(window.scrollY, window.innerHeight, document.documentElement.scrollHeight),
+        )
+      }
+    },
+    [pintarBarra],
+  )
+
+  const onProgressoNarracao = useCallback(
+    (fracao: number) => {
+      pintarBarra(fracao)
+    },
+    [pintarBarra],
+  )
 
   const irAnterior = useCallback(() => {
     if (prev) navigate(`/leitura/${prev.ordem}`)
@@ -477,7 +619,9 @@ export default function Leitura() {
 
   async function markDone() {
     await setProgresso(ordem, 'concluido')
-    clearReadingPosition(ordem)
+    // Concluiu: o checkpoint morre (com lápide — sem ela o pull ressuscitaria)
+    // e a próxima abertura começa do topo, como sempre foi.
+    await clearPosicao(ordem)
     doneRef.current = true
     setStatus('concluido')
   }
@@ -489,6 +633,9 @@ export default function Leitura() {
     const verses = prox ? versesInRange(blocks, prox.start, prox.end) : []
     // "versículo em leitura" persistido continua sendo o PRIMEIRO da seleção.
     setVerseFocus(ordem, verses[0]?.id ?? null)
+    // 3/3 do checkpoint: tocar num versículo é o gesto mais explícito de
+    // "estou aqui" — só a seleção limpa não grava (fechar a barra não é mover-se).
+    if (!doneRef.current && verses[0]) void setPosicaoLocal(ordem, 'versiculo', verses[0].id)
   }
 
   function flashAviso(msg: string) {
@@ -684,6 +831,30 @@ export default function Leitura() {
           const secao = secaoDoChip(id)
           if (secao) playerRef.current?.irParaSecao(secao)
         }}
+        onSecaoAtiva={salvarSecaoAtiva}
+        acao={
+          narracaoUsada ? (
+            <button
+              type="button"
+              className="narracao-mini"
+              aria-label={tocandoNarracao ? 'Pausar narração' : 'Continuar narração'}
+              title={tocandoNarracao ? 'Pausar narração' : 'Continuar narração'}
+              onClick={() => playerRef.current?.alternar()}
+            >
+              {tocandoNarracao ? <IconePausa /> : <IconePlay />}
+            </button>
+          ) : undefined
+        }
+        progresso={
+          <div
+            ref={barraRef}
+            className="leitura-progresso"
+            role="progressbar"
+            aria-label={tocandoNarracao ? 'Progresso da narração' : 'Progresso da perícope'}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
+        }
       />
 
       <NarracaoPlayer
@@ -692,6 +863,9 @@ export default function Leitura() {
         secoes={secoesNarracao}
         onAlvo={setFalando}
         onSeek={onSeekNarracao}
+        tempoInicial={tempoInicialNarracao}
+        onTocando={onTocandoNarracao}
+        onProgresso={onProgressoNarracao}
       />
 
       <section className="block block-plain" id="contexto" tabIndex={-1}>

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 
 /** Ordem canônica das seções — é ela que decide qual chip fica ativo quando
  * mais de uma seção cruza a faixa de leitura ao mesmo tempo. */
@@ -21,10 +21,20 @@ type Props = {
   /** Avisa a página ANTES de rolar — é assim que o chip Contexto expande a
    * seção colapsada em vez de parar num título mudo. */
   onIr?: (id: string) => void
+  /** A seção em leitura MUDOU (nunca dispara pela inicial): é o evento de
+   * checkpoint da posição de leitura. DEVE ser referência estável por ordem. */
+  onSecaoAtiva?: (id: string) => void
+  /** Controle compacto ao lado dos chips (pausa da narração no header). */
+  acao?: ReactNode
+  /** Filete rente à borda de baixo da barra (progresso da perícope). */
+  progresso?: ReactNode
 }
 
-export default function SectionChips({ ordem, onIr }: Props) {
+export default function SectionChips({ ordem, onIr, onSecaoAtiva, acao, progresso }: Props) {
   const [ativo, setAtivo] = useState<string>(SECTIONS[0].id)
+  // Fora do estado: o observer dispara em rajada durante uma rolagem e o
+  // callback só interessa quando a seção de fato troca.
+  const ativaAnterior = useRef<string>(SECTIONS[0].id)
 
   // O header é sticky e some ao rolar: os chips precisam saber a altura dele
   // para encostar embaixo sem sobrepor. O CSS zera esse offset quando o header
@@ -56,6 +66,9 @@ export default function SectionChips({ ordem, onIr }: Props) {
   // Chip ativo: um único observer sobre as quatro seções.
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return
+    // Perícope nova recomeça da primeira seção — sem isto, abrir a próxima
+    // perícope já em "contexto" nunca dispararia o primeiro checkpoint dela.
+    ativaAnterior.current = SECTIONS[0].id
     const alvos = SECTIONS.map((s) => document.getElementById(s.id)).filter(
       (el): el is HTMLElement => el !== null,
     )
@@ -68,7 +81,13 @@ export default function SectionChips({ ordem, onIr }: Props) {
           else visiveis.delete(e.target.id)
         }
         const primeira = SECTIONS.find((s) => visiveis.has(s.id))
-        if (primeira) setAtivo(primeira.id)
+        if (primeira) {
+          setAtivo(primeira.id)
+          if (primeira.id !== ativaAnterior.current) {
+            ativaAnterior.current = primeira.id
+            onSecaoAtiva?.(primeira.id)
+          }
+        }
       },
       // Faixa fina no primeiro terço da viewport: o que está ali é o que o
       // leitor está lendo agora.
@@ -76,7 +95,7 @@ export default function SectionChips({ ordem, onIr }: Props) {
     )
     for (const el of alvos) obs.observe(el)
     return () => obs.disconnect()
-  }, [ordem])
+  }, [ordem, onSecaoAtiva])
 
   function irPara(id: string) {
     onIr?.(id)
@@ -95,26 +114,33 @@ export default function SectionChips({ ordem, onIr }: Props) {
 
   return (
     <nav className="section-chips" aria-label="Seções da perícope">
-      {/* Controle segmentado: os quatro chips dividem a largura em partes
-          iguais, então nunca há rolagem lateral nem chip cortado — e não há
-          mais faixa para trazer o chip ativo "para dentro". */}
-      <div className="section-chips-row">
-        {SECTIONS.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            // `section-chip-texto`: o único rótulo de duas palavras; no
-            // celular o CSS deixa só ele quebrar em duas linhas.
-            className={`section-chip${s.id === 'texto' ? ' section-chip-texto' : ''}${
-              ativo === s.id ? ' active' : ''
-            }`}
-            aria-current={ativo === s.id ? 'true' : undefined}
-            onClick={() => irPara(s.id)}
-          >
-            {s.label}
-          </button>
-        ))}
+      {/* A linha é flex: os chips continuam um controle segmentado de largura
+          cheia, e a `acao` (quando existe) entra como um botão compacto à
+          direita sem quebrar o grid de quatro colunas. */}
+      <div className="section-chips-linha">
+        {/* Controle segmentado: os quatro chips dividem a largura em partes
+            iguais, então nunca há rolagem lateral nem chip cortado — e não há
+            mais faixa para trazer o chip ativo "para dentro". */}
+        <div className="section-chips-row">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              // `section-chip-texto`: o único rótulo de duas palavras; no
+              // celular o CSS deixa só ele quebrar em duas linhas.
+              className={`section-chip${s.id === 'texto' ? ' section-chip-texto' : ''}${
+                ativo === s.id ? ' active' : ''
+              }`}
+              aria-current={ativo === s.id ? 'true' : undefined}
+              onClick={() => irPara(s.id)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        {acao}
       </div>
+      {progresso}
     </nav>
   )
 }

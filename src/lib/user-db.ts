@@ -1,15 +1,24 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { remoteWinsLocal } from './sync-merge'
 import { MAX_TEXTO } from './sync-limits'
-import type { Anotacao, Destaque, DestaqueCor, Progresso, ProgressoStatus } from './types'
+import type {
+  Anotacao,
+  Destaque,
+  DestaqueCor,
+  PosicaoLeitura,
+  PosicaoTipo,
+  Progresso,
+  ProgressoStatus,
+} from './types'
 
 const DB_NAME = 'biblia-pericopes'
-const DB_VERSION = 3
+const DB_VERSION = 4
 
 export type OutboxItem =
   | { seq?: number; kind: 'progresso'; ordem: number; status: ProgressoStatus; atualizadoEm: string }
   | { seq?: number; kind: 'anotacao'; nota: Anotacao; apagadoEm: string | null }
   | { seq?: number; kind: 'destaque'; destaque: Destaque; apagadoEm: string | null }
+  | { seq?: number; kind: 'posicao'; posicao: PosicaoLeitura; apagadoEm: string | null }
 
 type Schema = {
   progresso: {
@@ -25,6 +34,10 @@ type Schema = {
     key: string
     value: Destaque
     indexes: { 'by-pericope': number }
+  }
+  posicoes: {
+    key: number
+    value: PosicaoLeitura
   }
   outbox: {
     key: number
@@ -54,6 +67,9 @@ function db() {
         if (oldVersion < 3) {
           const hl = database.createObjectStore('destaques', { keyPath: 'id' })
           hl.createIndex('by-pericope', 'pericopeOrdem')
+        }
+        if (oldVersion < 4) {
+          database.createObjectStore('posicoes', { keyPath: 'pericopeOrdem' })
         }
       },
     })
@@ -212,6 +228,88 @@ export async function removeDestaque(id: string): Promise<void> {
   await tx.done
 }
 
+/**
+ * Vocabulário completo do `ref` de uma posição de leitura — os mesmos ids que
+ * a Leitura põe no DOM (id de seção, data-verse-id, data-fala-id). O Worker
+ * mantém uma cópia (POSICAO_REF em worker/sync-logic.ts, mesmo motivo dos
+ * limites em sync-limits.ts): um ref fora disso no outbox faria o servidor
+ * rejeitar o lote inteiro com 400, travando o sync — daí o guard na escrita,
+ * como o VERSE_ID_RE de setDestaque.
+ */
+const POSICAO_REF_RE =
+  /^(?:\d+:\d+|(?:contexto|resenha|reflexao)-\d+|contexto|texto|resenha|reflexao|titulo|referencia|cabecalho-(?:contexto|texto|resenha|reflexoes)|cap-\d+)$/
+
+export async function getPosicao(ordem: number): Promise<PosicaoLeitura | undefined> {
+  return (await db()).get('posicoes', ordem)
+}
+
+/**
+ * Grava o checkpoint local SEM enfileirar no outbox — exceção deliberada ao
+ * padrão "linha + outbox na mesma transação" das outras entidades. Os eventos
+ * de leitura (seção ativa, versículo tocado, item narrado) acontecem o tempo
+ * todo; quem sobe para o sync é só o estado final, via enqueuePosicao() ao
+ * sair da página. Perder um enqueue custa um checkpoint; encher o outbox
+ * custaria um lote por scroll.
+ */
+export async function setPosicaoLocal(
+  pericopeOrdem: number,
+  tipo: PosicaoTipo,
+  ref: string,
+  tempo: number | null = null,
+): Promise<PosicaoLeitura | null> {
+  if (!POSICAO_REF_RE.test(ref)) return null
+  const posicao: PosicaoLeitura = {
+    pericopeOrdem,
+    tipo,
+    ref,
+    tempo: tipo === 'narracao' && tempo !== null && Number.isFinite(tempo) ? Math.max(0, tempo) : null,
+    atualizadoEm: new Date().toISOString(),
+  }
+  await (await db()).put('posicoes', posicao)
+  return posicao
+}
+
+/** Sobe o checkpoint atual para o outbox (chamado ao sair da leitura). */
+export async function enqueuePosicao(ordem: number): Promise<void> {
+  const d = await db()
+  const tx = d.transaction(['posicoes', 'outbox'], 'readwrite')
+  const posicao = await tx.objectStore('posicoes').get(ordem)
+  if (posicao) {
+    await tx.objectStore('outbox').put({ kind: 'posicao', posicao, apagadoEm: null } as OutboxItem)
+  }
+  await tx.done
+}
+
+/** Concluir a perícope apaga o checkpoint — com lápide, senão o pull o ressuscita. */
+export async function clearPosicao(ordem: number): Promise<void> {
+  const d = await db()
+  const tx = d.transaction(['posicoes', 'outbox'], 'readwrite')
+  const store = tx.objectStore('posicoes')
+  const existing = await store.get(ordem)
+  await store.delete(ordem)
+  if (existing) {
+    const now = new Date().toISOString()
+    await tx.objectStore('outbox').put({
+      kind: 'posicao',
+      posicao: { ...existing, atualizadoEm: now },
+      apagadoEm: now,
+    } as OutboxItem)
+  }
+  await tx.done
+}
+
+/** A posição mais nova dentro de um conjunto de ordens (a trilha de um testamento). */
+export async function getPosicaoMaisRecente(ordens: number[]): Promise<PosicaoLeitura | undefined> {
+  const conjunto = new Set(ordens)
+  const todas = await (await db()).getAll('posicoes')
+  let melhor: PosicaoLeitura | undefined
+  for (const p of todas) {
+    if (!conjunto.has(p.pericopeOrdem)) continue
+    if (!melhor || p.atualizadoEm > melhor.atualizadoEm) melhor = p
+  }
+  return melhor
+}
+
 export async function listOutbox(): Promise<OutboxItem[]> {
   return (await db()).getAll('outbox')
 }
@@ -244,11 +342,12 @@ export async function deleteMeta(key: string): Promise<void> {
  */
 export async function clearAllUserData(): Promise<void> {
   const d = await db()
-  const tx = d.transaction(['progresso', 'anotacoes', 'destaques', 'outbox'], 'readwrite')
+  const tx = d.transaction(['progresso', 'anotacoes', 'destaques', 'posicoes', 'outbox'], 'readwrite')
   await Promise.all([
     tx.objectStore('progresso').clear(),
     tx.objectStore('anotacoes').clear(),
     tx.objectStore('destaques').clear(),
+    tx.objectStore('posicoes').clear(),
     tx.objectStore('outbox').clear(),
     tx.done,
   ])
@@ -304,6 +403,34 @@ export async function applyRemoteAnotacoes(
       // Linha vinda de servidor sem a coluna (ou de antes da migration) entra
       // como null: o tipo local exige o campo presente.
       await d.put('anotacoes', { ...nota, verseRef: nota.verseRef ?? null })
+      aplicadas++
+    }
+  }
+  return aplicadas
+}
+
+export async function applyRemotePosicoes(
+  items: {
+    pericopeOrdem: number
+    tipo: PosicaoTipo
+    ref: string
+    tempo: number | null
+    atualizadoEm: string
+    apagadoEm: string | null
+  }[],
+): Promise<number> {
+  const d = await db()
+  let aplicadas = 0
+  for (const item of items) {
+    const local = await d.get('posicoes', item.pericopeOrdem)
+    if (!remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) continue
+    if (item.apagadoEm) {
+      if (!local) continue
+      await d.delete('posicoes', item.pericopeOrdem)
+      aplicadas++
+    } else {
+      const { apagadoEm: _apagadoEm, ...posicao } = item
+      await d.put('posicoes', posicao)
       aplicadas++
     }
   }

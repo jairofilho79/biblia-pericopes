@@ -21,6 +21,10 @@ export type NarracaoPlayerHandle = {
    * Sem áudio ou sem manifesto, não faz nada.
    */
   irParaSecao: (secao: SecaoNarrada) => void
+  /** Play/pause — o mesmo botão do player, para o controle compacto do header. */
+  alternar: () => void
+  /** currentTime do áudio agora, em segundos (0 sem áudio). */
+  tempoAtual: () => number
 }
 
 type Props = {
@@ -31,6 +35,16 @@ type Props = {
   onAlvo: (id: string | null) => void
   /** Avisa que o usuário reposicionou o áudio. DEVE ser referência estável. */
   onSeek?: () => void
+  /**
+   * Retomada de checkpoint: posiciona o áudio aqui UMA vez por perícope,
+   * assim que a duração é conhecida — sem tocar sozinho (autoplay é bloqueado
+   * pelos navegadores; o play continua sendo gesto do usuário).
+   */
+  tempoInicial?: number | null
+  /** Play/pause mudou. DEVE ser referência estável. */
+  onTocando?: (tocando: boolean) => void
+  /** Fração 0..1 já ouvida, no ritmo do timeupdate (~4×/s). DEVE ser estável. */
+  onProgresso?: (fracao: number) => void
   ref?: Ref<NarracaoPlayerHandle>
 }
 
@@ -58,7 +72,16 @@ export const ADIANTO_S = 0.15
  * O `<audio>` fica sem `controls`: a UI é do app, para caber no tema e para
  * os chips de seção poderem mandar o áudio para o cabeçalho de cada uma.
  */
-export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: Props) {
+export default function NarracaoPlayer({
+  ordem,
+  secoes,
+  onAlvo,
+  onSeek,
+  tempoInicial,
+  onTocando,
+  onProgresso,
+  ref,
+}: Props) {
   const [src, setSrc] = useState<string | null>(null)
   const [manifesto, setManifesto] = useState<Manifesto | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -73,6 +96,9 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
   const iPalavra = useRef(0)
   const alvoAtual = useRef<string | null>(null)
   const spanAtual = useRef<HTMLElement | null>(null)
+  // Uma aplicação por perícope: depois que o usuário mexeu no áudio, o
+  // checkpoint antigo não pode voltar a puxar o relógio.
+  const tempoInicialAplicado = useRef(false)
 
   const alinhamento = useMemo(
     () => (manifesto ? alinhar(manifesto, secoes) : []),
@@ -89,6 +115,7 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
     setTempo(0)
     setDuracao(Number.NaN)
     setErro(false)
+    tempoInicialAplicado.current = false
     // Serializado: cobertura de narração é parcial, então buscar o manifesto
     // incondicionalmente seria um GET garantidamente 404 em quase toda
     // perícope aberta. Só vale a pena depois de o HEAD confirmar o áudio.
@@ -106,6 +133,19 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
       ac.abort()
     }
   }, [ordem])
+
+  // Efeito (e não onLoadedMetadata): o checkpoint chega do IndexedDB depois
+  // que o player montou, então `tempoInicial` e a duração podem aparecer em
+  // qualquer ordem — este efeito roda quando o ÚLTIMO dos dois chegar.
+  useEffect(() => {
+    const a = audioRef.current
+    if (!a || tempoInicialAplicado.current) return
+    if (tempoInicial == null || tempoInicial <= 0) return
+    if (!Number.isFinite(duracao) || duracao <= 0 || tempoInicial >= duracao) return
+    tempoInicialAplicado.current = true
+    a.currentTime = tempoInicial
+    setTempo(tempoInicial)
+  }, [tempoInicial, duracao])
 
   const limparPalavra = useCallback(() => {
     spanAtual.current?.classList.remove('word-speaking')
@@ -212,6 +252,8 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         if (inicio === null || !audioRef.current) return
         irPara(inicio)
       },
+      alternar,
+      tempoAtual: () => audioRef.current?.currentTime ?? 0,
     }),
     [manifesto],
   )
@@ -248,7 +290,12 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         // segundo.
         onTimeUpdate={() => {
           const a = audioRef.current
-          if (a) setTempo(a.currentTime)
+          if (!a) return
+          setTempo(a.currentTime)
+          // A barra do header segue o áudio no mesmo ritmo ~4×/s do mostrador.
+          if (Number.isFinite(a.duration) && a.duration > 0) {
+            onProgresso?.(a.currentTime / a.duration)
+          }
         }}
         onSeeked={() => {
           // A tela precisa estar liberada antes de calcular o novo alvo,
@@ -258,11 +305,18 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
         }}
         onEnded={() => {
           setTocando(false)
+          onTocando?.(false)
           limparPalavra()
           trocarAlvo(null)
         }}
-        onPlay={() => setTocando(true)}
-        onPause={() => setTocando(false)}
+        onPlay={() => {
+          setTocando(true)
+          onTocando?.(true)
+        }}
+        onPause={() => {
+          setTocando(false)
+          onTocando?.(false)
+        }}
         onLoadedMetadata={() => {
           const a = audioRef.current
           if (a) setDuracao(a.duration)
@@ -339,7 +393,9 @@ export default function NarracaoPlayer({ ordem, secoes, onAlvo, onSeek, ref }: P
   )
 }
 
-function IconePlay() {
+// Exportados para o controle compacto de narração no header da Leitura usar
+// os mesmos desenhos do player.
+export function IconePlay() {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden focusable="false">
       <path d="M8 5.5v13l10-6.5z" fill="currentColor" />
@@ -347,7 +403,7 @@ function IconePlay() {
   )
 }
 
-function IconePausa() {
+export function IconePausa() {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden focusable="false">
       <path d="M7 5.5h3.5v13H7zM13.5 5.5H17v13h-3.5z" fill="currentColor" />

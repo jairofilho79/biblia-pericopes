@@ -56,6 +56,20 @@ export type Destaque = {
   atualizadoEm: string
 }
 
+export type PosicaoTipo = 'secao' | 'versiculo' | 'narracao'
+
+/** Checkpoint de leitura: uma linha por perícope, a última âncora relevante.
+ * `ref` fala o vocabulário do DOM da Leitura — id de seção ("texto"),
+ * verseId ("3:16"), parágrafo em prosa ("resenha-0") ou alvo de narração. */
+export type PosicaoLeitura = {
+  pericopeOrdem: number
+  tipo: PosicaoTipo
+  ref: string
+  /** Segundos do áudio quando tipo é "narracao"; null nos demais. */
+  tempo: number | null
+  atualizadoEm: string
+}
+
 export type RawPericope = {
   ordem: number
   titulo_en: string

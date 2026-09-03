@@ -3,12 +3,17 @@ import { describe, expect, it } from 'vitest'
 import {
   applyRemoteAnotacoes,
   applyRemoteDestaques,
+  applyRemotePosicoes,
   applyRemoteProgresso,
   clearAllUserData,
   clearOutbox,
+  clearPosicao,
   deleteAnotacao,
   deleteMeta,
+  enqueuePosicao,
   getMeta,
+  getPosicao,
+  getPosicaoMaisRecente,
   getProgresso,
   listAnotacoes,
   listDestaques,
@@ -17,6 +22,7 @@ import {
   saveAnotacao,
   setDestaque,
   setMeta,
+  setPosicaoLocal,
   setProgresso,
 } from './user-db'
 import { MAX_TEXTO } from './sync-limits'
@@ -335,6 +341,131 @@ describe('anotações com vínculo a versículo', () => {
     ])
 
     expect((await listAnotacoes(9200)).map((n) => n.id)).toEqual(['ord-b', 'ord-c', 'ord-a'])
+  })
+})
+
+// O checkpoint de leitura grava fora do padrão "linha + outbox na mesma
+// transação" de propósito: os eventos de leitura (seção ativa, versículo
+// tocado, item narrado) são frequentes demais para encher o outbox — a linha
+// local muda na hora e só o ENQUEUE explícito (ao sair da página) sobe para o
+// sync. Perder um enqueue é aceitável; encher o outbox não é.
+describe('user-db v4 (posição de leitura)', () => {
+  it('setPosicaoLocal grava a linha sem tocar o outbox', async () => {
+    const outboxAntes = await listOutbox()
+
+    const pos = await setPosicaoLocal(9301, 'versiculo', '3:16')
+    expect(pos?.tipo).toBe('versiculo')
+    expect(pos?.ref).toBe('3:16')
+    expect(pos?.tempo).toBeNull()
+
+    const salvo = await getPosicao(9301)
+    expect(salvo?.ref).toBe('3:16')
+    expect(await listOutbox()).toEqual(outboxAntes)
+  })
+
+  it('setPosicaoLocal aceita seção, parágrafo em prosa e alvo de narração com tempo', async () => {
+    expect((await setPosicaoLocal(9302, 'secao', 'resenha'))?.ref).toBe('resenha')
+    expect((await setPosicaoLocal(9302, 'secao', 'contexto-2'))?.ref).toBe('contexto-2')
+    const narr = await setPosicaoLocal(9302, 'narracao', 'reflexao-1', 123.4)
+    expect(narr?.tempo).toBe(123.4)
+  })
+
+  // Mesma lógica do guard de setDestaque: um ref fora do vocabulário no
+  // outbox faria o Worker rejeitar o lote inteiro com 400 para sempre.
+  it('setPosicaoLocal com ref fora do vocabulário não grava nada', async () => {
+    expect(await setPosicaoLocal(9303, 'versiculo', 'x:1')).toBeNull()
+    expect(await setPosicaoLocal(9303, 'secao', 'qualquer-coisa')).toBeNull()
+    expect(await getPosicao(9303)).toBeUndefined()
+  })
+
+  it('enqueuePosicao enfileira o estado atual; sem linha, não enfileira nada', async () => {
+    await setPosicaoLocal(9304, 'secao', 'texto')
+    await enqueuePosicao(9304)
+    const outbox = await listOutbox()
+    const item = outbox.find((i) => i.kind === 'posicao' && i.posicao.pericopeOrdem === 9304)
+    expect(item).toBeDefined()
+    if (item?.kind === 'posicao') {
+      expect(item.apagadoEm).toBeNull()
+      expect(item.posicao.ref).toBe('texto')
+    }
+
+    const antes = (await listOutbox()).length
+    await enqueuePosicao(9305)
+    expect((await listOutbox()).length).toBe(antes)
+  })
+
+  it('clearPosicao apaga a linha e enfileira a lápide', async () => {
+    await setPosicaoLocal(9306, 'versiculo', '1:1')
+    await clearPosicao(9306)
+
+    expect(await getPosicao(9306)).toBeUndefined()
+    const outbox = await listOutbox()
+    const lapides = outbox.filter(
+      (i) => i.kind === 'posicao' && i.posicao.pericopeOrdem === 9306 && i.apagadoEm !== null,
+    )
+    const ultima = lapides[lapides.length - 1]
+    expect(ultima).toBeDefined()
+    if (ultima?.kind === 'posicao') {
+      expect(ultima.posicao.atualizadoEm).toBe(ultima.apagadoEm)
+    }
+  })
+
+  it('clearPosicao sem linha não enfileira nada', async () => {
+    const antes = (await listOutbox()).length
+    await clearPosicao(9307)
+    expect((await listOutbox()).length).toBe(antes)
+  })
+
+  it('getPosicaoMaisRecente devolve a mais nova dentro das ordens dadas', async () => {
+    await applyRemotePosicoes([
+      { pericopeOrdem: 9310, tipo: 'secao', ref: 'texto', tempo: null, atualizadoEm: '2099-01-01T00:00:00.000Z', apagadoEm: null },
+      { pericopeOrdem: 9311, tipo: 'versiculo', ref: '2:5', tempo: null, atualizadoEm: '2099-03-01T00:00:00.000Z', apagadoEm: null },
+      { pericopeOrdem: 9312, tipo: 'secao', ref: 'resenha', tempo: null, atualizadoEm: '2099-02-01T00:00:00.000Z', apagadoEm: null },
+    ])
+
+    expect((await getPosicaoMaisRecente([9310, 9311, 9312]))?.pericopeOrdem).toBe(9311)
+    // filtro: fora da lista de ordens, a mais nova é outra
+    expect((await getPosicaoMaisRecente([9310, 9312]))?.pericopeOrdem).toBe(9312)
+    expect(await getPosicaoMaisRecente([9399])).toBeUndefined()
+  })
+
+  it('applyRemotePosicoes: LWW e lápides, contando só o que mudou', async () => {
+    await setPosicaoLocal(9320, 'versiculo', '1:2')
+
+    // remoto mais velho perde
+    expect(
+      await applyRemotePosicoes([
+        { pericopeOrdem: 9320, tipo: 'secao', ref: 'texto', tempo: null, atualizadoEm: PAST, apagadoEm: null },
+      ]),
+    ).toBe(0)
+    expect((await getPosicao(9320))?.ref).toBe('1:2')
+
+    // remoto mais novo vence
+    expect(
+      await applyRemotePosicoes([
+        { pericopeOrdem: 9320, tipo: 'narracao', ref: 'resenha-0', tempo: 45, atualizadoEm: FUTURE, apagadoEm: null },
+      ]),
+    ).toBe(1)
+    expect((await getPosicao(9320))?.tempo).toBe(45)
+
+    // lápide apaga; reentrega da lápide não conta
+    expect(
+      await applyRemotePosicoes([
+        { pericopeOrdem: 9320, tipo: 'narracao', ref: 'resenha-0', tempo: 45, atualizadoEm: FUTURE_2, apagadoEm: FUTURE_2 },
+      ]),
+    ).toBe(1)
+    expect(await getPosicao(9320)).toBeUndefined()
+    expect(
+      await applyRemotePosicoes([
+        { pericopeOrdem: 9320, tipo: 'narracao', ref: 'resenha-0', tempo: 45, atualizadoEm: '2099-12-01T00:00:00.000Z', apagadoEm: '2099-12-01T00:00:00.000Z' },
+      ]),
+    ).toBe(0)
+  })
+
+  it('clearAllUserData também apaga as posições', async () => {
+    await setPosicaoLocal(9330, 'secao', 'texto')
+    await clearAllUserData()
+    expect(await getPosicao(9330)).toBeUndefined()
   })
 })
 

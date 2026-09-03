@@ -74,6 +74,15 @@ type LinhaDestaque = {
   apagadoEm: string | null
   serverEm: string
 }
+type LinhaPosicao = {
+  pericopeOrdem: number
+  tipo: string
+  ref: string
+  tempo: number | null
+  atualizadoEm: string
+  apagadoEm: string | null
+  serverEm: string
+}
 
 // A parte comum das duas formas de ler cada entidade: a página (`server_em >
 // since`, com LIMIT) e o fechamento de grupo (`server_em = cursor`, sem
@@ -90,6 +99,10 @@ const SELECT_DESTAQUES = `SELECT id, pericope_ordem AS pericopeOrdem, verse_id A
           criado_em AS criadoEm, atualizado_em AS atualizadoEm, apagado_em AS apagadoEm,
           server_em AS serverEm
    FROM destaques WHERE user_id = ?1`
+const SELECT_POSICOES = `SELECT pericope_ordem AS pericopeOrdem, tipo, ref, tempo,
+          atualizado_em AS atualizadoEm, apagado_em AS apagadoEm,
+          server_em AS serverEm
+   FROM posicao_leitura WHERE user_id = ?1`
 
 /**
  * Busca a página de uma entidade: n+1 linhas, a extra só pra provar que há
@@ -146,6 +159,7 @@ app.get('/api/sync', async (c) => {
       progresso: await buscarPagina<LinhaProgresso>(c.env.DB, SELECT_PROGRESSO, userId, since),
       anotacoes: await buscarPagina<LinhaAnotacao>(c.env.DB, SELECT_ANOTACOES, userId, since),
       destaques: await buscarPagina<LinhaDestaque>(c.env.DB, SELECT_DESTAQUES, userId, since),
+      posicoes: await buscarPagina<LinhaPosicao>(c.env.DB, SELECT_POSICOES, userId, since),
     },
     TAMANHO_PAGINA_PULL,
   )
@@ -158,14 +172,17 @@ app.get('/api/sync', async (c) => {
   let progresso = paginado.progresso
   let anotacoes = paginado.anotacoes
   let destaques = paginado.destaques
+  let posicoes = paginado.posicoes
   if (cortado !== null) {
     for (const entidade of paginado.gruposIncompletos) {
       if (entidade === 'progresso') {
         progresso = await fecharGrupo<LinhaProgresso>(c.env.DB, SELECT_PROGRESSO, userId, cortado)
       } else if (entidade === 'anotacoes') {
         anotacoes = await fecharGrupo<LinhaAnotacao>(c.env.DB, SELECT_ANOTACOES, userId, cortado)
-      } else {
+      } else if (entidade === 'destaques') {
         destaques = await fecharGrupo<LinhaDestaque>(c.env.DB, SELECT_DESTAQUES, userId, cortado)
+      } else {
+        posicoes = await fecharGrupo<LinhaPosicao>(c.env.DB, SELECT_POSICOES, userId, cortado)
       }
     }
   }
@@ -174,6 +191,7 @@ app.get('/api/sync', async (c) => {
     progresso: progresso.map(despirServerEm),
     anotacoes: anotacoes.map(despirServerEm),
     destaques: destaques.map(despirServerEm),
+    posicoes: posicoes.map(despirServerEm),
     // Sem truncamento (o caminho de longe mais comum): cursor é `agora`,
     // exatamente como antes desta funcionalidade existir. Com truncamento, o
     // cursor é a fronteira computada por paginarPull — nunca `agora`, porque
@@ -254,6 +272,17 @@ app.post('/api/sync', async (c) => {
         d.apagadoEm,
         serverEm,
       ),
+    ),
+    ...parsed.posicoes.map((p) =>
+      c.env.DB.prepare(
+        `INSERT INTO posicao_leitura (user_id, pericope_ordem, tipo, ref, tempo, atualizado_em, apagado_em, server_em)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+         ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
+           tipo = excluded.tipo, ref = excluded.ref, tempo = excluded.tempo,
+           atualizado_em = excluded.atualizado_em,
+           apagado_em = excluded.apagado_em, server_em = excluded.server_em
+         WHERE excluded.atualizado_em > posicao_leitura.atualizado_em`,
+      ).bind(userId, p.pericopeOrdem, p.tipo, p.ref, p.tempo, p.atualizadoEm, p.apagadoEm, serverEm),
     ),
   ]
   if (stmts.length) await c.env.DB.batch(stmts)

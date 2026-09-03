@@ -21,16 +21,69 @@ const destaque = {
   apagadoEm: null,
 }
 
+const posicao = {
+  pericopeOrdem: 7,
+  tipo: 'versiculo',
+  ref: '3:16',
+  tempo: null,
+  atualizadoEm: '2026-08-31T10:00:00.000Z',
+  apagadoEm: null,
+}
+
+describe('parseSyncPush — posições de leitura', () => {
+  it('aceita posição válida em cada tipo de ref do vocabulário', () => {
+    expect(parseSyncPush({ posicoes: [posicao] })?.posicoes).toEqual([posicao])
+    for (const ref of ['texto', 'contexto-0', 'reflexao-12', 'cabecalho-reflexoes', 'cap-3', 'titulo']) {
+      expect(parseSyncPush({ posicoes: [{ ...posicao, tipo: 'secao', ref }] })?.posicoes).toHaveLength(1)
+    }
+  })
+  it('aceita narração com tempo e lápide (apagadoEm ISO)', () => {
+    const narr = { ...posicao, tipo: 'narracao', ref: 'resenha-2', tempo: 91.3 }
+    expect(parseSyncPush({ posicoes: [narr] })?.posicoes).toEqual([narr])
+    const lapide = { ...posicao, apagadoEm: '2026-08-31T11:00:00.000Z' }
+    expect(parseSyncPush({ posicoes: [lapide] })?.posicoes).toEqual([lapide])
+  })
+  it('rejeita tipo desconhecido, ref fora do vocabulário e tempo inválido', () => {
+    expect(parseSyncPush({ posicoes: [{ ...posicao, tipo: 'scroll' }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, ref: 'x:1' }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, ref: 'divagando' }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, ref: '' }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, tempo: Number.POSITIVE_INFINITY }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, tempo: -1 }] })).toBeNull()
+    expect(parseSyncPush({ posicoes: [{ ...posicao, tempo: '10' }] })).toBeNull()
+  })
+  it('rejeita lote de posições acima de 500 itens', () => {
+    expect(parseSyncPush({ posicoes: Array(501).fill(posicao) })).toBeNull()
+  })
+})
+
+describe('paginarPull — posições', () => {
+  it('posições estourando: corta, avança o cursor e marca grupo incompleto quando tudo empata', () => {
+    const T = '2026-01-01T00:00:05.000Z'
+    const listas = {
+      progresso: [] as ReturnType<typeof linha>[],
+      anotacoes: [] as ReturnType<typeof linha>[],
+      destaques: [] as ReturnType<typeof linha>[],
+      posicoes: [linha(T, 1), linha(T, 2), linha(T, 3)],
+    }
+    const resultado = paginarPull(listas, 2)
+    expect(resultado.cursor).toBe(T)
+    expect(resultado.maisDados).toBe(true)
+    expect(resultado.gruposIncompletos).toEqual(['posicoes'])
+  })
+})
+
 describe('parseSyncPush', () => {
   it('aceita payload válido', () => {
     expect(parseSyncPush({ progresso: [prog], anotacoes: [nota] })).toEqual({
       progresso: [prog],
       anotacoes: [nota],
       destaques: [],
+      posicoes: [],
     })
   })
   it('aceita listas ausentes como vazias', () => {
-    expect(parseSyncPush({})).toEqual({ progresso: [], anotacoes: [], destaques: [] })
+    expect(parseSyncPush({})).toEqual({ progresso: [], anotacoes: [], destaques: [], posicoes: [] })
   })
   it('rejeita status desconhecido, tipos errados e não-objeto', () => {
     expect(parseSyncPush({ progresso: [{ ...prog, status: 'x' }] })).toBeNull()
@@ -55,6 +108,7 @@ describe('parseSyncPush', () => {
       progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z' }],
       anotacoes: [],
       destaques: [],
+      posicoes: [],
     })
   })
 })
@@ -65,6 +119,7 @@ describe('parseSyncPush — destaques', () => {
       progresso: [],
       anotacoes: [],
       destaques: [destaque],
+      posicoes: [],
     })
   })
   it('aceita lápide (apagadoEm ISO)', () => {
@@ -172,6 +227,7 @@ describe('paginarPull', () => {
       progresso: [linha('2026-01-01T00:00:00.000Z', 1), linha('2026-01-01T00:00:01.000Z', 2)],
       anotacoes: [linha('2026-01-01T00:00:00.500Z', 3)],
       destaques: [] as ReturnType<typeof linha>[],
+      posicoes: [] as ReturnType<typeof linha>[],
     }
     const resultado = paginarPull(listas, 3)
     expect(resultado).toEqual({
@@ -193,6 +249,7 @@ describe('paginarPull', () => {
       progresso: [linha('2026-01-01T00:00:00.000Z', 10)],
       anotacoes: [] as ReturnType<typeof linha>[],
       destaques,
+      posicoes: [] as ReturnType<typeof linha>[],
     }
     const resultado = paginarPull(listas, 3)
     expect(resultado.cursor).toBe('2026-01-01T00:00:03.000Z')
@@ -217,7 +274,12 @@ describe('paginarPull', () => {
       linha('2026-01-01T00:00:04.000Z', 12), // T4 — fronteira do destaques
       linha('2026-01-01T00:00:05.000Z', 13), // a (n+1)-ésima
     ]
-    const listas = { progresso, anotacoes: [] as ReturnType<typeof linha>[], destaques }
+    const listas = {
+      progresso,
+      anotacoes: [] as ReturnType<typeof linha>[],
+      destaques,
+      posicoes: [] as ReturnType<typeof linha>[],
+    }
     const resultado = paginarPull(listas, 2)
     expect(resultado.cursor).toBe('2026-01-01T00:00:02.000Z') // T2, o mínimo das duas fronteiras
     expect(resultado.maisDados).toBe(true)
@@ -235,7 +297,12 @@ describe('paginarPull', () => {
     // rebuscar o grupo inteiro, senão o resto dele some pra sempre.
     const T = '2026-01-01T00:00:05.000Z'
     const destaques = [linha(T, 1), linha(T, 2), linha(T, 3)]
-    const listas = { progresso: [] as ReturnType<typeof linha>[], anotacoes: [], destaques }
+    const listas = {
+      progresso: [] as ReturnType<typeof linha>[],
+      anotacoes: [],
+      destaques,
+      posicoes: [] as ReturnType<typeof linha>[],
+    }
     const resultado = paginarPull(listas, 2)
     expect(resultado.cursor).toBe(T)
     expect(resultado.maisDados).toBe(true)
@@ -256,6 +323,7 @@ describe('paginarPull', () => {
       progresso,
       anotacoes: [] as ReturnType<typeof linha>[],
       destaques: [linha(T5, 10), linha(T5, 11), linha(T5, 12)],
+      posicoes: [] as ReturnType<typeof linha>[],
     }
     const resultado = paginarPull(listas, 2)
     expect(resultado.cursor).toBe('2026-01-01T00:00:02.000Z')
@@ -282,9 +350,14 @@ describe('paginarPull', () => {
 // ---------------------------------------------------------------------------
 
 type LinhaRT = { serverEm: string; v: number }
-type BancoRT = { progresso: LinhaRT[]; anotacoes: LinhaRT[]; destaques: LinhaRT[] }
+type BancoRT = {
+  progresso: LinhaRT[]
+  anotacoes: LinhaRT[]
+  destaques: LinhaRT[]
+  posicoes: LinhaRT[]
+}
 
-const ENTIDADES_RT = ['progresso', 'anotacoes', 'destaques'] as const
+const ENTIDADES_RT = ['progresso', 'anotacoes', 'destaques', 'posicoes'] as const
 
 /** `SELECT ... WHERE server_em > since ORDER BY server_em LIMIT n+1`, em memória. */
 function janela(linhas: LinhaRT[], since: string, n: number): LinhaRT[] {
@@ -310,6 +383,7 @@ function rodadaDePull(banco: BancoRT, since: string, n: number) {
       progresso: janela(banco.progresso, since, n),
       anotacoes: janela(banco.anotacoes, since, n),
       destaques: janela(banco.destaques, since, n),
+      posicoes: janela(banco.posicoes, since, n),
     },
     n,
   )
@@ -317,6 +391,7 @@ function rodadaDePull(banco: BancoRT, since: string, n: number) {
     progresso: paginado.progresso,
     anotacoes: paginado.anotacoes,
     destaques: paginado.destaques,
+    posicoes: paginado.posicoes,
   }
   for (const nome of paginado.gruposIncompletos) {
     entregue[nome] = grupo(banco[nome], paginado.cursor as string)
@@ -327,7 +402,7 @@ function rodadaDePull(banco: BancoRT, since: string, n: number) {
 
 /** Roda o loop de páginas do cliente até o fim e devolve tudo o que chegou. */
 function pullCompleto(banco: BancoRT, n: number): BancoRT {
-  const entregues: BancoRT = { progresso: [], anotacoes: [], destaques: [] }
+  const entregues: BancoRT = { progresso: [], anotacoes: [], destaques: [], posicoes: [] }
   let since = ''
   for (let pagina = 0; pagina < 200; pagina++) {
     const res = rodadaDePull(banco, since, n)
@@ -362,6 +437,7 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
       progresso: [],
       anotacoes: [],
       destaques: serie(1, 25, '2026-01-01T00:00:05.000Z'),
+      posicoes: [],
     }
     esperaEntregaExata(banco, 10)
     expect(pullCompleto(banco, 10).destaques).toHaveLength(25)
@@ -376,6 +452,7 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
         ...serie(100, 25, '2026-01-01T00:00:02.000Z'), // maior que a página inteira
         ...serie(200, 7, '2026-01-01T00:00:03.000Z'),
       ],
+      posicoes: [],
     }
     esperaEntregaExata(banco, 10)
   })
@@ -397,6 +474,10 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
         ...serie(90, 20, '2026-01-01T00:00:06.000Z'),
         ...serie(120, 4, '2026-01-01T00:00:07.000Z'),
       ],
+      posicoes: [
+        ...serie(200, 2, '2026-01-01T00:00:01.500Z'),
+        ...serie(210, 9, '2026-01-01T00:00:04.500Z'), // estoura n=5 sozinho
+      ],
     }
     esperaEntregaExata(banco, 5)
   })
@@ -407,6 +488,7 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
       progresso: serie(1, 9, T),
       anotacoes: [],
       destaques: serie(100, 14, T),
+      posicoes: [],
     }
     esperaEntregaExata(banco, 3)
   })
@@ -416,6 +498,7 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
       progresso: serie(1, 3, '2026-01-01T00:00:01.000Z'),
       anotacoes: serie(10, 2, '2026-01-01T00:00:02.000Z'),
       destaques: serie(20, 4, '2026-01-01T00:00:03.000Z'),
+      posicoes: serie(30, 2, '2026-01-01T00:00:04.000Z'),
     }
     const entregues = pullCompleto(banco, 100)
     expect(entregues).toEqual(banco)

@@ -4,6 +4,8 @@ import { SkeletonHome } from '../components/Skeleton'
 import { loadIndex, ordensDoTestamento, refLabel } from '../lib/content'
 import {
   countConcluidasNaSequencia,
+  doneSet,
+  getPosicaoMaisRecente,
   getProximaOrdemNaSequencia,
   listAllProgresso,
 } from '../lib/user-db'
@@ -33,9 +35,18 @@ export default function Home() {
     try {
       const all = await loadIndex()
       const built: Track[] = []
+      const concluidas = await doneSet()
       for (const testament of ['vt', 'nt'] as Testament[]) {
         const ordens = ordensDoTestamento(all, testament)
-        const ordem = await getProximaOrdemNaSequencia(ordens)
+        // "Continuar" prefere onde a pessoa PAROU DE LER (o checkpoint mais
+        // recente da trilha) à heurística da primeira não concluída — é o que
+        // retoma uma perícope longa deixada no meio. Concluída não conta:
+        // o rótulo diz "continuar", não "reler".
+        const posicao = await getPosicaoMaisRecente(ordens)
+        const ordem =
+          posicao && !concluidas.has(posicao.pericopeOrdem)
+            ? posicao.pericopeOrdem
+            : await getProximaOrdemNaSequencia(ordens)
         // Não usar getPericope aqui: puxar a perícope inteira baixaria os
         // dois shards do livro (~1,1 MB) só para escrever um título e uma
         // referência que já estão no índice.

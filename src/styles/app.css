@@ -897,6 +897,95 @@ button.ghost {
   color: var(--cta-ink);
 }
 
+/* Linha do header de leitura: os chips + (quando a narração já começou) o
+   botão compacto de pausa. O grid de quatro colunas segue intacto dentro do
+   flex; o botão entra à direita sem quebrar nada. */
+.section-chips-linha {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.section-chips-linha .section-chips-row {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Pausar/continuar a narração sem rolar de volta ao player: um botão redondo
+   na altura do pill dos chips. */
+.narracao-mini {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.narracao-mini:hover {
+  color: var(--ink);
+}
+
+.narracao-mini:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Progresso da perícope: um filete rente à borda de baixo da barra sticky.
+   A largura vem de --pct-lida, pintada direto pelo JS — pelo scroll na
+   leitura, pelo relógio do áudio quando a narração toca. O -1px cobre o
+   border-bottom da própria barra. */
+.leitura-progresso {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 3px;
+  pointer-events: none;
+}
+
+.leitura-progresso::before {
+  content: '';
+  display: block;
+  height: 100%;
+  width: var(--pct-lida, 0%);
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.25s linear;
+}
+
+/* "Você parou aqui": um pulso curto no elemento restaurado pelo checkpoint,
+   que morre sozinho — informação de chegada, não estado. */
+@keyframes retomada-pulso {
+  0% {
+    background-color: color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.retomada-flash {
+  animation: retomada-pulso 2s ease-out;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leitura-progresso::before {
+    transition: none;
+  }
+
+  .retomada-flash {
+    animation: none;
+  }
+}
+
 /* Celular: "Texto Bíblico" não cabe num quarto de 375px (~73px) em fonte
    legível, então só esse chip pode quebrar — vira "Texto" / "Bíblico", em
    duas linhas que cabem na altura de 2.25rem (0.78rem × 1.15 × 2 ≈ 1.8rem).

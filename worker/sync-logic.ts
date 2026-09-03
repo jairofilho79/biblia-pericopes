@@ -24,10 +24,28 @@ export type PushDestaque = {
   apagadoEm: string | null
 }
 
+export type PushPosicao = {
+  pericopeOrdem: number
+  tipo: 'secao' | 'versiculo' | 'narracao'
+  ref: string
+  tempo: number | null
+  atualizadoEm: string
+  apagadoEm: string | null
+}
+
 const STATUS = new Set(['nao_iniciado', 'em_andamento', 'concluido'])
 const CORES = new Set(['amarelo', 'verde', 'azul', 'rosa'])
 // "capitulo:versiculo" — o mesmo formato do TextoBlock.id no cliente.
 const VERSE_ID = /^\d+:\d+$/
+const POSICAO_TIPOS = new Set(['secao', 'versiculo', 'narracao'])
+// Cópia de POSICAO_REF_RE em src/lib/user-db.ts (o Worker não importa de
+// src/) — o vocabulário de ids que a Leitura põe no DOM. Mudar um exige
+// mudar o outro.
+const POSICAO_REF =
+  /^(?:\d+:\d+|(?:contexto|resenha|reflexao)-\d+|contexto|texto|resenha|reflexao|titulo|referencia|cabecalho-(?:contexto|texto|resenha|reflexoes)|cap-\d+)$/
+// Teto folgado do `tempo` (segundos de áudio): nenhuma narração real passa
+// disso; barra só o absurdo, como MAX_CORPO.
+const MAX_TEMPO_S = 86_400
 // Cópia deliberada dos limites de src/lib/sync-limits.ts: o Worker não pode
 // importar de src/ (tsconfig/bundle separados). Mantenha os dois em sincronia.
 // MAX_ITENS vale para as três listas (progresso/anotacoes/destaques).
@@ -137,6 +155,25 @@ function validDestaque(v: unknown): v is PushDestaque {
   )
 }
 
+function validPosicao(v: unknown): v is PushPosicao {
+  if (typeof v !== 'object' || v === null) return false
+  const p = v as Record<string, unknown>
+  return (
+    isOrdem(p.pericopeOrdem) &&
+    typeof p.tipo === 'string' &&
+    POSICAO_TIPOS.has(p.tipo) &&
+    typeof p.ref === 'string' &&
+    POSICAO_REF.test(p.ref) &&
+    (p.tempo === null ||
+      (typeof p.tempo === 'number' &&
+        Number.isFinite(p.tempo) &&
+        p.tempo >= 0 &&
+        p.tempo <= MAX_TEMPO_S)) &&
+    isIso(p.atualizadoEm) &&
+    (p.apagadoEm === null || isIso(p.apagadoEm))
+  )
+}
+
 /**
  * Tamanho de página do pull (GET /api/sync), por entidade. Cada query busca
  * TAMANHO_PAGINA_PULL + 1 linhas: a linha extra é só pra provar que existe
@@ -151,17 +188,19 @@ export const TAMANHO_PAGINA_PULL = 2000
 /** Uma linha do pull, na parte que paginarPull precisa: o carimbo do servidor. */
 export type LinhaPull = { serverEm: string }
 
-/** As três listas do pull, pelo nome. */
-export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques'
+/** As listas do pull, pelo nome. */
+export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques' | 'posicoes'
 
 export type ResultadoPaginacaoPull<
   P extends LinhaPull,
   A extends LinhaPull,
   D extends LinhaPull,
+  O extends LinhaPull,
 > = {
   progresso: P[]
   anotacoes: A[]
   destaques: D[]
+  posicoes: O[]
   /**
    * `null` quando nenhuma entidade estourou: o chamador usa `agora` (o
    * instante gerado antes dos SELECTs) como cursor, exatamente como antes
@@ -256,15 +295,21 @@ function limiteDaEntidadeEstourada(linhas: readonly LinhaPull[]): {
  * maior que a janela, quem fecha o buraco é `gruposIncompletos`, que o
  * chamador PRECISA honrar.
  */
-export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends LinhaPull>(
-  listas: { progresso: P[]; anotacoes: A[]; destaques: D[] },
+export function paginarPull<
+  P extends LinhaPull,
+  A extends LinhaPull,
+  D extends LinhaPull,
+  O extends LinhaPull,
+>(
+  listas: { progresso: P[]; anotacoes: A[]; destaques: D[]; posicoes: O[] },
   n: number,
-): ResultadoPaginacaoPull<P, A, D> {
+): ResultadoPaginacaoPull<P, A, D, O> {
   const fronteiras = (
     [
       { nome: 'progresso', linhas: listas.progresso as LinhaPull[] },
       { nome: 'anotacoes', linhas: listas.anotacoes as LinhaPull[] },
       { nome: 'destaques', linhas: listas.destaques as LinhaPull[] },
+      { nome: 'posicoes', linhas: listas.posicoes as LinhaPull[] },
     ] satisfies { nome: EntidadePull; linhas: LinhaPull[] }[]
   )
     .filter(({ linhas }) => linhas.length > n)
@@ -285,6 +330,7 @@ export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends 
     progresso: cortar(listas.progresso),
     anotacoes: cortar(listas.anotacoes),
     destaques: cortar(listas.destaques),
+    posicoes: cortar(listas.posicoes),
     cursor,
     maisDados: true,
     // Só a entidade que empatou tudo E cuja fronteira virou o cursor tem
@@ -298,24 +344,41 @@ export function paginarPull<P extends LinhaPull, A extends LinhaPull, D extends 
   }
 }
 
-export function parseSyncPush(
-  body: unknown,
-): { progresso: PushProgresso[]; anotacoes: PushAnotacao[]; destaques: PushDestaque[] } | null {
+export function parseSyncPush(body: unknown): {
+  progresso: PushProgresso[]
+  anotacoes: PushAnotacao[]
+  destaques: PushDestaque[]
+  posicoes: PushPosicao[]
+} | null {
   if (typeof body !== 'object' || body === null) return null
   const b = body as Record<string, unknown>
   const progresso = b.progresso ?? []
   const anotacoes = b.anotacoes ?? []
-  // Corpo sem `destaques` é aceito como lista vazia: um cliente ainda não
-  // atualizado continua sincronizando progresso e anotações normalmente.
+  // Corpo sem `destaques`/`posicoes` é aceito como lista vazia: um cliente
+  // ainda não atualizado continua sincronizando as entidades que conhece.
   const destaques = b.destaques ?? []
-  if (!Array.isArray(progresso) || !Array.isArray(anotacoes) || !Array.isArray(destaques)) return null
-  if (progresso.length > MAX_ITENS || anotacoes.length > MAX_ITENS || destaques.length > MAX_ITENS) {
+  const posicoes = b.posicoes ?? []
+  if (
+    !Array.isArray(progresso) ||
+    !Array.isArray(anotacoes) ||
+    !Array.isArray(destaques) ||
+    !Array.isArray(posicoes)
+  ) {
+    return null
+  }
+  if (
+    progresso.length > MAX_ITENS ||
+    anotacoes.length > MAX_ITENS ||
+    destaques.length > MAX_ITENS ||
+    posicoes.length > MAX_ITENS
+  ) {
     return null
   }
   if (
     !progresso.every(validProgresso) ||
     !anotacoes.every(validAnotacao) ||
-    !destaques.every(validDestaque)
+    !destaques.every(validDestaque) ||
+    !posicoes.every(validPosicao)
   ) {
     return null
   }
@@ -326,5 +389,6 @@ export function parseSyncPush(
       verseRef: typeof a.verseRef === 'string' ? a.verseRef : null,
     })),
     destaques,
+    posicoes,
   }
 }

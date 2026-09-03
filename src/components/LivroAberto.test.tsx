@@ -6,6 +6,22 @@ import LivroAberto from './LivroAberto'
 import { bookByAbbrev } from '../lib/bible-books'
 import type { FiltroLeitura } from '../lib/content'
 
+/**
+ * Atribuir `input.value` direto não aciona o setter nativo que o React usa
+ * para detectar mudança, então o onChange sintético não roda e o estado não
+ * muda — um teste feito assim passa sem testar nada. Chamar o setter do
+ * prototype e disparar 'input' é o que faz o React ver a digitação.
+ */
+function digitar(input: HTMLInputElement, valor: string) {
+  const setter = Object.getOwnPropertyDescriptor(
+    window.HTMLInputElement.prototype,
+    'value',
+  )?.set
+  if (!setter) throw new Error('setter nativo de value indisponível')
+  setter.call(input, valor)
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+}
+
 let container: HTMLDivElement
 let root: Root
 
@@ -45,14 +61,19 @@ describe('LivroAberto', () => {
       )
     })
 
-    // Encontrar o input de capítulo e digitar um número válido
-    const inputCap = container.querySelector('input[inputMode="numeric"]') as HTMLInputElement
-    if (!inputCap) throw new Error('Input de capítulo não encontrado')
+    // Encontrar inputs de capítulo e versículo
+    const inputs = container.querySelectorAll('input[inputMode="numeric"]')
+    const inputCap = inputs[0] as HTMLInputElement
+    const inputVer = inputs[1] as HTMLInputElement
+    if (!inputCap || !inputVer) throw new Error('Inputs não encontrados')
+
+    // Digitar um capítulo válido
     act(() => {
-      inputCap.value = '3'
-      inputCap.dispatchEvent(new Event('change', { bubbles: true }))
+      digitar(inputCap, '3')
     })
-    expect(inputCap.value).toBe('3')
+
+    // Prova de que o estado mudou: versículo deve estar habilitado agora
+    expect(inputVer.disabled).toBe(false)
 
     // Re-renderizar com João (mesmo componente, livro diferente)
     act(() => {
@@ -71,9 +92,13 @@ describe('LivroAberto', () => {
       )
     })
 
-    // Verificar que o campo foi zerado
-    const inputCapAfter = container.querySelector('input[inputMode="numeric"]') as HTMLInputElement
-    if (!inputCapAfter) throw new Error('Input de capítulo não encontrado após re-render')
+    // Verificar que ambos os campos foram zerados
+    const inputsAfter = container.querySelectorAll('input[inputMode="numeric"]')
+    const inputCapAfter = inputsAfter[0] as HTMLInputElement
+    const inputVerAfter = inputsAfter[1] as HTMLInputElement
+    if (!inputCapAfter || !inputVerAfter) throw new Error('Inputs não encontrados após re-render')
     expect(inputCapAfter.value).toBe('')
+    // Versículo volta a ficar desabilitado — invariante vista pelo outro lado
+    expect(inputVerAfter.disabled).toBe(true)
   })
 })

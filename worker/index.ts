@@ -1,7 +1,13 @@
 import { Hono } from 'hono'
 import { cabecalhoContentRange, chaveAudio } from './audio'
 import { createAuth } from './auth'
-import { TAMANHO_PAGINA_PULL, corpoExcedeLimite, paginarPull, parseSyncPush } from './sync-logic'
+import {
+  TAMANHO_PAGINA_PULL,
+  UPSERT_PROGRESSO,
+  corpoExcedeLimite,
+  paginarPull,
+  parseSyncPush,
+} from './sync-logic'
 import {
   MAX_BYTES,
   MODELO,
@@ -46,11 +52,29 @@ function despirServerEm<T extends { serverEm: string }>(linha: T): Omit<T, 'serv
   return resto
 }
 
+/**
+ * D1 devolve `historico` como TEXT e `para_reler` como 0/1. O cliente espera
+ * `string[]` e `boolean` — a conversão é aqui, não lá, para o formato do
+ * protocolo ser o mesmo do tipo `Progresso`.
+ */
+function hidratarProgresso<T extends { historico: unknown; paraReler: unknown }>(linha: T) {
+  let historico: string[] = []
+  try {
+    const bruto: unknown = JSON.parse(String(linha.historico ?? '[]'))
+    if (Array.isArray(bruto)) historico = bruto.filter((d): d is string => typeof d === 'string')
+  } catch {
+    // Linha corrompida vira histórico vazio em vez de derrubar o pull inteiro.
+  }
+  return { ...linha, historico, paraReler: Boolean(linha.paraReler) }
+}
+
 // Linhas como saem do SELECT (camelCase pelos AS). `serverEm` é interno: sai
 // da linha em despirServerEm antes de virar JSON.
 type LinhaProgresso = {
   pericopeOrdem: number
   status: string
+  historico: unknown
+  paraReler: unknown
   atualizadoEm: string
   serverEm: string
 }
@@ -83,13 +107,27 @@ type LinhaPosicao = {
   apagadoEm: string | null
   serverEm: string
 }
+type LinhaJornada = {
+  id: string
+  nome: string
+  tipo: string
+  escopo: string
+  inicioOrdem: number
+  contaDesde: string | null
+  criadoEm: string
+  atualizadoEm: string
+  arquivadaEm: string | null
+  concluidaEm: string | null
+  apagadoEm: string | null
+  serverEm: string
+}
 
 // A parte comum das duas formas de ler cada entidade: a página (`server_em >
 // since`, com LIMIT) e o fechamento de grupo (`server_em = cursor`, sem
 // LIMIT). Ficam juntas de propósito — a lista de colunas tem que ser a mesma
 // nas duas, senão o fechamento devolveria linhas com formato diferente.
-const SELECT_PROGRESSO = `SELECT pericope_ordem AS pericopeOrdem, status, atualizado_em AS atualizadoEm,
-          server_em AS serverEm
+const SELECT_PROGRESSO = `SELECT pericope_ordem AS pericopeOrdem, status, historico,
+          para_reler AS paraReler, atualizado_em AS atualizadoEm, server_em AS serverEm
    FROM progresso WHERE user_id = ?1`
 const SELECT_ANOTACOES = `SELECT id, pericope_ordem AS pericopeOrdem, texto, verse_ref AS verseRef,
           criado_em AS criadoEm, atualizado_em AS atualizadoEm, apagado_em AS apagadoEm,
@@ -103,6 +141,13 @@ const SELECT_POSICOES = `SELECT pericope_ordem AS pericopeOrdem, tipo, ref, temp
           atualizado_em AS atualizadoEm, apagado_em AS apagadoEm,
           server_em AS serverEm
    FROM posicao_leitura WHERE user_id = ?1`
+const SELECT_JORNADAS = `SELECT id, nome, tipo, escopo,
+          inicio_ordem AS inicioOrdem, conta_desde AS contaDesde,
+          criado_em AS criadoEm, atualizado_em AS atualizadoEm,
+          arquivada_em AS arquivadaEm, concluida_em AS concluidaEm,
+          apagado_em AS apagadoEm,
+          server_em AS serverEm
+   FROM jornada WHERE user_id = ?1`
 
 /**
  * Busca a página de uma entidade: n+1 linhas, a extra só pra provar que há
@@ -160,6 +205,7 @@ app.get('/api/sync', async (c) => {
       anotacoes: await buscarPagina<LinhaAnotacao>(c.env.DB, SELECT_ANOTACOES, userId, since),
       destaques: await buscarPagina<LinhaDestaque>(c.env.DB, SELECT_DESTAQUES, userId, since),
       posicoes: await buscarPagina<LinhaPosicao>(c.env.DB, SELECT_POSICOES, userId, since),
+      jornadas: await buscarPagina<LinhaJornada>(c.env.DB, SELECT_JORNADAS, userId, since),
     },
     TAMANHO_PAGINA_PULL,
   )
@@ -173,6 +219,7 @@ app.get('/api/sync', async (c) => {
   let anotacoes = paginado.anotacoes
   let destaques = paginado.destaques
   let posicoes = paginado.posicoes
+  let jornadas = paginado.jornadas
   if (cortado !== null) {
     for (const entidade of paginado.gruposIncompletos) {
       if (entidade === 'progresso') {
@@ -181,17 +228,30 @@ app.get('/api/sync', async (c) => {
         anotacoes = await fecharGrupo<LinhaAnotacao>(c.env.DB, SELECT_ANOTACOES, userId, cortado)
       } else if (entidade === 'destaques') {
         destaques = await fecharGrupo<LinhaDestaque>(c.env.DB, SELECT_DESTAQUES, userId, cortado)
-      } else {
+      } else if (entidade === 'posicoes') {
         posicoes = await fecharGrupo<LinhaPosicao>(c.env.DB, SELECT_POSICOES, userId, cortado)
+      } else if (entidade === 'jornadas') {
+        jornadas = await fecharGrupo<LinhaJornada>(c.env.DB, SELECT_JORNADAS, userId, cortado)
+      } else {
+        // Exaustividade de propósito: um `else` catch-all aqui já causou um
+        // apontamento de revisão (jornadas herdou o papel de posicoes sem
+        // querer). Se EntidadePull ganhar um nome novo (a próxima entidade,
+        // dias_leitura) sem um ramo dedicado, este `never` vira ERRO DE
+        // COMPILAÇÃO em vez de perda de dados silenciosa: a nova entidade
+        // cairia aqui, o grupo dela nunca seria fechado, e jornadas seria
+        // sobrescrita com o conteúdo errado.
+        const _exaustivo: never = entidade
+        throw new Error(`grupo incompleto de entidade desconhecida: ${String(_exaustivo)}`)
       }
     }
   }
 
   return c.json({
-    progresso: progresso.map(despirServerEm),
+    progresso: progresso.map((l) => despirServerEm(hidratarProgresso(l))),
     anotacoes: anotacoes.map(despirServerEm),
     destaques: destaques.map(despirServerEm),
     posicoes: posicoes.map(despirServerEm),
+    jornadas: jornadas.map(despirServerEm),
     // Sem truncamento (o caminho de longe mais comum): cursor é `agora`,
     // exatamente como antes desta funcionalidade existir. Com truncamento, o
     // cursor é a fronteira computada por paginarPull — nunca `agora`, porque
@@ -223,14 +283,15 @@ app.post('/api/sync', async (c) => {
   const serverEm = new Date().toISOString()
   const stmts = [
     ...parsed.progresso.map((p) =>
-      c.env.DB.prepare(
-        `INSERT INTO progresso (user_id, pericope_ordem, status, atualizado_em, server_em)
-         VALUES (?1, ?2, ?3, ?4, ?5)
-         ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
-           status = excluded.status, atualizado_em = excluded.atualizado_em,
-           server_em = excluded.server_em
-         WHERE excluded.atualizado_em > progresso.atualizado_em`,
-      ).bind(userId, p.pericopeOrdem, p.status, p.atualizadoEm, serverEm),
+      c.env.DB.prepare(UPSERT_PROGRESSO).bind(
+        userId,
+        p.pericopeOrdem,
+        p.status,
+        JSON.stringify(p.historico),
+        p.paraReler ? 1 : 0,
+        p.atualizadoEm,
+        serverEm,
+      ),
     ),
     ...parsed.anotacoes.map((a) =>
       c.env.DB.prepare(
@@ -283,6 +344,24 @@ app.post('/api/sync', async (c) => {
            apagado_em = excluded.apagado_em, server_em = excluded.server_em
          WHERE excluded.atualizado_em > posicao_leitura.atualizado_em`,
       ).bind(userId, p.pericopeOrdem, p.tipo, p.ref, p.tempo, p.atualizadoEm, p.apagadoEm, serverEm),
+    ),
+    ...parsed.jornadas.map((j) =>
+      c.env.DB.prepare(
+        `INSERT INTO jornada (user_id, id, nome, tipo, escopo, inicio_ordem, conta_desde,
+                              criado_em, atualizado_em, arquivada_em, concluida_em,
+                              apagado_em, server_em)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+         ON CONFLICT(user_id, id) DO UPDATE SET
+           nome = excluded.nome, tipo = excluded.tipo, escopo = excluded.escopo,
+           inicio_ordem = excluded.inicio_ordem, conta_desde = excluded.conta_desde,
+           atualizado_em = excluded.atualizado_em, arquivada_em = excluded.arquivada_em,
+           concluida_em = excluded.concluida_em, apagado_em = excluded.apagado_em,
+           server_em = excluded.server_em
+         WHERE excluded.atualizado_em > jornada.atualizado_em`,
+      ).bind(
+        userId, j.id, j.nome, j.tipo, j.escopo, j.inicioOrdem, j.contaDesde,
+        j.criadoEm, j.atualizadoEm, j.arquivadaEm, j.concluidaEm, j.apagadoEm, serverEm,
+      ),
     ),
   ]
   if (stmts.length) await c.env.DB.batch(stmts)

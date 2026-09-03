@@ -4,6 +4,7 @@ import {
   bumpReadingLeading,
   getReadingPrefs,
   LEADING_STEPS,
+  onReadingPrefs,
   setReadingLayout,
   setReadingMeasure,
 } from './reading-prefs'
@@ -65,5 +66,41 @@ describe('reading-prefs espaçamento e medida', () => {
 
     localStorage.setItem('pericopes-reading', JSON.stringify({ measure: 'gigante', leadingStep: 9 }))
     expect(getReadingPrefs()).toMatchObject({ measure: 'media', leadingStep: 1 })
+  })
+})
+
+describe('onReadingPrefs', () => {
+  beforeEach(() => localStorage.clear())
+
+  it('avisa os inscritos a cada aplicação de prefs', () => {
+    let avisos = 0
+    const desinscrever = onReadingPrefs(() => {
+      avisos++
+    })
+    setReadingLayout('blocos')
+    expect(avisos).toBe(1)
+    setReadingMeasure('larga')
+    expect(avisos).toBe(2)
+    desinscrever()
+  })
+
+  it('desinscrito para de receber', () => {
+    let avisos = 0
+    const desinscrever = onReadingPrefs(() => {
+      avisos++
+    })
+    desinscrever()
+    setReadingLayout('blocos')
+    expect(avisos).toBe(0)
+  })
+
+  it('dois inscritos recebem o mesmo aviso', () => {
+    const vistos: string[] = []
+    const off1 = onReadingPrefs(() => vistos.push('a'))
+    const off2 = onReadingPrefs(() => vistos.push('b'))
+    setReadingLayout('blocos')
+    expect(vistos).toEqual(['a', 'b'])
+    off1()
+    off2()
   })
 })

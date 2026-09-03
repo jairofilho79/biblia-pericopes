@@ -2,6 +2,8 @@ export type PushProgresso = {
   pericopeOrdem: number
   status: 'nao_iniciado' | 'em_andamento' | 'concluido'
   atualizadoEm: string
+  historico: string[]
+  paraReler: boolean
 }
 
 export type PushAnotacao = {
@@ -33,11 +35,31 @@ export type PushPosicao = {
   apagadoEm: string | null
 }
 
+export type PushJornada = {
+  id: string
+  nome: string
+  tipo: 'sequencia' | 'bloco' | 'livro'
+  escopo: string
+  inicioOrdem: number
+  contaDesde: string | null
+  criadoEm: string
+  atualizadoEm: string
+  arquivadaEm: string | null
+  concluidaEm: string | null
+  apagadoEm: string | null
+}
+
 const STATUS = new Set(['nao_iniciado', 'em_andamento', 'concluido'])
 const CORES = new Set(['amarelo', 'verde', 'azul', 'rosa'])
 // "capitulo:versiculo" — o mesmo formato do TextoBlock.id no cliente.
 const VERSE_ID = /^\d+:\d+$/
 const POSICAO_TIPOS = new Set(['secao', 'versiculo', 'narracao'])
+const JORNADA_TIPOS = new Set(['sequencia', 'bloco', 'livro'])
+// Cópia de LIMITE_NOME em src/lib/sync-limits.ts (o Worker não importa de src/),
+// mesma convenção já usada para MAX_ITENS e MAX_TEXTO logo abaixo.
+const MAX_NOME = 120
+// Nome de livro é o escopo mais longo ("1 Tessalonicenses"); o teto só barra abuso.
+const MAX_ESCOPO = 64
 // Cópia de POSICAO_REF_RE em src/lib/user-db.ts (o Worker não importa de
 // src/) — o vocabulário de ids que a Leitura põe no DOM. Mudar um exige
 // mudar o outro.
@@ -48,9 +70,52 @@ const POSICAO_REF =
 const MAX_TEMPO_S = 86_400
 // Cópia deliberada dos limites de src/lib/sync-limits.ts: o Worker não pode
 // importar de src/ (tsconfig/bundle separados). Mantenha os dois em sincronia.
-// MAX_ITENS vale para as três listas (progresso/anotacoes/destaques).
+// MAX_ITENS vale para as cinco listas (progresso/anotacoes/destaques/posicoes/jornadas).
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
+// Cópia de MAX_HISTORICO em src/lib/sync-limits.ts.
+export const MAX_HISTORICO = 50
+
+/**
+ * Upsert de `progresso`, com duas políticas de merge simultâneas na mesma
+ * linha: `status`/`para_reler` seguem last-write-wins por `atualizado_em`
+ * (estado — vira nos dois sentidos); `historico` é um conjunto que só
+ * cresce, mesclado por UNIÃO e recalculado FORA da guarda do LWW.
+ *
+ * A união tem que escapar da guarda por causa deste cenário: aparelho A
+ * conclui uma perícope offline em T2; aparelho B desmarca em T3 > T2 e
+ * sincroniza primeiro; o lote de A chega depois e perde o LWW — se a união
+ * estivesse dentro do CASE, a conclusão de A seria descartada para sempre.
+ *
+ * O `WHERE` usa `EXISTS (... NOT IN ...)` e não `excluded.historico <>
+ * progresso.historico`: com `<>`, um cliente velho que sempre envia
+ * `historico: '[]'` faria a cláusula disparar toda vez que `progresso.historico`
+ * não é vazio — mesmo sem nada de novo para gravar —, avançando `server_em`
+ * a cada push e fazendo a linha ser reentregue em todo pull, para sempre.
+ * `EXISTS` com `json_each` sobre um array vazio não produz linha nenhuma,
+ * então fica `false` incondicionalmente quando não há nada novo em
+ * `excluded.historico`, e o `WHERE` cai só no LWW puro.
+ *
+ * Extraída para cá (em vez de inline em index.ts) para que o teste em
+ * upsert-progresso.test.ts rode o SQL de verdade, não uma cópia dele.
+ */
+export const UPSERT_PROGRESSO = `INSERT INTO progresso (user_id, pericope_ordem, status, historico, para_reler, atualizado_em, server_em)
+ VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+ ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
+   status     = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
+                     THEN excluded.status     ELSE progresso.status     END,
+   para_reler = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
+                     THEN excluded.para_reler ELSE progresso.para_reler END,
+   atualizado_em = MAX(excluded.atualizado_em, progresso.atualizado_em),
+   historico = (SELECT json_group_array(d) FROM (
+                  SELECT value AS d FROM json_each(excluded.historico)
+                  UNION
+                  SELECT value AS d FROM json_each(progresso.historico)
+                  ORDER BY d DESC LIMIT ${MAX_HISTORICO})),
+   server_em = excluded.server_em
+ WHERE excluded.atualizado_em > progresso.atualizado_em
+    OR EXISTS (SELECT 1 FROM json_each(excluded.historico)
+               WHERE value NOT IN (SELECT value FROM json_each(progresso.historico)))`
 
 /**
  * Teto do corpo bruto do POST /api/sync, em bytes.
@@ -102,14 +167,22 @@ function isIso(v: unknown): v is string {
   return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
 }
 
-function validProgresso(v: unknown): v is PushProgresso {
+function validProgresso(v: unknown): v is Omit<PushProgresso, 'historico' | 'paraReler'> & {
+  historico?: unknown
+  paraReler?: unknown
+} {
   if (typeof v !== 'object' || v === null) return false
   const p = v as Record<string, unknown>
   return (
     isOrdem(p.pericopeOrdem) &&
     typeof p.status === 'string' &&
     STATUS.has(p.status) &&
-    isIso(p.atualizadoEm)
+    isIso(p.atualizadoEm) &&
+    // Ausentes = cliente ainda não atualizado, aceito (mesma tolerância que
+    // `destaques`/`posicoes` já têm em parseSyncPush).
+    (p.historico === undefined ||
+      (Array.isArray(p.historico) && p.historico.length <= MAX_HISTORICO && p.historico.every(isIso))) &&
+    (p.paraReler === undefined || typeof p.paraReler === 'boolean')
   )
 }
 
@@ -174,6 +247,35 @@ function validPosicao(v: unknown): v is PushPosicao {
   )
 }
 
+/** null ou ISO canônico — os quatro campos de estado da jornada. */
+function isIsoOuNulo(v: unknown): v is string | null {
+  return v === null || isIso(v)
+}
+
+function validJornada(v: unknown): v is PushJornada {
+  if (typeof v !== 'object' || v === null) return false
+  const j = v as Record<string, unknown>
+  return (
+    typeof j.id === 'string' &&
+    j.id.length > 0 &&
+    j.id.length <= 64 &&
+    typeof j.nome === 'string' &&
+    j.nome.length <= MAX_NOME &&
+    typeof j.tipo === 'string' &&
+    JORNADA_TIPOS.has(j.tipo) &&
+    typeof j.escopo === 'string' &&
+    j.escopo.length > 0 &&
+    j.escopo.length <= MAX_ESCOPO &&
+    isOrdem(j.inicioOrdem) &&
+    isIsoOuNulo(j.contaDesde) &&
+    isIso(j.criadoEm) &&
+    isIso(j.atualizadoEm) &&
+    isIsoOuNulo(j.arquivadaEm) &&
+    isIsoOuNulo(j.concluidaEm) &&
+    isIsoOuNulo(j.apagadoEm)
+  )
+}
+
 /**
  * Tamanho de página do pull (GET /api/sync), por entidade. Cada query busca
  * TAMANHO_PAGINA_PULL + 1 linhas: a linha extra é só pra provar que existe
@@ -189,18 +291,20 @@ export const TAMANHO_PAGINA_PULL = 2000
 export type LinhaPull = { serverEm: string }
 
 /** As listas do pull, pelo nome. */
-export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques' | 'posicoes'
+export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques' | 'posicoes' | 'jornadas'
 
 export type ResultadoPaginacaoPull<
   P extends LinhaPull,
   A extends LinhaPull,
   D extends LinhaPull,
   O extends LinhaPull,
+  J extends LinhaPull,
 > = {
   progresso: P[]
   anotacoes: A[]
   destaques: D[]
   posicoes: O[]
+  jornadas: J[]
   /**
    * `null` quando nenhuma entidade estourou: o chamador usa `agora` (o
    * instante gerado antes dos SELECTs) como cursor, exatamente como antes
@@ -300,16 +404,18 @@ export function paginarPull<
   A extends LinhaPull,
   D extends LinhaPull,
   O extends LinhaPull,
+  J extends LinhaPull,
 >(
-  listas: { progresso: P[]; anotacoes: A[]; destaques: D[]; posicoes: O[] },
+  listas: { progresso: P[]; anotacoes: A[]; destaques: D[]; posicoes: O[]; jornadas: J[] },
   n: number,
-): ResultadoPaginacaoPull<P, A, D, O> {
+): ResultadoPaginacaoPull<P, A, D, O, J> {
   const fronteiras = (
     [
       { nome: 'progresso', linhas: listas.progresso as LinhaPull[] },
       { nome: 'anotacoes', linhas: listas.anotacoes as LinhaPull[] },
       { nome: 'destaques', linhas: listas.destaques as LinhaPull[] },
       { nome: 'posicoes', linhas: listas.posicoes as LinhaPull[] },
+      { nome: 'jornadas', linhas: listas.jornadas as LinhaPull[] },
     ] satisfies { nome: EntidadePull; linhas: LinhaPull[] }[]
   )
     .filter(({ linhas }) => linhas.length > n)
@@ -331,6 +437,7 @@ export function paginarPull<
     anotacoes: cortar(listas.anotacoes),
     destaques: cortar(listas.destaques),
     posicoes: cortar(listas.posicoes),
+    jornadas: cortar(listas.jornadas),
     cursor,
     maisDados: true,
     // Só a entidade que empatou tudo E cuja fronteira virou o cursor tem
@@ -349,20 +456,23 @@ export function parseSyncPush(body: unknown): {
   anotacoes: PushAnotacao[]
   destaques: PushDestaque[]
   posicoes: PushPosicao[]
+  jornadas: PushJornada[]
 } | null {
   if (typeof body !== 'object' || body === null) return null
   const b = body as Record<string, unknown>
   const progresso = b.progresso ?? []
   const anotacoes = b.anotacoes ?? []
-  // Corpo sem `destaques`/`posicoes` é aceito como lista vazia: um cliente
-  // ainda não atualizado continua sincronizando as entidades que conhece.
+  // Corpo sem `destaques`/`posicoes`/`jornadas` é aceito como lista vazia: um
+  // cliente ainda não atualizado continua sincronizando as entidades que conhece.
   const destaques = b.destaques ?? []
   const posicoes = b.posicoes ?? []
+  const jornadas = b.jornadas ?? []
   if (
     !Array.isArray(progresso) ||
     !Array.isArray(anotacoes) ||
     !Array.isArray(destaques) ||
-    !Array.isArray(posicoes)
+    !Array.isArray(posicoes) ||
+    !Array.isArray(jornadas)
   ) {
     return null
   }
@@ -370,7 +480,8 @@ export function parseSyncPush(body: unknown): {
     progresso.length > MAX_ITENS ||
     anotacoes.length > MAX_ITENS ||
     destaques.length > MAX_ITENS ||
-    posicoes.length > MAX_ITENS
+    posicoes.length > MAX_ITENS ||
+    jornadas.length > MAX_ITENS
   ) {
     return null
   }
@@ -378,17 +489,23 @@ export function parseSyncPush(body: unknown): {
     !progresso.every(validProgresso) ||
     !anotacoes.every(validAnotacao) ||
     !destaques.every(validDestaque) ||
-    !posicoes.every(validPosicao)
+    !posicoes.every(validPosicao) ||
+    !jornadas.every(validJornada)
   ) {
     return null
   }
   return {
-    progresso,
+    progresso: progresso.map((p) => ({
+      ...p,
+      historico: Array.isArray(p.historico) ? (p.historico as string[]) : [],
+      paraReler: p.paraReler === true,
+    })),
     anotacoes: anotacoes.map((a) => ({
       ...a,
       verseRef: typeof a.verseRef === 'string' ? a.verseRef : null,
     })),
     destaques,
     posicoes,
+    jornadas,
   }
 }

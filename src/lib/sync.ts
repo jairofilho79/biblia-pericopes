@@ -4,6 +4,7 @@ import { notificarSync } from './sync-event'
 import {
   applyRemoteDestaques,
   applyRemoteAnotacoes,
+  applyRemoteJornadas,
   applyRemotePosicoes,
   applyRemoteProgresso,
   clearAllUserData,
@@ -15,6 +16,7 @@ import {
   setMeta,
   type OutboxItem,
 } from './user-db'
+import type { Jornada } from './types'
 
 const CURSOR_KEY = 'sync-cursor'
 const USER_KEY = 'sync-user'
@@ -31,7 +33,13 @@ let running = false
  */
 export const MAX_PAGINAS_PULL = 500
 
-type PushProgresso = { pericopeOrdem: number; status: string; atualizadoEm: string }
+type PushProgresso = {
+  pericopeOrdem: number
+  status: string
+  historico: string[]
+  paraReler: boolean
+  atualizadoEm: string
+}
 type PushAnotacao = {
   id: string
   pericopeOrdem: number
@@ -58,24 +66,33 @@ type PushPosicao = {
   atualizadoEm: string
   apagadoEm: string | null
 }
+type PushJornada = Jornada & { apagadoEm: string | null }
 
 function toPush(items: OutboxItem[]) {
   const progresso = new Map<number, PushProgresso>()
   const anotacoes = new Map<string, PushAnotacao>()
   const destaques = new Map<string, PushDestaque>()
   const posicoes = new Map<number, PushPosicao>()
+  const jornadas = new Map<string, PushJornada>()
   for (const item of items) {
     if (item.kind === 'progresso') {
       progresso.set(item.ordem, {
         pericopeOrdem: item.ordem,
         status: item.status,
+        // Item enfileirado por uma versão anterior do app não tem os campos.
+        // `[]` é neutro na união do servidor e `false` é seguro: `paraReler`
+        // não existia quando aquele item foi gravado.
+        historico: item.historico ?? [],
+        paraReler: item.paraReler ?? false,
         atualizadoEm: item.atualizadoEm,
       })
     } else if (item.kind === 'anotacao') {
       anotacoes.set(item.nota.id, { ...item.nota, apagadoEm: item.apagadoEm })
     } else if (item.kind === 'destaque') {
       destaques.set(item.destaque.id, { ...item.destaque, apagadoEm: item.apagadoEm })
-    } else {
+    } else if (item.kind === 'jornada') {
+      jornadas.set(item.jornada.id, { ...item.jornada, apagadoEm: item.apagadoEm })
+    } else if (item.kind === 'posicao') {
       posicoes.set(item.posicao.pericopeOrdem, { ...item.posicao, apagadoEm: item.apagadoEm })
     }
   }
@@ -84,6 +101,7 @@ function toPush(items: OutboxItem[]) {
     anotacoes: [...anotacoes.values()],
     destaques: [...destaques.values()],
     posicoes: [...posicoes.values()],
+    jornadas: [...jornadas.values()],
   }
 }
 
@@ -107,16 +125,18 @@ function derrubarSessao() {
  * Reenviar um lote já aceito é inofensivo: o upsert no servidor é idempotente.
  */
 async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
-  const { progresso, anotacoes, destaques, posicoes } = toPush(outbox)
+  const { progresso, anotacoes, destaques, posicoes, jornadas } = toPush(outbox)
   const lotesProgresso = chunk(progresso, MAX_ITENS_POR_LOTE)
   const lotesAnotacoes = chunk(anotacoes, MAX_ITENS_POR_LOTE)
   const lotesDestaques = chunk(destaques, MAX_ITENS_POR_LOTE)
   const lotesPosicoes = chunk(posicoes, MAX_ITENS_POR_LOTE)
+  const lotesJornadas = chunk(jornadas, MAX_ITENS_POR_LOTE)
   const total = Math.max(
     lotesProgresso.length,
     lotesAnotacoes.length,
     lotesDestaques.length,
     lotesPosicoes.length,
+    lotesJornadas.length,
   )
 
   for (let i = 0; i < total; i++) {
@@ -129,6 +149,7 @@ async function pushOutbox(outbox: OutboxItem[]): Promise<boolean> {
         anotacoes: lotesAnotacoes[i] ?? [],
         destaques: lotesDestaques[i] ?? [],
         posicoes: lotesPosicoes[i] ?? [],
+        jornadas: lotesJornadas[i] ?? [],
       }),
     })
     if (res.status === 401) {
@@ -225,6 +246,7 @@ export async function syncNow(): Promise<void> {
         // teste) vira lista vazia em vez de estourar e abortar o pull inteiro.
         destaques?: Parameters<typeof applyRemoteDestaques>[0]
         posicoes?: Parameters<typeof applyRemotePosicoes>[0]
+        jornadas?: Parameters<typeof applyRemoteJornadas>[0]
         agora: string
         // opcional pelo mesmo motivo: um servidor antigo nunca manda este campo.
         maisDados?: boolean
@@ -233,7 +255,8 @@ export async function syncNow(): Promise<void> {
         (await applyRemoteProgresso(data.progresso)) +
         (await applyRemoteAnotacoes(data.anotacoes)) +
         (await applyRemoteDestaques(data.destaques ?? [])) +
-        (await applyRemotePosicoes(data.posicoes ?? []))
+        (await applyRemotePosicoes(data.posicoes ?? [])) +
+        (await applyRemoteJornadas(data.jornadas ?? []))
       // Salva o cursor a cada página, não só no fim: um pull interrompido no
       // meio (erro de rede na página seguinte, aba fechada) retoma da última
       // página aplicada em vez de repetir tudo desde o início.

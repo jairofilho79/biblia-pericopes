@@ -1,7 +1,10 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  atualizarJornada,
   clearAllUserData,
+  criarJornada,
+  concluirProgresso,
   deleteMeta,
   enqueuePosicao,
   getMeta,
@@ -9,6 +12,7 @@ import {
   getProgresso,
   listAnotacoes,
   listDestaques,
+  listJornadas,
   listOutbox,
   saveAnotacao,
   setDestaque,
@@ -87,7 +91,7 @@ describe('syncNow', () => {
     // ordem 20001 written twice: dedupe must keep only the LAST state ("em_andamento" then
     // "concluido" wins), proving toPush() collapses by key instead of pushing every outbox row.
     await setProgresso(20001, 'em_andamento')
-    await setProgresso(20001, 'concluido')
+    await concluirProgresso(20001)
     const nota = await saveAnotacao(20002, 'primeira anotação')
 
     const remoteAgora = '2026-08-31T12:00:00.000Z'
@@ -95,7 +99,15 @@ describe('syncNow', () => {
       if (init?.method === 'POST') {
         const body = JSON.parse(init.body as string)
         expect(body.progresso).toEqual([
-          { pericopeOrdem: 20001, status: 'concluido', atualizadoEm: expect.any(String) },
+          {
+            pericopeOrdem: 20001,
+            status: 'concluido',
+            // Não [] mais: concluirProgresso é quem grava agora, e ele
+            // sempre anexa a data da conclusão ao histórico.
+            historico: [expect.any(String)],
+            paraReler: false,
+            atualizadoEm: expect.any(String),
+          },
         ])
         expect(body.anotacoes).toEqual([
           {
@@ -135,7 +147,7 @@ describe('syncNow', () => {
 
   it('POST returning 401 → outbox NOT cleared, no pull attempted', async () => {
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(20003, 'concluido')
+    await concluirProgresso(20003)
 
     const fetchMock = vi.fn(async () => jsonResponse({ error: 'não autenticado' }, { status: 401, ok: false }))
     vi.stubGlobal('fetch', fetchMock)
@@ -224,7 +236,7 @@ describe('syncNow — push em lotes', () => {
   const TOTAL = MAX_ITENS_POR_LOTE * 2 + 1 // 1001 → 3 lotes (500 + 500 + 1)
 
   async function encherOutbox() {
-    for (let i = 0; i < TOTAL; i++) await setProgresso(40000 + i, 'concluido')
+    for (let i = 0; i < TOTAL; i++) await concluirProgresso(40000 + i)
   }
 
   it('outbox acima do limite → vários POSTs, nenhuma lista acima de 500, outbox limpo no fim', async () => {
@@ -278,6 +290,52 @@ describe('syncNow — push em lotes', () => {
     expect(warn).toHaveBeenCalledWith('[sync] push falhou', 500)
     warn.mockRestore()
   })
+
+  // Regressão específica de jornadas: se `lotesJornadas.length` saísse do
+  // `Math.max` que calcula `total`, um outbox com MAIS lotes de jornadas do
+  // que de qualquer outro grupo perderia em silêncio as jornadas do lote
+  // excedente — sem erro, sem log, nenhum POST pra elas. Progresso presente
+  // ao lado (1 lote) é o que garante que este teste morre por essa razão
+  // específica (um lote de jornadas faltando na soma) e não pela razão
+  // incidental de "nenhum POST saiu", que aconteceria se o outbox só
+  // tivesse jornadas e `total` virasse 0.
+  it('jornadas em mais lotes que progresso → nenhum lote de jornadas se perde', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    await concluirProgresso(90000) // 1 item → 1 lote
+    const TOTAL_JORNADAS = MAX_ITENS_POR_LOTE + 1 // 501 → 2 lotes (500 + 1)
+    for (let i = 0; i < TOTAL_JORNADAS; i++) {
+      await criarJornada({
+        nome: `Jornada ${i}`,
+        tipo: 'livro',
+        escopo: 'Salmos',
+        inicioOrdem: 1,
+        contaDesde: null,
+      })
+    }
+
+    const posts: { jornadas: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    // a asserção que importa vem primeiro: a soma dos lotes é o total de
+    // jornadas criadas — se `jornadas` saísse do Math.max, o segundo lote
+    // nunca seria POSTado e esta soma ficaria em 500, não 501 (o outbox NÃO
+    // ficaria vazio, e é isso que a asserção final também comprova).
+    expect(posts.reduce((n, p) => n + p.jornadas.length, 0)).toBe(TOTAL_JORNADAS)
+    expect(posts.length).toBe(2)
+    for (const p of posts) expect(p.jornadas.length).toBeLessThanOrEqual(MAX_ITENS_POR_LOTE)
+    expect(await listOutbox()).toEqual([])
+  }, 20000)
 })
 
 // 400 é validação determinística: reenviar o mesmo lote nunca muda o
@@ -287,7 +345,7 @@ describe('syncNow — push rejeitado com 400', () => {
   it('POST retornando 400 → outbox é limpo e o pull acontece mesmo assim', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(80001, 'concluido')
+    await concluirProgresso(80001)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     let getUrl = ''
@@ -316,7 +374,7 @@ describe('syncNow — push rejeitado com 400', () => {
   it('POST retornando 413 → mesmo tratamento determinístico do 400', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(80002, 'concluido')
+    await concluirProgresso(80002)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
@@ -341,7 +399,7 @@ describe('troca de conta e logout', () => {
   it('sessão de outro usuário → apaga os dados locais antes de aplicar os dele', async () => {
     await resetLocal()
     // dados do usuário A neste dispositivo
-    await setProgresso(50001, 'concluido')
+    await concluirProgresso(50001)
     const notaA = await saveAnotacao(50002, 'nota do usuário A')
     await setMeta('sync-user', 'usuario-A')
     await setMeta('sync-cursor', '2020-01-01T00:00:00.000Z')
@@ -379,7 +437,7 @@ describe('troca de conta e logout', () => {
   it('mesma conta de novo → nada é apagado', async () => {
     await resetLocal()
     await setMeta('sync-user', 'u1')
-    await setProgresso(50004, 'concluido')
+    await concluirProgresso(50004)
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
     vi.stubGlobal(
       'fetch',
@@ -397,7 +455,7 @@ describe('troca de conta e logout', () => {
 
   it('signOutLocal: esvazia o outbox, zera o cursor e desloga — mantendo a marca do dono', async () => {
     await resetLocal()
-    await setProgresso(60001, 'concluido')
+    await concluirProgresso(60001)
     await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
     await setMeta('sync-user', 'u1')
 
@@ -414,7 +472,7 @@ describe('troca de conta e logout', () => {
 
   it('signOutLocal: se o signOut falhar, o outbox e o cursor ficam intactos', async () => {
     await resetLocal()
-    await setProgresso(60002, 'concluido')
+    await concluirProgresso(60002)
     await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
     vi.mocked(authClient.signOut).mockRejectedValue(new Error('offline') as never)
 
@@ -541,6 +599,75 @@ describe('syncNow — destaques', () => {
     await syncNow()
 
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+})
+
+describe('syncNow — jornadas', () => {
+  it('push envia jornadas deduplicadas por id e o pull aplica as remotas', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // mesma jornada criada e depois renomeada: só o último nome sobe
+    const jornada = await criarJornada({
+      nome: 'Salmos',
+      tipo: 'livro',
+      escopo: 'Salmos',
+      inicioOrdem: 2,
+      contaDesde: null,
+    })
+    await atualizarJornada(jornada.id, { nome: 'Salmos (releitura)' })
+
+    const posts: { jornadas: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [],
+        posicoes: [],
+        jornadas: [
+          {
+            id: 'remota-1',
+            nome: 'Pentateuco',
+            tipo: 'bloco',
+            escopo: 'pentateuco',
+            inicioOrdem: 1,
+            contaDesde: null,
+            criadoEm: FUTURE,
+            atualizadoEm: FUTURE,
+            arquivadaEm: null,
+            concluidaEm: null,
+            apagadoEm: null,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts).toHaveLength(1)
+    expect(posts[0].jornadas).toEqual([
+      {
+        id: jornada.id,
+        nome: 'Salmos (releitura)',
+        tipo: 'livro',
+        escopo: 'Salmos',
+        inicioOrdem: 2,
+        contaDesde: null,
+        criadoEm: expect.any(String),
+        atualizadoEm: expect.any(String),
+        arquivadaEm: null,
+        concluidaEm: null,
+        apagadoEm: null,
+      },
+    ])
+    expect((await listJornadas()).map((j) => j.id)).toContain('remota-1')
+    expect(await listOutbox()).toEqual([])
   })
 })
 

@@ -5,7 +5,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { BOOK_MAP, parseReference } from './book-map.ts'
+import { BOOK_MAP } from './book-map.ts'
+import { resolveBounds } from './pericope-bounds.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const naaPath = join(root, 'data/NAA.json')
@@ -18,6 +19,8 @@ type KjvRow = {
   Pericope: string
   'Reference Start': string
   'Reference End': string
+  /** Fonte de verdade dos limites: ver scripts/pericope-bounds.ts. */
+  Verses?: { Reference: string; Text: string }[]
 }
 
 type Warning = { ordem: number; type: string; detail: string }
@@ -68,8 +71,14 @@ function main() {
 
   for (let i = 0; i < kjv.length; i++) {
     const row = kjv[i]
-    const start = parseReference(row['Reference Start'])
-    const end = parseReference(row['Reference End'])
+    const { start, end, corrigido } = resolveBounds(row)
+    if (corrigido) {
+      warnings.push({
+        ordem: i,
+        type: 'limite_corrigido',
+        detail: `declarado ${row['Reference Start']}→${row['Reference End']}, real ${start.livroEn} ${start.capitulo}:${start.versiculo}→${end.capitulo}:${end.versiculo}`,
+      })
+    }
     const mapped = BOOK_MAP[start.livroEn]
     if (!mapped) {
       warnings.push({ ordem: i, type: 'livro_desconhecido', detail: start.livroEn })

@@ -186,7 +186,10 @@ a {
 
 .top {
   display: grid;
-  grid-template-columns: 1fr auto;
+  /* Uma coluna só: a marca na linha 1, a nav (grid-column: 1 / -1) na 2. A
+     2ª coluna existia para o ThemeMenu solto, que virou item da nav — sem
+     ele o grid ainda reservava o column-gap de uma trilha vazia. */
+  grid-template-columns: 1fr;
   align-items: center;
   column-gap: 0.75rem;
   row-gap: 0.15rem;
@@ -276,36 +279,6 @@ a {
   font-weight: 600;
 }
 
-.theme-menu {
-  grid-column: 2;
-  grid-row: 1;
-  position: relative;
-  justify-self: end;
-}
-
-/* Alinha à direita, abaixo do gatilho; a borda direita do header já é a
-   do botão, então o popover nunca sai da tela em 375px. */
-.theme-pop {
-  min-width: 0;
-  width: max-content;
-  max-width: calc(100vw - 2 * var(--shell-pad));
-}
-
-.theme-toggle {
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--paper) 80%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.4rem 0.65rem;
-  min-height: 2.5rem;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 @media (max-width: 379.98px) {
   .brand {
     font-size: 1.15rem;
@@ -315,17 +288,12 @@ a {
     gap: 0.25rem 0.75rem;
     font-size: 0.85rem;
   }
-
-  .theme-toggle {
-    padding: 0.3rem 0.45rem;
-    font-size: 0.72rem;
-  }
 }
 
-/* tablet+: brand | nav | theme on one row */
+/* tablet+: brand | nav on one row */
 @media (min-width: 640px) {
   .top {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     row-gap: 0;
   }
 
@@ -334,10 +302,6 @@ a {
     grid-row: 1;
     justify-content: flex-end;
     gap: 0.35rem 0.85rem;
-  }
-
-  .theme-menu {
-    grid-column: 3;
   }
 }
 
@@ -514,6 +478,66 @@ h2 {
   }
 }
 
+/* "Vale reler": abaixo do conteúdo principal, ausente do DOM quando vazio —
+   lugar que se visita, nunca alarme. ★ é o pin manual, ● é o decay de 1 ano. */
+.vale-reler {
+  margin-top: 2rem;
+}
+
+.vale-reler h2 {
+  margin-bottom: 0.5rem;
+}
+
+.vale-reler ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vale-reler li a {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  min-height: 3rem;
+}
+
+.vale-reler li a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.vale-reler li a > span:first-child {
+  flex: 0 0 1.1rem;
+  color: var(--accent);
+  line-height: 1.4;
+}
+
+.vale-reler-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.vale-reler-texto strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.vale-reler-texto span {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.vale-reler .linkish {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+}
+
 .peri-row {
   display: flex;
   gap: 0.55rem;
@@ -670,11 +694,9 @@ button.ghost {
   user-select: all;
 }
 
-/* Linha de meta do cabeçalho: referência à esquerda, grupo ←/→/Aa à direita.
-   flex-wrap porque em 375px "1 Coríntios 15:1–15:58 · ~4 min" mais o grupo
-   (~135px) não cabem juntos: o grupo desce inteiro para a linha seguinte e
-   encosta na direita (margin-left: auto no .ref-nav), em vez de espremer a
-   referência ou cortar botão. */
+/* Linha de meta do cabeçalho da perícope: só a referência e a estimativa de
+   tempo. O grupo ←/→/Aa que justificava o flex-wrap saiu — as setas foram
+   para o pager do rodapé e o swipe, e o "Aa" para o menu Perfil. */
 .ref-row {
   display: flex;
   flex-wrap: wrap;
@@ -692,16 +714,6 @@ button.ghost {
 
 .ref-min {
   white-space: nowrap;
-}
-
-.readmenu {
-  position: relative;
-}
-
-.readmenu-btn {
-  font-family: var(--font-display);
-  min-width: 2.75rem;
-  min-height: 2.5rem;
 }
 
 .readmenu-pop {
@@ -794,43 +806,7 @@ button.ghost {
   background: var(--accent-soft);
 }
 
-/* ←, → e Aa como um grupo só: um "pill" com borda e os botões encostados
-   dentro, todos com a mesma altura. Quando não há anterior (1ª perícope) o
-   botão simplesmente não é renderizado e o pill encolhe — nada de buraco.
-   margin-left: auto é o que leva o grupo para a direita quando o .ref-row
-   quebra linha no celular. */
-.ref-nav {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  margin-left: auto;
-  gap: 0.1rem;
-  padding: 0.15rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--paper) 70%, transparent);
-}
-
-/* Dentro do pill os botões viram segmentos redondos do mesmo tamanho
-   (2.5rem — o .read-tool sozinho fica em 2.25rem e o Aa saía mais estreito
-   que as setas); o hover/foco do .read-tool (borda + fundo) continua valendo
-   e fica contido no segmento. */
-.ref-nav .read-tool {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  border-radius: 999px;
-}
-
-.ref-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  text-decoration: none;
-}
-
-/* tablet+: mais respiro entre a referência e o grupo, tudo numa linha só. */
+/* tablet+: mais respiro em volta da linha de referência. */
 @media (min-width: 640px) {
   .ref-row {
     gap: 0.5rem 1.25rem;
@@ -839,19 +815,25 @@ button.ghost {
 }
 
 /* barra de âncoras: sticky abaixo do header, e colada no topo quando ele some.
-   z-index 4 fica abaixo do .top (5) e da .verse-actions (8) de propósito. */
+   z-index 4 fica abaixo do .top (5) e da .verse-actions (8) de propósito.
+
+   Fundo OPACO, não translúcido: com 82% + blur(6px) o texto que passava por
+   baixo aparecia borrado na faixa de padding acima do pill, e a barra parecia
+   descolada do header — o vão aparente era texto vazando, não espaço.
+
+   Sem `transition: top`: o offset vem de --top-h, medido em JS, e o header
+   anima um `transform` em paralelo. Animar os dois separadamente deixa a barra,
+   durante 250ms, num offset que não corresponde a estado nenhum. Quando o
+   header desliza, o certo é a barra saltar. */
 .section-chips {
   position: sticky;
   top: var(--top-h, 0px);
   z-index: 4;
   margin: 0 -1.05rem 0.9rem;
   padding: 0.3rem 1.05rem;
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: var(--paper);
   border-bottom: 1px solid var(--line);
   font-family: var(--font-ui);
-  transition: top 0.25s ease;
 }
 
 /* Clique num chip ou `?v=` na URL rolam até a seção via âncora nativa: sem
@@ -1016,12 +998,6 @@ button.ghost {
   .section-chip-texto {
     white-space: normal;
     text-align: center;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .section-chips {
-    transition: none;
   }
 }
 
@@ -1954,6 +1930,31 @@ button.ghost {
   }
 }
 
+.desmarcar {
+  display: block;
+  margin: 0.75rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.reler {
+  display: block;
+  margin: 0.5rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.reler[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.historico-leitura {
+  margin: 0.5rem auto 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 .badge {
   font-family: var(--font-ui);
   background: var(--accent-soft);
@@ -2385,50 +2386,96 @@ button.ghost {
   font-size: 0.9rem;
 }
 
-.nav-conta {
-  font-size: inherit;
-  color: var(--muted);
-  /* mesma altura e respiro dos links ao lado, senão "Sair" fica deslocado */
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding-inline: 0.15rem;
-}
+/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra, cor
+   de erro igual à do .entrar-erro.
 
-.nav-conta-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra.
-   Fora do fluxo (abaixo do botão) para não reservar altura nem empurrar
-   o "Sair" para cima; é transitório (4 s), pode sobrepor o que vem abaixo.
-   Cor de erro igual à do .entrar-erro. */
+   Mora dentro do .perfil-pop desde que o "Sair" virou item do menu: é uma
+   linha normal do grid, logo abaixo do botão. Nada de position: absolute
+   aqui — o .perfil-pop tem overflow-y: auto, o que faz o overflow-x computar
+   para auto também, então um filho fora do fluxo seria recortado pelo
+   contêiner de rolagem (ou viraria rolagem escondida) justamente quando a
+   mensagem precisa ser vista. Sem nowrap pelo mesmo motivo: o texto quebra
+   dentro dos 260px em vez de vazar na horizontal. O padding-inline é o do
+   .perfil-item, para o aviso alinhar com o rótulo do "Sair". */
 .nav-conta-erro {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  min-height: 0;
-  white-space: nowrap;
+  padding-inline: 0.55rem;
   color: #b3564d;
   font-family: var(--font-ui);
   font-size: 0.75rem;
   line-height: 1.25;
-  text-align: center;
 }
 
-/* tablet+: "Sair" é o último item na borda direita; centralizar o aviso
-   nele faria o texto vazar a viewport, então ele cresce para a esquerda */
-@media (min-width: 640px) {
-  .nav-conta-erro {
-    left: auto;
-    right: 0;
-    transform: none;
-    text-align: end;
-  }
+/* Task 6 (jornadas): Home mostra a jornada ativa em vez das trilhas VT/NT.
+   Reaproveita .track-label/.track-progress/.book-progress/.cta — só o
+   invólucro do card e o convite abaixo das trilhas são novos. */
+.jornada-card {
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.4rem;
+  max-width: 28rem;
+}
+
+.jornada-card .book-progress {
+  width: 100%;
+  height: 6px;
+  margin: 0 0 1rem;
+}
+
+.jornada-card .cta {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+/* "Comece uma jornada" / "Entre para criar jornadas", abaixo das trilhas
+   VT/NT — convite, não obrigação, por isso .ghost e não .cta. */
+.jornada-convite {
+  margin: 1rem 0 0;
+}
+
+/* Task 7 (jornadas): tela de gestão em /jornada. Reaproveita .jornada-card,
+   .track-progress, .book-progress, .ghost e .linkish (Task 6 e Leitura já os
+   definem) — só os dois agrupamentos novos (ações/confirmação e histórico)
+   precisam de layout próprio. */
+.jornada-acoes,
+.jornada-confirmar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0 0;
+  font-family: var(--font-ui);
+}
+
+.jornada-historico-titulo {
+  margin-top: 2rem;
+}
+
+.jornada-historico {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.jornada-historico li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.jornada-historico li .track-progress {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.jornada-historico-nome {
+  font-family: var(--font-ui);
+  color: var(--ink);
 }
 
 /* visível só para leitores de tela */
@@ -2442,4 +2489,284 @@ button.ghost {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Task 8 (jornadas): catálogo de escopos (passo 1) e confirmação (passo 2)
+   em /jornada. Reaproveita .muted, .ghost, .linkish, .cta e .jornada-acoes
+   (Tasks 6/7 já os definem) — só a escada de grupos, os cards de escopo e
+   os dois campos do passo 2 precisam de layout próprio. */
+.jornada-catalogo,
+.jornada-confirmacao {
+  margin-top: 1.5rem;
+  max-width: 34rem;
+}
+
+.jornada-grupo + .jornada-grupo {
+  margin-top: 1.25rem;
+}
+
+.jornada-grupo h3 {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.jornada-escopos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Cada escopo é um botão a largura toda: nome à esquerda, tamanho à direita
+   — o mesmo par que .track-progress já usa noutras telas, só que aqui é a
+   PRÉVIA do tamanho, não o progresso de uma jornada gravada. */
+.jornada-escopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.jornada-escopo-tamanho {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.jornada-confirmacao h2,
+.jornada-catalogo h2 {
+  margin-top: 0;
+}
+
+/* Rótulo + controle empilhados, como .entrar-form já faz — só que aqui um
+   <label> vira <fieldset>/<legend> para o grupo de rádios. */
+.jornada-campo {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.jornada-campo input[type='text'] {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+fieldset.jornada-campo {
+  border: none;
+  padding: 0;
+}
+
+.jornada-campo legend {
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.jornada-campo label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+/* Aviso ANTES do botão de criar — não é erro (por isso sem a cor de
+   .entrar-erro), é uma decisão que o leitor toma de olhos abertos. */
+.jornada-aviso {
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--paper));
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.ajustes-livro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+.ajustes-livro select {
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.ajustes-alvos {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+}
+
+.ajustes-alvos li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.ajustes-rotulo {
+  flex: 1;
+}
+
+.ajustes-contagem {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-family: var(--font-ui);
+}
+
+.ajustes-confirma {
+  margin-top: 1.25rem;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+}
+
+.ajustes-confirma-acoes {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.85rem;
+}
+
+.ajustes-aviso {
+  margin: 1rem 0 0;
+  min-height: 1.1rem;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+  color: var(--muted);
+
+/* ── Menu Perfil ─────────────────────────────────────────────────────────
+   Reúne tema, tipografia, Ajustes e conta. É o popover mais alto do app:
+   ~520px na Leitura, contra os ~240px do antigo "Aa". Daí as medidas
+   abaixo. */
+
+/* margin-left: auto empurra o gatilho para a borda direita da nav, que é a
+   borda direita do header. Não é estética: o .readmenu-pop abre com
+   `right: 0` e cresce para a esquerda, então quem ancora o popover é a
+   direita do gatilho. Antes quem garantia isso era o `justify-self: end` do
+   .theme-menu; a nav abaixo de 640px é `flex-start`, e sem esta regra um
+   popover de 260px pendurado num gatilho que ficou no meio da linha vazaria
+   pela esquerda da tela. Acima de 640px a nav já é `flex-end` e isto é
+   inócuo. */
+.perfil-wrap {
+  position: relative;
+  margin-left: auto;
+}
+
+/* 260px e não os 230px do .readmenu-pop porque a 230px a linha de fontes
+   (Serif/Literata/Sans) e a de tema (quatro rótulos) quebram em duas linhas.
+   O max-width é o que herdamos do .theme-pop, apagado junto com o ThemeMenu:
+   é ele que segura o popover dentro da tela em 375px (com o margin-left: auto
+   do .perfil-wrap acima, sobra --shell-pad de cada lado). Não apagar.
+   max-height + rolagem porque num aparelho de 568px de altura os ~520px não
+   cabem abaixo do header; overscroll-behavior impede a rolagem de vazar para
+   a página atrás quando chega ao fim. */
+.perfil-pop {
+  min-width: 260px;
+  max-width: calc(100vw - 2 * var(--shell-pad));
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.perfil-secao {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.perfil-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 0.15rem 0;
+}
+
+.perfil-item {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding-inline: 0.55rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.perfil-item:hover,
+.perfil-item:focus-visible {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  outline: none;
+}
+
+.perfil-item:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* O gatilho é um <button> no meio de <a>s: sem herdar font e cor ele destoa
+   dos vizinhos da nav. Aberto, acende como o link ativo acende. */
+.top nav .perfil-btn {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding-inline: 0.15rem;
+  min-height: 2.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.top nav .perfil-btn[aria-expanded='true'] {
+  color: var(--accent);
+  font-weight: 600;
 }

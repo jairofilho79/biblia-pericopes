@@ -220,7 +220,21 @@ POSTs. Protocolo intocado.
 ### Interface
 
 Rota nova `/ajustes` (`src/pages/Ajustes.tsx`), com os três níveis na mesma
-gramática, cada um mostrando a contagem real antes de confirmar:
+gramática, cada um mostrando a contagem real antes de confirmar.
+
+**Ponto de entrada: uma entrada dentro do menu "Perfil"**, não um ícone solto
+no header. Decidido pela sessão de jornadas, que é dona do chrome: ela remove
+"Hoje" da nav (a marca já leva a `/`) e absorve o `ThemeMenu` e as preferências
+do "Aa" num menu de conta — então a engrenagem que este design pedia "ao lado
+do `ThemeMenu`" não teria vizinho. É melhor por mérito, não só por espaço:
+ação destrutiva de conta pertence ao menu de conta, que é onde se procura por
+"apagar meus dados", e ficar a dois cliques deliberados convém a algo que apaga
+o ✓ de centenas de linhas.
+
+O **formato** do Perfil ainda está sendo decidido; a **localização** (menu de
+conta, nunca item de primeiro nível da nav) é estável. Se o formato mudar, o
+que muda aqui é o rótulo do ponto de entrada — não a rota, nem a tela.
+
 
 ```
 /AJUSTES  →  Progresso de leitura
@@ -252,8 +266,14 @@ export function candidatosReler(progressos: Progresso[], agora: Date): Candidato
 Regra: `paraReler || (status === 'concluido' && dias(historico[0]) > 365)`.
 Ordem: pin primeiro, depois mais esquecida, desempate por menos lida.
 
-Bloco **"Vale reler"** na Home abaixo das duas trilhas, **oculto quando
-vazio**, top 3 mais "ver todas" que expande no lugar — sem rota nova.
+Bloco **"Vale reler"** na Home **abaixo do conteúdo principal nos dois
+estados** — com o card de jornada ativa, e com as trilhas VT/NT quando não há
+jornada — **oculto quando vazio**, top 3 mais "ver todas" que expande no lugar.
+Sem rota nova.
+
+Abaixo e não acima por decisão da sessão de jornadas, dona da estrutura da
+Home: ela responde primeiro "para onde eu vou agora"; releitura é oferta, não
+instrução.
 
 Na Leitura, `★ Marcar para reler` ao lado do desmarcar, e o histórico visível:
 `lida 3× · mar/26 · ago/25 · jan/25`. Concluir limpa o pin: a releitura
@@ -292,8 +312,8 @@ As duas features são desenhadas em paralelo. Divisões acordadas:
 | `src/lib/conclusao.ts` | consome | **dono** |
 | `src/lib/jornadas.ts` | dono | não toca |
 | `streak.ts` | consome | **dono** (fatia 3) |
-| `Home.tsx` | **dono da estrutura** | encaixa o bloco "Vale reler" abaixo |
-| header / nav | **dono** (já reescreve `App.tsx`) | pede um slot para `/ajustes` |
+| `Home.tsx` | **dono da estrutura** | "Vale reler" abaixo, nos dois estados |
+| header / nav | **dono** (reescreve `App.tsx`) | `/ajustes` entra pelo menu "Perfil" |
 
 `progressoPorLivro` (`content.ts`) **não muda**: já recebe `Set<number>` e não
 lê `atualizadoEm`. Nenhuma das duas features encosta nele.
@@ -326,12 +346,12 @@ em `streak.ts`, para a Home nova não precisar saber que a fonte muda na fatia 3
 2. **Mais uma lista no `paginarPull` (fatia 3).** O arquivo mais sutil do repo, com
    invariantes de cursor documentadas em detalhe. É o pedaço mais arriscado do
    plano e provavelmente merece brainstorm próprio quando chegar a vez.
-3. **Espaço no header a 360 px, e a Home disputada.** A spec de jornadas já
-   registra a nav apertada, com plano B de transformar `Entrar` em ícone, e
-   jornadas reescreve a Home para mostrar o card da jornada ativa no lugar das
-   trilhas VT/NT. `/ajustes` acrescenta um alvo no header e "Vale reler"
-   acrescenta um bloco na Home. **Jornadas é dona das duas estruturas**; esta
-   feature encaixa no que ela definir.
+3. **Chrome ainda em movimento.** As duas colisões com jornadas (bloco na
+   Home, ponto de entrada de `/ajustes`) foram **resolvidas** por ela, que é
+   dona das duas estruturas — ver Fatia 1 e Fatia 2. O aperto de 360 px que a
+   spec dela registrava acabou: "Hoje" sai da nav. O resíduo é que o formato
+   do menu "Perfil" segue em decisão; o impacto máximo deste lado é o rótulo
+   de uma entrada de menu.
 4. **Cliente velho empurrando sem `historico`.** Coberto pelo `EXISTS` no
    `WHERE` (não bomba `server_em`) e pela tolerância a campo ausente no
    `validProgresso`.

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { authClient } from '../lib/auth-client'
+import { mostrarPrefsDeLeitura } from '../lib/perfil-secoes'
 import { signOutLocal } from '../lib/sync'
 import { getThemePref, setThemePref, type ThemePref } from '../lib/theme'
 import { usePopover } from '../lib/use-popover'
@@ -12,15 +13,6 @@ const TEMAS: { id: ThemePref; label: string }[] = [
   { id: 'sepia', label: 'Sépia' },
   { id: 'dark', label: 'Escuro' },
 ]
-
-/**
- * A tipografia só aparece onde há prosa de leitura na tela: ajustar entrelinha
- * no Índice não mostraria efeito nenhum. Puro, para ser testável.
- */
-// eslint-disable-next-line react/only-export-components -- export nomeado puro exigido pela interface da task, para ser testável isoladamente
-export function mostrarPrefsDeLeitura(pathname: string): boolean {
-  return pathname.startsWith('/leitura/')
-}
 
 type Props = {
   /** O header trava o auto-ocultar enquanto o menu está aberto. */

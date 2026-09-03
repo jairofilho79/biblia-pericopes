@@ -26,7 +26,7 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('../lib/sync', () => ({ signOutLocal: vi.fn(async () => {}) }))
 
-import PerfilMenu, { mostrarPrefsDeLeitura } from './PerfilMenu'
+import PerfilMenu from './PerfilMenu'
 
 let container: HTMLDivElement
 let root: Root
@@ -57,24 +57,6 @@ function abrir() {
 function textos(seletor: string): string[] {
   return [...container.querySelectorAll(seletor)].map((e) => e.textContent?.trim() ?? '')
 }
-
-describe('mostrarPrefsDeLeitura', () => {
-  it('vale na Leitura', () => {
-    expect(mostrarPrefsDeLeitura('/leitura/1')).toBe(true)
-    expect(mostrarPrefsDeLeitura('/leitura/842')).toBe(true)
-  })
-
-  it('não vale fora dela', () => {
-    expect(mostrarPrefsDeLeitura('/')).toBe(false)
-    expect(mostrarPrefsDeLeitura('/indice')).toBe(false)
-    expect(mostrarPrefsDeLeitura('/pesquisar')).toBe(false)
-    expect(mostrarPrefsDeLeitura('/ajustes')).toBe(false)
-  })
-
-  it('não confunde uma rota que só começa parecido', () => {
-    expect(mostrarPrefsDeLeitura('/leituras-antigas')).toBe(false)
-  })
-})
 
 describe('PerfilMenu — o gatilho', () => {
   it('a nav mostra "Perfil" deslogado', () => {

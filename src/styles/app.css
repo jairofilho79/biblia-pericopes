@@ -2301,34 +2301,23 @@ button.ghost {
   font-size: 0.9rem;
 }
 
-/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra.
-   Fora do fluxo (abaixo do botão) para não reservar altura nem empurrar
-   o "Sair" para cima; é transitório (4 s), pode sobrepor o que vem abaixo.
-   Cor de erro igual à do .entrar-erro. */
+/* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra, cor
+   de erro igual à do .entrar-erro.
+
+   Mora dentro do .perfil-pop desde que o "Sair" virou item do menu: é uma
+   linha normal do grid, logo abaixo do botão. Nada de position: absolute
+   aqui — o .perfil-pop tem overflow-y: auto, o que faz o overflow-x computar
+   para auto também, então um filho fora do fluxo seria recortado pelo
+   contêiner de rolagem (ou viraria rolagem escondida) justamente quando a
+   mensagem precisa ser vista. Sem nowrap pelo mesmo motivo: o texto quebra
+   dentro dos 260px em vez de vazar na horizontal. O padding-inline é o do
+   .perfil-item, para o aviso alinhar com o rótulo do "Sair". */
 .nav-conta-erro {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  min-height: 0;
-  white-space: nowrap;
+  padding-inline: 0.55rem;
   color: #b3564d;
   font-family: var(--font-ui);
   font-size: 0.75rem;
   line-height: 1.25;
-  text-align: center;
-}
-
-/* tablet+: "Sair" é o último item na borda direita; centralizar o aviso
-   nele faria o texto vazar a viewport, então ele cresce para a esquerda */
-@media (min-width: 640px) {
-  .nav-conta-erro {
-    left: auto;
-    right: 0;
-    transform: none;
-    text-align: end;
-  }
 }
 
 /* visível só para leitores de tela */

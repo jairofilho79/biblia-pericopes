@@ -95,7 +95,13 @@ describe('syncNow', () => {
       if (init?.method === 'POST') {
         const body = JSON.parse(init.body as string)
         expect(body.progresso).toEqual([
-          { pericopeOrdem: 20001, status: 'concluido', atualizadoEm: expect.any(String) },
+          {
+            pericopeOrdem: 20001,
+            status: 'concluido',
+            historico: [],
+            paraReler: false,
+            atualizadoEm: expect.any(String),
+          },
         ])
         expect(body.anotacoes).toEqual([
           {

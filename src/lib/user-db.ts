@@ -1,6 +1,6 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import { remoteWinsLocal } from './sync-merge'
-import { MAX_TEXTO } from './sync-limits'
+import { MAX_HISTORICO, MAX_TEXTO } from './sync-limits'
 import type {
   Anotacao,
   Destaque,
@@ -130,6 +130,43 @@ export async function setProgresso(ordem: number, status: ProgressoStatus): Prom
     kind: 'progresso',
     ordem,
     status,
+    historico: linha.historico,
+    paraReler: linha.paraReler,
+    atualizadoEm,
+  } as OutboxItem)
+  await tx.done
+}
+
+/** Une dois históricos: conjunto, mais nova primeiro, cortado em MAX_HISTORICO. */
+function unirHistorico(a: readonly string[] = [], b: readonly string[] = []): string[] {
+  return [...new Set([...a, ...b])].sort((x, y) => (x < y ? 1 : x > y ? -1 : 0)).slice(0, MAX_HISTORICO)
+}
+
+/**
+ * Conclui a perícope: anexa a data ao histórico, marca `concluido` e limpa o
+ * pin de releitura (a releitura aconteceu).
+ *
+ * Substitui `setProgresso(ordem, 'concluido')` como o gesto de concluir — é o
+ * único lugar que faz o histórico crescer.
+ */
+export async function concluirProgresso(ordem: number): Promise<void> {
+  const atualizadoEm = new Date().toISOString()
+  const d = await db()
+  const tx = d.transaction(['progresso', 'outbox'], 'readwrite')
+  const store = tx.objectStore('progresso')
+  const anterior = await store.get(ordem)
+  const linha: Progresso = {
+    pericopeOrdem: ordem,
+    status: 'concluido',
+    historico: unirHistorico([atualizadoEm], anterior?.historico),
+    paraReler: false,
+    atualizadoEm,
+  }
+  await store.put(linha)
+  await tx.objectStore('outbox').put({
+    kind: 'progresso',
+    ordem,
+    status: linha.status,
     historico: linha.historico,
     paraReler: linha.paraReler,
     atualizadoEm,
@@ -399,29 +436,43 @@ export async function clearAllUserData(): Promise<void> {
 }
 
 /**
- * Aplica o progresso vindo do pull e devolve quantas linhas mudaram de fato.
+ * Aplica o progresso vindo do pull. Duas políticas na mesma linha, de propósito:
+ * `status` e `paraReler` seguem o LWW por `atualizadoEm`; `historico` é união
+ * de conjuntos e roda FORA da guarda do LWW — senão um lote que perdeu o LWW
+ * levaria junto uma conclusão feita offline, que nunca mais voltaria.
  *
- * A contagem alimenta o evento de live refresh (src/lib/sync-event.ts): o pull
- * reentrega linhas de propósito, então "veio no payload" não é o mesmo que
- * "mudou aqui" — só o que o LWW deixou entrar conta.
+ * A contagem alimenta o live refresh (sync-event.ts): "veio no payload" não é
+ * "mudou aqui", e uma união que cresceu conta tanto quanto um status novo.
  */
 export async function applyRemoteProgresso(
-  items: { pericopeOrdem: number; status: ProgressoStatus; atualizadoEm: string }[],
+  items: {
+    pericopeOrdem: number
+    status: ProgressoStatus
+    historico?: string[]
+    paraReler?: boolean
+    atualizadoEm: string
+  }[],
 ): Promise<number> {
   const d = await db()
   let aplicadas = 0
   for (const item of items) {
     const local = await d.get('progresso', item.pericopeOrdem)
-    if (remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) {
-      // O pull ainda não carrega historico/paraReler (migration do D1 é
-      // tarefa futura): preserva o que já está aqui, nunca esvazia.
-      await d.put('progresso', {
-        ...item,
-        historico: local?.historico ?? [],
-        paraReler: local?.paraReler ?? false,
-      })
-      aplicadas++
-    }
+    const remotoVence = remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)
+    const historico = unirHistorico(item.historico, local?.historico)
+    const uniaoMudou = historico.length !== (local?.historico?.length ?? -1)
+    if (!remotoVence && !uniaoMudou) continue
+    await d.put('progresso', {
+      pericopeOrdem: item.pericopeOrdem,
+      status: remotoVence ? item.status : (local?.status ?? item.status),
+      historico,
+      // `item.paraReler` ausente (servidor/cliente antigo) não é "remoto diz
+      // false" — é "remoto não opina", e opinião nenhuma não pode apagar o pin
+      // local, mesmo com o LWW do status do lado do remoto.
+      paraReler: remotoVence ? (item.paraReler ?? local?.paraReler ?? false) : (local?.paraReler ?? false),
+      atualizadoEm:
+        remotoVence || !local ? item.atualizadoEm : local.atualizadoEm,
+    })
+    aplicadas++
   }
   return aplicadas
 }

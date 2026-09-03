@@ -34,6 +34,7 @@ import { useKeyboardNav } from '../lib/use-keyboard-nav'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   clearPosicao,
+  concluirProgresso,
   deleteAnotacao,
   destaqueId,
   enqueuePosicao,
@@ -626,7 +627,7 @@ export default function Leitura() {
   }
 
   async function markDone() {
-    await setProgresso(ordem, 'concluido')
+    await concluirProgresso(ordem)
     // Concluiu: o checkpoint morre (com lápide — sem ela o pull ressuscitaria)
     // e a próxima abertura começa do topo, como sempre foi.
     await clearPosicao(ordem)

@@ -8,6 +8,7 @@ import {
   clearAllUserData,
   clearOutbox,
   clearPosicao,
+  concluirProgresso,
   deleteAnotacao,
   deleteMeta,
   enqueuePosicao,
@@ -587,5 +588,101 @@ describe('progresso: historico e paraReler', () => {
 
   it('MAX_HISTORICO é 50', () => {
     expect(MAX_HISTORICO).toBe(50)
+  })
+})
+
+describe('concluirProgresso', () => {
+  it('anexa uma data ao histórico e marca concluido', async () => {
+    await concluirProgresso(9310)
+    const p = await getProgresso(9310)
+    expect(p?.status).toBe('concluido')
+    expect(p?.historico).toHaveLength(1)
+    expect(p?.historico[0]).toBe(p?.atualizadoEm)
+  })
+
+  it('reler acrescenta uma SEGUNDA data, mais nova primeiro', async () => {
+    await concluirProgresso(9311)
+    const primeira = (await getProgresso(9311))!.historico[0]
+    await new Promise((r) => setTimeout(r, 2))
+    await concluirProgresso(9311)
+    const p = await getProgresso(9311)
+    expect(p?.historico).toHaveLength(2)
+    expect(p?.historico[1]).toBe(primeira)
+    expect(p!.historico[0] > p!.historico[1]).toBe(true)
+  })
+
+  it('concluir limpa o pin de releitura: a releitura aconteceu', async () => {
+    await setProgresso(9312, 'em_andamento')
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...(await getProgresso(9312))!, paraReler: true })
+    d.close()
+    await concluirProgresso(9312)
+    expect((await getProgresso(9312))?.paraReler).toBe(false)
+  })
+
+  it('respeita MAX_HISTORICO, descartando a mais antiga', async () => {
+    const cheio = Array.from({ length: MAX_HISTORICO }, (_, i) =>
+      new Date(Date.UTC(2020, 0, 1 + i)).toISOString(),
+    ).reverse()
+    await setProgresso(9313, 'em_andamento')
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...(await getProgresso(9313))!, historico: cheio })
+    d.close()
+
+    await concluirProgresso(9313)
+    const p = await getProgresso(9313)
+    expect(p?.historico).toHaveLength(MAX_HISTORICO)
+    expect(p?.historico).not.toContain('2020-01-01T00:00:00.000Z')
+  })
+})
+
+describe('applyRemoteProgresso: merge híbrido', () => {
+  it('une os históricos mesmo quando o LWW local vence', async () => {
+    // Aparelho A concluiu offline em T2; B desmarcou em T3 > T2 e sincronizou
+    // primeiro. O status de B vence, e a conclusão de A NÃO pode se perder.
+    await setProgresso(9320, 'nao_iniciado')
+    const local = await getProgresso(9320)
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...local!, historico: ['2026-08-03T00:00:00.000Z'] })
+    d.close()
+
+    await applyRemoteProgresso([
+      {
+        pericopeOrdem: 9320,
+        status: 'concluido',
+        historico: ['2026-08-01T00:00:00.000Z'],
+        paraReler: false,
+        atualizadoEm: PAST,
+      },
+    ])
+    const p = await getProgresso(9320)
+    expect(p?.status).toBe('nao_iniciado') // LWW local venceu
+    expect(p?.historico).toEqual(['2026-08-03T00:00:00.000Z', '2026-08-01T00:00:00.000Z'])
+  })
+
+  it('conta como aplicada quando SÓ a união mudou', async () => {
+    await setProgresso(9321, 'concluido')
+    const n = await applyRemoteProgresso([
+      {
+        pericopeOrdem: 9321,
+        status: 'concluido',
+        historico: ['2019-01-01T00:00:00.000Z'],
+        paraReler: false,
+        atualizadoEm: PAST,
+      },
+    ])
+    // Sem isto o live refresh perderia uma releitura vinda de outro aparelho.
+    expect(n).toBe(1)
+    expect((await getProgresso(9321))?.historico).toContain('2019-01-01T00:00:00.000Z')
+  })
+
+  it('tolera payload sem os campos novos (servidor/cliente antigo)', async () => {
+    await setProgresso(9322, 'nao_iniciado')
+    await applyRemoteProgresso([
+      { pericopeOrdem: 9322, status: 'concluido', atualizadoEm: FUTURE },
+    ])
+    const p = await getProgresso(9322)
+    expect(p?.status).toBe('concluido')
+    expect(Array.isArray(p?.historico)).toBe(true)
   })
 })

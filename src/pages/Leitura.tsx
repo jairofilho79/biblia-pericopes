@@ -224,9 +224,10 @@ export default function Leitura() {
   }
 
   // Refresh estreito para o aviso de sync: mexe só no que vem do sync
-  // (destaques, notas e status) e não encosta em rascunho, seleção nem barra
-  // de ações. O efeito grande de troca de perícope reseta tudo isso — usá-lo
-  // aqui apagaria a anotação que o usuário está digitando neste instante.
+  // (destaques, notas, status, pin e histórico) e não encosta em rascunho,
+  // seleção nem barra de ações. O efeito grande de troca de perícope reseta
+  // tudo isso — usá-lo aqui apagaria a anotação que o usuário está digitando
+  // neste instante.
   useSyncRefresh(() => {
     void (async () => {
       try {
@@ -235,6 +236,9 @@ export default function Leitura() {
         // O IndexedDB já é a palavra final: o LWW resolveu quem ganhou antes
         // de o aviso sair.
         const prog = await getProgresso(ordem)
+        setProg(prog ?? null)
+        // status deriva do mesmo `prog` lido acima — badge e pin não podem
+        // discordar sobre a mesma linha.
         const proximo = prog?.status ?? 'em_andamento'
         setStatus(proximo === 'nao_iniciado' ? 'em_andamento' : proximo)
         doneRef.current = proximo === 'concluido'

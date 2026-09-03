@@ -46,3 +46,6 @@ public/data/estudo/
 
 .superpowers/
 .tts-key.local
+
+# worktrees criadas pela ferramenta nativa do Claude Code (como .worktrees/)
+.claude/worktrees/

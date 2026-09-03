@@ -8,6 +8,12 @@ import {
   msAteVolta,
   transcrever,
 } from '../lib/ditado'
+import {
+  estadoMicrofone,
+  mensagemMicrofoneBloqueado,
+  pedirMicrofone,
+  type EstadoMicrofone,
+} from '../lib/microfone'
 import { pontuarFrase } from '../lib/pontuar-ditado'
 import {
   criarDitadoNativo,
@@ -31,8 +37,12 @@ type Props = {
 
 type Fase =
   | { tipo: 'ocioso' }
+  /** Modo nativo: o prompt do microfone está na tela, esperando a pessoa. */
+  | { tipo: 'pedindo' }
   /** Modo nativo: ouvindo, com a prévia do que está sendo dito. */
   | { tipo: 'ouvindo'; parcial: string }
+  /** Modo nativo: microfone negado — fica na tela dizendo onde liberar. */
+  | { tipo: 'bloqueado' }
   /** Modo nativo: a pessoa parou e o trecho está na revisão por IA. */
   | { tipo: 'revisando' }
   /** Modo fallback (Whisper). */
@@ -55,7 +65,9 @@ function temMicrofoneNoNavegador(): boolean {
  *   botão. Quando a pessoa para, e está logada, o trecho inteiro vai à
  *   revisão por IA (revisar-ditado.ts) e volta por onRevisao — vírgulas e
  *   correções que a heurística não alcança. Se a revisão falhar, fica o que
- *   já está lá, sem aviso.
+ *   já está lá, sem aviso. A permissão do microfone é pedida antes de ouvir,
+ *   com o prompt de verdade (microfone.ts): a Web Speech API sozinha não o
+ *   sobe no iOS, só falha.
  * - Fallback (Firefox e afins, sem a API): grava com MediaRecorder e manda
  *   para o Worker transcrever. Só para quem está logado (a rota cobra cota
  *   por usuário) e com teto de 60 s.
@@ -91,6 +103,10 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
   // revisão quando a pessoa parar. O reinício automático do iOS não zera.
   const segmentos = useRef<string[]>([])
   const montado = useRef(true)
+  // Último estado conhecido da permissão do microfone. `granted` e
+  // `desconhecido` começam a ouvir no próprio toque (sem await no meio, que
+  // o navegador pode tratar como perda do gesto); os outros conferem antes.
+  const permissao = useRef<EstadoMicrofone>('desconhecido')
 
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
@@ -122,8 +138,17 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
 
   // Desmontar no meio de uma gravação (trocar de perícope, sair) não pode
   // deixar o microfone aberto nem timers pendurados.
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    if (!nativo) return
+    void estadoMicrofone().then((e) => {
+      if (montado.current) permissao.current = e
+    })
+  }, [nativo])
+
+  useEffect(() => {
+    // StrictMode monta, desmonta e monta de novo: o flag tem que voltar.
+    montado.current = true
+    return () => {
       montado.current = false
       querOuvir.current = false
       ditado.current?.parar()
@@ -136,9 +161,8 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
       }
       soltarMicrofone()
       window.clearTimeout(volta.current)
-    },
-    [soltarMicrofone],
-  )
+    }
+  }, [soltarMicrofone])
 
   function entrarEmEsgotado(voltaEm: string) {
     setFase({ tipo: 'esgotado', voltaEm })
@@ -235,7 +259,8 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
     segmentos.current = []
     if (!montado.current) return
     if (!frases.length || !sessionRef.current) {
-      setFase({ tipo: 'ocioso' })
+      // Um `onend` depois do erro de permissão não pode apagar o aviso.
+      setFase((f) => (f.tipo === 'bloqueado' ? f : { tipo: 'ocioso' }))
       return
     }
     const original = frases.join(' ')
@@ -246,7 +271,7 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
     setFase({ tipo: 'ocioso' })
   }
 
-  function comecarNativo() {
+  async function comecarNativo() {
     ditado.current ??= criarDitadoNativo(
       {
         onFinal: (texto) => {
@@ -257,10 +282,18 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
         },
         onParcial: (parcial) =>
           setFase((f) => (f.tipo === 'ouvindo' ? { tipo: 'ouvindo', parcial } : f)),
-        onErro: (msg) => {
-          // Microfone negado, sem rede: reiniciar só repetiria o erro.
+        onErro: (msg, codigo) => {
+          // Microfone negado, sem rede: reiniciar só repetiria o erro. E não
+          // dá para esperar o `onend` para sair de "Ouvindo…": no iOS ele
+          // não vem depois de `not-allowed`.
           querOuvir.current = false
+          if (codigo === 'not-allowed') {
+            permissao.current = 'denied'
+            setFase({ tipo: 'bloqueado' })
+            return
+          }
           onAvisoRef.current(msg)
+          setFase({ tipo: 'ocioso' })
         },
         onFim: () => {
           if (querOuvir.current) ditado.current?.iniciar()
@@ -270,6 +303,26 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
       Reconhecimento,
     )
     if (!ditado.current) return
+    if (permissao.current === 'prompt' || permissao.current === 'denied') {
+      // Confere de novo: a pessoa pode ter liberado nos ajustes e voltado.
+      permissao.current = await estadoMicrofone()
+      if (!montado.current) return
+    }
+    if (permissao.current === 'denied') {
+      setFase({ tipo: 'bloqueado' })
+      return
+    }
+    if (permissao.current === 'prompt') {
+      setFase({ tipo: 'pedindo' })
+      const ok = await pedirMicrofone()
+      if (!montado.current) return
+      if (!ok) {
+        permissao.current = 'denied'
+        setFase({ tipo: 'bloqueado' })
+        return
+      }
+      permissao.current = 'granted'
+    }
     querOuvir.current = true
     segmentos.current = []
     setFase({ tipo: 'ouvindo', parcial: '' })
@@ -309,9 +362,13 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
           ? 'Transcrevendo…'
           : fase.tipo === 'revisando'
             ? 'Revisando…'
-            : fase.tipo === 'esgotado'
-              ? mensagemEsgotado(fase.voltaEm)
-              : null
+            : fase.tipo === 'pedindo'
+              ? 'Permita o microfone…'
+              : fase.tipo === 'bloqueado'
+                ? mensagemMicrofoneBloqueado()
+                : fase.tipo === 'esgotado'
+                  ? mensagemEsgotado(fase.voltaEm)
+                  : null
 
   return (
     <span className="ditar">
@@ -326,7 +383,11 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
             {lado}
           </span>
         ) : (
-          <span className="ditar-status" role="status" aria-live="polite">
+          <span
+            className={`ditar-status${fase.tipo === 'bloqueado' ? ' ditar-aviso' : ''}`}
+            role="status"
+            aria-live="polite"
+          >
             {lado}
           </span>
         ))}
@@ -340,10 +401,17 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
           disabled ||
           fase.tipo === 'transcrevendo' ||
           fase.tipo === 'revisando' ||
+          fase.tipo === 'pedindo' ||
           fase.tipo === 'esgotado'
         }
         onClick={() =>
-          nativo ? (ouvindo ? pararNativo() : comecarNativo()) : gravando ? parar() : void comecar()
+          nativo
+            ? ouvindo
+              ? pararNativo()
+              : void comecarNativo()
+            : gravando
+              ? parar()
+              : void comecar()
         }
       >
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">

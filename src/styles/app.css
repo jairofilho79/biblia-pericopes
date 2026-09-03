@@ -1872,6 +1872,14 @@ button.ghost {
   text-overflow: ellipsis;
 }
 
+/* o aviso de microfone bloqueado é para ser lido inteiro: pode quebrar linha
+   e vai à direita, alinhado ao botão. */
+.ditar-status.ditar-aviso {
+  white-space: normal;
+  text-align: right;
+  color: var(--ink);
+}
+
 /* "Ouvindo…"/contador na cor de gravação; a prévia do que está sendo dito
    fica muted, é rascunho e não alarme. */
 .ditar-status:has(+ .ditar-botao.gravando):not(.ditar-previa) {

@@ -272,9 +272,17 @@ describe('DitarBotao — fluxo (fallback)', () => {
 describe('DitarBotao — modo nativo', () => {
   const rec = () => FakeReconhecimento.instancias[0]
   const previa = () => host.querySelector('.ditar-status')
+  /** Permissions API de mentira: `null` = navegador sem ela. */
+  function permissoes(estado: 'granted' | 'denied' | 'prompt' | null) {
+    Object.defineProperty(navigator, 'permissions', {
+      value: estado ? { query: async () => ({ state: estado }) } : undefined,
+      configurable: true,
+    })
+  }
 
   beforeEach(() => {
     vi.stubGlobal('SpeechRecognition', FakeReconhecimento)
+    permissoes(null)
   })
 
   it('aparece sem sessão e sem MediaRecorder, mas não offline', () => {
@@ -416,14 +424,75 @@ describe('DitarBotao — modo nativo', () => {
     root = createRoot(host)
   })
 
-  it('microfone negado vira aviso e não reinicia', () => {
+  it('microfone negado pelo aparelho: sai do "ouvindo" na hora, mostra onde liberar e não reinicia', async () => {
     montar()
-    act(() => botao()!.click())
+    await act(async () => botao()!.click())
     act(() => rec().erro('not-allowed'))
-    expect(onAviso).toHaveBeenCalledWith('Permita o microfone para ditar')
+    // Sem esperar o onend — no iOS ele não vem depois deste erro.
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+    expect(status()).toContain('Microfone bloqueado')
+    expect(onAviso).not.toHaveBeenCalled()
     act(() => rec().fim())
     expect(rec().starts).toBe(1)
+    expect(status()).toContain('Microfone bloqueado')
+    // Tocar de novo confere a permissão de novo; ainda negada, fica no aviso.
+    permissoes('denied')
+    await act(async () => botao()!.click())
+    expect(rec().starts).toBe(1)
+    expect(getUserMedia).not.toHaveBeenCalled()
+    expect(status()).toContain('Microfone bloqueado')
+  })
+
+  it('outros erros viram aviso e voltam ao ocioso sem esperar o onend', async () => {
+    montar()
+    await act(async () => botao()!.click())
+    act(() => rec().erro('network'))
+    expect(onAviso).toHaveBeenCalledWith('Sem conexão para ditar')
     expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+    act(() => rec().fim())
+    expect(rec().starts).toBe(1)
+  })
+
+  it('permissão ainda não pedida: sobe o prompt (getUserMedia), solta o microfone e só então ouve', async () => {
+    permissoes('prompt')
+    let liberar: (v: MediaStream) => void = () => {}
+    getUserMedia.mockImplementationOnce(() => new Promise<MediaStream>((r) => (liberar = r)))
+    montar()
+    await act(async () => {}) // efeito lê a permissão
+    await act(async () => botao()!.click())
+    expect(getUserMedia).toHaveBeenCalledWith({ audio: true })
+    expect(status()).toBe('Permita o microfone…')
+    expect(botao()?.disabled).toBe(true)
+    expect(FakeReconhecimento.instancias[0].starts).toBe(0)
+    await act(async () => liberar({ getTracks: () => tracks } as unknown as MediaStream))
+    expect(tracks[0].stop).toHaveBeenCalledTimes(1)
+    expect(rec().starts).toBe(1)
+    expect(previa()?.textContent).toBe('Ouvindo…')
+    // Da próxima vez não pergunta mais.
+    act(() => botao()!.click())
+    act(() => rec().fim())
+    await act(async () => botao()!.click())
+    expect(getUserMedia).toHaveBeenCalledTimes(1)
+    expect(rec().starts).toBe(2)
+  })
+
+  it('prompt recusado vira o aviso de bloqueio, sem começar a ouvir', async () => {
+    permissoes('prompt')
+    getUserMedia.mockRejectedValueOnce(new DOMException('', 'NotAllowedError'))
+    montar()
+    await act(async () => {})
+    await act(async () => botao()!.click())
+    expect(FakeReconhecimento.instancias[0].starts).toBe(0)
+    expect(status()).toContain('Microfone bloqueado')
+    expect(botao()?.disabled).toBe(false)
+  })
+
+  it('permissão já concedida (ou API ausente) começa a ouvir no próprio toque', () => {
+    permissoes('granted')
+    montar()
+    act(() => botao()!.click())
+    expect(rec().starts).toBe(1)
+    expect(getUserMedia).not.toHaveBeenCalled()
   })
 
   it('silêncio não avisa nem para', () => {

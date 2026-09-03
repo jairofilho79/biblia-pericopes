@@ -109,16 +109,16 @@ describe('criarDitadoNativo', () => {
     expect(h.onFinal).not.toHaveBeenCalled()
   })
 
-  it('mapeia os erros que merecem aviso e cala os outros', () => {
+  it('mapeia os erros que merecem aviso (com o código) e cala os outros', () => {
     criarDitadoNativo(h, FakeReconhecimento)
     rec().erro('not-allowed')
-    expect(h.onErro).toHaveBeenLastCalledWith('Permita o microfone para ditar')
+    expect(h.onErro).toHaveBeenLastCalledWith('Permita o microfone para ditar', 'not-allowed')
     rec().erro('service-not-allowed')
-    expect(h.onErro).toHaveBeenLastCalledWith('Permita o microfone para ditar')
+    expect(h.onErro).toHaveBeenLastCalledWith('Ditado desativado no aparelho', 'service-not-allowed')
     rec().erro('audio-capture')
-    expect(h.onErro).toHaveBeenLastCalledWith('Nenhum microfone encontrado')
+    expect(h.onErro).toHaveBeenLastCalledWith('Nenhum microfone encontrado', 'audio-capture')
     rec().erro('network')
-    expect(h.onErro).toHaveBeenLastCalledWith('Sem conexão para ditar')
+    expect(h.onErro).toHaveBeenLastCalledWith('Sem conexão para ditar', 'network')
     expect(h.onErro).toHaveBeenCalledTimes(4)
     rec().erro('no-speech')
     rec().erro('aborted')

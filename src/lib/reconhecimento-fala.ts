@@ -39,8 +39,12 @@ export type DitadoNativoHandlers = {
   onFinal: (texto: string) => void
   /** O que está sendo dito agora (prévia); vazio quando não há nada pendente. */
   onParcial: (texto: string) => void
-  /** Só erros que merecem aviso; silêncio e abort não passam por aqui. */
-  onErro: (mensagem: string) => void
+  /**
+   * Só erros que merecem aviso; silêncio e abort não passam por aqui. O
+   * código vai junto: `not-allowed` pede tratamento próprio (microfone
+   * bloqueado — ver microfone.ts), os outros são só mensagem.
+   */
+  onErro: (mensagem: string, codigo: SpeechRecognitionErrorCode) => void
   /** A sessão acabou — por `parar()`, por erro ou porque o SO encerrou sozinho. */
   onFim: () => void
 }
@@ -53,7 +57,8 @@ export type DitadoNativo = {
 
 const MENSAGENS: Partial<Record<SpeechRecognitionErrorCode, string>> = {
   'not-allowed': 'Permita o microfone para ditar',
-  'service-not-allowed': 'Permita o microfone para ditar',
+  // O serviço de reconhecimento (Siri/ditado no iOS), não o microfone.
+  'service-not-allowed': 'Ditado desativado no aparelho',
   'audio-capture': 'Nenhum microfone encontrado',
   network: 'Sem conexão para ditar',
 }
@@ -100,7 +105,7 @@ export function criarDitadoNativo(
 
   rec.onerror = (ev) => {
     const msg = MENSAGENS[ev.error]
-    if (msg) h.onErro(msg)
+    if (msg) h.onErro(msg, ev.error)
   }
 
   rec.onend = () => h.onFim()

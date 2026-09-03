@@ -1295,6 +1295,21 @@ export default function Explorar() {
   const setCap = (valor: number | null) =>
     mexerNaUrl((p) => (valor == null ? p.delete('cap') : p.set('cap', String(valor))), false)
 
+  /**
+   * Submeter capítulo+versículo no livro aberto tem que FECHAR o livro, não só
+   * setar `q`: o render é `livro ? <LivroAberto/> : …`, então deixar `livro` na
+   * URL manteria o painel do livro na tela e a seção "Referência" nunca
+   * apareceria — o botão não faria nada visível. Sair do livro é aceitável
+   * porque a seção "Livros" logo abaixo do resultado traz ele de volta a um
+   * toque (`parseConsulta` de uma referência devolve `livros: [livro]`).
+   */
+  const irParaReferencia = (abbrev: string, cap: number, ver: number) =>
+    mexerNaUrl((p) => {
+      p.set('q', `${abbrev} ${cap}:${ver}`)
+      p.delete('livro')
+      p.delete('cap')
+    }, false)
+
   // ---- Seção Referência ----
   const [refHit, setRefHit] = useState<PericopeIndex | null>(null)
   const [refMiss, setRefMiss] = useState('')
@@ -1477,7 +1492,7 @@ export default function Explorar() {
           cap={cap}
           onCap={setCap}
           onTrocar={fecharLivro}
-          onIrParaVersiculo={(c, v) => setQ(`${livro.abbrev} ${c}:${v}`)}
+          onIrParaVersiculo={(c, v) => irParaReferencia(livro.abbrev, c, v)}
         />
       ) : emRepouso ? (
         <CatalogoLivros
@@ -1511,6 +1526,10 @@ export default function Explorar() {
             </section>
           )}
 
+          {/* `consulta.livros` vem de `filterBooks`, que filtra BIBLE_BOOKS sem
+              reordenar. `agruparLivros` monta as seções por TRANSIÇÃO, então
+              depende dessa ordem: uma lista reordenada produziria duas seções
+              com o mesmo nome. Não ordene isto. */}
           {consulta.livros.length > 0 && (
             <section className="secao-resultado">
               <h2 className="secao-h">

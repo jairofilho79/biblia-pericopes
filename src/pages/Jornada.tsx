@@ -17,6 +17,7 @@ import {
   patchEncerrarJornada,
   patchReiniciarJornada,
   progressoDaJornada,
+  reconciliacaoDeConclusao,
   rotaCompletaDoEscopo,
   rotaDaJornada,
   type Catalogo,
@@ -162,8 +163,14 @@ function PassoConfirmacao({
   const [modo, setModo] = useState<ModoJornada>('continuar')
   const [criando, setCriando] = useState(false)
 
+  // `?? 0`: igual ao irmão em escolherEscopo. Hoje inalcançável (todo item do
+  // catálogo tem ao menos uma perícope), mas se um escopo vazio chegar aqui,
+  // `undefined` viajaria como `inicioOrdem` até o Worker, que reprova
+  // `isOrdem(undefined)` e devolve 400 — e sync.ts trata 400 como rejeição
+  // determinística, abandonando o lote inteiro (progresso, anotações,
+  // destaques e posições que viajavam junto).
   const inicioOrdem =
-    comecarEm === 'checkpoint' && checkpoint ? checkpoint.pericopeOrdem : rotaCompleta[0]
+    comecarEm === 'checkpoint' && checkpoint ? checkpoint.pericopeOrdem : (rotaCompleta[0] ?? 0)
   // A rota que a jornada teria de verdade com este início — é ela, não a
   // rota completa do escopo, que alimenta o aviso de "já lido" abaixo.
   const rotaFinal = useMemo(
@@ -310,6 +317,15 @@ export default function Jornada() {
       const progCorrente = corrente
         ? progressoDaJornada(rotaDaJornada(corrente, all), progressos, corrente.contaDesde)
         : null
+      // Mesma reconciliação de Home.tsx, mesmo padrão: a spec promete que os
+      // dois caminhos de carga (Home e /jornada) reconciliam `concluidaEm`,
+      // idempotente. Sem custo hoje (nada lê o campo para comportamento aqui),
+      // mas é a divergência declarada da spec que vira dívida quando alguém
+      // ler o campo.
+      if (corrente && progCorrente) {
+        const patch = reconciliacaoDeConclusao(corrente, progCorrente.proximaOrdem)
+        if (patch) await atualizarJornada(corrente.id, patch)
+      }
       const historico = historicoDeJornadas(todas).map((j) => ({
         jornada: j,
         prog: progressoDaJornada(rotaDaJornada(j, all), progressos, j.contaDesde),

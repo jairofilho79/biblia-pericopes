@@ -621,6 +621,44 @@ describe('jornadas', () => {
     expect(corrente?.concluidaEm).toBe(FUTURE)
   })
 
+  it('duas correntes vindas do pull (aparelhos diferentes): desempata por atualizadoEm, não por criadoEm', async () => {
+    // applyRemoteJornadas é o caminho de pull de verdade — a invariante "no
+    // máximo uma corrente" é de escrita (criarJornada), então nada aqui a
+    // impede de gravar duas linhas com arquivadaEm null, exatamente o cenário
+    // que a spec cobre. criadoEm da 2ª é mais novo, mas atualizadoEm da 1ª é
+    // mais novo — se o desempate caísse de volta para criadoEm (a ordem de
+    // listJornadas), este teste pegaria a divergência.
+    await clearAllUserData()
+    const base = {
+      tipo: 'livro' as const,
+      inicioOrdem: 0,
+      contaDesde: null,
+      arquivadaEm: null,
+      concluidaEm: null,
+      apagadoEm: null,
+    }
+    await applyRemoteJornadas([
+      {
+        ...base,
+        id: 'antiga-mas-editada-por-ultimo',
+        nome: 'Salmos',
+        escopo: 'Salmos',
+        criadoEm: PAST,
+        atualizadoEm: FUTURE_2,
+      },
+      {
+        ...base,
+        id: 'nova-mas-nao-tocada-depois',
+        nome: 'Mateus',
+        escopo: 'Mateus',
+        criadoEm: FUTURE,
+        atualizadoEm: FUTURE,
+      },
+    ])
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe('antiga-mas-editada-por-ultimo')
+  })
+
   it('trunca o nome em LIMITE_NOME', async () => {
     await clearAllUserData()
     const j = await criarJornada({

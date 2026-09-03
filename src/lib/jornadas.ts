@@ -290,3 +290,61 @@ export function avisosCriacao(
     escopoJaLido: modo === 'continuar' && progressoDaJornada(rota, progressos, null).proximaOrdem === null,
   }
 }
+
+export type Track = {
+  testament: Testament
+  peri: PericopeIndex
+  prog: ProgressoJornada
+}
+
+/**
+ * Jornada sintética por testamento: nunca gravada, existe só para que
+ * rotaDaJornada/progressoDaJornada/cursorDaJornada (Task 2) calculem a
+ * trilha VT/NT com EXATAMENTE a mesma regra de uma jornada de verdade. Duas
+ * implementações separadas do "onde estou / o que falta" é o jeito garantido
+ * de os dois estados da Home um dia divergirem.
+ */
+export function jornadaDoTestamento(testament: Testament, inicioOrdem: number): Jornada {
+  return {
+    id: '',
+    nome: '',
+    tipo: 'sequencia',
+    escopo: testament,
+    inicioOrdem,
+    contaDesde: null,
+    criadoEm: '',
+    atualizadoEm: '',
+    arquivadaEm: null,
+    concluidaEm: null,
+  }
+}
+
+/**
+ * A lógica das trilhas de hoje, extraída para função pura sobre os `Map`s já
+ * carregados — nada aqui consulta o IndexedDB, então o mesmo cálculo serve
+ * tanto para montar a tela quanto (mais tarde) para testar sem fake IDB.
+ */
+export function montarTrilhas(
+  all: PericopeIndex[],
+  progressos: Map<number, Progresso>,
+  posicoes: Map<number, PosicaoLeitura>,
+): Track[] {
+  const tracks: Track[] = []
+  for (const testament of ['vt', 'nt'] as Testament[]) {
+    const ordens = ordensDoTestamento(all, testament)
+    if (ordens.length === 0) continue
+    const sintetica = jornadaDoTestamento(testament, ordens[0])
+    const rota = rotaDaJornada(sintetica, all)
+    const prog = progressoDaJornada(rota, progressos, null)
+    const cursor = cursorDaJornada(rota, progressos, posicoes, null)
+    // Trilha inteira concluída: cursorDaJornada devolve null (não há "próxima
+    // ordem" a apontar), então o botão "Rever" cai na última perícope da
+    // rota — o mesmo destino que a heurística antiga (getProximaOrdemNaSequencia
+    // com tudo feito devolvia a última ordem da sequência).
+    const ordem = cursor ?? rota[rota.length - 1]
+    const peri = all.find((p) => p.ordem === ordem)
+    if (!peri) continue
+    tracks.push({ testament, peri, prog })
+  }
+  return tracks
+}

@@ -505,9 +505,22 @@ export async function listJornadas(): Promise<Jornada[]> {
  * concluída, essa função parava de devolvê-la, e ninguém a examinava de
  * novo. Duas seleções quase iguais convivendo é como esse bug nasceu — por
  * isso só existe esta.
+ *
+ * Desempate por `atualizadoEm` (spec): a invariante "no máximo uma corrente"
+ * é de escrita (criarJornada/atualizarJornada), mas se o pull trouxer duas
+ * não arquivadas de aparelhos diferentes antes de convergirem, a LEITURA
+ * resolve pela mais recente por `atualizadoEm` — não por `criadoEm`, que é a
+ * ordem de listJornadas() e divergia da spec em silêncio. Isto só resolve o
+ * lado da leitura: a perdedora aqui segue sem `arquivadaEm` (arquivar é
+ * escrita, decisão de produto fora deste caminho) até `criarJornada` limpar
+ * na próxima criação.
  */
 export async function getJornadaCorrente(): Promise<Jornada | undefined> {
-  return (await listJornadas()).find((j) => j.arquivadaEm === null)
+  const correntes = (await listJornadas()).filter((j) => j.arquivadaEm === null)
+  return correntes.reduce<Jornada | undefined>(
+    (melhor, j) => (!melhor || j.atualizadoEm > melhor.atualizadoEm ? j : melhor),
+    undefined,
+  )
 }
 
 /**

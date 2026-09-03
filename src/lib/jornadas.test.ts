@@ -3,7 +3,9 @@ import {
   avisosCriacao,
   cursorDaJornada,
   historicoDeJornadas,
+  jornadaDoTestamento,
   montarCatalogo,
+  montarTrilhas,
   nomePadrao,
   patchEncerrarJornada,
   patchReiniciarJornada,
@@ -347,5 +349,109 @@ describe('avisosCriacao', () => {
       arquivaAtual: true,
       escopoJaLido: true,
     })
+  })
+})
+
+// Movidos de src/pages/Home.test.ts (Correção 2 da revisão final): as duas
+// funções (jornadaDoTestamento, montarTrilhas) agora vivem em jornadas.ts,
+// junto do resto da lógica pura de jornada — Home.tsx as exportava por
+// engano, gerando dois avisos react/only-export-components.
+//
+// Índice local (3 de Gênesis, 2 de Mateus), diferente do INDICE do topo
+// deste arquivo, porque os valores esperados abaixo (total: 3 no VT, ordens
+// específicas) foram escritos em cima dele originalmente.
+function periTrilha(ordem: number, livro: string, abbrev: string, cap = 1): PericopeIndex {
+  return {
+    ordem,
+    livro,
+    abbrev,
+    capitulo_inicio: cap,
+    versiculo_inicio: 1,
+    capitulo_fim: cap,
+    versiculo_fim: 10,
+    titulo_pericope_pt: `${livro} ${cap}`,
+    minutos: 3,
+  }
+}
+
+/** 3 de Gênesis (VT), 2 de Mateus (NT). */
+const INDICE_TRILHAS: PericopeIndex[] = [
+  periTrilha(0, 'Gênesis', 'Gn', 1),
+  periTrilha(1, 'Gênesis', 'Gn', 2),
+  periTrilha(2, 'Gênesis', 'Gn', 3),
+  periTrilha(3, 'Mateus', 'Mt', 1),
+  periTrilha(4, 'Mateus', 'Mt', 2),
+]
+
+function concluidaTrilha(ordem: number, quando: string): [number, Progresso] {
+  return [ordem, { pericopeOrdem: ordem, status: 'concluido', atualizadoEm: quando }]
+}
+
+function posicaoTrilha(ordem: number, ref: string, quando: string): [number, PosicaoLeitura] {
+  return [ordem, { pericopeOrdem: ordem, tipo: 'versiculo', ref, tempo: null, atualizadoEm: quando }]
+}
+
+describe('jornadaDoTestamento', () => {
+  it('monta uma jornada sintética sequencia/vt|nt nunca gravada', () => {
+    const j = jornadaDoTestamento('vt', 0)
+    expect(j.tipo).toBe('sequencia')
+    expect(j.escopo).toBe('vt')
+    expect(j.inicioOrdem).toBe(0)
+    expect(j.contaDesde).toBeNull()
+    // "nunca gravada": id vazio, não um crypto.randomUUID() de verdade —
+    // não pode ser confundida com uma jornada real por engano em nenhum
+    // comparador por id.
+    expect(j.id).toBe('')
+  })
+})
+
+describe('montarTrilhas', () => {
+  it('conta "N de M" nas duas trilhas, sem nada concluído', () => {
+    const tracks = montarTrilhas(INDICE_TRILHAS, new Map(), new Map())
+    expect(tracks).toHaveLength(2)
+    const vt = tracks.find((t) => t.testament === 'vt')
+    const nt = tracks.find((t) => t.testament === 'nt')
+    expect(vt?.prog).toEqual({ total: 3, concluidas: 0, pct: 0, proximaOrdem: 0 })
+    expect(vt?.peri.ordem).toBe(0)
+    expect(nt?.prog).toEqual({ total: 2, concluidas: 0, pct: 0, proximaOrdem: 3 })
+    expect(nt?.peri.ordem).toBe(3)
+  })
+
+  it('conta as concluídas de cada trilha independentemente', () => {
+    const progressos = new Map([
+      concluidaTrilha(0, '2026-01-01T00:00:00.000Z'),
+      concluidaTrilha(1, '2026-01-01T00:00:00.000Z'),
+    ])
+    const tracks = montarTrilhas(INDICE_TRILHAS, progressos, new Map())
+    const vt = tracks.find((t) => t.testament === 'vt')
+    const nt = tracks.find((t) => t.testament === 'nt')
+    expect(vt?.prog).toEqual({ total: 3, concluidas: 2, pct: 67, proximaOrdem: 2 })
+    // NT não tem nada concluído: as duas trilhas não podem vazar contagem
+    // uma para a outra.
+    expect(nt?.prog).toEqual({ total: 2, concluidas: 0, pct: 0, proximaOrdem: 3 })
+  })
+
+  it('fallback do cursor quando a rota terminou: aponta para a última ordem, não null', () => {
+    // Trilha VT inteira concluída → cursorDaJornada devolve null (não há
+    // "próxima ordem"); a Home usa então a última ordem da rota para o botão
+    // "Rever" — o mesmo destino que a heurística antiga (tudo feito devolvia
+    // a última ordem da sequência).
+    const quando = '2026-01-01T00:00:00.000Z'
+    const progressos = new Map([
+      concluidaTrilha(0, quando),
+      concluidaTrilha(1, quando),
+      concluidaTrilha(2, quando),
+    ])
+    const tracks = montarTrilhas(INDICE_TRILHAS, progressos, new Map())
+    const vt = tracks.find((t) => t.testament === 'vt')
+    expect(vt?.prog.proximaOrdem).toBeNull()
+    expect(vt?.peri.ordem).toBe(2) // última ordem da rota VT, não a primeira
+  })
+
+  it('prefere o checkpoint mais recente (posição) à primeira não concluída', () => {
+    const posicoes = new Map([posicaoTrilha(2, '3:16', '2026-01-01T00:00:00.000Z')])
+    const tracks = montarTrilhas(INDICE_TRILHAS, new Map(), posicoes)
+    const vt = tracks.find((t) => t.testament === 'vt')
+    expect(vt?.peri.ordem).toBe(2)
   })
 })

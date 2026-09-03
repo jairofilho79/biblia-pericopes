@@ -280,6 +280,27 @@ describe('Jornada — passo 2: confirmação', () => {
   })
 })
 
+describe('Jornada — passo 2: escopo vazio', () => {
+  it('escopo sem nenhuma perícope (livro do catálogo sem itens): inicioOrdem vai 0, nunca undefined', async () => {
+    // "Juízes" não está no fixture INDICE — like montarCatalogo mantém todo
+    // livro de BIBLE_BOOKS mesmo com zero perícopes (jornadas.test.ts), o
+    // card é clicável e rotaCompleta fica []. Sem o `?? 0` em inicioOrdem,
+    // isto grava `inicioOrdem: undefined`, o Worker reprova e sync.ts
+    // abandona o lote inteiro do outbox.
+    montar()
+    await assentar()
+    act(() => botao('Comece uma jornada').click())
+    const juizes = [...host.querySelectorAll<HTMLButtonElement>('button.jornada-escopo')].find((b) =>
+      b.textContent?.startsWith('Juízes'),
+    )!
+    await act(async () => juizes.click())
+    expect(host.textContent).toContain('Confirme sua jornada')
+    await act(async () => botao('Criar jornada').click())
+    expect(criarJornada).toHaveBeenCalledTimes(1)
+    expect(criarJornada.mock.calls[0][0].inicioOrdem).toBe(0)
+  })
+})
+
 describe('Jornada — avisos do passo 2', () => {
   it('havendo jornada corrente, avisa que ela será arquivada', async () => {
     getJornadaCorrente.mockResolvedValue(jornada({ id: 'c1', nome: 'Minha jornada atual' }))
@@ -402,6 +423,24 @@ describe('Jornada — logado, com jornada corrente', () => {
     montar()
     await assentar()
     expect(botao('Nova jornada')).not.toBeUndefined()
+  })
+
+  it('a carga de /jornada também reconcilia concluidaEm, igual a Home.tsx (Correção 5)', async () => {
+    // Rota inteira (Gênesis: ordens 0 e 1) concluída, mas concluidaEm ainda
+    // null — o mesmo cenário que Home.tsx reconcilia. A spec promete os dois
+    // caminhos de carga idempotentes; sem isto, /jornada nunca fecharia a
+    // jornada quando é a única tela visitada.
+    getJornadaCorrente.mockResolvedValue(jornada({ id: 'j9' }))
+    listAllProgresso.mockResolvedValue([
+      { pericopeOrdem: 0, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
+    ])
+    montar()
+    await assentar()
+    expect(atualizarJornada).toHaveBeenCalledTimes(1)
+    const [id, patch] = atualizarJornada.mock.calls[0]
+    expect(id).toBe('j9')
+    expect(typeof patch.concluidaEm).toBe('string')
   })
 })
 

@@ -118,6 +118,10 @@ describe('parseSyncPush — jornadas', () => {
     expect(parseSyncPush({ jornadas: [j] })?.jornadas).toHaveLength(1)
     expect(parseSyncPush({ jornadas: [{ ...valida, contaDesde: 'ontem' }] })).toBeNull()
   })
+
+  it('rejeita lote de jornadas acima de 500 itens', () => {
+    expect(parseSyncPush({ jornadas: Array(501).fill(valida) })).toBeNull()
+  })
 })
 
 describe('paginarPull — com jornadas', () => {

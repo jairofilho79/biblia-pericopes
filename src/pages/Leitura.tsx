@@ -7,7 +7,6 @@ import NarracaoPlayer, {
   type NarracaoPlayerHandle,
 } from '../components/NarracaoPlayer'
 import { secaoDoChip } from '../lib/narracao-controles'
-import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
 import { SkeletonLeitura } from '../components/Skeleton'
 import VerseActions from '../components/VerseActions'
@@ -804,29 +803,6 @@ export default function Leitura() {
         <p className={tituloClass('ref', 'referencia')} data-fala-id="referencia">
           {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
         </p>
-        <div className="ref-nav">
-          {prev && (
-            <Link
-              className="read-tool ref-arrow"
-              aria-label={`Anterior: ${prev.titulo}`}
-              title={`Anterior: ${prev.titulo} · atalho ←`}
-              to={`/leitura/${prev.ordem}`}
-            >
-              ←
-            </Link>
-          )}
-          {next && (
-            <Link
-              className="read-tool ref-arrow"
-              aria-label={`Próxima: ${next.titulo}`}
-              title={`Próxima: ${next.titulo} · atalho →`}
-              to={`/leitura/${next.ordem}`}
-            >
-              →
-            </Link>
-          )}
-          <ReadingMenu />
-        </div>
       </div>
 
       <SectionChips

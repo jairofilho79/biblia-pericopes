@@ -276,36 +276,6 @@ a {
   font-weight: 600;
 }
 
-.theme-menu {
-  grid-column: 2;
-  grid-row: 1;
-  position: relative;
-  justify-self: end;
-}
-
-/* Alinha à direita, abaixo do gatilho; a borda direita do header já é a
-   do botão, então o popover nunca sai da tela em 375px. */
-.theme-pop {
-  min-width: 0;
-  width: max-content;
-  max-width: calc(100vw - 2 * var(--shell-pad));
-}
-
-.theme-toggle {
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink);
-  background: color-mix(in srgb, var(--paper) 80%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.4rem 0.65rem;
-  min-height: 2.5rem;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 @media (max-width: 379.98px) {
   .brand {
     font-size: 1.15rem;
@@ -315,17 +285,12 @@ a {
     gap: 0.25rem 0.75rem;
     font-size: 0.85rem;
   }
-
-  .theme-toggle {
-    padding: 0.3rem 0.45rem;
-    font-size: 0.72rem;
-  }
 }
 
-/* tablet+: brand | nav | theme on one row */
+/* tablet+: brand | nav on one row */
 @media (min-width: 640px) {
   .top {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     row-gap: 0;
   }
 
@@ -334,10 +299,6 @@ a {
     grid-row: 1;
     justify-content: flex-end;
     gap: 0.35rem 0.85rem;
-  }
-
-  .theme-menu {
-    grid-column: 3;
   }
 }
 
@@ -670,11 +631,9 @@ button.ghost {
   user-select: all;
 }
 
-/* Linha de meta do cabeçalho: referência à esquerda, grupo ←/→/Aa à direita.
-   flex-wrap porque em 375px "1 Coríntios 15:1–15:58 · ~4 min" mais o grupo
-   (~135px) não cabem juntos: o grupo desce inteiro para a linha seguinte e
-   encosta na direita (margin-left: auto no .ref-nav), em vez de espremer a
-   referência ou cortar botão. */
+/* Linha de meta do cabeçalho da perícope: só a referência e a estimativa de
+   tempo. O grupo ←/→/Aa que justificava o flex-wrap saiu — as setas foram
+   para o pager do rodapé e o swipe, e o "Aa" para o menu Perfil. */
 .ref-row {
   display: flex;
   flex-wrap: wrap;
@@ -792,42 +751,6 @@ button.ghost {
   color: var(--accent);
   border-color: var(--focus-line);
   background: var(--accent-soft);
-}
-
-/* ←, → e Aa como um grupo só: um "pill" com borda e os botões encostados
-   dentro, todos com a mesma altura. Quando não há anterior (1ª perícope) o
-   botão simplesmente não é renderizado e o pill encolhe — nada de buraco.
-   margin-left: auto é o que leva o grupo para a direita quando o .ref-row
-   quebra linha no celular. */
-.ref-nav {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  margin-left: auto;
-  gap: 0.1rem;
-  padding: 0.15rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--paper) 70%, transparent);
-}
-
-/* Dentro do pill os botões viram segmentos redondos do mesmo tamanho
-   (2.5rem — o .read-tool sozinho fica em 2.25rem e o Aa saía mais estreito
-   que as setas); o hover/foco do .read-tool (borda + fundo) continua valendo
-   e fica contido no segmento. */
-.ref-nav .read-tool {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  border-radius: 999px;
-}
-
-.ref-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  text-decoration: none;
 }
 
 /* tablet+: mais respiro entre a referência e o grupo, tudo numa linha só. */

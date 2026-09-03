@@ -36,6 +36,37 @@ function bullets(topicos: string, secao: 'raciocinio' | 'mensagens'): number {
   return alvo.split('\n').filter((l) => l.trimStart().startsWith('- ')).length
 }
 
+/**
+ * Frases entre aspas que o material apresenta como sendo do texto.
+ * Aspas curvas e retas; ignora trechos curtos (termo técnico, palavra hebraica)
+ * e os que trazem marca de elisão, que são citação parcial legítima.
+ */
+function citacoes(texto: string): string[] {
+  // Dividir em pares, não casar com regex: um trecho citado curto demais faria
+  // o regex falhar ali, avançar, e tratar a aspa de FECHAMENTO como abertura —
+  // passando a comparar o texto ENTRE citações. Dividindo, os índices ímpares
+  // são sempre o que está dentro das aspas, independente do tamanho.
+  const partes = texto.replace(/[“”]/g, '"').split('"')
+  const dentro = partes.filter((_, i) => i % 2 === 1)
+  return dentro
+    .map((c) => c.trim())
+    .filter((c) => c.split(/\s+/).length >= 4)
+    .filter((c) => c.length <= 200)
+    // Elisão e reticências marcam citação parcial legítima.
+    .filter((c) => !c.includes('…') && !c.includes('...'))
+}
+
+/** Normaliza para comparar citação com o texto bíblico sem tropeçar em pontuação. */
+function normalizar(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 /** Palavras de conteúdo do texto bíblico, para ver se o material fala DELE. */
 function palavrasDoTexto(texto: string): Set<string> {
   return new Set(
@@ -61,6 +92,7 @@ function main() {
     .sort((a, b) => a - b)
 
   const problemas: string[] = []
+  const avisos: string[] = []
   let ok = 0
   let faltando = 0
 
@@ -114,6 +146,18 @@ function main() {
     const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
     if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
 
+    // Citação que o material apresenta como do texto tem de estar NO texto.
+    // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura
+    // inventada, e é a falha mais grave possível aqui. Fica como AVISO e não
+    // erro porque citar outro livro da Bíblia é legítimo e comum.
+    const alvo = normalizar(entrada.texto_naa)
+    const suspeitas = [
+      ...citacoes(m.contexto_historico_literario ?? ''),
+      ...citacoes(m.resenha ?? ''),
+      ...citacoes(m.topicos_pregar ?? ''),
+    ].filter((c) => !alvo.includes(normalizar(c)))
+    for (const c of suspeitas) avisos.push(`${ordem}: citação fora do texto — "${c.slice(0, 60)}"`)
+
     for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
       const v = m[campo] ?? ''
       if (v.length < 200) p.push(`${campo} curto demais (${v.length})`)
@@ -125,7 +169,14 @@ function main() {
     else ok++
   }
 
-  console.log(`esperadas ${esperados.length} · válidas ${ok} · com problema ${problemas.length} · ausentes ${faltando}`)
+  console.log(
+    `esperadas ${esperados.length} · válidas ${ok} · com problema ${problemas.length} · ausentes ${faltando}`,
+  )
+  if (avisos.length) {
+    console.log(`\n⚠️  ${avisos.length} citação(ões) a conferir (pode ser citação de outro livro):`)
+    for (const a of avisos.slice(0, 40)) console.log(`  ${a}`)
+    if (avisos.length > 40) console.log(`  … e mais ${avisos.length - 40}`)
+  }
   if (problemas.length) {
     console.log('\n❌ problemas:')
     for (const x of problemas) console.log(`  ${x}`)

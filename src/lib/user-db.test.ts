@@ -3,20 +3,26 @@ import { describe, expect, it } from 'vitest'
 import {
   applyRemoteAnotacoes,
   applyRemoteDestaques,
+  applyRemoteJornadas,
   applyRemotePosicoes,
   applyRemoteProgresso,
+  atualizarJornada,
   clearAllUserData,
   clearOutbox,
   clearPosicao,
+  criarJornada,
   deleteAnotacao,
   deleteMeta,
   enqueuePosicao,
+  getJornadaCorrente,
   getMeta,
   getPosicao,
   getPosicaoMaisRecente,
   getProgresso,
+  listAllPosicoes,
   listAnotacoes,
   listDestaques,
+  listJornadas,
   listOutbox,
   removeDestaque,
   saveAnotacao,
@@ -25,7 +31,7 @@ import {
   setPosicaoLocal,
   setProgresso,
 } from './user-db'
-import { MAX_TEXTO } from './sync-limits'
+import { LIMITE_NOME, MAX_TEXTO } from './sync-limits'
 
 const FUTURE = '2099-01-01T00:00:00.000Z'
 const FUTURE_2 = '2099-06-01T00:00:00.000Z'
@@ -363,6 +369,11 @@ describe('user-db v4 (posição de leitura)', () => {
     expect(await listOutbox()).toEqual(outboxAntes)
   })
 
+  it('listAllPosicoes devolve o que setPosicaoLocal gravou', async () => {
+    const pos = await setPosicaoLocal(9309, 'versiculo', '2:5')
+    expect(await listAllPosicoes()).toContainEqual(pos)
+  })
+
   it('setPosicaoLocal aceita seção, parágrafo em prosa e alvo de narração com tempo', async () => {
     expect((await setPosicaoLocal(9302, 'secao', 'resenha'))?.ref).toBe('resenha')
     expect((await setPosicaoLocal(9302, 'secao', 'contexto-2'))?.ref).toBe('contexto-2')
@@ -536,5 +547,168 @@ describe('applyRemote* — contagem de linhas aplicadas', () => {
     }
     expect(await applyRemoteDestaques([lapide])).toBe(1)
     expect(await applyRemoteDestaques([{ ...lapide, atualizadoEm: FUTURE_2 }])).toBe(0)
+  })
+})
+
+describe('jornadas', () => {
+  it('criar grava a jornada e enfileira no outbox na mesma transação', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'Evangelhos',
+      tipo: 'bloco',
+      escopo: 'evangelhos',
+      inicioOrdem: 4,
+      contaDesde: null,
+    })
+    expect(j.id).toBeTruthy()
+    expect(j.arquivadaEm).toBeNull()
+    expect(await listJornadas()).toHaveLength(1)
+    const outbox = await listOutbox()
+    expect(outbox.filter((i) => i.kind === 'jornada')).toHaveLength(1)
+  })
+
+  it('criar uma segunda arquiva a primeira — no máximo uma corrente', async () => {
+    await clearAllUserData()
+    const primeira = await criarJornada({
+      nome: 'Salmos', tipo: 'livro', escopo: 'Salmos', inicioOrdem: 2, contaDesde: null,
+    })
+    const segunda = await criarJornada({
+      nome: 'Mateus', tipo: 'livro', escopo: 'Mateus', inicioOrdem: 4, contaDesde: null,
+    })
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(segunda.id)
+    const todas = await listJornadas()
+    expect(todas.find((j) => j.id === primeira.id)?.arquivadaEm).not.toBeNull()
+    // Duas jornadas + duas lápides de arquivamento não: o arquivamento é um
+    // update, então são 3 itens de outbox (criar, arquivar, criar).
+    const outbox = (await listOutbox()).filter((i) => i.kind === 'jornada')
+    expect(outbox).toHaveLength(3)
+  })
+
+  it('criar uma segunda arquiva a primeira mesmo já CONCLUÍDA — não fica pendurada', async () => {
+    // Regressão do bug corrigido no ciclo 1: o laço de arquivamento de
+    // criarJornada pulava jornadas com concluidaEm !== null, então uma
+    // jornada concluída nunca era arquivada ao abrir a próxima — sobrava
+    // pendurada, nem arquivada nem escolhida por getJornadaCorrente() (que
+    // encontraria duas linhas com arquivadaEm === null).
+    await clearAllUserData()
+    const primeira = await criarJornada({
+      nome: 'Salmos', tipo: 'livro', escopo: 'Salmos', inicioOrdem: 2, contaDesde: null,
+    })
+    await atualizarJornada(primeira.id, { concluidaEm: FUTURE })
+    const segunda = await criarJornada({
+      nome: 'Mateus', tipo: 'livro', escopo: 'Mateus', inicioOrdem: 4, contaDesde: null,
+    })
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(segunda.id)
+    const todas = await listJornadas()
+    const arquivada = todas.find((j) => j.id === primeira.id)
+    expect(arquivada?.arquivadaEm).not.toBeNull()
+    expect(arquivada?.concluidaEm).not.toBeNull()
+  })
+
+  it('getJornadaCorrente devolve a concluída enquanto ela não for arquivada', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    await atualizarJornada(j.id, { concluidaEm: FUTURE })
+    // Concluída, mas ainda a única não arquivada: continua sendo a corrente
+    // — é o que permite a Home mostrar "· concluída" e, se uma perícope for
+    // desmarcada depois, reabri-la (reconciliacaoDeConclusao).
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(j.id)
+    expect(corrente?.concluidaEm).toBe(FUTURE)
+  })
+
+  it('duas correntes vindas do pull (aparelhos diferentes): desempata por atualizadoEm, não por criadoEm', async () => {
+    // applyRemoteJornadas é o caminho de pull de verdade — a invariante "no
+    // máximo uma corrente" é de escrita (criarJornada), então nada aqui a
+    // impede de gravar duas linhas com arquivadaEm null, exatamente o cenário
+    // que a spec cobre. criadoEm da 2ª é mais novo, mas atualizadoEm da 1ª é
+    // mais novo — se o desempate caísse de volta para criadoEm (a ordem de
+    // listJornadas), este teste pegaria a divergência.
+    await clearAllUserData()
+    const base = {
+      tipo: 'livro' as const,
+      inicioOrdem: 0,
+      contaDesde: null,
+      arquivadaEm: null,
+      concluidaEm: null,
+      apagadoEm: null,
+    }
+    await applyRemoteJornadas([
+      {
+        ...base,
+        id: 'antiga-mas-editada-por-ultimo',
+        nome: 'Salmos',
+        escopo: 'Salmos',
+        criadoEm: PAST,
+        atualizadoEm: FUTURE_2,
+      },
+      {
+        ...base,
+        id: 'nova-mas-nao-tocada-depois',
+        nome: 'Mateus',
+        escopo: 'Mateus',
+        criadoEm: FUTURE,
+        atualizadoEm: FUTURE,
+      },
+    ])
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe('antiga-mas-editada-por-ultimo')
+  })
+
+  it('trunca o nome em LIMITE_NOME', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'x'.repeat(LIMITE_NOME + 50),
+      tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    expect(j.nome).toHaveLength(LIMITE_NOME)
+  })
+
+  it('atualizarJornada mexe no campo e enfileira', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    const antes = j.atualizadoEm
+    const nova = await atualizarJornada(j.id, { contaDesde: FUTURE })
+    expect(nova?.contaDesde).toBe(FUTURE)
+    expect(nova!.atualizadoEm >= antes).toBe(true)
+  })
+
+  it('applyRemoteJornadas respeita o LWW e conta só o que mudou', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    // Remota mais VELHA perde e não conta.
+    const velha = { ...j, nome: 'Velha', atualizadoEm: '2000-01-01T00:00:00.000Z', apagadoEm: null }
+    expect(await applyRemoteJornadas([velha])).toBe(0)
+    // Remota mais NOVA ganha.
+    const nova = { ...j, nome: 'Nova', atualizadoEm: FUTURE, apagadoEm: null }
+    expect(await applyRemoteJornadas([nova])).toBe(1)
+    expect((await listJornadas())[0].nome).toBe('Nova')
+  })
+
+  it('lápide remota apaga; lápide de linha inexistente não conta', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    expect(await applyRemoteJornadas([{ ...j, atualizadoEm: FUTURE, apagadoEm: FUTURE }])).toBe(1)
+    expect(await listJornadas()).toHaveLength(0)
+    // Reentrega de lápide é rotina no pull — não pode acordar as telas de novo.
+    expect(await applyRemoteJornadas([{ ...j, atualizadoEm: FUTURE, apagadoEm: FUTURE }])).toBe(0)
+  })
+
+  it('clearAllUserData limpa as jornadas', async () => {
+    await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    await clearAllUserData()
+    expect(await listJornadas()).toHaveLength(0)
   })
 })

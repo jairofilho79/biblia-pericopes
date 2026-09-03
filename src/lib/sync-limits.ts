@@ -9,3 +9,13 @@ export const MAX_ITENS_POR_LOTE = 500
 
 /** Máximo de caracteres do texto de uma anotação; o servidor rejeita acima disso. */
 export const MAX_TEXTO = 20_000
+
+/**
+ * Máximo de caracteres do nome de uma jornada; o servidor rejeita acima disso.
+ *
+ * Teto próprio, bem abaixo de MAX_TEXTO: nome de jornada não é corpo de
+ * anotação. Mora aqui, e não em jornadas.ts, porque user-db.ts precisa dele e
+ * jornadas.ts passou a importar de conclusao.ts, que importa de user-db.ts —
+ * declarar a constante lá fecharia um ciclo de import com uma `const` no meio.
+ */
+export const LIMITE_NOME = 120

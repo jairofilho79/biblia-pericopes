@@ -82,3 +82,34 @@ export type RawPericope = {
   versiculo_fim: number
   texto_naa: string
 }
+
+export type JornadaTipo = 'sequencia' | 'bloco' | 'livro' // 'cronologica' depois
+
+/**
+ * Percurso declarado pelo leitor. Guarda só a DEFINIÇÃO — a rota e o
+ * progresso são derivados em runtime do índice e do `progresso` global
+ * (src/lib/jornadas.ts). Nunca uma segunda contabilidade de leitura.
+ */
+export type Jornada = {
+  id: string
+  nome: string
+  tipo: JornadaTipo
+  /**
+   * 'sequencia' → 'biblia' | 'vt' | 'nt'
+   * 'bloco'     → id de BLOCOS (ex.: 'pentateuco')
+   * 'livro'     → nome do livro, como em PericopeIndex.livro
+   */
+  escopo: string
+  /** Ordem da 1ª perícope da jornada dentro da rota do escopo. */
+  inicioOrdem: number
+  /**
+   * Âncora da atribuição.
+   * `null` → "continuar": qualquer conclusão no escopo conta, de qualquer época.
+   * ISO    → "reler": só conclusões a partir dali contam, e o cursor volta ao início.
+   */
+  contaDesde: string | null
+  criadoEm: string
+  atualizadoEm: string
+  arquivadaEm: string | null
+  concluidaEm: string | null
+}

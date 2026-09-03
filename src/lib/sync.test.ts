@@ -1,7 +1,9 @@
 import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  atualizarJornada,
   clearAllUserData,
+  criarJornada,
   deleteMeta,
   enqueuePosicao,
   getMeta,
@@ -9,6 +11,7 @@ import {
   getProgresso,
   listAnotacoes,
   listDestaques,
+  listJornadas,
   listOutbox,
   saveAnotacao,
   setDestaque,
@@ -278,6 +281,52 @@ describe('syncNow — push em lotes', () => {
     expect(warn).toHaveBeenCalledWith('[sync] push falhou', 500)
     warn.mockRestore()
   })
+
+  // Regressão específica de jornadas: se `lotesJornadas.length` saísse do
+  // `Math.max` que calcula `total`, um outbox com MAIS lotes de jornadas do
+  // que de qualquer outro grupo perderia em silêncio as jornadas do lote
+  // excedente — sem erro, sem log, nenhum POST pra elas. Progresso presente
+  // ao lado (1 lote) é o que garante que este teste morre por essa razão
+  // específica (um lote de jornadas faltando na soma) e não pela razão
+  // incidental de "nenhum POST saiu", que aconteceria se o outbox só
+  // tivesse jornadas e `total` virasse 0.
+  it('jornadas em mais lotes que progresso → nenhum lote de jornadas se perde', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    await setProgresso(90000, 'concluido') // 1 item → 1 lote
+    const TOTAL_JORNADAS = MAX_ITENS_POR_LOTE + 1 // 501 → 2 lotes (500 + 1)
+    for (let i = 0; i < TOTAL_JORNADAS; i++) {
+      await criarJornada({
+        nome: `Jornada ${i}`,
+        tipo: 'livro',
+        escopo: 'Salmos',
+        inicioOrdem: 1,
+        contaDesde: null,
+      })
+    }
+
+    const posts: { jornadas: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({ progresso: [], anotacoes: [], agora: FUTURE })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    // a asserção que importa vem primeiro: a soma dos lotes é o total de
+    // jornadas criadas — se `jornadas` saísse do Math.max, o segundo lote
+    // nunca seria POSTado e esta soma ficaria em 500, não 501 (o outbox NÃO
+    // ficaria vazio, e é isso que a asserção final também comprova).
+    expect(posts.reduce((n, p) => n + p.jornadas.length, 0)).toBe(TOTAL_JORNADAS)
+    expect(posts.length).toBe(2)
+    for (const p of posts) expect(p.jornadas.length).toBeLessThanOrEqual(MAX_ITENS_POR_LOTE)
+    expect(await listOutbox()).toEqual([])
+  }, 20000)
 })
 
 // 400 é validação determinística: reenviar o mesmo lote nunca muda o
@@ -541,6 +590,75 @@ describe('syncNow — destaques', () => {
     await syncNow()
 
     expect(await getMeta('sync-cursor')).toBe(FUTURE)
+  })
+})
+
+describe('syncNow — jornadas', () => {
+  it('push envia jornadas deduplicadas por id e o pull aplica as remotas', async () => {
+    await resetLocal()
+    vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
+
+    // mesma jornada criada e depois renomeada: só o último nome sobe
+    const jornada = await criarJornada({
+      nome: 'Salmos',
+      tipo: 'livro',
+      escopo: 'Salmos',
+      inicioOrdem: 2,
+      contaDesde: null,
+    })
+    await atualizarJornada(jornada.id, { nome: 'Salmos (releitura)' })
+
+    const posts: { jornadas: unknown[] }[] = []
+    const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
+      if (init?.method === 'POST') {
+        posts.push(JSON.parse(init.body as string))
+        return jsonResponse({ ok: true, agora: FUTURE })
+      }
+      return jsonResponse({
+        progresso: [],
+        anotacoes: [],
+        destaques: [],
+        posicoes: [],
+        jornadas: [
+          {
+            id: 'remota-1',
+            nome: 'Pentateuco',
+            tipo: 'bloco',
+            escopo: 'pentateuco',
+            inicioOrdem: 1,
+            contaDesde: null,
+            criadoEm: FUTURE,
+            atualizadoEm: FUTURE,
+            arquivadaEm: null,
+            concluidaEm: null,
+            apagadoEm: null,
+          },
+        ],
+        agora: FUTURE,
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await syncNow()
+
+    expect(posts).toHaveLength(1)
+    expect(posts[0].jornadas).toEqual([
+      {
+        id: jornada.id,
+        nome: 'Salmos (releitura)',
+        tipo: 'livro',
+        escopo: 'Salmos',
+        inicioOrdem: 2,
+        contaDesde: null,
+        criadoEm: expect.any(String),
+        atualizadoEm: expect.any(String),
+        arquivadaEm: null,
+        concluidaEm: null,
+        apagadoEm: null,
+      },
+    ])
+    expect((await listJornadas()).map((j) => j.id)).toContain('remota-1')
+    expect(await listOutbox()).toEqual([])
   })
 })
 

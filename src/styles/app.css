@@ -2431,6 +2431,79 @@ button.ghost {
   }
 }
 
+/* Task 6 (jornadas): Home mostra a jornada ativa em vez das trilhas VT/NT.
+   Reaproveita .track-label/.track-progress/.book-progress/.cta — só o
+   invólucro do card e o convite abaixo das trilhas são novos. */
+.jornada-card {
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.35rem 1.4rem;
+  max-width: 28rem;
+}
+
+.jornada-card .book-progress {
+  width: 100%;
+  height: 6px;
+  margin: 0 0 1rem;
+}
+
+.jornada-card .cta {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+/* "Comece uma jornada" / "Entre para criar jornadas", abaixo das trilhas
+   VT/NT — convite, não obrigação, por isso .ghost e não .cta. */
+.jornada-convite {
+  margin: 1rem 0 0;
+}
+
+/* Task 7 (jornadas): tela de gestão em /jornada. Reaproveita .jornada-card,
+   .track-progress, .book-progress, .ghost e .linkish (Task 6 e Leitura já os
+   definem) — só os dois agrupamentos novos (ações/confirmação e histórico)
+   precisam de layout próprio. */
+.jornada-acoes,
+.jornada-confirmar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0 0;
+  font-family: var(--font-ui);
+}
+
+.jornada-historico-titulo {
+  margin-top: 2rem;
+}
+
+.jornada-historico {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.jornada-historico li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.jornada-historico li .track-progress {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.jornada-historico-nome {
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
 /* visível só para leitores de tela */
 .sr-only {
   position: absolute;
@@ -2442,4 +2515,122 @@ button.ghost {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* Task 8 (jornadas): catálogo de escopos (passo 1) e confirmação (passo 2)
+   em /jornada. Reaproveita .muted, .ghost, .linkish, .cta e .jornada-acoes
+   (Tasks 6/7 já os definem) — só a escada de grupos, os cards de escopo e
+   os dois campos do passo 2 precisam de layout próprio. */
+.jornada-catalogo,
+.jornada-confirmacao {
+  margin-top: 1.5rem;
+  max-width: 34rem;
+}
+
+.jornada-grupo + .jornada-grupo {
+  margin-top: 1.25rem;
+}
+
+.jornada-grupo h3 {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.jornada-escopos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Cada escopo é um botão a largura toda: nome à esquerda, tamanho à direita
+   — o mesmo par que .track-progress já usa noutras telas, só que aqui é a
+   PRÉVIA do tamanho, não o progresso de uma jornada gravada. */
+.jornada-escopo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.jornada-escopo-tamanho {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.jornada-confirmacao h2,
+.jornada-catalogo h2 {
+  margin-top: 0;
+}
+
+/* Rótulo + controle empilhados, como .entrar-form já faz — só que aqui um
+   <label> vira <fieldset>/<legend> para o grupo de rádios. */
+.jornada-campo {
+  display: block;
+  margin-top: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.jornada-campo input[type='text'] {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+fieldset.jornada-campo {
+  border: none;
+  padding: 0;
+}
+
+.jornada-campo legend {
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.jornada-campo label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+/* Aviso ANTES do botão de criar — não é erro (por isso sem a cor de
+   .entrar-erro), é uma decisão que o leitor toma de olhos abertos. */
+.jornada-aviso {
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--paper));
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--ink);
 }

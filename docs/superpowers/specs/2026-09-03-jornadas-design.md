@@ -334,11 +334,17 @@ reconciliação da carga.
 O item vira **"Jornada"**, singular — mais curto e, com uma ativa por vez,
 literalmente correto.
 
-**Risco de implementação registrado:** a nav fica com 5 itens
-(`Hoje · Índice · Pesquisar · Jornada · Entrar`) numa flex de linha única com
-`white-space: nowrap` (`src/styles/app.css:254`), além da marca e do menu de
-tema. **Medir a 360 px.** Se estourar, o plano B é `Entrar` virar ícone/avatar
-— é o item de menor frequência de uso.
+**O risco de adensamento foi resolvido fora desta fase** (decidido com o
+usuário em 2026-09-03): `Hoje` sai da nav, porque a marca já é
+`<NavLink to="/">` e faz exatamente a mesma coisa. A nav vai de
+`Hoje · Índice · Pesquisar · Entrar` para
+`Jornada · Índice · Pesquisar · Perfil` — mesmo número de itens de antes,
+mesmo tendo ganhado `Jornada`.
+
+Essa reorganização do chrome (remover `Hoje`, trocar `Sair` por um menu
+`Perfil` que absorve o `ThemeMenu` e as preferências do `Aa`, e retirar o pill
+`.ref-nav` da Leitura) é **tarefa própria**, com desenho separado. Esta fase
+depende dela apenas em não introduzir um 5º item — e não introduz.
 
 ## Fronteira com releitura e esquecimento
 

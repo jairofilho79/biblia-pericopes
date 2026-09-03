@@ -29,17 +29,14 @@
      médio no sépia, um pouco mais aqui — papel quase branco precisa de um
      pouco mais de véu para o trecho se destacar.
 
-     `--candle-luz` é a luz que sobe na palavra atual, e ela é BRANCA em todo
-     tema — luz é branca, não é da cor do móvel. Aqui isso tem um efeito
-     bonito de graça: como o véu escureceu o bloco, o branco traz a palavra
-     de volta para o branco do papel. A palavra não é pintada, é acesa.
-
-     A força muda por tema porque branco rende muito diferente conforme o
-     papel: sobre papel claro ele só desfaz o véu, sobre papel escuro ele
-     salta. */
+     `--candle-luz-pct` é a luz branca que sobe na palavra atual, e nos temas
+     CLAROS ela é 0: sobre papel quase branco o branco não tem para onde
+     brilhar — ele só desfazia o véu e o resultado ficava sujo em vez de
+     aceso. Aqui a palavra é marcada só pela barra embaixo dela, que já
+     basta. A luz sobrou onde ela realmente funciona: no tema escuro. */
   --candle: var(--accent);
   --candle-fundo: color-mix(in srgb, var(--candle) 15%, transparent);
-  --candle-luz-pct: 55%;
+  --candle-luz-pct: 0%;
   /* gravando: o vermelho do microfone aberto. Um só tom para claro e sépia. */
   --rec: #c0392b;
   --radius: 12px;
@@ -82,7 +79,8 @@
      sobre papel escuro — e por isso basta pouco: 8% já separa o trecho. */
   --candle: var(--accent);
   --candle-fundo: color-mix(in srgb, var(--candle) 8%, transparent);
-  /* no escuro o branco salta sozinho: menos é mais */
+  /* só aqui a luz existe: branco sobre papel escuro é luz de verdade, e
+     basta pouco. */
   --candle-luz-pct: 22%;
   /* no escuro o vermelho sobe um tom, senão afunda no papel. */
   --rec: #e4655a;
@@ -113,7 +111,8 @@
      de verão que o tema pede sem pesar. */
   --candle: #8f5c1c;
   --candle-fundo: color-mix(in srgb, var(--candle) 12%, transparent);
-  --candle-luz-pct: 45%;
+  /* papel bege tem o mesmo problema do branco: sem luz, só a barra */
+  --candle-luz-pct: 0%;
   --rec: #c0392b;
   color-scheme: light;
 }
@@ -1451,9 +1450,15 @@ button.ghost {
    preso à esquerda com largura cheia. Como `background-position` NÃO
    transita, só o tamanho, a luz nasce de um lado e some pelo outro.
 
-   A luz é branca (`--candle-luz-pct` sobre #fff), não da cor do tema: luz
-   não tem a cor do móvel que ilumina. Nos temas claros isso faz a palavra
-   voltar ao branco do papel por cima do véu — ela é acesa, não pintada.
+   A luz é branca e só existe no tema escuro (`--candle-luz-pct` é 0 nos
+   claros): branco sobre papel escuro é luz; sobre papel claro é só sujeira.
+   Nos temas claros sobra a barra, que já marca a palavra sozinha.
+
+   A continuidade entre uma palavra e a seguinte não é feita aqui — vem de
+   os spans `[data-w]` estarem encostados, com o espaço separador dentro do
+   span em vez de entre eles (ver TextoFalado em Leitura.tsx). Sem isso, o
+   espaço entre palavras é texto nu que nenhum fundo alcança, e o realce
+   pisca numa fresta escura a cada troca.
 
    `--candeia` é o único resto de fogo no desenho: a luz que sobe respira de
    leve. Ele mora no trecho em fala (ver a regra da animação abaixo), não na

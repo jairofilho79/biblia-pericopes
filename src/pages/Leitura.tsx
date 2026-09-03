@@ -70,12 +70,20 @@ function TextoFalado({ texto, ativo }: { texto: string; ativo: boolean }) {
     <>
       {/* `data-w` tem que numerar exatamente como `tokens()` — é a mesma
           função que produz o campo `palavras` do manifesto (via
-          alinhar-narracao.ts), e as duas numerações precisam ser uma só. */}
-      {tokens(texto).map((tk, k) => (
-        <Fragment key={k}>
-          {k > 0 ? ' ' : ''}
-          <span data-w={k}>{tk}</span>
-        </Fragment>
+          alinhar-narracao.ts), e as duas numerações precisam ser uma só.
+
+          O espaço separador vai DENTRO do span, no fim de cada palavra menos
+          a última — e não entre os spans, que é onde ele estaria naturalmente.
+          O motivo é o realce: ele é um fundo do span, então espaço fora de
+          span é espaço que nenhuma luz alcança, e a luz piscava numa fresta
+          escura a cada troca de palavra. Com os spans encostados, a palavra
+          que sai encolhe para a direita enquanto a que entra cresce da
+          esquerda, as duas metades se tocam na fronteira e o realce vira uma
+          faixa contínua que desliza. O texto renderizado é o mesmo. */}
+      {tokens(texto).map((tk, k, todos) => (
+        <span data-w={k} key={k}>
+          {k < todos.length - 1 ? `${tk} ` : tk}
+        </span>
       ))}
     </>
   )

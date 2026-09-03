@@ -17,6 +17,13 @@ declare global {
     onresult: ((ev: SpeechRecognitionEvent) => void) | null
     onerror: ((ev: SpeechRecognitionErrorEvent) => void) | null
     onend: ((ev: Event) => void) | null
+    // Só para o rastro de diagnóstico (onEvento); o fluxo não depende deles.
+    onstart?: ((ev: Event) => void) | null
+    onaudiostart?: ((ev: Event) => void) | null
+    onspeechstart?: ((ev: Event) => void) | null
+    onspeechend?: ((ev: Event) => void) | null
+    onaudioend?: ((ev: Event) => void) | null
+    onnomatch?: ((ev: Event) => void) | null
     start(): void
     stop(): void
     abort(): void
@@ -47,6 +54,11 @@ export type DitadoNativoHandlers = {
   onErro: (mensagem: string, codigo: SpeechRecognitionErrorCode) => void
   /** A sessão acabou — por `parar()`, por erro ou porque o SO encerrou sozinho. */
   onFim: () => void
+  /**
+   * Rastro de diagnóstico: cada evento cru do reconhecedor, numa linha
+   * curta. Só o DitarBotao em modo debug liga isto; o fluxo não depende.
+   */
+  onEvento?: (linha: string) => void
 }
 
 export type DitadoNativo = {
@@ -84,7 +96,18 @@ export function criarDitadoNativo(
   // só passa adiante o que estiver deste índice em diante.
   let proximoFinal = 0
 
+  const traco = h.onEvento
+  if (traco) {
+    rec.onstart = () => traco('onstart')
+    rec.onaudiostart = () => traco('onaudiostart')
+    rec.onspeechstart = () => traco('onspeechstart')
+    rec.onspeechend = () => traco('onspeechend')
+    rec.onaudioend = () => traco('onaudioend')
+    rec.onnomatch = () => traco('onnomatch')
+  }
+
   rec.onresult = (ev) => {
+    traco?.(`onresult idx=${ev.resultIndex} n=${ev.results.length}`)
     const finais: string[] = []
     let parcial = ''
     for (let i = ev.resultIndex; i < ev.results.length; i++) {
@@ -104,22 +127,29 @@ export function criarDitadoNativo(
   }
 
   rec.onerror = (ev) => {
+    traco?.(`onerror ${ev.error}${ev.message ? ` — ${ev.message}` : ''}`)
     const msg = MENSAGENS[ev.error]
     if (msg) h.onErro(msg, ev.error)
   }
 
-  rec.onend = () => h.onFim()
+  rec.onend = () => {
+    traco?.('onend')
+    h.onFim()
+  }
 
   return {
     iniciar() {
       proximoFinal = 0
       try {
         rec.start()
-      } catch {
+        traco?.('start()')
+      } catch (e) {
         // InvalidStateError: já estava ouvindo. Nada a fazer.
+        traco?.(`start() lançou ${(e as { name?: string })?.name ?? e}`)
       }
     },
     parar() {
+      traco?.('stop()')
       rec.stop()
     },
   }

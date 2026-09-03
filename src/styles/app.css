@@ -1880,6 +1880,26 @@ button.ghost {
   color: var(--ink);
 }
 
+/* rastro de diagnóstico do ditado (`?ditado=debug`): ocupa a linha toda
+   abaixo do botão, texto miúdo, para print. */
+.ditar:has(.ditar-debug) {
+  flex-wrap: wrap;
+}
+
+.ditar-debug {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  padding: 0.4rem 0.5rem;
+  font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ink);
+  background: var(--paper-2, rgba(0, 0, 0, 0.05));
+  border-radius: 0.4rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 14rem;
+  overflow: auto;
+}
+
 /* "Ouvindo…"/contador na cor de gravação; a prévia do que está sendo dito
    fica muted, é rascunho e não alarme. */
 .ditar-status:has(+ .ditar-botao.gravando):not(.ditar-previa) {

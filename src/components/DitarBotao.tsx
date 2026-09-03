@@ -107,6 +107,19 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
   // `desconhecido` começam a ouvir no próprio toque (sem await no meio, que
   // o navegador pode tratar como perda do gesto); os outros conferem antes.
   const permissao = useRef<EstadoMicrofone>('desconhecido')
+  // Rastro de diagnóstico (`?ditado=debug` na URL): os eventos crus do
+  // reconhecedor e os passos do botão, para ver no aparelho o que o iOS
+  // está fazendo quando o ditado fica em "Ouvindo…" sem entregar nada.
+  const [debug] = useState(() => new URLSearchParams(window.location.search).get('ditado') === 'debug')
+  const [traco, setTraco] = useState<string[]>([])
+  const anotar = useCallback(
+    (linha: string) => {
+      if (!debug) return
+      const t = new Date().toISOString().slice(11, 23)
+      setTraco((l) => [...l.slice(-39), `${t} ${linha}`])
+    },
+    [debug],
+  )
 
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
@@ -142,8 +155,9 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
     if (!nativo) return
     void estadoMicrofone().then((e) => {
       if (montado.current) permissao.current = e
+      anotar(`permissão inicial: ${e}`)
     })
-  }, [nativo])
+  }, [nativo, anotar])
 
   useEffect(() => {
     // StrictMode monta, desmonta e monta de novo: o flag tem que voltar.
@@ -276,12 +290,15 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
       {
         onFinal: (texto) => {
           const frase = pontuarFrase(texto)
+          anotar(`onFinal "${texto}" → "${frase}"`)
           if (!frase) return
           segmentos.current.push(frase)
           onTextoRef.current(frase)
         },
-        onParcial: (parcial) =>
-          setFase((f) => (f.tipo === 'ouvindo' ? { tipo: 'ouvindo', parcial } : f)),
+        onParcial: (parcial) => {
+          if (parcial) anotar(`onParcial "${parcial}"`)
+          setFase((f) => (f.tipo === 'ouvindo' ? { tipo: 'ouvindo', parcial } : f))
+        },
         onErro: (msg, codigo) => {
           // Microfone negado, sem rede: reiniciar só repetiria o erro. E não
           // dá para esperar o `onend` para sair de "Ouvindo…": no iOS ele
@@ -296,17 +313,21 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
           setFase({ tipo: 'ocioso' })
         },
         onFim: () => {
+          anotar(`onFim querOuvir=${querOuvir.current}`)
           if (querOuvir.current) ditado.current?.iniciar()
           else void encerrarNativo()
         },
+        onEvento: debug ? anotar : undefined,
       },
       Reconhecimento,
     )
     if (!ditado.current) return
+    anotar(`toque: permissão=${permissao.current}`)
     if (permissao.current === 'prompt' || permissao.current === 'denied') {
       // Confere de novo: a pessoa pode ter liberado nos ajustes e voltado.
       permissao.current = await estadoMicrofone()
       if (!montado.current) return
+      anotar(`permissão agora: ${permissao.current}`)
     }
     if (permissao.current === 'denied') {
       setFase({ tipo: 'bloqueado' })
@@ -316,6 +337,7 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
       setFase({ tipo: 'pedindo' })
       const ok = await pedirMicrofone()
       if (!montado.current) return
+      anotar(`getUserMedia ${ok ? 'ok' : 'negado'}`)
       if (!ok) {
         permissao.current = 'denied'
         setFase({ tipo: 'bloqueado' })
@@ -330,6 +352,7 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
   }
 
   function pararNativo() {
+    anotar('toque: parar')
     querOuvir.current = false
     // Ocioso já: o onend pode demorar, e o botão precisa responder na hora.
     // A última frase ainda chega por onFinal, que não depende da fase; a
@@ -421,6 +444,11 @@ export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Pr
           />
         </svg>
       </button>
+      {debug && (
+        <pre className="ditar-debug" aria-hidden="true">
+          {traco.length ? traco.join('\n') : `debug ligado · nativo=${nativo}`}
+        </pre>
+      )}
     </span>
   )
 }

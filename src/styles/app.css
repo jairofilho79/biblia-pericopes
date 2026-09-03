@@ -1961,6 +1961,24 @@ button.ghost {
   color: var(--muted);
 }
 
+.reler {
+  display: block;
+  margin: 0.5rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.reler[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.historico-leitura {
+  margin: 0.5rem auto 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 .badge {
   font-family: var(--font-ui);
   background: var(--accent-soft);

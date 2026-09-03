@@ -25,6 +25,7 @@ import {
   saveAnotacao,
   setDestaque,
   setMeta,
+  setParaReler,
   setPosicaoLocal,
   setProgresso,
   zerarProgresso,
@@ -717,6 +718,37 @@ describe('zerarProgresso', () => {
       (i) => i.kind === 'posicao' && i.posicao.pericopeOrdem === 9362 && i.apagadoEm !== null,
     )
     expect(lapide).toBeDefined()
+  })
+
+  it('linha nao_iniciado mas pinada NÃO está em repouso: zera escrevendo e limpa o pin', async () => {
+    // `emRepouso` é `anterior.status === 'nao_iniciado' && !anterior.paraReler`:
+    // uma linha nao_iniciado E pinada não conta como repouso, então esta
+    // continua sendo escrita mesmo sem status para mudar — só para apagar o
+    // pin. Antes de setParaReler existir, este estado era irreproduzível.
+    await setParaReler(9363, true)
+    expect((await getProgresso(9363))?.status).toBe('nao_iniciado')
+    const antes = (await listOutbox()).length
+
+    const n = await zerarProgresso([9363])
+
+    expect(n).toBe(1)
+    expect((await getProgresso(9363))?.paraReler).toBe(false)
+    expect((await listOutbox()).length).toBeGreaterThan(antes)
+  })
+})
+
+describe('setParaReler', () => {
+  it('liga e desliga o pin sem tocar em status nem histórico', async () => {
+    await concluirProgresso(9380)
+    const antes = await getProgresso(9380)
+    await setParaReler(9380, true)
+    const ligado = await getProgresso(9380)
+    expect(ligado?.paraReler).toBe(true)
+    expect(ligado?.status).toBe('concluido')
+    expect(ligado?.historico).toEqual(antes?.historico)
+
+    await setParaReler(9380, false)
+    expect((await getProgresso(9380))?.paraReler).toBe(false)
   })
 })
 

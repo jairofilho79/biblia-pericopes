@@ -46,6 +46,7 @@ import {
   removeDestaque,
   saveAnotacao,
   setDestaque,
+  setParaReler,
   setPosicaoLocal,
   setProgresso,
 } from '../lib/user-db'
@@ -55,7 +56,7 @@ import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
 import { inserirNoCursor, substituirTrecho } from '../lib/ditado'
-import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
+import type { Anotacao, DestaqueCor, Pericope, Progresso, ProgressoStatus } from '../lib/types'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
@@ -138,6 +139,7 @@ export default function Leitura() {
   const [prev, setPrev] = useState<Vizinha | null>(null)
   const [next, setNext] = useState<Vizinha | null>(null)
   const [status, setStatus] = useState<ProgressoStatus>('nao_iniciado')
+  const [prog, setProg] = useState<Progresso | null>(null)
   const [notes, setNotes] = useState<Anotacao[]>([])
   const [draft, setDraft] = useState('')
   const [err, setErr] = useState('')
@@ -282,6 +284,7 @@ export default function Leitura() {
         const hl = await listDestaques(ordem)
         setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
         const prog = await getProgresso(ordem)
+        setProg(prog ?? null)
         const next = prog?.status ?? 'em_andamento'
         setStatus(next === 'nao_iniciado' ? 'em_andamento' : next)
         if (prog?.status === 'concluido') doneRef.current = true
@@ -634,12 +637,21 @@ export default function Leitura() {
     await clearPosicao(ordem)
     doneRef.current = true
     setStatus('concluido')
+    setProg((await getProgresso(ordem)) ?? null)
   }
 
   async function desmarcar() {
     await desmarcarProgresso(ordem)
     doneRef.current = false
     setStatus('em_andamento')
+    setProg((await getProgresso(ordem)) ?? null)
+  }
+
+  // Pin não-destrutivo: liga/desliga sem tocar em status nem histórico —
+  // ao contrário de desmarcar, a jornada não regride.
+  async function alternarReler() {
+    await setParaReler(ordem, !prog?.paraReler)
+    setProg((await getProgresso(ordem)) ?? null)
   }
 
   function selectVerse(id: string) {
@@ -1142,6 +1154,25 @@ export default function Leitura() {
               <button type="button" className="linkish desmarcar" onClick={() => void desmarcar()}>
                 Desmarcar como concluída
               </button>
+              <button
+                type="button"
+                className="linkish reler"
+                aria-pressed={prog?.paraReler ?? false}
+                onClick={() => void alternarReler()}
+              >
+                {prog?.paraReler ? '★ Marcada para reler' : '☆ Marcar para reler'}
+              </button>
+              {prog && prog.historico.length > 0 && (
+                <p className="historico-leitura">
+                  {prog.historico.length === 1 ? 'lida 1×' : `lida ${prog.historico.length}×`} ·{' '}
+                  {prog.historico
+                    .slice(0, 3)
+                    .map((d) =>
+                      new Date(d).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+                    )
+                    .join(' · ')}
+                </p>
+              )}
             </>
           )}
         </div>

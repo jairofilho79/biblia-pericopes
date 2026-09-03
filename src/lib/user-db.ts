@@ -274,6 +274,21 @@ export async function zerarProgresso(ordens: number[]): Promise<number> {
   return mudadas
 }
 
+/**
+ * Liga/desliga o pin "quero revisitar". Não mexe em `status` nem no
+ * histórico: é exatamente a alternativa não-destrutiva a desmarcar — a
+ * perícope continua lida, o ✓ do Índice fica e a jornada não regride.
+ */
+export async function setParaReler(ordem: number, valor: boolean): Promise<void> {
+  await gravarProgresso(ordem, (anterior) => ({
+    pericopeOrdem: ordem,
+    status: anterior?.status ?? 'nao_iniciado',
+    historico: anterior?.historico ?? [],
+    paraReler: valor,
+    atualizadoEm: new Date().toISOString(),
+  }))
+}
+
 export async function listAllProgresso(): Promise<Progresso[]> {
   return (await db()).getAll('progresso')
 }

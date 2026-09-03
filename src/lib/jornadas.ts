@@ -1,10 +1,11 @@
-import { abbrevsDoBloco, blocoPorId } from './blocos'
+import { BIBLE_BOOKS } from './bible-books'
+import { abbrevsDoBloco, blocoPorId, BLOCOS } from './blocos'
 // O predicado vem de conclusao.ts, o seam com a fase de releitura/esquecimento:
 // jornadas nunca toca no formato de armazenamento de `progresso`.
 import { contaComoLida } from './conclusao'
 import { ordensDoTestamento, refLabel } from './content'
 import { LIMITE_NOME } from './sync-limits'
-import type { Testament } from './testament'
+import { testamentOf, type Testament } from './testament'
 import type { Jornada, JornadaTipo, PericopeIndex, PosicaoLeitura, Progresso } from './types'
 
 /**
@@ -146,10 +147,40 @@ export function patchEncerrarJornada(
   return { arquivadaEm: agora }
 }
 
-const ROTULO_SEQUENCIA: Record<string, string> = {
+export const ROTULO_SEQUENCIA: Record<string, string> = {
   biblia: 'A Bíblia toda',
   vt: 'Velho Testamento',
   nt: 'Novo Testamento',
+}
+
+/**
+ * A rota completa do escopo, sem o corte de início — o que o catálogo (passo
+ * 1) e `nomePadrao` precisam antes de o leitor escolher onde começar.
+ *
+ * Mesmo truque de degrade que `rotaDaJornada` já usa para catálogo mudado
+ * debaixo de uma jornada antiga: `inicioOrdem: -1` nunca bate em `indexOf`,
+ * então o corte vira `slice(0)` — a rota inteira, de propósito.
+ */
+export function rotaCompletaDoEscopo(
+  tipo: JornadaTipo,
+  escopo: string,
+  indice: PericopeIndex[],
+): number[] {
+  return rotaDaJornada(
+    {
+      id: '',
+      nome: '',
+      tipo,
+      escopo,
+      inicioOrdem: -1,
+      contaDesde: null,
+      criadoEm: '',
+      atualizadoEm: '',
+      arquivadaEm: null,
+      concluidaEm: null,
+    },
+    indice,
+  )
 }
 
 /** Nome pré-preenchido no passo de confirmação; o leitor pode trocar. */
@@ -166,24 +197,96 @@ export function nomePadrao(
         ? (blocoPorId(escopo)?.nome ?? escopo)
         : (ROTULO_SEQUENCIA[escopo] ?? escopo)
 
-  const rota = rotaDaJornada(
-    {
-      id: '',
-      nome: '',
-      tipo,
-      escopo,
-      inicioOrdem: -1, // força o degrade: queremos a rota COMPLETA do escopo
-      contaDesde: null,
-      criadoEm: '',
-      atualizadoEm: '',
-      arquivadaEm: null,
-      concluidaEm: null,
-    },
-    indice,
-  )
+  const rota = rotaCompletaDoEscopo(tipo, escopo, indice)
   if (rota.length === 0 || rota[0] === inicioOrdem) return base.slice(0, LIMITE_NOME)
 
   const peri = indice.find((p) => p.ordem === inicioOrdem)
   if (!peri) return base.slice(0, LIMITE_NOME)
   return `${base} a partir de ${refLabel(peri)}`.slice(0, LIMITE_NOME)
+}
+
+/** Tamanho de um escopo do catálogo: contagem de perícopes e a soma de
+ * `minutos` já formatada — minutos abaixo de uma hora (um livro breve como
+ * Obadias), horas arredondadas dali para cima (um testamento, a Bíblia). */
+export function tamanhoDoEscopo(itens: PericopeIndex[]): { total: number; duracao: string } {
+  const minutos = itens.reduce((soma, p) => soma + p.minutos, 0)
+  return {
+    total: itens.length,
+    duracao: minutos < 60 ? `~${minutos} min` : `~${Math.round(minutos / 60)} h`,
+  }
+}
+
+export type ItemCatalogo = {
+  tipo: JornadaTipo
+  escopo: string
+  nome: string
+  total: number
+  duracao: string
+}
+
+export type Catalogo = {
+  curta: ItemCatalogo[]
+  media: ItemCatalogo[]
+  longa: ItemCatalogo[]
+  inteira: ItemCatalogo[]
+}
+
+function itemCatalogo(
+  tipo: JornadaTipo,
+  escopo: string,
+  nome: string,
+  itens: PericopeIndex[],
+): ItemCatalogo {
+  return { tipo, escopo, nome, ...tamanhoDoEscopo(itens) }
+}
+
+/**
+ * O catálogo de escopos do passo 1: quatro grupos, cada item com o tamanho
+ * calculado do índice já carregado. Pura — nenhum acesso a
+ * `public/data/index.json` nem ao IndexedDB, testável com um índice mínimo
+ * em memória, como o resto deste arquivo.
+ *
+ * Curta e Média percorrem BIBLE_BOOKS/BLOCOS (não o índice) para que os 66
+ * livros e os 8 blocos apareçam sempre inteiros, mesmo que um deles não
+ * tenha nenhuma perícope no índice recebido — não é o caso do catálogo real,
+ * mas evita um card "sumido" se algum dia for.
+ */
+export function montarCatalogo(indice: PericopeIndex[]): Catalogo {
+  const curta = BIBLE_BOOKS.map((b) =>
+    itemCatalogo('livro', b.name, b.name, indice.filter((p) => p.livro === b.name)),
+  )
+  const media = BLOCOS.map((b) => {
+    const abbrevs = abbrevsDoBloco(b.id)
+    return itemCatalogo('bloco', b.id, b.nome, indice.filter((p) => abbrevs.has(p.abbrev)))
+  })
+  const longa = (['vt', 'nt'] as const).map((t) =>
+    itemCatalogo('sequencia', t, ROTULO_SEQUENCIA[t], indice.filter((p) => testamentOf(p) === t)),
+  )
+  const inteira = [itemCatalogo('sequencia', 'biblia', ROTULO_SEQUENCIA.biblia, indice)]
+  return { curta, media, longa, inteira }
+}
+
+export type ModoJornada = 'continuar' | 'reler'
+
+/**
+ * Os dois avisos do passo 2, ANTES do botão de criar — nunca depois do fato:
+ *
+ * - `arquivaAtual`: existe uma jornada corrente que será arquivada.
+ * - `escopoJaLido`: modo Continuar e a rota (já cortada no início escolhido)
+ *   está toda lida — sem o aviso, a jornada nasceria e a reconciliação da
+ *   Home a marcaria concluída no mesmo instante, uma jornada natimorta. Só
+ *   se aplica ao modo Continuar: em modo Reler a barra sempre começa em 0
+ *   (âncora `contaDesde` no futuro de qualquer conclusão passada), então o
+ *   aviso não tem o que dizer.
+ */
+export function avisosCriacao(
+  corrente: Jornada | null,
+  modo: ModoJornada,
+  rota: number[],
+  progressos: Map<number, Progresso>,
+): { arquivaAtual: boolean; escopoJaLido: boolean } {
+  return {
+    arquivaAtual: corrente !== null,
+    escopoJaLido: modo === 'continuar' && progressoDaJornada(rota, progressos, null).proximaOrdem === null,
+  }
 }

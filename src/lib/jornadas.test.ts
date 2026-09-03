@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import {
+  avisosCriacao,
   cursorDaJornada,
   historicoDeJornadas,
+  montarCatalogo,
   nomePadrao,
   patchEncerrarJornada,
   patchReiniciarJornada,
   progressoDaJornada,
   reconciliacaoDeConclusao,
+  rotaCompletaDoEscopo,
   rotaDaJornada,
+  tamanhoDoEscopo,
 } from './jornadas'
 import type { Jornada, PericopeIndex, PosicaoLeitura, Progresso } from './types'
 
@@ -226,5 +230,122 @@ describe('historicoDeJornadas', () => {
 
   it('rota vazia (nenhuma jornada) devolve histórico vazio', () => {
     expect(historicoDeJornadas([])).toEqual([])
+  })
+})
+
+// Task 8: catálogo de escopos e fluxo de criação (/jornada, passos 1 e 2).
+describe('rotaCompletaDoEscopo', () => {
+  it('devolve a rota inteira, sem cortar em lugar nenhum', () => {
+    expect(rotaCompletaDoEscopo('sequencia', 'vt', INDICE)).toEqual([0, 1, 2, 3])
+    expect(rotaCompletaDoEscopo('livro', 'Salmos', INDICE)).toEqual([2, 3])
+  })
+})
+
+describe('tamanhoDoEscopo', () => {
+  it('soma perícopes e minutos, em minutos abaixo de 1h', () => {
+    // As duas de Gênesis do fixture têm 3 min cada — 6 min ao todo.
+    expect(tamanhoDoEscopo(INDICE.slice(0, 2))).toEqual({ total: 2, duracao: '~6 min' })
+  })
+
+  it('vira horas arredondadas a partir de 1h', () => {
+    const longa: PericopeIndex[] = [peri(0, 'X', 'X'), peri(1, 'X', 'X')].map((p, i) => ({
+      ...p,
+      minutos: i === 0 ? 40 : 50, // 90 min → 1h30, arredonda para 2h
+    }))
+    expect(tamanhoDoEscopo(longa)).toEqual({ total: 2, duracao: '~2 h' })
+  })
+
+  it('escopo vazio não quebra: 0 perícopes, 0 min', () => {
+    expect(tamanhoDoEscopo([])).toEqual({ total: 0, duracao: '~0 min' })
+  })
+})
+
+describe('montarCatalogo', () => {
+  const catalogo = montarCatalogo(INDICE)
+
+  it('tem os quatro grupos, com a cardinalidade da escada', () => {
+    // 66 livros e 8 blocos vêm de BIBLE_BOOKS/BLOCOS — o catálogo real, não
+    // do índice de 6 perícopes do fixture, que só preenche o tamanho.
+    expect(catalogo.curta).toHaveLength(66)
+    expect(catalogo.media).toHaveLength(8)
+    expect(catalogo.longa).toHaveLength(2)
+    expect(catalogo.inteira).toHaveLength(1)
+  })
+
+  it('o card de um livro do fixture tem o tamanho certo', () => {
+    const genesis = catalogo.curta.find((i) => i.escopo === 'Gênesis')
+    expect(genesis).toEqual({ tipo: 'livro', escopo: 'Gênesis', nome: 'Gênesis', total: 2, duracao: '~6 min' })
+  })
+
+  it('um livro sem nenhuma perícope no fixture aparece com tamanho zero — nunca some do catálogo', () => {
+    const juizes = catalogo.curta.find((i) => i.escopo === 'Juízes')
+    expect(juizes).toEqual({ tipo: 'livro', escopo: 'Juízes', nome: 'Juízes', total: 0, duracao: '~0 min' })
+  })
+
+  it('o bloco pega as duas perícopes de Gênesis (Pentateuco)', () => {
+    const pentateuco = catalogo.media.find((i) => i.escopo === 'pentateuco')
+    expect(pentateuco?.total).toBe(2)
+    expect(pentateuco?.nome).toBe('Pentateuco')
+  })
+
+  it('longa soma VT e NT separados, inteira soma tudo', () => {
+    const vt = catalogo.longa.find((i) => i.escopo === 'vt')
+    const nt = catalogo.longa.find((i) => i.escopo === 'nt')
+    expect(vt).toEqual({ tipo: 'sequencia', escopo: 'vt', nome: 'Velho Testamento', total: 4, duracao: '~12 min' })
+    expect(nt?.total).toBe(2)
+    expect(catalogo.inteira[0]).toEqual({
+      tipo: 'sequencia',
+      escopo: 'biblia',
+      nome: 'A Bíblia toda',
+      total: 6,
+      duracao: '~18 min',
+    })
+  })
+})
+
+describe('avisosCriacao', () => {
+  const rotaGenesis = [0, 1]
+
+  it('sem jornada corrente e escopo não totalmente lido: nenhum aviso', () => {
+    expect(avisosCriacao(null, 'continuar', rotaGenesis, new Map())).toEqual({
+      arquivaAtual: false,
+      escopoJaLido: false,
+    })
+  })
+
+  it('com jornada corrente: avisa que ela será arquivada', () => {
+    expect(avisosCriacao(jornada({ id: 'c' }), 'continuar', rotaGenesis, new Map())).toEqual({
+      arquivaAtual: true,
+      escopoJaLido: false,
+    })
+  })
+
+  it('modo Continuar com o escopo já todo lido: avisa que a jornada nasceria concluída', () => {
+    const progressos = new Map([concluida(0, DEPOIS), concluida(1, DEPOIS)])
+    expect(avisosCriacao(null, 'continuar', rotaGenesis, progressos)).toEqual({
+      arquivaAtual: false,
+      escopoJaLido: true,
+    })
+  })
+
+  it('modo Reler com o escopo já todo lido: SEM aviso — Reler sempre começa do zero', () => {
+    // O predicado usa desde=null de propósito (checa a leitura JÁ feita, não
+    // a que a jornada em modo reler vai contar); mas o gate `modo ===
+    // 'continuar'` é o que garante que Reler nunca dispara este aviso.
+    const progressos = new Map([concluida(0, DEPOIS), concluida(1, DEPOIS)])
+    expect(avisosCriacao(null, 'reler', rotaGenesis, progressos).escopoJaLido).toBe(false)
+  })
+
+  it('modo Continuar com o escopo parcialmente lido: sem aviso', () => {
+    const progressos = new Map([concluida(0, DEPOIS)])
+    expect(avisosCriacao(null, 'continuar', rotaGenesis, progressos).escopoJaLido).toBe(false)
+  })
+
+  it('os dois avisos juntos, quando há jornada corrente E o novo escopo já foi lido', () => {
+    const progressos = new Map([concluida(0, DEPOIS), concluida(1, DEPOIS)])
+    expect(avisosCriacao(jornada({ id: 'c' }), 'continuar', rotaGenesis, progressos)).toEqual({
+      arquivaAtual: true,
+      escopoJaLido: true,
+    })
   })
 })

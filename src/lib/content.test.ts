@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { anteriorNoTestamento, loadIndex, progressoPorLivro, proximaNoTestamento } from './content'
-import type { Pericope, PericopeIndex } from './types'
+import { anteriorNoTestamento, loadIndex, progressoPorLivro, proximaNoTestamento, aceitaFiltro, contagemPorLivro, filtroDeOrdens, statusPorOrdem } from './content'
+import type { Pericope, PericopeIndex, Progresso } from './types'
 
 function respostaJson(body: unknown): Response {
   return { ok: true, json: async () => body } as Response
@@ -75,5 +75,63 @@ describe('loadIndex', () => {
     expect(await loadIndex()).toEqual(idx)
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock.mock.calls[0][0]).toContain('data/index.json')
+  })
+})
+
+function prog(ordem: number, status: Progresso['status']): Progresso {
+  return { pericopeOrdem: ordem, status, atualizadoEm: '2026-09-03T00:00:00.000Z' }
+}
+
+describe('aceitaFiltro', () => {
+  it('"todos" aceita tudo, inclusive sem registro', () => {
+    expect(aceitaFiltro(undefined, 'todos')).toBe(true)
+    expect(aceitaFiltro('concluido', 'todos')).toBe(true)
+  })
+
+  it('"lidos" é só concluído', () => {
+    expect(aceitaFiltro('concluido', 'lidos')).toBe(true)
+    expect(aceitaFiltro('em_andamento', 'lidos')).toBe(false)
+    expect(aceitaFiltro(undefined, 'lidos')).toBe(false)
+  })
+
+  it('"comecei" é só em_andamento', () => {
+    expect(aceitaFiltro('em_andamento', 'comecei')).toBe(true)
+    expect(aceitaFiltro('concluido', 'comecei')).toBe(false)
+    expect(aceitaFiltro(undefined, 'comecei')).toBe(false)
+  })
+
+  it('"nao-lidos" é tudo que não concluiu — sem registro conta como não lido', () => {
+    expect(aceitaFiltro(undefined, 'nao-lidos')).toBe(true)
+    expect(aceitaFiltro('nao_iniciado', 'nao-lidos')).toBe(true)
+    expect(aceitaFiltro('em_andamento', 'nao-lidos')).toBe(true)
+    expect(aceitaFiltro('concluido', 'nao-lidos')).toBe(false)
+  })
+
+  it('"comecei" é subconjunto de "nao-lidos", de propósito', () => {
+    expect(aceitaFiltro('em_andamento', 'comecei')).toBe(true)
+    expect(aceitaFiltro('em_andamento', 'nao-lidos')).toBe(true)
+  })
+})
+
+describe('filtroDeOrdens e contagemPorLivro', () => {
+  const mapa = statusPorOrdem([prog(1, 'concluido'), prog(3, 'em_andamento')])
+
+  it('o predicado lê o mapa e trata ausência como não iniciado', () => {
+    const aceita = filtroDeOrdens(mapa, 'nao-lidos')
+    expect(aceita(1)).toBe(false)
+    expect(aceita(2)).toBe(true)
+    expect(aceita(3)).toBe(true)
+  })
+
+  it('conta por livro só o que o predicado aceita', () => {
+    const c = contagemPorLivro(ALL, filtroDeOrdens(mapa, 'nao-lidos'))
+    expect(c.get('Gn')).toBe(1)
+    expect(c.get('Mt')).toBe(2)
+  })
+
+  it('livro sem nada no recorte aparece com zero, não some do mapa', () => {
+    const c = contagemPorLivro(ALL, filtroDeOrdens(mapa, 'comecei'))
+    expect(c.get('Gn')).toBe(0)
+    expect(c.get('Mt')).toBe(1)
   })
 })

@@ -1,4 +1,4 @@
-import type { Pericope, PericopeIndex } from './types'
+import type { Pericope, PericopeIndex, Progresso, ProgressoStatus } from './types'
 import { testamentOf, type Testament } from './testament'
 import { livroSlug } from './livro-slug'
 import { carregarEstudo, carregarTexto } from './shards'
@@ -168,6 +168,56 @@ export function progressoPorLivro(
   }
   for (const v of out.values()) {
     v.pct = v.total ? Math.round((v.concluidas / v.total) * 100) : 0
+  }
+  return out
+}
+
+/** Os quatro recortes de leitura. São RECORTES, não uma partição: "comecei" é
+ *  subconjunto de "nao-lidos", porque "o que me falta" e "o que larguei no
+ *  meio" são perguntas diferentes. */
+export type FiltroLeitura = 'todos' | 'nao-lidos' | 'comecei' | 'lidos'
+
+/** Perícope sem registro de progresso conta como não iniciada. */
+export function aceitaFiltro(
+  status: ProgressoStatus | undefined,
+  filtro: FiltroLeitura,
+): boolean {
+  const s = status ?? 'nao_iniciado'
+  switch (filtro) {
+    case 'todos':
+      return true
+    case 'lidos':
+      return s === 'concluido'
+    case 'comecei':
+      return s === 'em_andamento'
+    case 'nao-lidos':
+      return s !== 'concluido'
+  }
+}
+
+export function statusPorOrdem(todos: Progresso[]): Map<number, ProgressoStatus> {
+  return new Map(todos.map((p) => [p.pericopeOrdem, p.status]))
+}
+
+export function filtroDeOrdens(
+  status: Map<number, ProgressoStatus>,
+  filtro: FiltroLeitura,
+): (ordem: number) => boolean {
+  return (ordem) => aceitaFiltro(status.get(ordem), filtro)
+}
+
+/**
+ * Quantas perícopes de cada livro sobrevivem ao recorte. Todo livro presente
+ * em `all` entra no mapa, inclusive com zero: a tela mostra os 66 livros
+ * sempre nos mesmos lugares, e um livro que some conforme se lê desorienta.
+ */
+export function contagemPorLivro(
+  all: PericopeIndex[],
+  aceita: (ordem: number) => boolean,
+): Map<string, number> {
+  const out = new Map<string, number>()
+  for (const p of all) {
+    out.set(p.livro, (out.get(p.livro) ?? 0) + (aceita(p.ordem) ? 1 : 0))
   }
   return out
 }

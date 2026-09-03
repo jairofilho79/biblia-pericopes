@@ -1,7 +1,7 @@
 export interface Env {
   DB: D1Database
   AUDIO: R2Bucket
-  /** Workers AI: só o ditado (whisper) usa. */
+  /** Workers AI: o ditado de fallback (whisper) e a revisão do ditado (llama). */
   AI: Ai
   BETTER_AUTH_SECRET: string
   APP_URL: string

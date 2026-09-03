@@ -13,6 +13,13 @@ import {
   proximaMeiaNoiteUtc,
   tipoAudioAceito,
 } from './transcrever'
+import {
+  MODELO as MODELO_REVISAO,
+  decidirCota as decidirCotaRevisao,
+  limparSaida,
+  montarInput as montarInputRevisao,
+  parseTexto,
+} from './revisar'
 import type { Env } from './env.d'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -316,6 +323,58 @@ app.post('/api/transcrever', async (c) => {
     .bind(userId, dia, duracao)
     .run()
   return c.json({ texto })
+})
+
+// Revisão do ditado nativo: o texto que o reconhecedor do aparelho despejou
+// sem pontuação volta pontuado e capitalizado por um modelo de texto pequeno
+// (Workers AI). Mesma receita do /api/transcrever: só logado, cota por
+// usuário e teto global, cobrados em caracteres. Se o modelo falhar ou
+// devolver algo suspeito, 502 — o cliente fica com o texto que já tem.
+app.post('/api/revisar-ditado', async (c) => {
+  const userId = await requireUserId(c)
+  if (!userId) return c.json({ error: 'não autenticado' }, 401)
+  const texto = parseTexto(parseJson(await c.req.text().catch(() => '')))
+  if (texto === null) return c.json({ erro: 'Texto inválido' }, 400)
+
+  const agora = new Date()
+  const dia = diaUtc(agora)
+  const uso = await c.env.DB.prepare(
+    `SELECT COALESCE(SUM(CASE WHEN user_id = ?1 THEN caracteres END), 0) AS usuario,
+            COALESCE(SUM(caracteres), 0) AS total
+     FROM revisao_uso WHERE dia = ?2`,
+  )
+    .bind(userId, dia)
+    .first<{ usuario: number; total: number }>()
+  const decisao = decidirCotaRevisao({
+    usoUsuario: uso?.usuario ?? 0,
+    usoGlobal: uso?.total ?? 0,
+    caracteres: texto.length,
+  })
+  if (decisao === 'usuario') {
+    return c.json({ erro: 'Cota diária de revisão esgotada', voltaEm: proximaMeiaNoiteUtc(agora) }, 429)
+  }
+  if (decisao === 'global') {
+    return c.json({ erro: 'Revisão indisponível hoje', voltaEm: proximaMeiaNoiteUtc(agora) }, 503)
+  }
+
+  let revisado: string | null
+  try {
+    const saida: unknown = await c.env.AI.run(MODELO_REVISAO, montarInputRevisao(texto))
+    revisado = limparSaida(saida, texto)
+  } catch (err) {
+    console.error('[revisar-ditado]', err)
+    revisado = null
+  }
+  if (revisado === null) return c.json({ erro: 'Não foi possível revisar' }, 502)
+
+  // Cobra só o que foi de fato revisado: falha do modelo não come cota.
+  await c.env.DB.prepare(
+    `INSERT INTO revisao_uso (user_id, dia, caracteres) VALUES (?1, ?2, ?3)
+     ON CONFLICT(user_id, dia) DO UPDATE SET caracteres = caracteres + excluded.caracteres`,
+  )
+    .bind(userId, dia, texto.length)
+    .run()
+  return c.json({ texto: revisado })
 })
 
 // Narração pré-gerada (R2). Pública como o texto que ela narra; imutável por

@@ -108,33 +108,49 @@ export async function getProgresso(ordem: number): Promise<Progresso | undefined
   return (await db()).get('progresso', ordem)
 }
 
-export async function setProgresso(ordem: number, status: ProgressoStatus): Promise<void> {
-  const atualizadoEm = new Date().toISOString()
+/**
+ * Escreve uma linha de `progresso` e enfileira o outbox correspondente numa
+ * única transação — uma aba morta no meio não pode gravar o progresso local
+ * sem enfileirar o item correspondente do outbox.
+ *
+ * O padrão compartilhado por todo gesto que muda o progresso (`setProgresso`,
+ * `concluirProgresso`, e futuramente `desmarcarProgresso`, `zerarProgresso`,
+ * `setParaReler`): abrir a transação, ler a linha anterior, montar a linha
+ * nova, gravar as duas coisas, fechar. `monta` é a única parte que varia —
+ * decide o que a linha vira a partir do que ela era.
+ */
+async function gravarProgresso(
+  ordem: number,
+  monta: (anterior: Progresso | undefined) => Progresso,
+): Promise<Progresso> {
   const d = await db()
-  // Uma única transação sobre os dois stores: uma aba morta no meio não pode
-  // gravar o progresso local sem enfileirar o item correspondente do outbox.
   const tx = d.transaction(['progresso', 'outbox'], 'readwrite')
   const store = tx.objectStore('progresso')
   const anterior = await store.get(ordem)
-  // Mudar de status NUNCA apaga o histórico nem o pin: quem os escreve são
-  // concluirProgresso, desmarcarProgresso, zerarProgresso e setParaReler.
-  const linha: Progresso = {
-    pericopeOrdem: ordem,
-    status,
-    historico: anterior?.historico ?? [],
-    paraReler: anterior?.paraReler ?? false,
-    atualizadoEm,
-  }
+  const linha = monta(anterior)
   await store.put(linha)
   await tx.objectStore('outbox').put({
     kind: 'progresso',
     ordem,
-    status,
+    status: linha.status,
     historico: linha.historico,
     paraReler: linha.paraReler,
-    atualizadoEm,
+    atualizadoEm: linha.atualizadoEm,
   } as OutboxItem)
   await tx.done
+  return linha
+}
+
+export async function setProgresso(ordem: number, status: ProgressoStatus): Promise<void> {
+  await gravarProgresso(ordem, (anterior) => ({
+    pericopeOrdem: ordem,
+    status,
+    // Mudar de status NUNCA apaga o histórico nem o pin: quem os escreve são
+    // concluirProgresso, desmarcarProgresso, zerarProgresso e setParaReler.
+    historico: anterior?.historico ?? [],
+    paraReler: anterior?.paraReler ?? false,
+    atualizadoEm: new Date().toISOString(),
+  }))
 }
 
 /** Une dois históricos: conjunto, mais nova primeiro, cortado em MAX_HISTORICO. */
@@ -150,28 +166,16 @@ function unirHistorico(a: readonly string[] = [], b: readonly string[] = []): st
  * único lugar que faz o histórico crescer.
  */
 export async function concluirProgresso(ordem: number): Promise<void> {
-  const atualizadoEm = new Date().toISOString()
-  const d = await db()
-  const tx = d.transaction(['progresso', 'outbox'], 'readwrite')
-  const store = tx.objectStore('progresso')
-  const anterior = await store.get(ordem)
-  const linha: Progresso = {
-    pericopeOrdem: ordem,
-    status: 'concluido',
-    historico: unirHistorico([atualizadoEm], anterior?.historico),
-    paraReler: false,
-    atualizadoEm,
-  }
-  await store.put(linha)
-  await tx.objectStore('outbox').put({
-    kind: 'progresso',
-    ordem,
-    status: linha.status,
-    historico: linha.historico,
-    paraReler: linha.paraReler,
-    atualizadoEm,
-  } as OutboxItem)
-  await tx.done
+  await gravarProgresso(ordem, (anterior) => {
+    const atualizadoEm = new Date().toISOString()
+    return {
+      pericopeOrdem: ordem,
+      status: 'concluido',
+      historico: unirHistorico([atualizadoEm], anterior?.historico),
+      paraReler: false,
+      atualizadoEm,
+    }
+  })
 }
 
 export async function listAllProgresso(): Promise<Progresso[]> {

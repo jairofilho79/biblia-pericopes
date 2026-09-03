@@ -459,7 +459,15 @@ export async function applyRemoteProgresso(
     const local = await d.get('progresso', item.pericopeOrdem)
     const remotoVence = remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)
     const historico = unirHistorico(item.historico, local?.historico)
-    const uniaoMudou = historico.length !== (local?.historico?.length ?? -1)
+    // Comparação exata, não só de tamanho: com `local.historico` já no teto de
+    // MAX_HISTORICO, uma entrada nova pode expulsar a mais antiga sem mudar o
+    // tamanho — só o conteúdo. `historico` é sempre mais-nova-primeiro, então
+    // comparar posição a posição é suficiente (não precisa de Set).
+    const anteriorHistorico = local?.historico
+    const uniaoMudou =
+      anteriorHistorico === undefined ||
+      historico.length !== anteriorHistorico.length ||
+      historico.some((data, i) => data !== anteriorHistorico[i])
     if (!remotoVence && !uniaoMudou) continue
     await d.put('progresso', {
       pericopeOrdem: item.pericopeOrdem,

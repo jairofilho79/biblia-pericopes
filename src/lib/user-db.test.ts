@@ -685,4 +685,55 @@ describe('applyRemoteProgresso: merge híbrido', () => {
     expect(p?.status).toBe('concluido')
     expect(Array.isArray(p?.historico)).toBe(true)
   })
+
+  // Regressão: um remoto MAIS VELHO com paraReler:true não pode reviver um pin
+  // que o local (mais novo) já tirou — LWW vale para paraReler mesmo quando o
+  // campo vem presente e explícito no payload.
+  it('remoto mais velho com paraReler:true não revive um pin que o local já tirou', async () => {
+    await setProgresso(9323, 'concluido')
+    const local = await getProgresso(9323)
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...local!, paraReler: false })
+    d.close()
+
+    await applyRemoteProgresso([
+      {
+        pericopeOrdem: 9323,
+        status: 'concluido',
+        historico: [],
+        paraReler: true,
+        atualizadoEm: PAST,
+      },
+    ])
+    expect((await getProgresso(9323))?.paraReler).toBe(false)
+  })
+
+  // Regressão: com o histórico local já no teto de MAX_HISTORICO, uma entrada
+  // nova troca o conteúdo (expulsa a mais antiga) sem mudar o TAMANHO do
+  // array — uma comparação só de length não detectaria a mudança.
+  it('conta como aplicada quando a união muda de conteúdo mesmo com o histórico no teto', async () => {
+    const cheio = Array.from({ length: MAX_HISTORICO }, (_, i) =>
+      new Date(Date.UTC(2020, 0, 1 + i)).toISOString(),
+    ).reverse()
+    await setProgresso(9324, 'concluido')
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...(await getProgresso(9324))!, historico: cheio })
+    d.close()
+
+    const nova = '2026-08-01T00:00:00.000Z'
+    const n = await applyRemoteProgresso([
+      {
+        pericopeOrdem: 9324,
+        status: 'concluido',
+        historico: [nova],
+        paraReler: false,
+        atualizadoEm: PAST, // remoto perde o LWW: só a união pode justificar a contagem
+      },
+    ])
+    expect(n).toBe(1)
+    const p = await getProgresso(9324)
+    expect(p?.historico).toHaveLength(MAX_HISTORICO)
+    expect(p?.historico[0]).toBe(nova)
+    expect(p?.historico).not.toContain('2020-01-01T00:00:00.000Z')
+  })
 })

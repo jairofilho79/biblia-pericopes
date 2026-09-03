@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { anteriorNoTestamento, loadIndex, progressoPorLivro, proximaNoTestamento, aceitaFiltro, contagemPorLivro, filtroDeOrdens, statusPorOrdem } from './content'
+import { anteriorNoTestamento, loadIndex, progressoPorLivro, proximaNoTestamento, aceitaFiltro, contagemPorLivro, filtroDeOrdens, statusPorOrdem, mesmosStatus } from './content'
 import type { Pericope, PericopeIndex, Progresso } from './types'
 
 function respostaJson(body: unknown): Response {
@@ -141,5 +141,31 @@ describe('filtroDeOrdens e contagemPorLivro', () => {
     const c = contagemPorLivro(ALL, filtroDeOrdens(mapa, 'comecei'))
     expect(c.get('Gn')).toBe(0)
     expect(c.get('Mt')).toBe(1)
+  })
+})
+
+describe('mesmosStatus', () => {
+  it('mapas com as mesmas ordens nos mesmos estados são iguais', () => {
+    const a = statusPorOrdem([prog(1, 'concluido'), prog(3, 'em_andamento')])
+    const b = statusPorOrdem([prog(1, 'concluido'), prog(3, 'em_andamento')])
+    expect(mesmosStatus(a, b)).toBe(true)
+  })
+
+  it('tamanhos diferentes nunca são iguais', () => {
+    const a = statusPorOrdem([prog(1, 'concluido')])
+    const b = statusPorOrdem([prog(1, 'concluido'), prog(3, 'em_andamento')])
+    expect(mesmosStatus(a, b)).toBe(false)
+  })
+
+  it('mesma ordem com status diferente não é igual', () => {
+    const a = statusPorOrdem([prog(1, 'concluido')])
+    const b = statusPorOrdem([prog(1, 'em_andamento')])
+    expect(mesmosStatus(a, b)).toBe(false)
+  })
+
+  it('mesmo tamanho com ordens diferentes não é igual (size sozinho não pega)', () => {
+    const a = statusPorOrdem([prog(1, 'concluido')])
+    const b = statusPorOrdem([prog(2, 'concluido')])
+    expect(mesmosStatus(a, b)).toBe(false)
   })
 })

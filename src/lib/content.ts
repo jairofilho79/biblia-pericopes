@@ -199,6 +199,22 @@ export function statusPorOrdem(todos: Progresso[]): Map<number, ProgressoStatus>
   return new Map(todos.map((p) => [p.pericopeOrdem, p.status]))
 }
 
+/** Dois mapas de status são iguais quando têm as mesmas ordens nos mesmos
+ *  estados. Existe para a tela poder MANTER o mapa anterior quando o sync
+ *  não trouxe novidade: `statusPorOrdem` devolve sempre um objeto novo, e
+ *  essa identidade nova se propaga até o efeito de busca, reiniciando uma
+ *  busca de texto que não precisava reiniciar. */
+export function mesmosStatus(
+  a: Map<number, ProgressoStatus>,
+  b: Map<number, ProgressoStatus>,
+): boolean {
+  if (a.size !== b.size) return false
+  for (const [ordem, status] of a) {
+    if (b.get(ordem) !== status) return false
+  }
+  return true
+}
+
 export function filtroDeOrdens(
   status: Map<number, ProgressoStatus>,
   filtro: FiltroLeitura,

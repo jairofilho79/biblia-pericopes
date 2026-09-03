@@ -55,9 +55,13 @@ export default function Explorar() {
   const f = params.get('f')
   const filtro: FiltroLeitura = ehFiltro(f) ? f : 'todos'
   const livroParam = params.get('livro') ?? ''
-  // `cap` sem `livro` é ignorado: um capítulo não significa nada sem o livro, e
-  // uma URL montada à mão não pode deixar a tela num estado que ela não desenha.
-  const livro: BibleBook | undefined = livroParam ? bookByName(livroParam) : undefined
+  // Busca e livro aberto são estados EXCLUSIVOS, e a exclusão precisa valer na
+  // DERIVAÇÃO, não só nos manipuladores: uma URL que chegue com os dois — link
+  // salvo, compartilhado, digitado à mão — não passa por `setQ` nem por
+  // `abrirLivro`, e mostraria o painel do livro com a caixa de busca cheia e
+  // muda. Entre os dois, a consulta vence: a seção "Livros" do resultado
+  // devolve o livro a um toque, e o caminho contrário não existe.
+  const livro: BibleBook | undefined = !q && livroParam ? bookByName(livroParam) : undefined
   const capParam = Number(params.get('cap'))
   const cap = livro && Number.isInteger(capParam) && capParam >= 1 ? capParam : null
 

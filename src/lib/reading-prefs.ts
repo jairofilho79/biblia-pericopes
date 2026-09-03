@@ -81,6 +81,7 @@ export function applyReadingPrefs(prefs: ReadingPrefs) {
   } catch {
     // storage cheio/indisponível nunca quebra a leitura
   }
+  alvo.dispatchEvent(new Event(PREFS_EVENT))
 }
 
 export function setReadingSizeStep(step: number): ReadingPrefs {
@@ -124,4 +125,23 @@ export function setReadingMeasure(measure: ReadingMeasure): ReadingPrefs {
   prefs.measure = measure
   applyReadingPrefs(prefs)
   return prefs
+}
+
+/**
+ * Aviso de "as preferências de leitura mudaram", para o menu (que vive no
+ * header, fora da rota) e a Leitura (que usa `layout` para decidir
+ * corrido/blocos) nunca discordarem.
+ *
+ * O alvo é um EventTarget próprio do módulo, não a `window`: mesmo motivo de
+ * `sync-event.ts` — funciona igual em teste, não ocupa nome global e deixa
+ * claro que só quem importa daqui participa.
+ */
+const alvo = new EventTarget()
+
+const PREFS_EVENT = 'pericopes-reading-prefs'
+
+/** Inscreve `fn` e devolve a função que desinscreve. */
+export function onReadingPrefs(fn: () => void): () => void {
+  alvo.addEventListener(PREFS_EVENT, fn)
+  return () => alvo.removeEventListener(PREFS_EVENT, fn)
 }

@@ -2,8 +2,8 @@ import { Hono } from 'hono'
 import { cabecalhoContentRange, chaveAudio } from './audio'
 import { createAuth } from './auth'
 import {
-  MAX_HISTORICO,
   TAMANHO_PAGINA_PULL,
+  UPSERT_PROGRESSO,
   corpoExcedeLimite,
   paginarPull,
   parseSyncPush,
@@ -247,25 +247,7 @@ app.post('/api/sync', async (c) => {
   const serverEm = new Date().toISOString()
   const stmts = [
     ...parsed.progresso.map((p) =>
-      c.env.DB.prepare(
-        `INSERT INTO progresso (user_id, pericope_ordem, status, historico, para_reler, atualizado_em, server_em)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-         ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
-           status     = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
-                             THEN excluded.status     ELSE progresso.status     END,
-           para_reler = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
-                             THEN excluded.para_reler ELSE progresso.para_reler END,
-           atualizado_em = MAX(excluded.atualizado_em, progresso.atualizado_em),
-           historico = (SELECT json_group_array(d) FROM (
-                          SELECT value AS d FROM json_each(excluded.historico)
-                          UNION
-                          SELECT value AS d FROM json_each(progresso.historico)
-                          ORDER BY d DESC LIMIT ${MAX_HISTORICO})),
-           server_em = excluded.server_em
-         WHERE excluded.atualizado_em > progresso.atualizado_em
-            OR EXISTS (SELECT 1 FROM json_each(excluded.historico)
-                       WHERE value NOT IN (SELECT value FROM json_each(progresso.historico)))`,
-      ).bind(
+      c.env.DB.prepare(UPSERT_PROGRESSO).bind(
         userId,
         p.pericopeOrdem,
         p.status,

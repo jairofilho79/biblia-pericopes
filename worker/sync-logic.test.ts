@@ -145,6 +145,54 @@ describe('paginarPull — com jornadas', () => {
     expect(r.cursor).toBe('b')
     expect(r.jornadas).toEqual([linhaJ('a')])
   })
+
+  // Os dois testes acima nunca fazem `jornadas` ESTOURAR (n+1 linhas): o
+  // primeiro cabe tudo, o segundo tem só 2 linhas com n=2. Nenhum dos dois
+  // passa pela entrada `{ nome: 'jornadas', ... }` do array `fronteiras` —
+  // uma mutação que apagasse essa linha passaria os dois igual. Os três
+  // testes abaixo fecham essa lacuna: (a) jornadas estourando é quem decide
+  // o cursor, (b) o grupo de jornadas maior que a página, (c) o caminho
+  // completo de fechamento de grupo (fecharGrupo) para jornadas.
+  it('jornadas estourando com fronteira MENOR que as outras entidades: o cursor é o de jornadas, e as outras são cortadas por ele', () => {
+    // jornadas estoura (n=2, 3 linhas) com fronteira T2 — menor que a linha
+    // de progresso em T2.5, que não estoura por si só mas tem que ser
+    // cortada porque o cursor global (o mínimo das fronteiras) é T2. Sem a
+    // entrada de jornadas em `fronteiras`, o estouro dela nunca seria visto:
+    // o cursor sairia null (nenhuma entidade "estourando"), devolvendo as 3
+    // linhas de jornadas inteiras e progresso intacto — o oposto disto.
+    const jornadas = [
+      linha('2026-01-01T00:00:01.000Z', 1),
+      linha('2026-01-01T00:00:02.000Z', 2), // T2 — fronteira de jornadas
+      linha('2026-01-01T00:00:03.000Z', 3), // a (n+1)-ésima
+    ]
+    const progresso = [
+      linha('2026-01-01T00:00:01.500Z', 10),
+      linha('2026-01-01T00:00:02.500Z', 11), // > T2, cortada mesmo sem estourar por si só
+    ]
+    const r = paginarPull(
+      { progresso, anotacoes: [], destaques: [], posicoes: [], jornadas },
+      2,
+    )
+    expect(r.cursor).toBe('2026-01-01T00:00:02.000Z')
+    expect(r.maisDados).toBe(true)
+    expect(r.jornadas.map((j) => j.v)).toEqual([1, 2])
+    expect(r.progresso.map((p) => p.v)).toEqual([10])
+  })
+
+  it('grupo de jornadas maior que a página inteira: avança o cursor e marca gruposIncompletos', () => {
+    // As n+1=3 linhas de jornadas compartilham o MESMO server_em — o mesmo
+    // cenário de "grupo maior que a página" já coberto para destaques e
+    // posições, agora para jornadas.
+    const T = '2026-01-01T00:00:05.000Z'
+    const jornadas = [linha(T, 1), linha(T, 2), linha(T, 3)]
+    const r = paginarPull(
+      { progresso: [], anotacoes: [], destaques: [], posicoes: [], jornadas },
+      2,
+    )
+    expect(r.cursor).toBe(T)
+    expect(r.maisDados).toBe(true)
+    expect(r.gruposIncompletos).toEqual(['jornadas'])
+  })
 })
 
 describe('parseSyncPush', () => {
@@ -533,6 +581,22 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
     }
     esperaEntregaExata(banco, 10)
     expect(pullCompleto(banco, 10).destaques).toHaveLength(25)
+  })
+
+  it('mesmo cenário, agora em jornadas: fecharGrupo cobre jornadas, não só destaques/posições', () => {
+    // Idêntico ao teste acima, mas a entidade que estoura em grupo gigante é
+    // jornadas — cobre o ramo `entidade === 'jornadas'` do laço de
+    // gruposIncompletos em worker/index.ts (aqui simulado por rodadaDePull),
+    // que antes desta rodada de correção era só o `else` catch-all.
+    const banco: BancoRT = {
+      progresso: [],
+      anotacoes: [],
+      destaques: [],
+      posicoes: [],
+      jornadas: serie(1, 25, '2026-01-01T00:00:05.000Z'),
+    }
+    esperaEntregaExata(banco, 10)
+    expect(pullCompleto(banco, 10).jornadas).toHaveLength(25)
   })
 
   it('grupo gigante entre grupos normais: nem o grupo nem os vizinhos se perdem', () => {

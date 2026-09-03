@@ -206,8 +206,18 @@ app.get('/api/sync', async (c) => {
         destaques = await fecharGrupo<LinhaDestaque>(c.env.DB, SELECT_DESTAQUES, userId, cortado)
       } else if (entidade === 'posicoes') {
         posicoes = await fecharGrupo<LinhaPosicao>(c.env.DB, SELECT_POSICOES, userId, cortado)
-      } else {
+      } else if (entidade === 'jornadas') {
         jornadas = await fecharGrupo<LinhaJornada>(c.env.DB, SELECT_JORNADAS, userId, cortado)
+      } else {
+        // Exaustividade de propósito: um `else` catch-all aqui já causou um
+        // apontamento de revisão (jornadas herdou o papel de posicoes sem
+        // querer). Se EntidadePull ganhar um nome novo (a próxima entidade,
+        // dias_leitura) sem um ramo dedicado, este `never` vira ERRO DE
+        // COMPILAÇÃO em vez de perda de dados silenciosa: a nova entidade
+        // cairia aqui, o grupo dela nunca seria fechado, e jornadas seria
+        // sobrescrita com o conteúdo errado.
+        const _exaustivo: never = entidade
+        throw new Error(`grupo incompleto de entidade desconhecida: ${String(_exaustivo)}`)
       }
     }
   }

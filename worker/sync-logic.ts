@@ -54,7 +54,7 @@ const VERSE_ID = /^\d+:\d+$/
 const POSICAO_TIPOS = new Set(['secao', 'versiculo', 'narracao'])
 const JORNADA_TIPOS = new Set(['sequencia', 'bloco', 'livro'])
 // Cópia de LIMITE_NOME em src/lib/sync-limits.ts (o Worker não importa de src/),
-// mesma convenção já usada para MAX_ITENS e MAX_TEXTO logo acima.
+// mesma convenção já usada para MAX_ITENS e MAX_TEXTO logo abaixo.
 const MAX_NOME = 120
 // Nome de livro é o escopo mais longo ("1 Tessalonicenses"); o teto só barra abuso.
 const MAX_ESCOPO = 64
@@ -68,7 +68,7 @@ const POSICAO_REF =
 const MAX_TEMPO_S = 86_400
 // Cópia deliberada dos limites de src/lib/sync-limits.ts: o Worker não pode
 // importar de src/ (tsconfig/bundle separados). Mantenha os dois em sincronia.
-// MAX_ITENS vale para as três listas (progresso/anotacoes/destaques).
+// MAX_ITENS vale para as cinco listas (progresso/anotacoes/destaques/posicoes/jornadas).
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
 
@@ -194,7 +194,7 @@ function validPosicao(v: unknown): v is PushPosicao {
   )
 }
 
-/** null ou ISO canônico — os três campos de estado da jornada. */
+/** null ou ISO canônico — os quatro campos de estado da jornada. */
 function isIsoOuNulo(v: unknown): v is string | null {
   return v === null || isIso(v)
 }

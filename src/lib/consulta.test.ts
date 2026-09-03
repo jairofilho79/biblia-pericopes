@@ -25,7 +25,7 @@ describe('parseConsulta — referência', () => {
     expect(c.ref?.ver).toBeNull()
   })
 
-  it('aceita ponto e vírgula como separador de versículo', () => {
+  it('aceita ponto OU vírgula como separador de versículo', () => {
     expect(parseConsulta('Jo 3.16').ref?.ver).toBe(16)
     expect(parseConsulta('Jo 3,16').ref?.ver).toBe(16)
   })
@@ -64,6 +64,14 @@ describe('parseConsulta — a colisão jo/jó', () => {
 
   it('empate jo/Jó: abbrev de João vence o nome de Jó', () => {
     expect(parseConsulta('jo 1').ref?.livro.name).toBe('João')
+    expect(parseConsulta('jó 1').ref?.livro.name).toBe('Jó')
+  })
+
+  it('entrada decomposta (NFD) não vira referência errada', () => {
+    // "jó 1" com o acento decomposto: "o" + U+0301
+    const decomposto = 'jó 1'
+    expect(parseConsulta(decomposto).ref?.livro.name).toBe('Jó')
+    // e a forma pré-composta continua igual
     expect(parseConsulta('jó 1').ref?.livro.name).toBe('Jó')
   })
 })

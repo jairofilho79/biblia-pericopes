@@ -49,7 +49,10 @@ function casaPrefixo(alvo: string, prefixo: string): boolean {
  * 4,1 MB — por isso só o dígito autoriza tratar como referência.
  */
 export function parseConsulta(entrada: string): Consulta {
-  const termo = entrada.trim()
+  // NFC antes de tudo: "jó" pode chegar decomposto ("o" + U+0301), e uma
+  // marca combinante não é \p{L} — a fronteira de casaPrefixo a leria como
+  // fim de palavra e o abbrev "jo" (João) casaria uma entrada que era Jó.
+  const termo = entrada.normalize('NFC').trim()
   if (!termo) {
     return { termo, ref: null, refForaDeFaixa: null, livros: [], buscarNoTexto: false }
   }

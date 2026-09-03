@@ -205,15 +205,30 @@ poucas e nomeadas: `.theme-menu` e `.theme-toggle` são removidas por ficarem
 declarações (`transition` e o `color-mix` do fundo). Fora essas, nada de
 reescrita.
 
-- **Jornadas** (`2026-09-03-jornadas-design.md`). Acrescenta `Jornada` à nav,
+**Ordem de merge, acordada em 2026-09-03:** jornadas → releitura → esta fase.
+
+- **Jornadas** (`2026-09-03-jornadas-design.md`). Vai primeiro, porque a edição
+  dela na nav é aditiva e a desta fase é uma reescrita do bloco: aditivo sobre
+  reescrita é fácil, reescrita sobre reescrita não. Ela acrescenta `Jornada`
   apontando para `/jornada` — tela própria, sem colidir com a marca, que aponta
-  para `/`. Também reescreve `src/pages/Home.tsx`, arquivo que esta fase não
-  toca. A ordem de merge de `src/App.tsx` é combinada entre as duas sessões.
+  para `/` — **e remove `Hoje` no mesmo passo**, para não mesclar uma nav de
+  cinco itens apertada a 360px enquanto esta fase não entra. Então esta fase
+  encontra `[marca] Jornada · Índice · Pesquisar · Entrar|Sair` e tem um item a
+  menos para remover. Tudo o mais em `App.tsx` — `ThemeMenu`, `sair()`,
+  `saindo`, `erroSaida`, `useHideOnScroll`, o estado de `prefs` — chega intacto.
 - **Releitura e esquecimento**
   (`2026-09-03-releitura-esquecimento-design.md`). A rota `/ajustes` entra como
   item do Perfil, abaixo do separador e acima de `Entrar`/`Sair`, com o rótulo
-  `Ajustes`. A localização está acordada e é estável; se o formato do Perfil
-  mudar, do lado deles muda só o rótulo da entrada.
+  `Ajustes`. Enquanto o Perfil não existe, aquela fase põe a entrada **fora** do
+  bloco `session ? (...)` da nav — decisão tomada por causa desta spec, para o
+  interino não contradizer o final. Quando esta fase entrar, a entrada só muda
+  de lugar e o comportamento não muda em momento nenhum da transição.
+
+  `/ajustes` **é alcançável deslogado**, e isso está certo: `zerarProgresso`
+  escreve só no IndexedDB local e enfileira no outbox, `syncNow` sai cedo sem
+  sessão, e `contarConcluidas` lê só o local. Deslogado, o progresso local *é* o
+  progresso. É o mesmo raciocínio que mantém tema e tipografia acessíveis sem
+  conta: o app é local-first, e uma tela que some sem conta contradiz isso.
 - **Fusão de Índice e Pesquisa.** Pode colapsar os dois itens de busca em um.
   A nav é uma lista literal de `<NavLink>`, não é montada a partir de rotas, e
   trocar dois itens por um é uma edição de poucas linhas em qualquer momento.
@@ -236,6 +251,19 @@ Seguindo o que o repo já faz — lógica pura em Vitest, não render:
 3. `LeituraPrefs` continua coberto pelos testes de `reading-prefs`.
 4. `use-keyboard-nav.test.ts` já cobre `←`/`→` e passa sem alteração — é a
    prova de que retirar as setas do pill não custou navegação por teclado.
+
+**Nenhum teste desta fase pode montar Home, Índice ou qualquer coisa que leia
+`public/data/index.json`.** Esse arquivo é derivado e gitignored
+(`.gitignore:29`), gerado por `npm run shard`, e não existe numa worktree limpa.
+O workflow `.github/workflows/deploy-worker.yml` roda `npm test` (linha 19)
+**antes** de `npm run build` (linha 21, que dispara o `prebuild`/`shard`): um
+teste que leia esse arquivo passa na máquina local e quebra a CI com `ENOENT`.
+Verificado nesta sessão; levantado independentemente pelas fases de jornadas e
+de releitura, que tropeçaram nele. Precisando do catálogo num teste, usar
+`data/pericopes.json` (versionado) ou `src/lib/bible-books.ts`.
+
+Os quatro testes acima são de lógica pura e não encostam nisso — a restrição
+está registrada para o plano de implementação não derivar para teste de render.
 
 ## Riscos
 

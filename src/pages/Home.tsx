@@ -7,7 +7,9 @@ import {
   doneSet,
   getPosicaoMaisRecente,
   getProximaOrdemNaSequencia,
+  listAllProgresso,
 } from '../lib/user-db'
+import { candidatosReler, type CandidatoReler } from '../lib/releitura'
 import { testamentLabel, type Testament } from '../lib/testament'
 import type { PericopeIndex } from '../lib/types'
 import { streakAtual, type Streak } from '../lib/streak'
@@ -22,10 +24,15 @@ type Track = {
   minutos: number
 }
 
+// CandidatoReler não traz título nem referência — só o índice tem isso.
+type ItemReler = CandidatoReler & { titulo: string; ref: string }
+
 export default function Home() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [err, setErr] = useState('')
   const [streak, setStreak] = useState<Streak>({ atual: 0, recorde: 0 })
+  const [candidatos, setCandidatos] = useState<ItemReler[]>([])
+  const [todos, setTodos] = useState(false)
 
   // Uma função só para as duas entradas: a montagem e o aviso de sync. O
   // streak sai daqui junto das trilhas porque as duas coisas leem o mesmo
@@ -65,6 +72,14 @@ export default function Home() {
       // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
       // entidade nova, e o streak segue o usuário para o celular novo.
       setStreak(await streakAtual())
+      const porOrdem = new Map(all.map((p) => [p.ordem, p]))
+      setCandidatos(
+        candidatosReler(await listAllProgresso(), new Date()).flatMap((c) => {
+          const meta = porOrdem.get(c.ordem)
+          // Perícope que saiu do catálogo não vira linha órfã na Home.
+          return meta ? [{ ...c, titulo: meta.titulo_pericope_pt, ref: refLabel(meta) }] : []
+        }),
+      )
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Erro')
     }
@@ -112,6 +127,32 @@ export default function Home() {
           </article>
         ))}
       </div>
+      {candidatos.length > 0 && (
+        <section className="vale-reler">
+          <h2>Vale reler</h2>
+          <ul>
+            {(todos ? candidatos : candidatos.slice(0, 3)).map((c) => (
+              <li key={c.ordem}>
+                <Link to={`/leitura/${c.ordem}`}>
+                  <span aria-hidden>{c.paraReler ? '★' : '●'}</span>
+                  <span className="vale-reler-texto">
+                    <strong>{c.titulo}</strong>
+                    <span>
+                      {c.ref} · {c.vezes === 1 ? 'lida 1×' : `lida ${c.vezes}×`}
+                      {c.paraReler ? ' · marcada' : ` · há ${Math.floor(c.dias / 30)} meses`}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {!todos && candidatos.length > 3 && (
+            <button type="button" className="linkish" onClick={() => setTodos(true)}>
+              ver todas ({candidatos.length})
+            </button>
+          )}
+        </section>
+      )}
     </section>
   )
 }

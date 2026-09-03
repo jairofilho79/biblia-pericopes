@@ -11,6 +11,7 @@ import {
   concluirProgresso,
   deleteAnotacao,
   deleteMeta,
+  desmarcarProgresso,
   enqueuePosicao,
   getMeta,
   getPosicao,
@@ -633,6 +634,35 @@ describe('concluirProgresso', () => {
     const p = await getProgresso(9313)
     expect(p?.historico).toHaveLength(MAX_HISTORICO)
     expect(p?.historico).not.toContain('2020-01-01T00:00:00.000Z')
+  })
+})
+
+describe('desmarcarProgresso', () => {
+  it('volta a nao_iniciado preservando o histórico', async () => {
+    await concluirProgresso(9330)
+    const antes = (await getProgresso(9330))!.historico
+    await desmarcarProgresso(9330)
+    const p = await getProgresso(9330)
+    expect(p?.status).toBe('nao_iniciado')
+    expect(p?.historico).toEqual(antes)
+  })
+
+  it('limpa o pin de releitura', async () => {
+    await concluirProgresso(9331)
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', { ...(await getProgresso(9331))!, paraReler: true })
+    d.close()
+    await desmarcarProgresso(9331)
+    expect((await getProgresso(9331))?.paraReler).toBe(false)
+  })
+
+  it('enfileira no outbox', async () => {
+    await concluirProgresso(9332)
+    await desmarcarProgresso(9332)
+    const item = (await listOutbox())
+      .filter((i) => i.kind === 'progresso' && i.ordem === 9332)
+      .at(-1)
+    expect(item && item.kind === 'progresso' && item.status).toBe('nao_iniciado')
   })
 })
 

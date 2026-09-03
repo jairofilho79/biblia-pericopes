@@ -1954,6 +1954,13 @@ button.ghost {
   }
 }
 
+.desmarcar {
+  display: block;
+  margin: 0.75rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
 .badge {
   font-family: var(--font-ui);
   background: var(--accent-soft);

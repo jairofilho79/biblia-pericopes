@@ -36,6 +36,7 @@ import {
   clearPosicao,
   concluirProgresso,
   deleteAnotacao,
+  desmarcarProgresso,
   destaqueId,
   enqueuePosicao,
   getPosicao,
@@ -635,6 +636,12 @@ export default function Leitura() {
     setStatus('concluido')
   }
 
+  async function desmarcar() {
+    await desmarcarProgresso(ordem)
+    doneRef.current = false
+    setStatus('em_andamento')
+  }
+
   function selectVerse(id: string) {
     const prox = nextSelection(blocks, selection, id)
     setSelection(prox)
@@ -1118,15 +1125,24 @@ export default function Leitura() {
             <button type="button" className="cta" onClick={markDone}>
               Marcar como concluída
             </button>
-          ) : next ? (
-            <Link className="done-card" to={`/leitura/${next.ordem}`}>
-              <span className="badge">Concluída ✓</span>
-              <span className="done-next">
-                Próxima: <strong>{next.titulo}</strong> →
-              </span>
-            </Link>
           ) : (
-            <p className="badge">Concluída ✓</p>
+            <>
+              {next ? (
+                <Link className="done-card" to={`/leitura/${next.ordem}`}>
+                  <span className="badge">Concluída ✓</span>
+                  <span className="done-next">
+                    Próxima: <strong>{next.titulo}</strong> →
+                  </span>
+                </Link>
+              ) : (
+                <p className="badge">Concluída ✓</p>
+              )}
+              {/* Sem confirmação: é UMA perícope, e remarcar é um toque. O
+                  cartão "Próxima →" continua sendo a ação primária. */}
+              <button type="button" className="linkish desmarcar" onClick={() => void desmarcar()}>
+                Desmarcar como concluída
+              </button>
+            </>
           )}
         </div>
         <nav className="pager" aria-label="Navegação entre perícopes">

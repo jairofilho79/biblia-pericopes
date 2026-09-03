@@ -187,6 +187,24 @@ export async function concluirProgresso(ordem: number): Promise<void> {
   })
 }
 
+/**
+ * Desmarca a perícope: volta a `nao_iniciado` e limpa o pin. O histórico fica —
+ * a leitura aconteceu, e é ele que sustenta o streak.
+ *
+ * Consequência deliberada: `contaComoLida` exige `status === 'concluido'`,
+ * então a jornada ativa regride junto. Desmarcar é desfazer, não revisitar;
+ * quem quer revisitar sem regredir usa `setParaReler`.
+ */
+export async function desmarcarProgresso(ordem: number): Promise<void> {
+  await gravarProgresso(ordem, (anterior) => ({
+    pericopeOrdem: ordem,
+    status: 'nao_iniciado',
+    historico: anterior?.historico ?? [],
+    paraReler: false,
+    atualizadoEm: new Date().toISOString(),
+  }))
+}
+
 export async function listAllProgresso(): Promise<Progresso[]> {
   return (await db()).getAll('progresso')
 }

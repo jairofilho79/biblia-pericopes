@@ -2443,3 +2443,86 @@ button.ghost {
   white-space: nowrap;
   border: 0;
 }
+
+/* ── Menu Perfil ─────────────────────────────────────────────────────────
+   Reúne tema, tipografia, Ajustes e conta. É o popover mais alto do app:
+   ~520px na Leitura, contra os ~240px do antigo "Aa". Daí as três medidas
+   abaixo. */
+.perfil-wrap {
+  position: relative;
+}
+
+/* 260px e não os 230px do .readmenu-pop porque a 230px a linha de fontes
+   (Serif/Literata/Sans) e a de tema (quatro rótulos) quebram em duas linhas.
+   max-height + rolagem porque num aparelho de 568px de altura os ~520px não
+   cabem abaixo do header; overscroll-behavior impede a rolagem de vazar para
+   a página atrás quando chega ao fim. */
+.perfil-pop {
+  min-width: 260px;
+  max-height: calc(100dvh - 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.perfil-secao {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.perfil-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 0.15rem 0;
+}
+
+.perfil-item {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding-inline: 0.55rem;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.perfil-item:hover,
+.perfil-item:focus-visible {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  outline: none;
+}
+
+.perfil-item:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* O gatilho é um <button> no meio de <a>s: sem herdar font e cor ele destoa
+   dos vizinhos da nav. Aberto, acende como o link ativo acende. */
+.top nav .perfil-btn {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  padding-inline: 0.15rem;
+  min-height: 2.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.top nav .perfil-btn[aria-expanded='true'] {
+  color: var(--accent);
+  font-weight: 600;
+}

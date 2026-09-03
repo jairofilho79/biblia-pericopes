@@ -25,7 +25,7 @@ import {
   setPosicaoLocal,
   setProgresso,
 } from './user-db'
-import { MAX_TEXTO } from './sync-limits'
+import { MAX_HISTORICO, MAX_TEXTO } from './sync-limits'
 
 const FUTURE = '2099-01-01T00:00:00.000Z'
 const FUTURE_2 = '2099-06-01T00:00:00.000Z'
@@ -536,5 +536,36 @@ describe('applyRemote* — contagem de linhas aplicadas', () => {
     }
     expect(await applyRemoteDestaques([lapide])).toBe(1)
     expect(await applyRemoteDestaques([{ ...lapide, atualizadoEm: FUTURE_2 }])).toBe(0)
+  })
+})
+
+describe('progresso: historico e paraReler', () => {
+  it('linha nova nasce com historico vazio e paraReler false', async () => {
+    await setProgresso(9300, 'em_andamento')
+    const p = await getProgresso(9300)
+    expect(p?.historico).toEqual([])
+    expect(p?.paraReler).toBe(false)
+  })
+
+  it('setProgresso PRESERVA historico e paraReler da linha existente', async () => {
+    // É a garantia central do modelo: mudar de status nunca apaga o fato.
+    await setProgresso(9301, 'concluido')
+    const d = await (await import('idb')).openDB('biblia-pericopes')
+    await d.put('progresso', {
+      ...(await getProgresso(9301))!,
+      historico: ['2026-01-10T12:00:00.000Z'],
+      paraReler: true,
+    })
+    d.close()
+
+    await setProgresso(9301, 'nao_iniciado')
+    const p = await getProgresso(9301)
+    expect(p?.status).toBe('nao_iniciado')
+    expect(p?.historico).toEqual(['2026-01-10T12:00:00.000Z'])
+    expect(p?.paraReler).toBe(true)
+  })
+
+  it('MAX_HISTORICO é 50', () => {
+    expect(MAX_HISTORICO).toBe(50)
   })
 })

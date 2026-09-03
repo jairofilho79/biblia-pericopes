@@ -8,7 +8,7 @@ function iso(y: number, m: number, d: number, hora = 12): string {
 }
 
 function concluida(ordem: number, quando: string): Progresso {
-  return { pericopeOrdem: ordem, status: 'concluido', atualizadoEm: quando }
+  return { pericopeOrdem: ordem, status: 'concluido', historico: [quando], paraReler: false, atualizadoEm: quando }
 }
 
 describe('diaLocal', () => {
@@ -28,8 +28,8 @@ describe('diasComConclusao', () => {
   it('só conta registros concluídos', () => {
     const dias = diasComConclusao([
       concluida(1, iso(2026, 8, 30)),
-      { pericopeOrdem: 2, status: 'em_andamento', atualizadoEm: iso(2026, 8, 29) },
-      { pericopeOrdem: 3, status: 'nao_iniciado', atualizadoEm: iso(2026, 8, 28) },
+      { pericopeOrdem: 2, status: 'em_andamento', historico: [], paraReler: false, atualizadoEm: iso(2026, 8, 29) },
+      { pericopeOrdem: 3, status: 'nao_iniciado', historico: [], paraReler: false, atualizadoEm: iso(2026, 8, 28) },
     ])
     expect([...dias]).toEqual(['2026-08-30'])
   })

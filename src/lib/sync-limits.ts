@@ -9,3 +9,10 @@ export const MAX_ITENS_POR_LOTE = 500
 
 /** Máximo de caracteres do texto de uma anotação; o servidor rejeita acima disso. */
 export const MAX_TEXTO = 20_000
+
+/**
+ * Máximo de conclusões guardadas por perícope. Da 51ª releitura em diante a
+ * mais antiga cai — mantém a linha limitada e o corpo do push previsível.
+ * worker/sync-logic.ts tem a cópia deste valor (ver o aviso no topo do arquivo).
+ */
+export const MAX_HISTORICO = 50

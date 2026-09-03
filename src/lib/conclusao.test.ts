@@ -5,7 +5,13 @@ import { setProgresso } from './user-db'
 import type { Progresso } from './types'
 
 function linha(ordem: number, status: Progresso['status'], quando: string): Progresso {
-  return { pericopeOrdem: ordem, status, atualizadoEm: quando }
+  return {
+    pericopeOrdem: ordem,
+    status,
+    historico: status === 'concluido' ? [quando] : [],
+    paraReler: false,
+    atualizadoEm: quando,
+  }
 }
 
 const JAN = '2026-01-10T12:00:00.000Z'

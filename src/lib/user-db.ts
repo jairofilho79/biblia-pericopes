@@ -12,10 +12,20 @@ import type {
 } from './types'
 
 const DB_NAME = 'biblia-pericopes'
-const DB_VERSION = 4
+const DB_VERSION = 5
 
 export type OutboxItem =
-  | { seq?: number; kind: 'progresso'; ordem: number; status: ProgressoStatus; atualizadoEm: string }
+  | {
+      seq?: number
+      kind: 'progresso'
+      ordem: number
+      status: ProgressoStatus
+      atualizadoEm: string
+      /** Opcionais: itens enfileirados por uma versão anterior do app não os
+       *  têm, e `toPush` (sync.ts) os trata como `[]` / `false`. */
+      historico?: string[]
+      paraReler?: boolean
+    }
   | { seq?: number; kind: 'anotacao'; nota: Anotacao; apagadoEm: string | null }
   | { seq?: number; kind: 'destaque'; destaque: Destaque; apagadoEm: string | null }
   | { seq?: number; kind: 'posicao'; posicao: PosicaoLeitura; apagadoEm: string | null }
@@ -54,7 +64,7 @@ let dbPromise: Promise<IDBPDatabase<Schema>> | null = null
 function db() {
   if (!dbPromise) {
     dbPromise = openDB<Schema>(DB_NAME, DB_VERSION, {
-      upgrade(database, oldVersion) {
+      async upgrade(database, oldVersion, _newVersion, transaction) {
         if (oldVersion < 1) {
           database.createObjectStore('progresso', { keyPath: 'pericopeOrdem' })
           const notes = database.createObjectStore('anotacoes', { keyPath: 'id' })
@@ -70,6 +80,23 @@ function db() {
         }
         if (oldVersion < 4) {
           database.createObjectStore('posicoes', { keyPath: 'pericopeOrdem' })
+        }
+        // Backfill OBRIGATÓRIO, não otimização: `remoteWinsLocal` é `>` estrito, então
+        // o pull nunca reescreve uma linha local cujo atualizadoEm empata com o do
+        // servidor — sem isto os campos ficariam `undefined` para sempre em quem já
+        // usa o app.
+        if (oldVersion < DB_VERSION) {
+          const store = transaction.objectStore('progresso')
+          for (const linha of await store.getAll()) {
+            if (linha.historico !== undefined) continue
+            await store.put({
+              ...linha,
+              // Linha já concluída teve ao menos uma conclusão; a única data que existe
+              // hoje é o atualizadoEm.
+              historico: linha.status === 'concluido' ? [linha.atualizadoEm] : [],
+              paraReler: false,
+            })
+          }
         }
       },
     })
@@ -87,8 +114,26 @@ export async function setProgresso(ordem: number, status: ProgressoStatus): Prom
   // Uma única transação sobre os dois stores: uma aba morta no meio não pode
   // gravar o progresso local sem enfileirar o item correspondente do outbox.
   const tx = d.transaction(['progresso', 'outbox'], 'readwrite')
-  await tx.objectStore('progresso').put({ pericopeOrdem: ordem, status, atualizadoEm })
-  await tx.objectStore('outbox').put({ kind: 'progresso', ordem, status, atualizadoEm } as OutboxItem)
+  const store = tx.objectStore('progresso')
+  const anterior = await store.get(ordem)
+  // Mudar de status NUNCA apaga o histórico nem o pin: quem os escreve são
+  // concluirProgresso, desmarcarProgresso, zerarProgresso e setParaReler.
+  const linha: Progresso = {
+    pericopeOrdem: ordem,
+    status,
+    historico: anterior?.historico ?? [],
+    paraReler: anterior?.paraReler ?? false,
+    atualizadoEm,
+  }
+  await store.put(linha)
+  await tx.objectStore('outbox').put({
+    kind: 'progresso',
+    ordem,
+    status,
+    historico: linha.historico,
+    paraReler: linha.paraReler,
+    atualizadoEm,
+  } as OutboxItem)
   await tx.done
 }
 
@@ -368,7 +413,13 @@ export async function applyRemoteProgresso(
   for (const item of items) {
     const local = await d.get('progresso', item.pericopeOrdem)
     if (remoteWinsLocal(item.atualizadoEm, local?.atualizadoEm)) {
-      await d.put('progresso', item)
+      // O pull ainda não carrega historico/paraReler (migration do D1 é
+      // tarefa futura): preserva o que já está aqui, nunca esvazia.
+      await d.put('progresso', {
+        ...item,
+        historico: local?.historico ?? [],
+        paraReler: local?.paraReler ?? false,
+      })
       aplicadas++
     }
   }

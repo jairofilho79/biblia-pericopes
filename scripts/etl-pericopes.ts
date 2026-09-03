@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { BOOK_MAP } from './book-map.ts'
 import { resolveBounds } from './pericope-bounds.ts'
+import { ajustarVersificacao } from './versificacao.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const naaPath = join(root, 'data/NAA.json')
@@ -71,7 +72,18 @@ function main() {
 
   for (let i = 0; i < kjv.length; i++) {
     const row = kjv[i]
-    const { start, end, corrigido } = resolveBounds(row)
+    const bruto = resolveBounds(row)
+    // Depois do resolveBounds, nunca antes: a tabela de versificação é escrita
+    // contra a faixa REAL da perícope, não contra a declarada no dataset.
+    const { start, end, ajustado } = ajustarVersificacao(i, bruto.start, bruto.end)
+    const corrigido = bruto.corrigido
+    if (ajustado) {
+      warnings.push({
+        ordem: i,
+        type: 'versificacao_ajustada',
+        detail: `${start.livroEn} ${start.capitulo}:${start.versiculo}→${end.capitulo}:${end.versiculo}`,
+      })
+    }
     if (corrigido) {
       warnings.push({
         ordem: i,

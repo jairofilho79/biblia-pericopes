@@ -31,7 +31,7 @@ import {
 } from '../lib/posicao-restauracao'
 import { useSwipeNav } from '../lib/use-swipe-nav'
 import { useKeyboardNav } from '../lib/use-keyboard-nav'
-import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
+import { useReadingPrefs } from '../lib/use-reading-prefs'
 import {
   clearPosicao,
   deleteAnotacao,
@@ -139,7 +139,7 @@ export default function Leitura() {
   const [notes, setNotes] = useState<Anotacao[]>([])
   const [draft, setDraft] = useState('')
   const [err, setErr] = useState('')
-  const [prefs, setPrefs] = useState<ReadingPrefs>(() => getReadingPrefs())
+  const prefs = useReadingPrefs()
   const [selection, setSelection] = useState<VerseSelection | null>(null)
   const [barOpen, setBarOpen] = useState(false)
   const [destaques, setDestaques] = useState<Map<string, DestaqueCor>>(new Map())
@@ -825,7 +825,7 @@ export default function Leitura() {
               →
             </Link>
           )}
-          <ReadingMenu prefs={prefs} onPrefs={setPrefs} />
+          <ReadingMenu />
         </div>
       </div>
 

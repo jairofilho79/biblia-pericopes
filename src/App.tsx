@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Leitura from './pages/Leitura'
+import Jornada from './pages/Jornada'
 import Indice from './pages/Indice'
 import Pesquisar from './pages/Pesquisar'
 import Entrar from './pages/Entrar'
@@ -74,9 +75,7 @@ function Shell() {
         </NavLink>
         <ThemeMenu />
         <nav>
-          <NavLink to="/" end>
-            Hoje
-          </NavLink>
+          <NavLink to="/jornada">Jornada</NavLink>
           <NavLink to="/indice">Índice</NavLink>
           <NavLink to="/pesquisar">Pesquisar</NavLink>
           {session ? (
@@ -110,6 +109,7 @@ function Shell() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/leitura/:ordem" element={<Leitura />} />
+          <Route path="/jornada" element={<Jornada />} />
           <Route path="/indice" element={<Indice />} />
           <Route path="/pesquisar" element={<Pesquisar />} />
           <Route path="/entrar" element={<Entrar />} />

@@ -116,6 +116,36 @@ export function reconciliacaoDeConclusao(
   return null
 }
 
+/**
+ * Separa o histórico dentro de `listJornadas()` — Task 7 (tela de gestão).
+ *
+ * Deliberadamente NÃO usa `j.arquivadaEm || j.concluidaEm` (o texto do brief
+ * original): uma jornada corrente CONCLUÍDA tem `concluidaEm` preenchido e
+ * `arquivadaEm === null` ao mesmo tempo (ver getJornadaCorrente em
+ * user-db.ts), e esse `||` a puxaria para o histórico enquanto ela ainda
+ * aparece como a corrente no topo da tela — a mesma jornada duplicada em
+ * dois lugares. Só `arquivadaEm !== null` marca "isto já foi arquivado";
+ * é o único predicado consistente com a invariante de "no máximo uma
+ * corrente" (criarJornada/atualizarJornada).
+ */
+export function historicoDeJornadas(todas: Jornada[]): Jornada[] {
+  return todas.filter((j) => j.arquivadaEm !== null)
+}
+
+/** O patch de "Reiniciar": zera a contagem a partir de agora e reabre se estava concluída. */
+export function patchReiniciarJornada(
+  agora: string = new Date().toISOString(),
+): Pick<Jornada, 'contaDesde' | 'concluidaEm'> {
+  return { contaDesde: agora, concluidaEm: null }
+}
+
+/** O patch de "Encerrar": arquiva a jornada corrente, sem mexer em `concluidaEm`. */
+export function patchEncerrarJornada(
+  agora: string = new Date().toISOString(),
+): Pick<Jornada, 'arquivadaEm'> {
+  return { arquivadaEm: agora }
+}
+
 const ROTULO_SEQUENCIA: Record<string, string> = {
   biblia: 'A Bíblia toda',
   vt: 'Velho Testamento',

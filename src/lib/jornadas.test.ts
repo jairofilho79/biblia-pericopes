@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   cursorDaJornada,
+  historicoDeJornadas,
   nomePadrao,
+  patchEncerrarJornada,
+  patchReiniciarJornada,
   progressoDaJornada,
   reconciliacaoDeConclusao,
   rotaDaJornada,
@@ -188,5 +191,40 @@ describe('nomePadrao', () => {
 
   it('acrescenta "a partir de" quando não começa no início da rota', () => {
     expect(nomePadrao('sequencia', 'vt', 2, INDICE)).toBe('Velho Testamento a partir de Salmos 1:1–1:10')
+  })
+})
+
+// Task 7: tela de gestão da jornada (/jornada) — patches das duas ações e a
+// separação entre a jornada corrente e o histórico.
+describe('patchReiniciarJornada', () => {
+  it('zera contaDesde a partir de agora e limpa concluidaEm', () => {
+    expect(patchReiniciarJornada(DEPOIS)).toEqual({ contaDesde: DEPOIS, concluidaEm: null })
+  })
+})
+
+describe('patchEncerrarJornada', () => {
+  it('arquiva a partir de agora', () => {
+    expect(patchEncerrarJornada(DEPOIS)).toEqual({ arquivadaEm: DEPOIS })
+  })
+})
+
+describe('historicoDeJornadas', () => {
+  it('só entram as arquivadas', () => {
+    const arquivada = jornada({ id: 'a', arquivadaEm: DEPOIS })
+    const corrente = jornada({ id: 'c', arquivadaEm: null })
+    expect(historicoDeJornadas([arquivada, corrente])).toEqual([arquivada])
+  })
+
+  it('a jornada corrente CONCLUÍDA não entra no histórico', () => {
+    // O caso que o texto original do brief ("arquivadaEm || concluidaEm")
+    // erraria: a jornada corrente concluída tem concluidaEm preenchido e
+    // arquivadaEm === null (ver getJornadaCorrente em user-db.ts) — ela
+    // apareceria duplicada, no card principal E na lista quieta.
+    const correnteConcluida = jornada({ id: 'c', arquivadaEm: null, concluidaEm: DEPOIS })
+    expect(historicoDeJornadas([correnteConcluida])).toEqual([])
+  })
+
+  it('rota vazia (nenhuma jornada) devolve histórico vazio', () => {
+    expect(historicoDeJornadas([])).toEqual([])
   })
 })

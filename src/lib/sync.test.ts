@@ -2,6 +2,7 @@ import 'fake-indexeddb/auto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   clearAllUserData,
+  concluirProgresso,
   deleteMeta,
   enqueuePosicao,
   getMeta,
@@ -87,7 +88,7 @@ describe('syncNow', () => {
     // ordem 20001 written twice: dedupe must keep only the LAST state ("em_andamento" then
     // "concluido" wins), proving toPush() collapses by key instead of pushing every outbox row.
     await setProgresso(20001, 'em_andamento')
-    await setProgresso(20001, 'concluido')
+    await concluirProgresso(20001)
     const nota = await saveAnotacao(20002, 'primeira anotação')
 
     const remoteAgora = '2026-08-31T12:00:00.000Z'
@@ -98,7 +99,9 @@ describe('syncNow', () => {
           {
             pericopeOrdem: 20001,
             status: 'concluido',
-            historico: [],
+            // Não [] mais: concluirProgresso é quem grava agora, e ele
+            // sempre anexa a data da conclusão ao histórico.
+            historico: [expect.any(String)],
             paraReler: false,
             atualizadoEm: expect.any(String),
           },
@@ -141,7 +144,7 @@ describe('syncNow', () => {
 
   it('POST returning 401 → outbox NOT cleared, no pull attempted', async () => {
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(20003, 'concluido')
+    await concluirProgresso(20003)
 
     const fetchMock = vi.fn(async () => jsonResponse({ error: 'não autenticado' }, { status: 401, ok: false }))
     vi.stubGlobal('fetch', fetchMock)
@@ -230,7 +233,7 @@ describe('syncNow — push em lotes', () => {
   const TOTAL = MAX_ITENS_POR_LOTE * 2 + 1 // 1001 → 3 lotes (500 + 500 + 1)
 
   async function encherOutbox() {
-    for (let i = 0; i < TOTAL; i++) await setProgresso(40000 + i, 'concluido')
+    for (let i = 0; i < TOTAL; i++) await concluirProgresso(40000 + i)
   }
 
   it('outbox acima do limite → vários POSTs, nenhuma lista acima de 500, outbox limpo no fim', async () => {
@@ -293,7 +296,7 @@ describe('syncNow — push rejeitado com 400', () => {
   it('POST retornando 400 → outbox é limpo e o pull acontece mesmo assim', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(80001, 'concluido')
+    await concluirProgresso(80001)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     let getUrl = ''
@@ -322,7 +325,7 @@ describe('syncNow — push rejeitado com 400', () => {
   it('POST retornando 413 → mesmo tratamento determinístico do 400', async () => {
     await resetLocal()
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
-    await setProgresso(80002, 'concluido')
+    await concluirProgresso(80002)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
@@ -347,7 +350,7 @@ describe('troca de conta e logout', () => {
   it('sessão de outro usuário → apaga os dados locais antes de aplicar os dele', async () => {
     await resetLocal()
     // dados do usuário A neste dispositivo
-    await setProgresso(50001, 'concluido')
+    await concluirProgresso(50001)
     const notaA = await saveAnotacao(50002, 'nota do usuário A')
     await setMeta('sync-user', 'usuario-A')
     await setMeta('sync-cursor', '2020-01-01T00:00:00.000Z')
@@ -385,7 +388,7 @@ describe('troca de conta e logout', () => {
   it('mesma conta de novo → nada é apagado', async () => {
     await resetLocal()
     await setMeta('sync-user', 'u1')
-    await setProgresso(50004, 'concluido')
+    await concluirProgresso(50004)
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
     vi.stubGlobal(
       'fetch',
@@ -403,7 +406,7 @@ describe('troca de conta e logout', () => {
 
   it('signOutLocal: esvazia o outbox, zera o cursor e desloga — mantendo a marca do dono', async () => {
     await resetLocal()
-    await setProgresso(60001, 'concluido')
+    await concluirProgresso(60001)
     await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
     await setMeta('sync-user', 'u1')
 
@@ -420,7 +423,7 @@ describe('troca de conta e logout', () => {
 
   it('signOutLocal: se o signOut falhar, o outbox e o cursor ficam intactos', async () => {
     await resetLocal()
-    await setProgresso(60002, 'concluido')
+    await concluirProgresso(60002)
     await setMeta('sync-cursor', '2026-01-01T00:00:00.000Z')
     vi.mocked(authClient.signOut).mockRejectedValue(new Error('offline') as never)
 

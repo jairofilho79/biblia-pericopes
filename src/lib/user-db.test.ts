@@ -44,8 +44,8 @@ describe('user-db v2 (outbox/meta)', () => {
     expect(outbox.some((i) => i.kind === 'progresso' && i.ordem === 9001)).toBe(true)
   })
 
-  it('setProgresso writes the progresso row and enqueues a matching outbox item', async () => {
-    await setProgresso(9002, 'concluido')
+  it('concluirProgresso writes the progresso row and enqueues a matching outbox item', async () => {
+    await concluirProgresso(9002)
     const progresso = await getProgresso(9002)
     expect(progresso).toBeDefined()
     expect(progresso?.status).toBe('concluido')
@@ -121,7 +121,7 @@ describe('user-db v2 (outbox/meta)', () => {
     expect(afterNewer?.atualizadoEm).toBe(FUTURE)
 
     // local newer survives
-    await setProgresso(9006, 'concluido')
+    await concluirProgresso(9006)
     const localBefore = await getProgresso(9006)
     await applyRemoteProgresso([{ pericopeOrdem: 9006, status: 'nao_iniciado', atualizadoEm: PAST }])
     const afterOlder = await getProgresso(9006)
@@ -207,7 +207,7 @@ describe('user-db v2 (outbox/meta)', () => {
   })
 
   it('clearAllUserData apaga progresso, anotações e outbox; deleteMeta remove a chave', async () => {
-    await setProgresso(9011, 'concluido')
+    await concluirProgresso(9011)
     await saveAnotacao(9012, 'some junto')
     await setDestaque(9013, '1:1', 'verde')
     await setMeta('chave-temp', 'x')
@@ -489,7 +489,7 @@ describe('applyRemote* — contagem de linhas aplicadas', () => {
         { pericopeOrdem: 9101, status: 'concluido', atualizadoEm: FUTURE },
       ]),
     ).toBe(0)
-    await setProgresso(9102, 'concluido')
+    await concluirProgresso(9102)
     expect(
       await applyRemoteProgresso([
         { pericopeOrdem: 9102, status: 'nao_iniciado', atualizadoEm: PAST },
@@ -550,7 +550,7 @@ describe('progresso: historico e paraReler', () => {
 
   it('setProgresso PRESERVA historico e paraReler da linha existente', async () => {
     // É a garantia central do modelo: mudar de status nunca apaga o fato.
-    await setProgresso(9301, 'concluido')
+    await concluirProgresso(9301)
     const d = await (await import('idb')).openDB('biblia-pericopes')
     await d.put('progresso', {
       ...(await getProgresso(9301))!,
@@ -661,7 +661,7 @@ describe('applyRemoteProgresso: merge híbrido', () => {
   })
 
   it('conta como aplicada quando SÓ a união mudou', async () => {
-    await setProgresso(9321, 'concluido')
+    await concluirProgresso(9321)
     const n = await applyRemoteProgresso([
       {
         pericopeOrdem: 9321,
@@ -690,7 +690,7 @@ describe('applyRemoteProgresso: merge híbrido', () => {
   // que o local (mais novo) já tirou — LWW vale para paraReler mesmo quando o
   // campo vem presente e explícito no payload.
   it('remoto mais velho com paraReler:true não revive um pin que o local já tirou', async () => {
-    await setProgresso(9323, 'concluido')
+    await concluirProgresso(9323)
     const local = await getProgresso(9323)
     const d = await (await import('idb')).openDB('biblia-pericopes')
     await d.put('progresso', { ...local!, paraReler: false })
@@ -715,7 +715,7 @@ describe('applyRemoteProgresso: merge híbrido', () => {
     const cheio = Array.from({ length: MAX_HISTORICO }, (_, i) =>
       new Date(Date.UTC(2020, 0, 1 + i)).toISOString(),
     ).reverse()
-    await setProgresso(9324, 'concluido')
+    await concluirProgresso(9324)
     const d = await (await import('idb')).openDB('biblia-pericopes')
     await d.put('progresso', { ...(await getProgresso(9324))!, historico: cheio })
     d.close()

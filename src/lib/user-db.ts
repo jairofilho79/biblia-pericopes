@@ -141,7 +141,16 @@ async function gravarProgresso(
   return linha
 }
 
-export async function setProgresso(ordem: number, status: ProgressoStatus): Promise<void> {
+/**
+ * `'concluido'` fica de fora do tipo de propósito: só `concluirProgresso`
+ * grava o histórico, então esta função aceitando `'concluido'` deixaria
+ * representável um estado inválido — `status: 'concluido'` com `historico`
+ * vazio, que `contaComoLida`/`diasComConclusao` leem como "nunca lida".
+ */
+export async function setProgresso(
+  ordem: number,
+  status: Exclude<ProgressoStatus, 'concluido'>,
+): Promise<void> {
   await gravarProgresso(ordem, (anterior) => ({
     pericopeOrdem: ordem,
     status,

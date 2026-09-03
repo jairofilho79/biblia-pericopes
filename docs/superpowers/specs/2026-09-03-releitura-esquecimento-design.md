@@ -101,7 +101,8 @@ export type Progresso = {
 }
 ```
 
-Continua **uma linha por perícope**, quarta entidade sincronizada, sem lápide
+Continua **uma linha por perícope**, a primeira das quatro entidades
+sincronizadas, sem lápide
 (desmarcar é upsert de status; o LWW resolve sozinho).
 
 `concluidoEm` e `vezes` **não são campos** — são derivados de `historico[0]` e
@@ -260,7 +261,8 @@ aconteceu.
 
 ## Fatia 3 — `dias_leitura`, streak por atividade
 
-Quinta entidade sincronizada: uma linha por dia local em que houve leitura
+Entidade sincronizada nova — a quinta, ou a sexta se jornadas chegar antes:
+uma linha por dia local em que houve leitura
 (`{ dia: '2026-09-03' }`). Conjunto que só cresce, **sem lápide** — dois
 aparelhos offline nunca conflitam, o merge é união.
 
@@ -275,8 +277,8 @@ substituída pela leitura do store novo.
 Backfill: semeia com **todas** as datas de `historico`, não só a última — quem
 já lê hoje não perde histórico de streak no dia em que isso entrar.
 
-Custo real: `paginarPull` sobe de 4 para 5 listas genéricas, no arquivo mais
-sutil do projeto. Ver Riscos.
+Custo real: `paginarPull` ganha mais uma lista genérica (4 → 5, ou 5 → 6 se
+jornadas chegar antes), no arquivo mais sutil do projeto. Ver Riscos.
 
 ## Coordenação com a sessão de jornadas
 
@@ -321,7 +323,7 @@ em `streak.ts`, para a Home nova não precisar saber que a fonte muda na fatia 3
 1. **Teto de 50 conclusões por perícope.** Da 51ª releitura em diante a data
    mais antiga cai, irreversivelmente. Aceito: mantém a linha limitada e o
    payload do push previsível.
-2. **`paginarPull` 4 → 5 (fatia 3).** O arquivo mais sutil do repo, com
+2. **Mais uma lista no `paginarPull` (fatia 3).** O arquivo mais sutil do repo, com
    invariantes de cursor documentadas em detalhe. É o pedaço mais arriscado do
    plano e provavelmente merece brainstorm próprio quando chegar a vez.
 3. **Espaço no header a 360 px, e a Home disputada.** A spec de jornadas já

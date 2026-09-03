@@ -52,6 +52,33 @@ describe('diasComConclusao', () => {
   it('lista vazia devolve conjunto vazio', () => {
     expect(diasComConclusao([]).size).toBe(0)
   })
+
+  it('conta TODAS as datas do histórico, não só a última', () => {
+    const dias = diasComConclusao([
+      {
+        pericopeOrdem: 1,
+        status: 'concluido',
+        historico: [iso(2026, 8, 30), iso(2026, 3, 2)],
+        paraReler: false,
+        atualizadoEm: iso(2026, 8, 30),
+      },
+    ])
+    expect([...dias].sort()).toEqual(['2026-03-02', '2026-08-30'])
+  })
+
+  it('desmarcar NÃO apaga o dia: o histórico sobrevive ao status', () => {
+    // A garantia que sustenta "zerar não zera o seu recorde".
+    const dias = diasComConclusao([
+      {
+        pericopeOrdem: 1,
+        status: 'nao_iniciado',
+        historico: [iso(2026, 8, 30)],
+        paraReler: false,
+        atualizadoEm: iso(2026, 9, 3),
+      },
+    ])
+    expect([...dias]).toEqual(['2026-08-30'])
+  })
 })
 
 describe('computeStreak', () => {

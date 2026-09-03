@@ -1,4 +1,5 @@
 import type { Progresso } from './types'
+import { listAllProgresso } from './user-db'
 
 /**
  * Chave de dia 'YYYY-MM-DD' no fuso LOCAL. `toISOString().slice(0, 10)` daria o
@@ -21,20 +22,22 @@ function diaAnterior(dia: string): string {
 }
 
 /**
- * Dias (locais) em que alguma perícope foi concluída.
+ * Dias (locais) em que alguma perícope foi concluída, lidos do HISTÓRICO — não
+ * do `atualizadoEm` nem do `status`.
  *
- * Limitação aceita e desejada: `atualizadoEm` é a última escrita do progresso,
- * então reconcluir uma perícope antiga conta para o dia de hoje — que é
- * exatamente o que "li hoje" deve significar.
+ * É isso que faz o streak sobreviver a desmarcar e a "zerar tudo": o histórico
+ * nunca é apagado, então os dias em que se leu continuam existindo mesmo depois
+ * de o ✓ sumir do Índice. O hábito não é o progresso.
  */
 export function diasComConclusao(progressos: Progresso[]): Set<string> {
   const dias = new Set<string>()
   for (const p of progressos) {
-    if (p.status !== 'concluido') continue
-    const data = new Date(p.atualizadoEm)
-    // Data inválida (registro corrompido, string vazia) não vira dia nenhum.
-    if (Number.isNaN(data.getTime())) continue
-    dias.add(diaLocal(data))
+    for (const quando of p.historico ?? []) {
+      const data = new Date(quando)
+      // Data inválida (registro corrompido, string vazia) não vira dia nenhum.
+      if (Number.isNaN(data.getTime())) continue
+      dias.add(diaLocal(data))
+    }
   }
   return dias
 }
@@ -70,4 +73,13 @@ export function computeStreak(dias: Set<string>, hoje: Date): Streak {
   }
 
   return { atual, recorde }
+}
+
+/**
+ * O streak de hoje, sem que quem chama saiba de onde ele sai. É o seam
+ * recíproco de `contaComoLida`: a fatia 3 troca a fonte por uma entidade de
+ * dias de leitura, e a Home não muda uma linha.
+ */
+export async function streakAtual(): Promise<Streak> {
+  return computeStreak(diasComConclusao(await listAllProgresso()), new Date())
 }

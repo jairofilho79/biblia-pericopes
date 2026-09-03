@@ -7,11 +7,10 @@ import {
   doneSet,
   getPosicaoMaisRecente,
   getProximaOrdemNaSequencia,
-  listAllProgresso,
 } from '../lib/user-db'
 import { testamentLabel, type Testament } from '../lib/testament'
 import type { PericopeIndex } from '../lib/types'
-import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
+import { streakAtual, type Streak } from '../lib/streak'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type Track = {
@@ -65,7 +64,7 @@ export default function Home() {
       setTracks(built)
       // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
       // entidade nova, e o streak segue o usuário para o celular novo.
-      setStreak(computeStreak(diasComConclusao(await listAllProgresso()), new Date()))
+      setStreak(await streakAtual())
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Erro')
     }

@@ -7,7 +7,6 @@ import NarracaoPlayer, {
   type NarracaoPlayerHandle,
 } from '../components/NarracaoPlayer'
 import { secaoDoChip } from '../lib/narracao-controles'
-import ReadingMenu from '../components/ReadingMenu'
 import SectionChips from '../components/SectionChips'
 import { SkeletonLeitura } from '../components/Skeleton'
 import VerseActions from '../components/VerseActions'
@@ -31,7 +30,7 @@ import {
 } from '../lib/posicao-restauracao'
 import { useSwipeNav } from '../lib/use-swipe-nav'
 import { useKeyboardNav } from '../lib/use-keyboard-nav'
-import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
+import { useReadingPrefs } from '../lib/use-reading-prefs'
 import {
   clearPosicao,
   concluirProgresso,
@@ -143,7 +142,7 @@ export default function Leitura() {
   const [notes, setNotes] = useState<Anotacao[]>([])
   const [draft, setDraft] = useState('')
   const [err, setErr] = useState('')
-  const [prefs, setPrefs] = useState<ReadingPrefs>(() => getReadingPrefs())
+  const prefs = useReadingPrefs()
   const [selection, setSelection] = useState<VerseSelection | null>(null)
   const [barOpen, setBarOpen] = useState(false)
   const [destaques, setDestaques] = useState<Map<string, DestaqueCor>>(new Map())
@@ -828,29 +827,6 @@ export default function Leitura() {
         <p className={tituloClass('ref', 'referencia')} data-fala-id="referencia">
           {refLabel(p)} · <span className="ref-min">~{minutos} min</span>
         </p>
-        <div className="ref-nav">
-          {prev && (
-            <Link
-              className="read-tool ref-arrow"
-              aria-label={`Anterior: ${prev.titulo}`}
-              title={`Anterior: ${prev.titulo} · atalho ←`}
-              to={`/leitura/${prev.ordem}`}
-            >
-              ←
-            </Link>
-          )}
-          {next && (
-            <Link
-              className="read-tool ref-arrow"
-              aria-label={`Próxima: ${next.titulo}`}
-              title={`Próxima: ${next.titulo} · atalho →`}
-              to={`/leitura/${next.ordem}`}
-            >
-              →
-            </Link>
-          )}
-          <ReadingMenu prefs={prefs} onPrefs={setPrefs} />
-        </div>
       </div>
 
       <SectionChips

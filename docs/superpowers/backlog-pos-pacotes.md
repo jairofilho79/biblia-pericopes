@@ -114,17 +114,22 @@ alcançável por um cliente normal. Registrados para não se perderem.
 - ~~Flash de 1 frame da barra de chips antes de `--top-h` ser medido.~~ Feito
   em 2026-09-02: a medição virou `useLayoutEffect`, então roda antes da
   pintura. **Mas ver o item abaixo** — o benefício visível não pôde ser
-  confirmado.
-- **Barra de chips sobrepõe o header ao rolar** (achado em 2026-09-02,
-  PRÉ-EXISTENTE, confirmado idêntico na base sem o P3). Com o header
-  visível, os chips grudam em `top: 0` e cobrem os 55px dele. A regra
-  vencedora é `.section-chips { top: var(--top-h, 0px) }`, ela casa com o
-  elemento, `--top-h` vale `55px` no `:root` e é visível pelos chips — e
-  mesmo assim o `top` computado resolve para `0px`. A regra
-  `.shell:has(.top-hidden)` não está casando. Causa não identificada em três
-  tentativas de investigação. Consequência colateral: enquanto o `top` não
-  consumir `--top-h`, a correção do flash acima está certa no código mas sem
-  efeito visível — as duas coisas precisam ser resolvidas juntas.
+  confirmado. Confirmado em 2026-09-03: o item abaixo era outro problema, e a
+  correção do flash está certa.
+- ~~Barra de chips sobrepõe o header ao rolar.~~ RESOLVIDO em 2026-09-03, e o
+  diagnóstico anterior estava errado nos dois pontos. Investigado ao vivo:
+  `--top-h` vale 55px e herda corretamente até `.section-chips`; existe
+  exatamente UMA regra declarando `top` no elemento; e a `CSSTransition` que o
+  browser gera tem keyframes `0px → 55px`, ou seja, `var(--top-h)` sempre
+  resolveu. `.shell:has(.top-hidden)` não casar com o header visível é o
+  comportamento CORRETO, não o defeito — as três investigações anteriores foram
+  atrás da peça errada. Os dois sintomas relatados eram outra coisa: "a barra
+  cobre o header" era o header auto-ocultando (`use-hide-on-scroll`, como
+  projetado), e "a barra fica descolada" era o texto vazando pela faixa de
+  padding translúcida — `color-mix(… 82%, transparent)` mais `blur(6px)`. O
+  fundo virou opaco. A `transition: top` saiu junto, por animar um offset vindo
+  de custom property medida em JS em paralelo ao `transform` do header. Spec:
+  `docs/superpowers/specs/2026-09-03-chrome-header-perfil-design.md`.
 - ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
   regras viraram uma (ambas no topo, sem `@media` em volta).
 

@@ -9,6 +9,7 @@ import {
   clearOutbox,
   clearPosicao,
   concluirProgresso,
+  contarConcluidas,
   deleteAnotacao,
   deleteMeta,
   desmarcarProgresso,
@@ -26,6 +27,7 @@ import {
   setMeta,
   setPosicaoLocal,
   setProgresso,
+  zerarProgresso,
 } from './user-db'
 import { MAX_HISTORICO, MAX_TEXTO } from './sync-limits'
 
@@ -663,6 +665,48 @@ describe('desmarcarProgresso', () => {
       .filter((i) => i.kind === 'progresso' && i.ordem === 9332)
       .at(-1)
     expect(item && item.kind === 'progresso' && item.status).toBe('nao_iniciado')
+  })
+})
+
+describe('zerarProgresso', () => {
+  it('zera as concluídas e as em andamento, preservando o histórico', async () => {
+    await concluirProgresso(9340)
+    await setProgresso(9341, 'em_andamento')
+    const hist = (await getProgresso(9340))!.historico
+    const n = await zerarProgresso([9340, 9341])
+    expect(n).toBe(2)
+    expect((await getProgresso(9340))?.status).toBe('nao_iniciado')
+    expect((await getProgresso(9340))?.historico).toEqual(hist)
+    expect((await getProgresso(9341))?.status).toBe('nao_iniciado')
+  })
+
+  it('SÓ escreve o que muda', async () => {
+    // Sem o filtro, "zerar tudo" enfileiraria 2646 itens para mudar 32.
+    await concluirProgresso(9350)
+    await zerarProgresso([9350])
+    const antes = (await listOutbox()).length
+    const n = await zerarProgresso([9350, 9351, 9352, 9353])
+    expect(n).toBe(0)
+    expect((await listOutbox()).length).toBe(antes)
+  })
+
+  it('apaga a posição das ordens zeradas, com lápide', async () => {
+    // Sem isto, zerar o AT e voltar à Home devolve o leitor ao meio de Isaías:
+    // Home.tsx prefere o checkpoint mais recente à primeira não-concluída.
+    await setProgresso(9360, 'em_andamento')
+    await setPosicaoLocal(9360, 'versiculo', '3:16')
+    await zerarProgresso([9360])
+    expect(await getPosicao(9360)).toBeUndefined()
+    const lapide = (await listOutbox()).find(
+      (i) => i.kind === 'posicao' && i.posicao.pericopeOrdem === 9360 && i.apagadoEm !== null,
+    )
+    expect(lapide).toBeDefined()
+  })
+
+  it('contarConcluidas conta só as concluídas das ordens pedidas', async () => {
+    await concluirProgresso(9370)
+    await setProgresso(9371, 'em_andamento')
+    expect(await contarConcluidas([9370, 9371, 9372])).toBe(1)
   })
 })
 

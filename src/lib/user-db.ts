@@ -205,6 +205,75 @@ export async function desmarcarProgresso(ordem: number): Promise<void> {
   }))
 }
 
+/** Quantas das `ordens` estão concluídas. Alimenta a contagem da confirmação. */
+export async function contarConcluidas(ordens: number[]): Promise<number> {
+  const done = await doneSet()
+  return ordens.filter((o) => done.has(o)).length
+}
+
+/**
+ * Zera o progresso das `ordens` e devolve quantas linhas mudou de fato.
+ *
+ * Três decisões que não são detalhe:
+ *
+ * 1. SÓ escreve o que muda. Zerar tudo com 32 lidas escreve 32 linhas, não
+ *    2646 — senão o outbox receberia 2646 itens para mudar 32.
+ * 2. Apaga a posição das ordens zeradas, COM LÁPIDE. Home.tsx prefere o
+ *    checkpoint mais recente à primeira não-concluída: sem isto se zera o
+ *    Antigo Testamento e o "Continuar" devolve o leitor ao meio de Isaías em
+ *    vez de Gênesis 1. Sem a lápide, o pull ressuscitaria o checkpoint.
+ * 3. Limpa `paraReler`: o que não consta como lido não pode estar na fila de
+ *    releitura.
+ *
+ * O `historico` NUNCA é apagado — é o que faz o streak e o recorde
+ * sobreviverem a "zerar tudo".
+ */
+export async function zerarProgresso(ordens: number[]): Promise<number> {
+  if (ordens.length === 0) return 0
+  const atualizadoEm = new Date().toISOString()
+  const d = await db()
+  const tx = d.transaction(['progresso', 'posicoes', 'outbox'], 'readwrite')
+  const progresso = tx.objectStore('progresso')
+  const posicoes = tx.objectStore('posicoes')
+  const outbox = tx.objectStore('outbox')
+  let mudadas = 0
+
+  for (const ordem of ordens) {
+    const anterior = await progresso.get(ordem)
+    if (!anterior || (anterior.status === 'nao_iniciado' && !anterior.paraReler)) continue
+    const linha: Progresso = {
+      pericopeOrdem: ordem,
+      status: 'nao_iniciado',
+      historico: anterior.historico ?? [],
+      paraReler: false,
+      atualizadoEm,
+    }
+    await progresso.put(linha)
+    await outbox.put({
+      kind: 'progresso',
+      ordem,
+      status: linha.status,
+      historico: linha.historico,
+      paraReler: false,
+      atualizadoEm,
+    } as OutboxItem)
+    mudadas++
+
+    const posicao = await posicoes.get(ordem)
+    if (posicao) {
+      await posicoes.delete(ordem)
+      await outbox.put({
+        kind: 'posicao',
+        posicao: { ...posicao, atualizadoEm },
+        apagadoEm: atualizadoEm,
+      } as OutboxItem)
+    }
+  }
+
+  await tx.done
+  return mudadas
+}
+
 export async function listAllProgresso(): Promise<Progresso[]> {
   return (await db()).getAll('progresso')
 }

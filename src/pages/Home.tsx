@@ -2,8 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SkeletonHome } from '../components/Skeleton'
 import { loadIndex, ordensDoTestamento, refLabel } from '../lib/content'
-import { atualizarJornada, getJornadaAtiva, listAllPosicoes, listAllProgresso } from '../lib/user-db'
-import { cursorDaJornada, progressoDaJornada, rotaDaJornada, type ProgressoJornada } from '../lib/jornadas'
+import { atualizarJornada, getJornadaCorrente, listAllPosicoes, listAllProgresso } from '../lib/user-db'
+import {
+  cursorDaJornada,
+  progressoDaJornada,
+  reconciliacaoDeConclusao,
+  rotaDaJornada,
+  type ProgressoJornada,
+} from '../lib/jornadas'
 import { testamentLabel, type Testament } from '../lib/testament'
 import type { Jornada, PericopeIndex, PosicaoLeitura, Progresso } from '../lib/types'
 import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
@@ -33,7 +39,7 @@ type Estado =
  * implementações separadas do "onde estou / o que falta" é o jeito garantido
  * de os dois estados da Home um dia divergirem.
  */
-function jornadaDoTestamento(testament: Testament, inicioOrdem: number): Jornada {
+export function jornadaDoTestamento(testament: Testament, inicioOrdem: number): Jornada {
   return {
     id: '',
     nome: '',
@@ -53,7 +59,7 @@ function jornadaDoTestamento(testament: Testament, inicioOrdem: number): Jornada
  * carregados — nada aqui consulta o IndexedDB, então o mesmo cálculo serve
  * tanto para montar a tela quanto (mais tarde) para testar sem fake IDB.
  */
-function montarTrilhas(
+export function montarTrilhas(
   all: PericopeIndex[],
   progressos: Map<number, Progresso>,
   posicoes: Map<number, PosicaoLeitura>,
@@ -96,23 +102,26 @@ export default function Home() {
       const progressos = new Map((await listAllProgresso()).map((p) => [p.pericopeOrdem, p]))
       const posicoes = new Map((await listAllPosicoes()).map((p) => [p.pericopeOrdem, p]))
 
-      const ativa = await getJornadaAtiva()
-      if (ativa) {
-        const rota = rotaDaJornada(ativa, all)
-        const prog = progressoDaJornada(rota, progressos, ativa.contaDesde)
-        // Reconciliação nos DOIS sentidos: a jornada fecha quando a rota
-        // acaba, e REABRE se uma perícope da rota for desmarcada depois —
-        // caso real quando outra frente do app desfaz uma conclusão de uma
-        // jornada já terminada.
-        if (prog.proximaOrdem === null && ativa.concluidaEm === null) {
-          await atualizarJornada(ativa.id, { concluidaEm: new Date().toISOString() })
-        } else if (prog.proximaOrdem !== null && ativa.concluidaEm !== null) {
-          await atualizarJornada(ativa.id, { concluidaEm: null })
-        }
-        const cursor = cursorDaJornada(rota, progressos, posicoes, ativa.contaDesde)
+      // getJornadaCorrente (não "ativa"): a jornada concluída continua sendo
+      // a corrente até o leitor arquivá-la abrindo outra — ver o comentário
+      // em user-db.ts. Uma seleção que também excluísse concluidaEm faria a
+      // Home parar de examinar a jornada assim que ela fechasse, e a
+      // reconciliação reversa abaixo nunca rodaria de novo.
+      const corrente = await getJornadaCorrente()
+      if (corrente) {
+        const rota = rotaDaJornada(corrente, all)
+        const prog = progressoDaJornada(rota, progressos, corrente.contaDesde)
+        // Reconciliação nos DOIS sentidos (função pura testada em
+        // jornadas.test.ts): a jornada fecha quando a rota acaba, e REABRE
+        // se uma perícope da rota for desmarcada depois — caso real quando
+        // outra frente do app desfaz uma conclusão de uma jornada já
+        // terminada.
+        const patch = reconciliacaoDeConclusao(corrente, prog.proximaOrdem)
+        if (patch) await atualizarJornada(corrente.id, patch)
+        const cursor = cursorDaJornada(rota, progressos, posicoes, corrente.contaDesde)
         setEstado({
           tipo: 'jornada',
-          jornada: ativa,
+          jornada: corrente,
           prog,
           cursor,
           peri: cursor === null ? undefined : all.find((p) => p.ordem === cursor),

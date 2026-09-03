@@ -92,6 +92,30 @@ export function cursorDaJornada(
   return melhor ? melhor.pericopeOrdem : proximaOrdem
 }
 
+/**
+ * O patch de `concluidaEm` a aplicar depois de recalcular o progresso da
+ * jornada corrente — ou `null` quando o estado gravado já bate com a rota.
+ *
+ * Nos DOIS sentidos: se a rota acabou (`proximaOrdem === null`) e a jornada
+ * ainda não estava marcada, grava a conclusão; se a rota NÃO acabou e a
+ * jornada estava marcada, LIMPA — é o caso real de outra frente do app
+ * desmarcar uma perícope de uma jornada já concluída, que precisa reabrir
+ * sozinha. Extraída como função pura (em vez de embutida em Home.tsx) para
+ * poder testar os quatro casos sem IndexedDB nem componente React.
+ *
+ * `agora` é parâmetro para o chamador poder injetar um relógio determinístico
+ * em teste; por padrão usa o instante real.
+ */
+export function reconciliacaoDeConclusao(
+  jornada: Pick<Jornada, 'concluidaEm'>,
+  proximaOrdem: number | null,
+  agora: string = new Date().toISOString(),
+): { concluidaEm: string | null } | null {
+  if (proximaOrdem === null && jornada.concluidaEm === null) return { concluidaEm: agora }
+  if (proximaOrdem !== null && jornada.concluidaEm !== null) return { concluidaEm: null }
+  return null
+}
+
 const ROTULO_SEQUENCIA: Record<string, string> = {
   biblia: 'A Bíblia toda',
   vt: 'Velho Testamento',

@@ -14,7 +14,7 @@ import {
   deleteAnotacao,
   deleteMeta,
   enqueuePosicao,
-  getJornadaAtiva,
+  getJornadaCorrente,
   getMeta,
   getPosicao,
   getPosicaoMaisRecente,
@@ -567,7 +567,7 @@ describe('jornadas', () => {
     expect(outbox.filter((i) => i.kind === 'jornada')).toHaveLength(1)
   })
 
-  it('criar uma segunda arquiva a primeira — no máximo uma ativa', async () => {
+  it('criar uma segunda arquiva a primeira — no máximo uma corrente', async () => {
     await clearAllUserData()
     const primeira = await criarJornada({
       nome: 'Salmos', tipo: 'livro', escopo: 'Salmos', inicioOrdem: 2, contaDesde: null,
@@ -575,14 +575,50 @@ describe('jornadas', () => {
     const segunda = await criarJornada({
       nome: 'Mateus', tipo: 'livro', escopo: 'Mateus', inicioOrdem: 4, contaDesde: null,
     })
-    const ativa = await getJornadaAtiva()
-    expect(ativa?.id).toBe(segunda.id)
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(segunda.id)
     const todas = await listJornadas()
     expect(todas.find((j) => j.id === primeira.id)?.arquivadaEm).not.toBeNull()
     // Duas jornadas + duas lápides de arquivamento não: o arquivamento é um
     // update, então são 3 itens de outbox (criar, arquivar, criar).
     const outbox = (await listOutbox()).filter((i) => i.kind === 'jornada')
     expect(outbox).toHaveLength(3)
+  })
+
+  it('criar uma segunda arquiva a primeira mesmo já CONCLUÍDA — não fica pendurada', async () => {
+    // Regressão do bug corrigido no ciclo 1: o laço de arquivamento de
+    // criarJornada pulava jornadas com concluidaEm !== null, então uma
+    // jornada concluída nunca era arquivada ao abrir a próxima — sobrava
+    // pendurada, nem arquivada nem escolhida por getJornadaCorrente() (que
+    // encontraria duas linhas com arquivadaEm === null).
+    await clearAllUserData()
+    const primeira = await criarJornada({
+      nome: 'Salmos', tipo: 'livro', escopo: 'Salmos', inicioOrdem: 2, contaDesde: null,
+    })
+    await atualizarJornada(primeira.id, { concluidaEm: FUTURE })
+    const segunda = await criarJornada({
+      nome: 'Mateus', tipo: 'livro', escopo: 'Mateus', inicioOrdem: 4, contaDesde: null,
+    })
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(segunda.id)
+    const todas = await listJornadas()
+    const arquivada = todas.find((j) => j.id === primeira.id)
+    expect(arquivada?.arquivadaEm).not.toBeNull()
+    expect(arquivada?.concluidaEm).not.toBeNull()
+  })
+
+  it('getJornadaCorrente devolve a concluída enquanto ela não for arquivada', async () => {
+    await clearAllUserData()
+    const j = await criarJornada({
+      nome: 'VT', tipo: 'sequencia', escopo: 'vt', inicioOrdem: 0, contaDesde: null,
+    })
+    await atualizarJornada(j.id, { concluidaEm: FUTURE })
+    // Concluída, mas ainda a única não arquivada: continua sendo a corrente
+    // — é o que permite a Home mostrar "· concluída" e, se uma perícope for
+    // desmarcada depois, reabri-la (reconciliacaoDeConclusao).
+    const corrente = await getJornadaCorrente()
+    expect(corrente?.id).toBe(j.id)
+    expect(corrente?.concluidaEm).toBe(FUTURE)
   })
 
   it('trunca o nome em LIMITE_NOME', async () => {

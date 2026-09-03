@@ -3,6 +3,7 @@ import {
   cursorDaJornada,
   nomePadrao,
   progressoDaJornada,
+  reconciliacaoDeConclusao,
   rotaDaJornada,
 } from './jornadas'
 import type { Jornada, PericopeIndex, PosicaoLeitura, Progresso } from './types'
@@ -145,6 +146,35 @@ describe('cursorDaJornada', () => {
   it('devolve null quando a rota acabou', () => {
     const progressos = new Map([concluida(0, DEPOIS), concluida(1, DEPOIS)])
     expect(cursorDaJornada([0, 1], progressos, new Map(), null)).toBeNull()
+  })
+})
+
+describe('reconciliacaoDeConclusao', () => {
+  const AGORA = '2026-07-01T00:00:00.000Z'
+
+  it('rota acabou e concluidaEm era null → grava a conclusão', () => {
+    expect(reconciliacaoDeConclusao({ concluidaEm: null }, null, AGORA)).toEqual({
+      concluidaEm: AGORA,
+    })
+  })
+
+  it('rota acabou e já estava concluída → nada a fazer', () => {
+    expect(reconciliacaoDeConclusao({ concluidaEm: ANTES }, null, AGORA)).toBeNull()
+  })
+
+  it('rota NÃO acabou mas concluidaEm não é null → LIMPA (reabre)', () => {
+    // Este é o caso que ficou morto no ciclo 1: getJornadaAtiva() excluía
+    // concluidaEm !== null do filtro, então nenhuma jornada chegava aqui
+    // com proximaOrdem não-nulo e concluidaEm preenchido ao mesmo tempo.
+    // Com getJornadaCorrente() (sem esse filtro), este ramo é alcançável de
+    // verdade — outra frente do app desmarcou uma perícope da rota.
+    expect(reconciliacaoDeConclusao({ concluidaEm: ANTES }, 3, AGORA)).toEqual({
+      concluidaEm: null,
+    })
+  })
+
+  it('rota não acabou e nunca esteve concluída → nada a fazer', () => {
+    expect(reconciliacaoDeConclusao({ concluidaEm: null }, 3, AGORA)).toBeNull()
   })
 })
 

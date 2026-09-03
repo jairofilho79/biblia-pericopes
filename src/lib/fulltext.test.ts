@@ -28,6 +28,9 @@ const FIXTURES: Pericope[] = [
   peri(0, 'Gênesis', 'Gn', TEXTO),
   peri(1, 'Salmos', 'Sl', 'Capítulo 23\n1 O Senhor é o meu pastor; nada me faltará.'),
   peri(2, 'João', 'Jo', 'Capítulo 3\n16 Porque Deus amou o mundo de tal maneira.'),
+  ...Array.from({ length: 60 }, (_, i) =>
+    peri(i + 3, 'Mateus', 'Mt', `Capítulo ${i + 1}\n1 A palavra abunda e alcança à alma. A ação faz a arte andar.`),
+  ),
 ]
 
 vi.mock('./content', async (importOriginal) => {
@@ -212,5 +215,28 @@ describe('fatiarResultado', () => {
     const r = fatiarResultado(lista(51), 50)
     expect(r.hits).toHaveLength(50)
     expect(r.truncado).toBe(true)
+  })
+})
+
+describe('searchTexto com filtro', () => {
+  it('o teto conta os aceitos, não os varridos', async () => {
+    // As 60 fixtures de Mateus (ordens 3–62) casam "palavra"; as outras não.
+    const semFiltro = await searchTexto('palavra', 20)
+    expect(semFiltro).toHaveLength(20)
+    expect(Math.max(...semFiltro.map((h) => h.ordem))).toBe(22)
+
+    const pares = await searchTexto('palavra', 20, (ordem) => ordem % 2 === 0)
+    expect(pares).toHaveLength(20)
+    expect(pares.every((h) => h.ordem % 2 === 0)).toBe(true)
+    // O decisivo: a varredura passou do 20º ACHADO para juntar 20 ACEITOS.
+    // Se o filtro fosse aplicado depois do teto, sobrariam só os 10 pares
+    // entre as ordens 3 e 22.
+    expect(Math.max(...pares.map((h) => h.ordem))).toBe(42)
+  })
+
+  it('sem o parâmetro, o comportamento não muda', async () => {
+    expect(await searchTexto('palavra', 3)).toEqual(
+      await searchTexto('palavra', 3, undefined),
+    )
   })
 })

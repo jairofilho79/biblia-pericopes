@@ -227,7 +227,11 @@ export function fatiarResultado<T>(
   return { hits: achados.slice(0, limite), truncado: achados.length > limite }
 }
 
-export async function searchTexto(q: string, limit = LIMITE_RESULTADOS): Promise<FulltextHit[]> {
+export async function searchTexto(
+  q: string,
+  limit = LIMITE_RESULTADOS,
+  aceitar?: (ordem: number) => boolean,
+): Promise<FulltextHit[]> {
   const agulha = normalize(q.trim())
   if (agulha.length < MIN_CHARS) return []
   const idx = await buildIndex()
@@ -235,6 +239,9 @@ export async function searchTexto(q: string, limit = LIMITE_RESULTADOS): Promise
   const hits: FulltextHit[] = []
   for (const e of idx) {
     if (hits.length >= limit) break
+    // Antes do indexOf de propósito: o teto precisa contar os ACEITOS. Cortar
+    // depois daria "51 achados → 3 não lidos" e esconderia o que passou do teto.
+    if (aceitar && !aceitar(e.ordem)) continue
     const pos = e.textoNorm.indexOf(agulha)
     if (pos < 0) continue
     const i = linhaIndexAtOffset(e.linhas, pos)

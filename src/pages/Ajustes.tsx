@@ -5,13 +5,19 @@ import { countConcluidasNaSequencia, zerarProgresso } from '../lib/user-db'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type Alvo = { chave: string; rotulo: string; ordens: number[] }
+// `ordens` e `contagem` vêm do MESMO clique — o mesmo `a` e o mesmo `n` que
+// a linha estava mostrando —, nunca recompostos depois de um re-render.
+// É o que faz a caixa de confirmação ser autocontida: uma vez aberta, nada
+// que aconteça em `contagens` (trocar de livro, um sync chegando) pode
+// fazer a caixa mostrar um número que não é o que `ordens` vai zerar.
+type Confirmando = Alvo & { contagem: number }
 
 export default function Ajustes() {
   const [livros, setLivros] = useState<string[]>([])
   const [livro, setLivro] = useState('')
   const [alvos, setAlvos] = useState<Alvo[]>([])
   const [contagens, setContagens] = useState<Map<string, number>>(new Map())
-  const [confirmando, setConfirmando] = useState<Alvo | null>(null)
+  const [confirmando, setConfirmando] = useState<Confirmando | null>(null)
   const [aviso, setAviso] = useState('')
   const [erro, setErro] = useState('')
 
@@ -74,7 +80,7 @@ export default function Ajustes() {
     }
   }, [confirmando])
 
-  async function zerar(alvo: Alvo) {
+  async function zerar(alvo: Confirmando) {
     setConfirmando(null)
     try {
       await zerarProgresso(alvo.ordens)
@@ -102,7 +108,11 @@ export default function Ajustes() {
 
       <label className="ajustes-livro">
         Escolher um livro
-        <select value={livro} onChange={(e) => setLivro(e.target.value)}>
+        <select
+          value={livro}
+          disabled={!!confirmando}
+          onChange={(e) => setLivro(e.target.value)}
+        >
           <option value="">—</option>
           {livros.map((l) => (
             <option key={l} value={l}>
@@ -123,7 +133,7 @@ export default function Ajustes() {
                 type="button"
                 className="ghost"
                 disabled={n === 0}
-                onClick={() => setConfirmando(a)}
+                onClick={() => setConfirmando({ ...a, contagem: n })}
               >
                 Zerar
               </button>
@@ -142,7 +152,7 @@ export default function Ajustes() {
         >
           <p>
             <strong>
-              Zerar {contagens.get(confirmando.chave) ?? 0} leituras de {confirmando.rotulo}?
+              Zerar {confirmando.contagem} leituras de {confirmando.rotulo}?
             </strong>
           </p>
           <p className="muted">

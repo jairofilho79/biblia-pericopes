@@ -7,6 +7,7 @@ import {
   inserirNoCursor,
   mensagemEsgotado,
   msAteVolta,
+  substituirTrecho,
   transcrever,
 } from './ditado'
 
@@ -93,6 +94,27 @@ describe('inserirNoCursor', () => {
 
   it('tolera cursor fora do intervalo (cai no fim)', () => {
     expect(inserirNoCursor('ab', 99, 99, 'c')).toEqual({ texto: 'ab c', cursor: 4 })
+  })
+})
+
+describe('substituirTrecho', () => {
+  it('troca a última ocorrência e põe o cursor no fim do revisado', () => {
+    expect(substituirTrecho('Nota. amém amém', 'amém', 'Amém.')).toEqual({
+      texto: 'Nota. amém Amém.',
+      cursor: 16,
+    })
+  })
+
+  it('null quando o trecho não está mais no texto ou é vazio', () => {
+    expect(substituirTrecho('Nota editada', 'amém', 'Amém.')).toBeNull()
+    expect(substituirTrecho('Nota', '', 'x')).toBeNull()
+  })
+
+  it('preserva o que vem depois do trecho', () => {
+    expect(substituirTrecho('a se deus quiser b', 'se deus quiser', 'Se Deus quiser.')).toEqual({
+      texto: 'a Se Deus quiser. b',
+      cursor: 17,
+    })
   })
 })
 

@@ -51,6 +51,28 @@ export function inserirNoCursor(
   return { texto: antes + inserido + depois, cursor: antes.length + inserido.length }
 }
 
+/**
+ * Troca a última ocorrência de `original` em `texto` por `revisado` — é o que
+ * a revisão por IA faz com o trecho que acabou de ser ditado. Da última para
+ * a primeira porque o ditado entrou perto do cursor, no fim. Se o trecho não
+ * está mais lá (a pessoa já editou), devolve null e nada muda. O cursor vai
+ * para o fim do que entrou.
+ */
+export function substituirTrecho(
+  texto: string,
+  original: string,
+  revisado: string,
+): { texto: string; cursor: number } | null {
+  if (!original) return null
+  const inicio = texto.lastIndexOf(original)
+  if (inicio < 0) return null
+  const antes = texto.slice(0, inicio)
+  return {
+    texto: antes + revisado + texto.slice(inicio + original.length),
+    cursor: antes.length + revisado.length,
+  }
+}
+
 /** Contador ao lado do microfone: `0:07 / 1:00`. */
 export function formatarContador(segundos: number): string {
   const s = Math.min(Math.max(0, Math.floor(segundos)), MAX_SEGUNDOS_DITADO)

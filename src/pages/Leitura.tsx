@@ -39,7 +39,7 @@ import { nextSelection, parseVerseRef, rangeLabel, rangeRef, verseRefLabel, vers
 import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
-import { inserirNoCursor } from '../lib/ditado'
+import { inserirNoCursor, substituirTrecho } from '../lib/ditado'
 import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
@@ -431,6 +431,22 @@ export default function Leitura() {
     window.setTimeout(() => {
       el?.focus()
       el?.setSelectionRange(cursor, cursor)
+    }, 0)
+  }
+
+  /**
+   * A revisão por IA chega segundos depois do ditado: troca o trecho que
+   * entrou (do fim para o começo, que é onde ele está) pela versão revisada.
+   * Se a pessoa já mexeu nele, não está mais lá e nada acontece.
+   */
+  function aplicarRevisao(original: string, revisado: string) {
+    const el = notaRef.current
+    const r = substituirTrecho(el?.value ?? draft, original, revisado)
+    if (!r) return
+    setDraft(r.texto)
+    window.setTimeout(() => {
+      el?.focus()
+      el?.setSelectionRange(r.cursor, r.cursor)
     }, 0)
   }
 
@@ -843,7 +859,7 @@ export default function Leitura() {
                 {/* Último da linha e encostado à direita (margin-left:auto no
                     CSS): o estado do ditado cresce para a esquerda e o
                     microfone nunca sai do lugar. */}
-                <DitarBotao onTexto={inserirDitado} onAviso={flashAviso} />
+                <DitarBotao onTexto={inserirDitado} onRevisao={aplicarRevisao} onAviso={flashAviso} />
               </div>
             </form>
             <ul className="note-list">

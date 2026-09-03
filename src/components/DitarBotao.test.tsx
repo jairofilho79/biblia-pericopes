@@ -9,6 +9,12 @@ vi.mock('../lib/auth-client', () => ({
   authClient: { useSession: () => ({ data: sessao }) },
 }))
 
+// Revisão por IA controlada pelo teste: resolve com o que `revisado` disser.
+const revisarDitado = vi.fn(async (_texto: string): Promise<string | null> => null)
+vi.mock('../lib/revisar-ditado', () => ({
+  revisarDitado: (t: string) => revisarDitado(t),
+}))
+
 import DitarBotao from './DitarBotao'
 import { FakeReconhecimento } from '../lib/testing/reconhecimento-fake'
 
@@ -44,11 +50,14 @@ const getUserMedia = vi.fn(async () => ({ getTracks: () => tracks }) as unknown 
 let root: Root
 let host: HTMLDivElement
 const onTexto = vi.fn()
+const onRevisao = vi.fn()
 const onAviso = vi.fn()
 
 function montar(props: { disabled?: boolean } = {}) {
   act(() => {
-    root.render(<DitarBotao onTexto={onTexto} onAviso={onAviso} {...props} />)
+    root.render(
+      <DitarBotao onTexto={onTexto} onRevisao={onRevisao} onAviso={onAviso} {...props} />,
+    )
   })
 }
 const botao = () => host.querySelector('button')
@@ -63,7 +72,10 @@ beforeEach(() => {
   tracks[0].stop.mockClear()
   FakeReconhecimento.instancias = []
   onTexto.mockClear()
+  onRevisao.mockClear()
   onAviso.mockClear()
+  revisarDitado.mockReset()
+  revisarDitado.mockResolvedValue(null)
   getUserMedia.mockClear()
   vi.stubGlobal('MediaRecorder', FakeRecorder)
   Object.defineProperty(navigator, 'mediaDevices', { value: { getUserMedia }, configurable: true })
@@ -294,8 +306,9 @@ describe('DitarBotao — modo nativo', () => {
     expect(previa()?.classList.contains('ditar-previa')).toBe(true)
     expect(onTexto).not.toHaveBeenCalled()
 
-    act(() => rec().resultado([['O Senhor é o meu pastor', true]]))
-    expect(onTexto).toHaveBeenCalledWith('O Senhor é o meu pastor')
+    // O final entra já com a pontuação heurística.
+    act(() => rec().resultado([['o senhor é o meu pastor', true]]))
+    expect(onTexto).toHaveBeenCalledWith('O Senhor é o meu pastor.')
     expect(previa()?.textContent).toBe('Ouvindo…')
     // Sem teto: um minuto depois continua ouvindo.
     act(() => {
@@ -305,7 +318,7 @@ describe('DitarBotao — modo nativo', () => {
     expect(botao()?.getAttribute('aria-label')).toBe('Parar ditado')
   })
 
-  it('reinicia quando o aparelho encerra sozinho, e não depois de parar', () => {
+  it('reinicia quando o aparelho encerra sozinho, e não depois de parar', async () => {
     montar()
     act(() => botao()!.click())
     // iOS encerra depois de uma pausa: a pessoa não pediu, então volta a ouvir.
@@ -319,10 +332,88 @@ describe('DitarBotao — modo nativo', () => {
     expect(previa()).toBeNull()
     // O último final ainda chega depois do stop e entra no texto.
     act(() => rec().resultado([['amém', true]]))
-    expect(onTexto).toHaveBeenCalledWith('amém')
-    act(() => rec().fim())
+    expect(onTexto).toHaveBeenCalledWith('Amém.')
+    await act(async () => rec().fim())
     expect(rec().starts).toBe(2)
     expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+  })
+
+  it('ao parar com sessão, revisa o trecho inteiro e entrega a revisão quando ela muda algo', async () => {
+    let resolver: (t: string | null) => void = () => {}
+    revisarDitado.mockImplementation(() => new Promise((r) => (resolver = r)))
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().resultado([['se deus quiser', true]]))
+    // O reinício automático do iOS não fecha a sessão de ditado da pessoa.
+    act(() => rec().fim())
+    expect(revisarDitado).not.toHaveBeenCalled()
+    act(() => rec().resultado([['amém', true]]))
+    act(() => botao()!.click())
+    expect(revisarDitado).not.toHaveBeenCalled()
+    // Só no onend, quando o último final já entrou.
+    act(() => rec().fim())
+    expect(revisarDitado).toHaveBeenCalledWith('Se Deus quiser. Amém.')
+    expect(status()).toBe('Revisando…')
+    expect(botao()?.disabled).toBe(true)
+    await act(async () => resolver('Se Deus quiser, amém.'))
+    expect(onRevisao).toHaveBeenCalledWith('Se Deus quiser. Amém.', 'Se Deus quiser, amém.')
+    expect(status()).toBeNull()
+    expect(botao()?.disabled).toBe(false)
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+  })
+
+  it('revisão igual ou falha não chama onRevisao', async () => {
+    revisarDitado.mockResolvedValue('Amém.')
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().resultado([['amém', true]]))
+    act(() => botao()!.click())
+    await act(async () => rec().fim())
+    expect(revisarDitado).toHaveBeenCalledWith('Amém.')
+    expect(onRevisao).not.toHaveBeenCalled()
+
+    revisarDitado.mockResolvedValue(null)
+    act(() => botao()!.click())
+    act(() => rec().resultado([['glória', true]]))
+    act(() => botao()!.click())
+    await act(async () => rec().fim())
+    expect(revisarDitado).toHaveBeenLastCalledWith('Glória.')
+    expect(onRevisao).not.toHaveBeenCalled()
+    expect(botao()?.disabled).toBe(false)
+  })
+
+  it('sem sessão, ou sem nada ditado, não revisa', async () => {
+    sessao = null
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().resultado([['amém', true]]))
+    act(() => botao()!.click())
+    await act(async () => rec().fim())
+    expect(onTexto).toHaveBeenCalledWith('Amém.')
+    expect(revisarDitado).not.toHaveBeenCalled()
+    expect(botao()?.getAttribute('aria-label')).toBe('Ditar anotação')
+
+    sessao = { user: { id: 'u1' } }
+    montar()
+    act(() => botao()!.click())
+    act(() => botao()!.click())
+    await act(async () => rec().fim())
+    expect(revisarDitado).not.toHaveBeenCalled()
+  })
+
+  it('desmontar durante a revisão ignora o resultado', async () => {
+    let resolver: (t: string | null) => void = () => {}
+    revisarDitado.mockImplementation(() => new Promise((r) => (resolver = r)))
+    montar()
+    act(() => botao()!.click())
+    act(() => rec().resultado([['amém', true]]))
+    act(() => botao()!.click())
+    act(() => rec().fim())
+    expect(revisarDitado).toHaveBeenCalledTimes(1)
+    act(() => root.unmount())
+    await act(async () => resolver('Amém!'))
+    expect(onRevisao).not.toHaveBeenCalled()
+    root = createRoot(host)
   })
 
   it('microfone negado vira aviso e não reinicia', () => {

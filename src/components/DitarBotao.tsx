@@ -8,15 +8,23 @@ import {
   msAteVolta,
   transcrever,
 } from '../lib/ditado'
+import { pontuarFrase } from '../lib/pontuar-ditado'
 import {
   criarDitadoNativo,
   obterReconhecimento,
   type DitadoNativo,
 } from '../lib/reconhecimento-fala'
+import { revisarDitado } from '../lib/revisar-ditado'
 
 type Props = {
   /** Recebe o texto transcrito; quem chama decide onde ele entra. */
   onTexto: (trecho: string) => void
+  /**
+   * A revisão por IA do que foi ditado desde o último toque: `original` é
+   * exatamente o que entrou por onTexto (frases juntas por espaço), para quem
+   * chama achar e trocar por `revisado`. Só no modo nativo, só com sessão.
+   */
+  onRevisao?: (original: string, revisado: string) => void
   onAviso: (msg: string) => void
   disabled?: boolean
 }
@@ -25,6 +33,8 @@ type Fase =
   | { tipo: 'ocioso' }
   /** Modo nativo: ouvindo, com a prévia do que está sendo dito. */
   | { tipo: 'ouvindo'; parcial: string }
+  /** Modo nativo: a pessoa parou e o trecho está na revisão por IA. */
+  | { tipo: 'revisando' }
   /** Modo fallback (Whisper). */
   | { tipo: 'gravando'; segundos: number }
   | { tipo: 'transcrevendo' }
@@ -39,9 +49,13 @@ function temMicrofoneNoNavegador(): boolean {
  * para. Dois caminhos:
  *
  * - Nativo (Web Speech API — o ditado da Apple no iPhone, o do Google no
- *   Android/Chrome): sem login, sem cota, sem teto de tempo. O texto entra no
- *   textarea a cada frase fechada; o que ainda está sendo dito aparece como
- *   prévia ao lado do botão.
+ *   Android/Chrome): sem login, sem cota, sem teto de tempo. Cada frase
+ *   fechada passa pela pontuação heurística (pontuar-ditado.ts) e entra no
+ *   textarea; o que ainda está sendo dito aparece como prévia ao lado do
+ *   botão. Quando a pessoa para, e está logada, o trecho inteiro vai à
+ *   revisão por IA (revisar-ditado.ts) e volta por onRevisao — vírgulas e
+ *   correções que a heurística não alcança. Se a revisão falhar, fica o que
+ *   já está lá, sem aviso.
  * - Fallback (Firefox e afins, sem a API): grava com MediaRecorder e manda
  *   para o Worker transcrever. Só para quem está logado (a rota cobra cota
  *   por usuário) e com teto de 60 s.
@@ -49,7 +63,7 @@ function temMicrofoneNoNavegador(): boolean {
  * Nos dois casos só com rede — o nativo do Chrome manda o áudio para o
  * Google — e um botão que só dá erro é pior que nenhum.
  */
-export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
+export default function DitarBotao({ onTexto, onRevisao, onAviso, disabled }: Props) {
   const { data: session } = authClient.useSession()
   const [online, setOnline] = useState(() => navigator.onLine)
   const [fase, setFase] = useState<Fase>({ tipo: 'ocioso' })
@@ -61,14 +75,22 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   // garantem que o texto chega na versão mais recente de onTexto/onAviso (a
   // que enxerga o rascunho atual), não numa fechada sobre um estado velho.
   const onTextoRef = useRef(onTexto)
+  const onRevisaoRef = useRef(onRevisao)
   const onAvisoRef = useRef(onAviso)
+  const sessionRef = useRef(session)
   onTextoRef.current = onTexto
+  onRevisaoRef.current = onRevisao
   onAvisoRef.current = onAviso
+  sessionRef.current = session
 
   const ditado = useRef<DitadoNativo | null>(null)
   // A intenção da pessoa: o iOS encerra a sessão sozinho depois de uma pausa
   // mesmo com `continuous`; enquanto ela não tocou em parar, o onFim reinicia.
   const querOuvir = useRef(false)
+  // Frases (já pontuadas) desde o toque que começou a ouvir: é o que vai à
+  // revisão quando a pessoa parar. O reinício automático do iOS não zera.
+  const segmentos = useRef<string[]>([])
+  const montado = useRef(true)
 
   const recorder = useRef<MediaRecorder | null>(null)
   const stream = useRef<MediaStream | null>(null)
@@ -102,6 +124,7 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   // deixar o microfone aberto nem timers pendurados.
   useEffect(
     () => () => {
+      montado.current = false
       querOuvir.current = false
       ditado.current?.parar()
       const rec = recorder.current
@@ -201,10 +224,37 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
     rec.stop() // onstop → terminar()
   }
 
+  /**
+   * A sessão de ditado acabou de vez (a pessoa parou, ou um erro parou por
+   * ela). Corre depois do `onend`, quando o último final já chegou: só então
+   * o trecho está completo para a revisão. Sem sessão não há rota — e não há
+   * aviso: a revisão é um extra.
+   */
+  async function encerrarNativo() {
+    const frases = segmentos.current
+    segmentos.current = []
+    if (!montado.current) return
+    if (!frases.length || !sessionRef.current) {
+      setFase({ tipo: 'ocioso' })
+      return
+    }
+    const original = frases.join(' ')
+    setFase({ tipo: 'revisando' })
+    const revisado = await revisarDitado(original)
+    if (!montado.current) return
+    if (revisado && revisado !== original) onRevisaoRef.current?.(original, revisado)
+    setFase({ tipo: 'ocioso' })
+  }
+
   function comecarNativo() {
     ditado.current ??= criarDitadoNativo(
       {
-        onFinal: (texto) => onTextoRef.current(texto),
+        onFinal: (texto) => {
+          const frase = pontuarFrase(texto)
+          if (!frase) return
+          segmentos.current.push(frase)
+          onTextoRef.current(frase)
+        },
         onParcial: (parcial) =>
           setFase((f) => (f.tipo === 'ouvindo' ? { tipo: 'ouvindo', parcial } : f)),
         onErro: (msg) => {
@@ -214,13 +264,14 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
         },
         onFim: () => {
           if (querOuvir.current) ditado.current?.iniciar()
-          else setFase({ tipo: 'ocioso' })
+          else void encerrarNativo()
         },
       },
       Reconhecimento,
     )
     if (!ditado.current) return
     querOuvir.current = true
+    segmentos.current = []
     setFase({ tipo: 'ouvindo', parcial: '' })
     ditado.current.iniciar()
   }
@@ -228,7 +279,8 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
   function pararNativo() {
     querOuvir.current = false
     // Ocioso já: o onend pode demorar, e o botão precisa responder na hora.
-    // A última frase ainda chega por onFinal, que não depende da fase.
+    // A última frase ainda chega por onFinal, que não depende da fase; a
+    // revisão começa no onFim, com ela dentro.
     setFase({ tipo: 'ocioso' })
     ditado.current?.parar()
   }
@@ -255,9 +307,11 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
         ? formatarContador(fase.segundos)
         : fase.tipo === 'transcrevendo'
           ? 'Transcrevendo…'
-          : fase.tipo === 'esgotado'
-            ? mensagemEsgotado(fase.voltaEm)
-            : null
+          : fase.tipo === 'revisando'
+            ? 'Revisando…'
+            : fase.tipo === 'esgotado'
+              ? mensagemEsgotado(fase.voltaEm)
+              : null
 
   return (
     <span className="ditar">
@@ -282,7 +336,12 @@ export default function DitarBotao({ onTexto, onAviso, disabled }: Props) {
         aria-label={rotulo}
         title={rotulo}
         aria-pressed={gravando}
-        disabled={disabled || fase.tipo === 'transcrevendo' || fase.tipo === 'esgotado'}
+        disabled={
+          disabled ||
+          fase.tipo === 'transcrevendo' ||
+          fase.tipo === 'revisando' ||
+          fase.tipo === 'esgotado'
+        }
         onClick={() =>
           nativo ? (ouvindo ? pararNativo() : comecarNativo()) : gravando ? parar() : void comecar()
         }

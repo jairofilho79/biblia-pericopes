@@ -33,11 +33,31 @@ export type PushPosicao = {
   apagadoEm: string | null
 }
 
+export type PushJornada = {
+  id: string
+  nome: string
+  tipo: 'sequencia' | 'bloco' | 'livro'
+  escopo: string
+  inicioOrdem: number
+  contaDesde: string | null
+  criadoEm: string
+  atualizadoEm: string
+  arquivadaEm: string | null
+  concluidaEm: string | null
+  apagadoEm: string | null
+}
+
 const STATUS = new Set(['nao_iniciado', 'em_andamento', 'concluido'])
 const CORES = new Set(['amarelo', 'verde', 'azul', 'rosa'])
 // "capitulo:versiculo" — o mesmo formato do TextoBlock.id no cliente.
 const VERSE_ID = /^\d+:\d+$/
 const POSICAO_TIPOS = new Set(['secao', 'versiculo', 'narracao'])
+const JORNADA_TIPOS = new Set(['sequencia', 'bloco', 'livro'])
+// Cópia de LIMITE_NOME em src/lib/sync-limits.ts (o Worker não importa de src/),
+// mesma convenção já usada para MAX_ITENS e MAX_TEXTO logo acima.
+const MAX_NOME = 120
+// Nome de livro é o escopo mais longo ("1 Tessalonicenses"); o teto só barra abuso.
+const MAX_ESCOPO = 64
 // Cópia de POSICAO_REF_RE em src/lib/user-db.ts (o Worker não importa de
 // src/) — o vocabulário de ids que a Leitura põe no DOM. Mudar um exige
 // mudar o outro.
@@ -174,6 +194,35 @@ function validPosicao(v: unknown): v is PushPosicao {
   )
 }
 
+/** null ou ISO canônico — os três campos de estado da jornada. */
+function isIsoOuNulo(v: unknown): v is string | null {
+  return v === null || isIso(v)
+}
+
+function validJornada(v: unknown): v is PushJornada {
+  if (typeof v !== 'object' || v === null) return false
+  const j = v as Record<string, unknown>
+  return (
+    typeof j.id === 'string' &&
+    j.id.length > 0 &&
+    j.id.length <= 64 &&
+    typeof j.nome === 'string' &&
+    j.nome.length <= MAX_NOME &&
+    typeof j.tipo === 'string' &&
+    JORNADA_TIPOS.has(j.tipo) &&
+    typeof j.escopo === 'string' &&
+    j.escopo.length > 0 &&
+    j.escopo.length <= MAX_ESCOPO &&
+    isOrdem(j.inicioOrdem) &&
+    isIsoOuNulo(j.contaDesde) &&
+    isIso(j.criadoEm) &&
+    isIso(j.atualizadoEm) &&
+    isIsoOuNulo(j.arquivadaEm) &&
+    isIsoOuNulo(j.concluidaEm) &&
+    isIsoOuNulo(j.apagadoEm)
+  )
+}
+
 /**
  * Tamanho de página do pull (GET /api/sync), por entidade. Cada query busca
  * TAMANHO_PAGINA_PULL + 1 linhas: a linha extra é só pra provar que existe
@@ -189,18 +238,20 @@ export const TAMANHO_PAGINA_PULL = 2000
 export type LinhaPull = { serverEm: string }
 
 /** As listas do pull, pelo nome. */
-export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques' | 'posicoes'
+export type EntidadePull = 'progresso' | 'anotacoes' | 'destaques' | 'posicoes' | 'jornadas'
 
 export type ResultadoPaginacaoPull<
   P extends LinhaPull,
   A extends LinhaPull,
   D extends LinhaPull,
   O extends LinhaPull,
+  J extends LinhaPull,
 > = {
   progresso: P[]
   anotacoes: A[]
   destaques: D[]
   posicoes: O[]
+  jornadas: J[]
   /**
    * `null` quando nenhuma entidade estourou: o chamador usa `agora` (o
    * instante gerado antes dos SELECTs) como cursor, exatamente como antes
@@ -300,16 +351,18 @@ export function paginarPull<
   A extends LinhaPull,
   D extends LinhaPull,
   O extends LinhaPull,
+  J extends LinhaPull,
 >(
-  listas: { progresso: P[]; anotacoes: A[]; destaques: D[]; posicoes: O[] },
+  listas: { progresso: P[]; anotacoes: A[]; destaques: D[]; posicoes: O[]; jornadas: J[] },
   n: number,
-): ResultadoPaginacaoPull<P, A, D, O> {
+): ResultadoPaginacaoPull<P, A, D, O, J> {
   const fronteiras = (
     [
       { nome: 'progresso', linhas: listas.progresso as LinhaPull[] },
       { nome: 'anotacoes', linhas: listas.anotacoes as LinhaPull[] },
       { nome: 'destaques', linhas: listas.destaques as LinhaPull[] },
       { nome: 'posicoes', linhas: listas.posicoes as LinhaPull[] },
+      { nome: 'jornadas', linhas: listas.jornadas as LinhaPull[] },
     ] satisfies { nome: EntidadePull; linhas: LinhaPull[] }[]
   )
     .filter(({ linhas }) => linhas.length > n)
@@ -331,6 +384,7 @@ export function paginarPull<
     anotacoes: cortar(listas.anotacoes),
     destaques: cortar(listas.destaques),
     posicoes: cortar(listas.posicoes),
+    jornadas: cortar(listas.jornadas),
     cursor,
     maisDados: true,
     // Só a entidade que empatou tudo E cuja fronteira virou o cursor tem
@@ -349,20 +403,23 @@ export function parseSyncPush(body: unknown): {
   anotacoes: PushAnotacao[]
   destaques: PushDestaque[]
   posicoes: PushPosicao[]
+  jornadas: PushJornada[]
 } | null {
   if (typeof body !== 'object' || body === null) return null
   const b = body as Record<string, unknown>
   const progresso = b.progresso ?? []
   const anotacoes = b.anotacoes ?? []
-  // Corpo sem `destaques`/`posicoes` é aceito como lista vazia: um cliente
-  // ainda não atualizado continua sincronizando as entidades que conhece.
+  // Corpo sem `destaques`/`posicoes`/`jornadas` é aceito como lista vazia: um
+  // cliente ainda não atualizado continua sincronizando as entidades que conhece.
   const destaques = b.destaques ?? []
   const posicoes = b.posicoes ?? []
+  const jornadas = b.jornadas ?? []
   if (
     !Array.isArray(progresso) ||
     !Array.isArray(anotacoes) ||
     !Array.isArray(destaques) ||
-    !Array.isArray(posicoes)
+    !Array.isArray(posicoes) ||
+    !Array.isArray(jornadas)
   ) {
     return null
   }
@@ -370,7 +427,8 @@ export function parseSyncPush(body: unknown): {
     progresso.length > MAX_ITENS ||
     anotacoes.length > MAX_ITENS ||
     destaques.length > MAX_ITENS ||
-    posicoes.length > MAX_ITENS
+    posicoes.length > MAX_ITENS ||
+    jornadas.length > MAX_ITENS
   ) {
     return null
   }
@@ -378,7 +436,8 @@ export function parseSyncPush(body: unknown): {
     !progresso.every(validProgresso) ||
     !anotacoes.every(validAnotacao) ||
     !destaques.every(validDestaque) ||
-    !posicoes.every(validPosicao)
+    !posicoes.every(validPosicao) ||
+    !jornadas.every(validJornada)
   ) {
     return null
   }
@@ -390,5 +449,6 @@ export function parseSyncPush(body: unknown): {
     })),
     destaques,
     posicoes,
+    jornadas,
   }
 }

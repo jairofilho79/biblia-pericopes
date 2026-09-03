@@ -132,6 +132,11 @@ alcançável por um cliente normal. Registrados para não se perderem.
   `docs/superpowers/specs/2026-09-03-chrome-header-perfil-design.md`.
 - ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
   regras viraram uma (ambas no topo, sem `@media` em volta).
+- CSS órfão depois da fusão: `.pesquisar .testament-h`, `.pesquisar .section-h`
+  (`app.css:2042-2056`) e o bloco `.modo-busca`/`.modo-btn`
+  (`app.css:2227-2251`) ficaram sem elemento quando `Pesquisar.tsx` foi
+  apagado. Não removidos junto de propósito: quatro sessões editavam o
+  arquivo na mesma rodada e a remoção conflitaria. Limpeza segura agora.
 
 ## UI geral
 

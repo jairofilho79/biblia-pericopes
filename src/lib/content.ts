@@ -38,13 +38,11 @@ export async function listPericopes(opts?: {
   if (opts?.testament) list = list.filter((p) => testamentOf(p) === opts.testament)
   if (opts?.livro) list = list.filter((p) => p.livro === opts.livro)
   if (opts?.q) {
+    // Só o TÍTULO. A cláusula de livro despejaria as 85 perícopes de João no
+    // meio dos 124 títulos que mencionam João, e a de "cap:ver" era substring
+    // sobre o início da perícope — "3:16" casava 13:16 e 23:16.
     const q = opts.q.toLowerCase()
-    list = list.filter(
-      (p) =>
-        p.titulo_pericope_pt.toLowerCase().includes(q) ||
-        p.livro.toLowerCase().includes(q) ||
-        `${p.capitulo_inicio}:${p.versiculo_inicio}`.includes(q),
-    )
+    list = list.filter((p) => p.titulo_pericope_pt.toLowerCase().includes(q))
   }
   return list
 }

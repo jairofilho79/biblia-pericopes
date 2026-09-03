@@ -169,3 +169,17 @@ describe('mesmosStatus', () => {
     expect(mesmosStatus(a, b)).toBe(false)
   })
 })
+
+describe('listPericopes com q', () => {
+  it('casa só o título — nome de livro não entra pela busca de texto', async () => {
+    // `loadIndex` guarda o índice num módulo singleton; o teste de 'loadIndex'
+    // acima já populou esse cache com outro fixture. resetModules() força uma
+    // instância nova de content.ts, isolada do resto do arquivo.
+    vi.resetModules()
+    vi.stubGlobal('fetch', vi.fn(async () => respostaJson(ALL)))
+    const { listPericopes } = await import('./content')
+
+    const r = await listPericopes({ q: 'P1' })
+    expect(r.map((p) => p.ordem)).toEqual([1])
+  })
+})

@@ -2,6 +2,8 @@ export type PushProgresso = {
   pericopeOrdem: number
   status: 'nao_iniciado' | 'em_andamento' | 'concluido'
   atualizadoEm: string
+  historico: string[]
+  paraReler: boolean
 }
 
 export type PushAnotacao = {
@@ -51,6 +53,8 @@ const MAX_TEMPO_S = 86_400
 // MAX_ITENS vale para as três listas (progresso/anotacoes/destaques).
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
+// Cópia de MAX_HISTORICO em src/lib/sync-limits.ts.
+export const MAX_HISTORICO = 50
 
 /**
  * Teto do corpo bruto do POST /api/sync, em bytes.
@@ -102,14 +106,22 @@ function isIso(v: unknown): v is string {
   return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
 }
 
-function validProgresso(v: unknown): v is PushProgresso {
+function validProgresso(v: unknown): v is Omit<PushProgresso, 'historico' | 'paraReler'> & {
+  historico?: unknown
+  paraReler?: unknown
+} {
   if (typeof v !== 'object' || v === null) return false
   const p = v as Record<string, unknown>
   return (
     isOrdem(p.pericopeOrdem) &&
     typeof p.status === 'string' &&
     STATUS.has(p.status) &&
-    isIso(p.atualizadoEm)
+    isIso(p.atualizadoEm) &&
+    // Ausentes = cliente ainda não atualizado, aceito (mesma tolerância que
+    // `destaques`/`posicoes` já têm em parseSyncPush).
+    (p.historico === undefined ||
+      (Array.isArray(p.historico) && p.historico.length <= MAX_HISTORICO && p.historico.every(isIso))) &&
+    (p.paraReler === undefined || typeof p.paraReler === 'boolean')
   )
 }
 
@@ -383,7 +395,11 @@ export function parseSyncPush(body: unknown): {
     return null
   }
   return {
-    progresso,
+    progresso: progresso.map((p) => ({
+      ...p,
+      historico: Array.isArray(p.historico) ? (p.historico as string[]) : [],
+      paraReler: p.paraReler === true,
+    })),
     anotacoes: anotacoes.map((a) => ({
       ...a,
       verseRef: typeof a.verseRef === 'string' ? a.verseRef : null,

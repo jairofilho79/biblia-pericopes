@@ -277,9 +277,24 @@ offline. Só "No texto" espera os 4,2 MB.
 ## 7. Testes
 
 **Nenhum teste lê `public/data/index.json`.** O arquivo é derivado e
-gitignored; `npm test` roda antes do build que o gera, então um teste assim
-passa localmente e dá `ENOENT` na CI. `bible-books.ts` é `.ts` versionado e
-pode ser fonte à vontade.
+gitignored (`.gitignore:29`), gerado só por `npm run shard`;
+`.github/workflows/deploy-worker.yml` roda `npm test` (passo 19) **antes** do
+build que o gera (passo 21). Um teste assim passa na máquina e quebra a CI com
+`ENOENT`. O risco foi levantado de forma independente por três sessões nesta
+rodada, e esta tela é a mais exposta — é a única que consome o catálogo pelos
+dois lados (`loadIndex()` e os shards), logo a candidata natural a um teste de
+integração que carregue o catálogo de verdade. **Não escreva esse teste.**
+
+Fontes permitidas: `src/lib/bible-books.ts` (66 livros com `name`, `abbrev`,
+`testament`, `section`, `versesPerChapter`, em memória, sem I/O) para tudo que
+é parser e catálogo; `data/pericopes.json` (versionado, 13,7 MB) só se um
+teste realmente precisar do catálogo inteiro; e índices literais montados no
+próprio teste para os casos pequenos.
+
+Uma nota de aferição, para não se comemorar número errado: numa worktree
+limpa o baseline é 39 arquivos / 435 testes. Na `main` o vitest também coleta
+`.worktrees/develop` e mostra 66 / 706 — é a outra worktree na conta, não
+cobertura a mais.
 
 - `src/lib/consulta.test.ts` — os 66 livros por nome e por abbrev;
   `jo`/`jó`/`joão`; `1 co 13`; separadores `:` `.` `,`; fora de faixa nos dois
@@ -300,7 +315,7 @@ pode ser fonte à vontade.
 | Superfície | Dono | Combinado |
 |---|---|---|
 | `Indice.tsx`, `Pesquisar.tsx`, `Explorar.tsx`, rotas delas | **esta sessão** | — |
-| `src/App.tsx` (nav e `<Route>`) | chrome/header | Recebe de nós: rótulo **"Explorar"**, `to="/explorar"`, a rota canônica e os dois redirects. Não editamos o arquivo. |
+| `src/App.tsx` (nav e `<Route>`) | chrome/header | Recebe de nós: rótulo **"Explorar"**, `to="/explorar"`, a rota canônica e os dois redirects — já enviado e arquivado por ela. Quem *aplica* depende da ordem de merge (abaixo) |
 | `src/pages/Leitura.tsx:796` | esta sessão, 1 linha | `/indice` → `/explorar?livro=<livro>`; as outras três são avisadas |
 | `src/pages/Home.tsx` | jornadas (f2) | Não encostamos |
 | `progresso.historico`, `paraReler` | releitura (a4) | Aditivos; `progressoPorLivro` não é tocado. "Vale reler" mora na Home, não aqui, e a a4 decidiu que o ✓ permanece — o filtro desta tela é só estado de leitura e não disputa superfície |
@@ -308,6 +323,25 @@ pode ser fonte à vontade.
 
 Se a nav for mesclada antes desta tela existir, ela mantém **dois** itens —
 um item só apontando para `/indice` esconderia a Pesquisa e seria regressão.
+
+### Ordem de merge
+
+Combinada entre as quatro sessões: **jornadas → releitura → chrome → esta**.
+Entrar por último é o que protege a dependência mais dura da rodada — o
+`import Explorar from './pages/Explorar'` do `App.tsx` não pode existir antes
+do arquivo. Como o chrome mescla antes, a aplicação física do diff da nav
+provavelmente cai para esta sessão, com o conteúdo já acordado e arquivado
+por ela; a decisão do rótulo e da rota continua tendo sido dela.
+
+O chrome reescreve a nav antes disso (`Hoje` sai, `Perfil` entra), então os
+números de linha do `App.tsx` mudam. O diff acordado é aplicado **por
+conteúdo**, nunca por linha.
+
+Um recorte "marcadas para reler" (`paraReler`) foi considerado e **recusado**
+pela sessão de releitura, que é dona do conceito: os chips desta tela são um
+eixo (status de leitura) e "Vale reler" é outro (tempo desde a última leitura
+mais pin manual). Juntá-los no mesmo conjunto prometeria uma coerência que não
+existe.
 
 ## 9. Limites conhecidos
 

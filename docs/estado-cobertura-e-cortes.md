@@ -183,3 +183,26 @@ Consequência que a spec precisa declarar mesmo assim, porque é visível: quem 
 é o denominador mudando — mas parece bug. O **streak não cai**: `historico` é por ordem
 e nunca é apagado, então a ordem aposentada continua contribuindo os dias lidos. O hábito
 fica; o que muda é a unidade de contagem.
+
+## Achado em aberto: os sobrescritos dos Salmos não existem na NAA.json
+
+`data/NAA.json` **não traz os sobrescritos** ("Salmo de Davi, quando fugia de
+Absalão, seu filho", "Ao mestre de canto, sobre Sosanim", etc.). Sl 3:1 começa
+direto em "SENHOR, como tem crescido o número dos meus adversários".
+
+Não é buraco de cobertura: a numeração em uso é a da KJV, que não numera o
+sobrescrito, então a auditoria fecha em 100% corretamente. As contagens ficam
+1-2 versículos abaixo do hebraico só nos salmos que têm sobrescrito (Sl 3: 8 vs
+9; Sl 51: 19 vs 21; Sl 90: 17 vs 17, porque o dele é curto).
+
+**Por que passou a importar:** com os Salmos virando 148 perícopes próprias, o
+sobrescrito é exatamente o contexto que a perícope deveria dar — "quando fugia
+de Absalão" é a diferença entre um lamento genérico e uma oração datada.
+
+Não dá para gerar: teria de vir de fonte NAA licenciada. Os subagents foram
+instruídos a usar o sobrescrito como CONHECIMENTO de contexto (mencionar no
+`contexto_historico_literario` que a tradição atribui o salmo a tal situação),
+nunca a citá-lo como se fosse texto do trecho — o que seria inventar Escritura.
+
+Decisão pendente do usuário: aceitar assim, ou conseguir os sobrescritos de uma
+fonte NAA e reprocessar os Salmos.

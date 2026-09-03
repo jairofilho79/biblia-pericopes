@@ -79,7 +79,15 @@ describe('loadIndex', () => {
 })
 
 function prog(ordem: number, status: Progresso['status']): Progresso {
-  return { pericopeOrdem: ordem, status, atualizadoEm: '2026-09-03T00:00:00.000Z' }
+  return {
+    pericopeOrdem: ordem,
+    status,
+    // Campos novos que a main trouxe. Este teste exercita só o predicado de
+    // status, então os dois ficam no valor neutro.
+    historico: [],
+    paraReler: false,
+    atualizadoEm: '2026-09-03T00:00:00.000Z',
+  }
 }
 
 describe('aceitaFiltro', () => {

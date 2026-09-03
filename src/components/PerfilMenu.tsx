@@ -130,12 +130,15 @@ export default function PerfilMenu({ onOpenChange }: Props) {
               >
                 {saindo ? 'Saindo…' : 'Sair'}
               </button>
-              {/* Sempre montado (mesmo padrão de .verse-actions-aviso): uma
-                  região aria-live só anuncia mudança de conteúdo se já
-                  existir no DOM antes da mudança. Criar o nó já populado
-                  no mesmo update não é confiável em leitores de tela. Quem
-                  usa toque também não vê `title` (precisa de hover), então
-                  a falha precisa aparecer na tela, não só ser lida em voz
+              {/* Montado desde antes do erro (mesmo padrão de
+                  .verse-actions-aviso): uma região aria-live só anuncia
+                  mudança de conteúdo se já existir no DOM antes da mudança.
+                  Criar o nó já populado no mesmo update não é confiável em
+                  leitores de tela. Vive dentro do popover, mas o `sair()` só
+                  é alcançável com o popover aberto e nada nele fecha o menu,
+                  então a região precede o erro que ela anuncia. Quem usa
+                  toque também não vê `title` (precisa de hover), então a
+                  falha precisa aparecer na tela, não só ser lida em voz
                   alta — por isso o texto fica visível, não .sr-only. */}
               <span className="nav-conta-erro" role="status" aria-live="polite">
                 {erroSaida}

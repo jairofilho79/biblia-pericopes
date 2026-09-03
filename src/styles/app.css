@@ -186,7 +186,10 @@ a {
 
 .top {
   display: grid;
-  grid-template-columns: 1fr auto;
+  /* Uma coluna só: a marca na linha 1, a nav (grid-column: 1 / -1) na 2. A
+     2ª coluna existia para o ThemeMenu solto, que virou item da nav — sem
+     ele o grid ainda reservava o column-gap de uma trilha vazia. */
+  grid-template-columns: 1fr;
   align-items: center;
   column-gap: 0.75rem;
   row-gap: 0.15rem;
@@ -653,16 +656,6 @@ button.ghost {
   white-space: nowrap;
 }
 
-.readmenu {
-  position: relative;
-}
-
-.readmenu-btn {
-  font-family: var(--font-display);
-  min-width: 2.75rem;
-  min-height: 2.5rem;
-}
-
 .readmenu-pop {
   position: absolute;
   right: 0;
@@ -753,7 +746,7 @@ button.ghost {
   background: var(--accent-soft);
 }
 
-/* tablet+: mais respiro entre a referência e o grupo, tudo numa linha só. */
+/* tablet+: mais respiro em volta da linha de referência. */
 @media (min-width: 640px) {
   .ref-row {
     gap: 0.5rem 1.25rem;
@@ -2308,22 +2301,6 @@ button.ghost {
   font-size: 0.9rem;
 }
 
-.nav-conta {
-  font-size: inherit;
-  color: var(--muted);
-  /* mesma altura e respiro dos links ao lado, senão "Sair" fica deslocado */
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding-inline: 0.15rem;
-}
-
-.nav-conta-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
 /* Mesmo padrão de .verse-actions-aviso: texto simples, sem borda/sombra.
    Fora do fluxo (abaixo do botão) para não reservar altura nem empurrar
    o "Sair" para cima; é transitório (4 s), pode sobrepor o que vem abaixo.
@@ -2369,19 +2346,33 @@ button.ghost {
 
 /* ── Menu Perfil ─────────────────────────────────────────────────────────
    Reúne tema, tipografia, Ajustes e conta. É o popover mais alto do app:
-   ~520px na Leitura, contra os ~240px do antigo "Aa". Daí as três medidas
+   ~520px na Leitura, contra os ~240px do antigo "Aa". Daí as medidas
    abaixo. */
+
+/* margin-left: auto empurra o gatilho para a borda direita da nav, que é a
+   borda direita do header. Não é estética: o .readmenu-pop abre com
+   `right: 0` e cresce para a esquerda, então quem ancora o popover é a
+   direita do gatilho. Antes quem garantia isso era o `justify-self: end` do
+   .theme-menu; a nav abaixo de 640px é `flex-start`, e sem esta regra um
+   popover de 260px pendurado num gatilho que ficou no meio da linha vazaria
+   pela esquerda da tela. Acima de 640px a nav já é `flex-end` e isto é
+   inócuo. */
 .perfil-wrap {
   position: relative;
+  margin-left: auto;
 }
 
 /* 260px e não os 230px do .readmenu-pop porque a 230px a linha de fontes
    (Serif/Literata/Sans) e a de tema (quatro rótulos) quebram em duas linhas.
+   O max-width é o que herdamos do .theme-pop, apagado junto com o ThemeMenu:
+   é ele que segura o popover dentro da tela em 375px (com o margin-left: auto
+   do .perfil-wrap acima, sobra --shell-pad de cada lado). Não apagar.
    max-height + rolagem porque num aparelho de 568px de altura os ~520px não
    cabem abaixo do header; overscroll-behavior impede a rolagem de vazar para
    a página atrás quando chega ao fim. */
 .perfil-pop {
   min-width: 260px;
+  max-width: calc(100vw - 2 * var(--shell-pad));
   max-height: calc(100dvh - 5rem);
   overflow-y: auto;
   overscroll-behavior: contain;

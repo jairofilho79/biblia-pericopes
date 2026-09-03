@@ -1,28 +1,15 @@
 {
   "model": "google/gemini-3.7-flash",
-  "concurrency": 1,
-  "done": 1,
-  "pending_total": 1,
-  "sample_cost_usd": 0.0046635,
-  "avg_cost_usd": 0.0046635,
+  "concurrency": 5,
+  "done": 0,
+  "pending_total": 0,
+  "sample_cost_usd": 0,
+  "avg_cost_usd": 0.0038088,
   "estimate_remaining_usd": 0,
-  "estimate_full_run_usd": 0.0046635,
-  "elapsed_sec": 14.567,
-  "throughput_per_sec": 0.06864831468387451,
+  "estimate_full_run_usd": 0,
+  "elapsed_sec": 0.123,
+  "throughput_per_sec": 0,
   "eta_sec": 0,
   "catalog_total": 2647,
-  "items": [
-    {
-      "ordem": 548,
-      "titulo_en": "Saul Slays the Priests of Nob",
-      "chars_texto": 3074,
-      "usage": {
-        "prompt_tokens": 1881,
-        "completion_tokens": 2111,
-        "total_tokens": 3992,
-        "cost_usd": 0.0046635,
-        "generation_id": "gen-1786833149-bPQZfPpv04J9quN6nsNt"
-      }
-    }
-  ]
+  "items": []
 }

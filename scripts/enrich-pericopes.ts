@@ -7,6 +7,7 @@
  *   --livro=Gênesis      filter by book
  *   --limit=N            process at most N pending items
  *   --force              re-enrich even non-stub caches
+ *   --desatualizados     re-enrich ONLY items whose cached text/bounds went stale
  *   --concurrency=N      parallel OpenRouter calls (default 5)
  *   --commit-every=N     git commit+push every N enriched (default 0 = off)
  *   --no-push            commit without push
@@ -20,6 +21,7 @@ import { spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Pericope, RawPericope } from '../src/lib/types.ts'
+import { montarPericope, cacheDesatualizado } from './montar-catalogo.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const rawPath = join(root, 'data/raw-pericopes.jsonl')
@@ -420,21 +422,10 @@ type Usage = {
 
 function merge(raw: RawPericope, ai: AiPartial): Pericope {
   const prev = readCached(raw.ordem)
-  return {
-    ordem: raw.ordem,
-    livro: raw.livro,
-    abbrev: raw.abbrev,
-    capitulo_inicio: raw.capitulo_inicio,
-    versiculo_inicio: raw.versiculo_inicio,
-    capitulo_fim: raw.capitulo_fim,
-    versiculo_fim: raw.versiculo_fim,
-    titulo_pericope_pt: ai.titulo_pericope_pt,
-    texto_naa: raw.texto_naa,
-    contexto_historico_literario: ai.contexto_historico_literario,
-    resenha: ai.resenha,
-    perguntas_reflexao: ai.perguntas_reflexao,
+  return montarPericope(raw, {
+    ...ai,
     ...(prev?.topicos_pregar ? { topicos_pregar: prev.topicos_pregar } : {}),
-  }
+  })
 }
 
 const STUB_PATTERNS = [
@@ -467,11 +458,13 @@ function readCached(ordem: number): Pericope | null {
   return cached
 }
 
-function needsEnrich(raw: RawPericope, force: boolean): boolean {
-  if (force) return true
+function needsEnrich(raw: RawPericope, force: boolean, soDesatualizados = false): boolean {
   const cached = readCached(raw.ordem)
+  if (soDesatualizados) return cacheDesatualizado(raw, cached)
+  if (force) return true
   if (!cached) return true
-  return isStub(cached)
+  // Material escrito sobre um texto que mudou depois vale tão pouco quanto stub.
+  return isStub(cached) || cacheDesatualizado(raw, cached)
 }
 
 function refLabel(raw: RawPericope) {
@@ -508,6 +501,7 @@ function parseArgs(argv: string[]) {
     livro: '' as string,
     limit: Infinity,
     force: false,
+    soDesatualizados: false,
     concurrency: 5,
     commitEvery: 0,
     noPush: false,
@@ -517,6 +511,7 @@ function parseArgs(argv: string[]) {
     if (a === '--openrouter' || a === '--openai') opts.mode = 'openrouter'
     if (a === '--local') opts.mode = 'local'
     if (a === '--force') opts.force = true
+    if (a === '--desatualizados') opts.soDesatualizados = true
     if (a === '--no-push') opts.noPush = true
     if (a === '--skip-git') opts.skipGit = true
     if (a.startsWith('--livro=')) opts.livro = a.slice('--livro='.length)
@@ -533,7 +528,7 @@ function assembleCatalog(allRaw: RawPericope[]): Pericope[] {
   const catalog: Pericope[] = []
   for (const raw of allRaw) {
     const cached = readCached(raw.ordem)
-    catalog.push(cached ?? merge(raw, localEnrich(raw)))
+    catalog.push(cached ? montarPericope(raw, cached) : merge(raw, localEnrich(raw)))
   }
   catalog.sort((a, b) => a.ordem - b.ordem)
   writeFileSync(outPath, JSON.stringify(catalog))
@@ -603,7 +598,7 @@ async function main() {
 
   const rawLines = readFileSync(rawPath, 'utf8').trim().split('\n')
   const allRaw = rawLines.map((l) => JSON.parse(l) as RawPericope)
-  let candidates = allRaw.filter((r) => needsEnrich(r, opts.force))
+  let candidates = allRaw.filter((r) => needsEnrich(r, opts.force, opts.soDesatualizados))
   if (opts.livro) candidates = candidates.filter((r) => r.livro === opts.livro)
   if (Number.isFinite(opts.limit)) candidates = candidates.slice(0, opts.limit)
 

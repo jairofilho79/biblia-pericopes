@@ -755,19 +755,25 @@ button.ghost {
 }
 
 /* barra de âncoras: sticky abaixo do header, e colada no topo quando ele some.
-   z-index 4 fica abaixo do .top (5) e da .verse-actions (8) de propósito. */
+   z-index 4 fica abaixo do .top (5) e da .verse-actions (8) de propósito.
+
+   Fundo OPACO, não translúcido: com 82% + blur(6px) o texto que passava por
+   baixo aparecia borrado na faixa de padding acima do pill, e a barra parecia
+   descolada do header — o vão aparente era texto vazando, não espaço.
+
+   Sem `transition: top`: o offset vem de --top-h, medido em JS, e o header
+   anima um `transform` em paralelo. Animar os dois separadamente deixa a barra,
+   durante 250ms, num offset que não corresponde a estado nenhum. Quando o
+   header desliza, o certo é a barra saltar. */
 .section-chips {
   position: sticky;
   top: var(--top-h, 0px);
   z-index: 4;
   margin: 0 -1.05rem 0.9rem;
   padding: 0.3rem 1.05rem;
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: var(--paper);
   border-bottom: 1px solid var(--line);
   font-family: var(--font-ui);
-  transition: top 0.25s ease;
 }
 
 /* Clique num chip ou `?v=` na URL rolam até a seção via âncora nativa: sem
@@ -932,12 +938,6 @@ button.ghost {
   .section-chip-texto {
     white-space: normal;
     text-align: center;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .section-chips {
-    transition: none;
   }
 }
 

@@ -1864,6 +1864,16 @@ vi.mock('../lib/content', async (original) => {
 })
 
 import Explorar from './Explorar'
+import { notificarSync } from '../lib/sync-event'
+
+// Os dois últimos testes mexem no tempo (debounce de 300 ms da busca no texto).
+// Sem timers falsos eles ficariam lentos e instáveis.
+beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+})
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 let host: HTMLDivElement
 let root: Root
@@ -1921,6 +1931,33 @@ describe('Explorar', () => {
     await montar('/explorar?f=lidos')
     const rotulos = [...host.querySelectorAll('.book-progress-label')].map((n) => n.textContent)
     expect(rotulos.filter((r) => r === '1')).toHaveLength(1)
+  })
+
+  // Os dois casos abaixo travam decisões que custaram uma rodada de revisão
+  // cada. Sem eles, uma regressão nos dois passa despercebida.
+
+  it('livro aberto e busca são estados exclusivos: com os dois na URL, a busca vence', async () => {
+    // O bug era chegar em ?livro=X&q=algo e a caixa de busca ficar MUDA: o
+    // render é `livro ? <LivroAberto/> : …`, então nenhuma seção aparecia.
+    await montar('/explorar?livro=Jo%C3%A3o&q=amor')
+    expect(host.querySelector('.ref-sticky')).toBeNull()
+    expect(host.querySelectorAll('.secao-resultado').length).toBeGreaterThan(0)
+  })
+
+  it('sync de outro aparelho não reinicia a busca no texto', async () => {
+    // `statusPorOrdem` devolve sempre um Map novo; sem `mesmosStatus` essa
+    // identidade chegava às dependências do efeito de busca e toda sincronização
+    // derrubava a busca em voo, com novo debounce e novo "Buscando…".
+    await montar('/explorar?q=amor%20de%20Deus')
+    await act(async () => {
+      vi.advanceTimersByTime(400)
+    })
+    const antes = searchTexto.mock.calls.length
+    await act(async () => {
+      notificarSync()
+      vi.advanceTimersByTime(400)
+    })
+    expect(searchTexto.mock.calls.length).toBe(antes)
   })
 })
 ```

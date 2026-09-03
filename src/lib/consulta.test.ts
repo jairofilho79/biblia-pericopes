@@ -50,14 +50,21 @@ describe('parseConsulta — a colisão jo/jó', () => {
     expect(parseConsulta('jó 3:16').ref?.livro.name).toBe('Jó')
   })
 
-  it('"jo" sozinho não é referência e lista os cinco livros que começam com jo', () => {
+  it('"jo" sozinho não é referência e lista os oito livros que contêm "jo"', () => {
     const c = parseConsulta('jo')
     expect(c.ref).toBeNull()
-    expect(c.livros.map((b) => b.name)).toEqual(['Josué', 'Jó', 'Joel', 'Jonas', 'João'])
+    expect(c.livros.map((b) => b.name)).toEqual([
+      'Josué', 'Jó', 'Joel', 'Jonas', 'João', '1 João', '2 João', '3 João',
+    ])
   })
 
   it('fronteira de palavra: "josue 3" é Josué, não João seguido de "sue 3"', () => {
     expect(parseConsulta('josue 3').ref?.livro.name).toBe('Josué')
+  })
+
+  it('empate jo/Jó: abbrev de João vence o nome de Jó', () => {
+    expect(parseConsulta('jo 1').ref?.livro.name).toBe('João')
+    expect(parseConsulta('jó 1').ref?.livro.name).toBe('Jó')
   })
 })
 

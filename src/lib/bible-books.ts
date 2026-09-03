@@ -1752,7 +1752,7 @@ export function filterBooks(q: string): BibleBook[] {
   const needle = normalizarNome(q.trim())
   if (!needle) return BIBLE_BOOKS
   return BIBLE_BOOKS.filter(
-    (b) => normalizarNome(b.name).startsWith(needle) || normalizarNome(b.abbrev).startsWith(needle),
+    (b) => normalizarNome(b.name).includes(needle) || normalizarNome(b.abbrev).includes(needle),
   )
 }
 

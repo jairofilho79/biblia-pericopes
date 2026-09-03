@@ -76,13 +76,14 @@ export function parseConsulta(entrada: string): Consulta {
     for (let i = 0; i < tentativas.length; i++) {
       const [alvo, alias] = tentativas[i]
       if (!casaPrefixo(alvo, alias)) continue
-      if (
+      const melhorQue =
         !melhor ||
-        i > melhor.tentativa ||
-        (i === melhor.tentativa && alias.length > melhor.comprimento)
-      ) {
-        melhor = { livro, comprimento: alias.length, tentativa: i }
-      }
+        alias.length > melhor.comprimento ||
+        // Empate real: "jo 3" casa Jó pelo NOME e João pelo ABBREV, ambos com 2
+        // caracteres. Sem esta desempate a ordem canônica devolveria Jó, e "Jo"
+        // é a abreviação padrão de João na NAA.
+        (alias.length === melhor.comprimento && i > melhor.tentativa)
+      if (melhorQue) melhor = { livro, comprimento: alias.length, tentativa: i }
     }
   }
   if (!melhor) return semRef

@@ -514,6 +514,66 @@ h2 {
   }
 }
 
+/* "Vale reler": abaixo do conteúdo principal, ausente do DOM quando vazio —
+   lugar que se visita, nunca alarme. ★ é o pin manual, ● é o decay de 1 ano. */
+.vale-reler {
+  margin-top: 2rem;
+}
+
+.vale-reler h2 {
+  margin-bottom: 0.5rem;
+}
+
+.vale-reler ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vale-reler li a {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  min-height: 3rem;
+}
+
+.vale-reler li a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.vale-reler li a > span:first-child {
+  flex: 0 0 1.1rem;
+  color: var(--accent);
+  line-height: 1.4;
+}
+
+.vale-reler-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.vale-reler-texto strong {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.vale-reler-texto span {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.vale-reler .linkish {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+}
+
 .peri-row {
   display: flex;
   gap: 0.55rem;
@@ -1954,6 +2014,31 @@ button.ghost {
   }
 }
 
+.desmarcar {
+  display: block;
+  margin: 0.75rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.reler {
+  display: block;
+  margin: 0.5rem auto 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.reler[aria-pressed='true'] {
+  color: var(--accent);
+}
+
+.historico-leitura {
+  margin: 0.5rem auto 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 .badge {
   font-family: var(--font-ui);
   background: var(--accent-soft);
@@ -2633,4 +2718,70 @@ fieldset.jornada-campo {
   font-family: var(--font-ui);
   font-size: 0.9rem;
   color: var(--ink);
+}
+
+.ajustes-livro {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+.ajustes-livro select {
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.ajustes-alvos {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+}
+
+.ajustes-alvos li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.ajustes-rotulo {
+  flex: 1;
+}
+
+.ajustes-contagem {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-family: var(--font-ui);
+}
+
+.ajustes-confirma {
+  margin-top: 1.25rem;
+  padding: 1.1rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+}
+
+.ajustes-confirma-acoes {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.85rem;
+}
+
+.ajustes-aviso {
+  margin: 1rem 0 0;
+  min-height: 1.1rem;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+  color: var(--muted);
 }

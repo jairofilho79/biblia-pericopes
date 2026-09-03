@@ -202,7 +202,7 @@ describe('paginarPull — com jornadas', () => {
 describe('parseSyncPush', () => {
   it('aceita payload válido', () => {
     expect(parseSyncPush({ progresso: [prog], anotacoes: [nota] })).toEqual({
-      progresso: [prog],
+      progresso: [{ ...prog, historico: [], paraReler: false }],
       anotacoes: [nota],
       destaques: [],
       posicoes: [],
@@ -238,7 +238,7 @@ describe('parseSyncPush', () => {
     expect(
       parseSyncPush({ progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z' }] }),
     ).toEqual({
-      progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z' }],
+      progresso: [{ ...prog, atualizadoEm: '2026-08-31T10:00:00.000Z', historico: [], paraReler: false }],
       anotacoes: [],
       destaques: [],
       posicoes: [],
@@ -320,7 +320,7 @@ describe('parseSyncPush — pericopeOrdem', () => {
   })
   it('aceita 0 — é a ordem da primeira perícope de Gênesis', () => {
     expect(parseSyncPush({ progresso: [{ ...prog, pericopeOrdem: 0 }] })?.progresso).toEqual([
-      { ...prog, pericopeOrdem: 0 },
+      { ...prog, pericopeOrdem: 0, historico: [], paraReler: false },
     ])
   })
 })
@@ -666,5 +666,38 @@ describe('paginarPull — ida e volta sobre o conjunto inteiro', () => {
     }
     const entregues = pullCompleto(banco, 100)
     expect(entregues).toEqual(banco)
+  })
+})
+
+describe('validProgresso: historico e paraReler', () => {
+  const base = { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-08-31T10:00:00.000Z' }
+
+  it('aceita o corpo ANTIGO, sem os campos novos', () => {
+    // Um service worker em cache continua sincronizando.
+    expect(parseSyncPush({ progresso: [base] })?.progresso).toHaveLength(1)
+  })
+
+  it('aceita historico e paraReler válidos', () => {
+    const r = parseSyncPush({
+      progresso: [{ ...base, historico: ['2026-08-31T10:00:00.000Z'], paraReler: true }],
+    })
+    expect(r?.progresso[0].historico).toEqual(['2026-08-31T10:00:00.000Z'])
+    expect(r?.progresso[0].paraReler).toBe(true)
+  })
+
+  it('rejeita data não canônica no histórico', () => {
+    expect(parseSyncPush({ progresso: [{ ...base, historico: ['2026-08-31'] }] })).toBeNull()
+  })
+
+  it('rejeita histórico acima do teto', () => {
+    const grande = Array.from({ length: 51 }, (_, i) =>
+      new Date(Date.UTC(2020, 0, 1 + i)).toISOString(),
+    )
+    expect(parseSyncPush({ progresso: [{ ...base, historico: grande }] })).toBeNull()
+  })
+
+  it('rejeita histórico que não é array e paraReler que não é boolean', () => {
+    expect(parseSyncPush({ progresso: [{ ...base, historico: 'x' }] })).toBeNull()
+    expect(parseSyncPush({ progresso: [{ ...base, paraReler: 1 }] })).toBeNull()
   })
 })

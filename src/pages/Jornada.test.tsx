@@ -329,8 +329,8 @@ describe('Jornada — avisos do passo 2', () => {
 
   it('modo Continuar com o escopo já todo lido: avisa, e o aviso some ao trocar para Reler', async () => {
     listAllProgresso.mockResolvedValue([
-      { pericopeOrdem: 0, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
-      { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 0, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 1, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' },
     ])
     montar()
     await assentar()
@@ -350,7 +350,7 @@ describe('Jornada — avisos do passo 2', () => {
 
   it('escopo parcialmente lido: sem aviso', async () => {
     listAllProgresso.mockResolvedValue([
-      { pericopeOrdem: 0, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 0, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' },
     ])
     montar()
     await assentar()
@@ -366,7 +366,7 @@ describe('Jornada — avisos do passo 2', () => {
 describe('Jornada — logado, com jornada corrente', () => {
   it('mostra nome, progresso e barra', async () => {
     getJornadaCorrente.mockResolvedValue(jornada({ nome: 'Minha jornada' }))
-    listAllProgresso.mockResolvedValue([{ pericopeOrdem: 0, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' }])
+    listAllProgresso.mockResolvedValue([{ pericopeOrdem: 0, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' }])
     montar()
     await assentar()
     expect(host.textContent).toContain('Minha jornada')
@@ -432,8 +432,8 @@ describe('Jornada — logado, com jornada corrente', () => {
     // jornada quando é a única tela visitada.
     getJornadaCorrente.mockResolvedValue(jornada({ id: 'j9' }))
     listAllProgresso.mockResolvedValue([
-      { pericopeOrdem: 0, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
-      { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 0, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' },
+      { pericopeOrdem: 1, status: 'concluido', historico: ['2026-02-01T00:00:00.000Z'], paraReler: false, atualizadoEm: '2026-02-01T00:00:00.000Z' },
     ])
     montar()
     await assentar()

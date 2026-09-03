@@ -12,6 +12,7 @@ import {
   type ProgressoJornada,
   type Track,
 } from '../lib/jornadas'
+import { candidatosReler, type CandidatoReler } from '../lib/releitura'
 import { testamentLabel } from '../lib/testament'
 import type { Jornada, PericopeIndex } from '../lib/types'
 import { computeStreak, diasComConclusao, type Streak } from '../lib/streak'
@@ -28,10 +29,15 @@ type Estado =
     }
   | { tipo: 'trilhas'; tracks: Track[] }
 
+// CandidatoReler não traz título nem referência — só o índice tem isso.
+type ItemReler = CandidatoReler & { titulo: string; ref: string }
+
 export default function Home() {
   const [estado, setEstado] = useState<Estado | null>(null)
   const [err, setErr] = useState('')
   const [streak, setStreak] = useState<Streak>({ atual: 0, recorde: 0 })
+  const [candidatos, setCandidatos] = useState<ItemReler[]>([])
+  const [todos, setTodos] = useState(false)
   const { data: session } = authClient.useSession()
 
   // Uma função só para as duas entradas: a montagem e o aviso de sync. O
@@ -76,6 +82,17 @@ export default function Home() {
       // Deriva do progresso que já sincroniza entre aparelhos — nenhuma
       // entidade nova, e o streak segue o usuário para o celular novo.
       setStreak(computeStreak(diasComConclusao([...progressos.values()]), new Date()))
+      // Reaproveita o Map já carregado acima: candidatosReler pede um array de
+      // Progresso, e varrer o store de novo faria a Home ler o mesmo dado duas
+      // vezes e ainda arriscar dois instantes diferentes na mesma tela.
+      const porOrdem = new Map(all.map((p) => [p.ordem, p]))
+      setCandidatos(
+        candidatosReler([...progressos.values()], new Date()).flatMap((c) => {
+          const meta = porOrdem.get(c.ordem)
+          // Perícope que saiu do catálogo não vira linha órfã na Home.
+          return meta ? [{ ...c, titulo: meta.titulo_pericope_pt, ref: refLabel(meta) }] : []
+        }),
+      )
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Erro')
     }
@@ -182,10 +199,36 @@ export default function Home() {
           </p>
         </>
       )}
-      {/* A fase de releitura/esquecimento monta aqui o bloco "Vale reler" (top 3
-          + "ver todas"), oculto quando vazio. Abaixo e não acima porque a Home
-          responde primeiro "para onde eu vou agora" — releitura é oferta, não
-          instrução. Combinado com a sessão biblia-pericopes-a4 em 2026-09-03. */}
+      {/* "Vale reler": abaixo e não acima porque a Home responde primeiro "para
+          onde eu vou agora" — releitura é oferta, não instrução. Fica fora do
+          ternário de propósito: vale nos dois modos, jornada e trilhas.
+          Posição combinada entre as sessões de jornadas e releitura. */}
+      {candidatos.length > 0 && (
+        <section className="vale-reler">
+          <h2>Vale reler</h2>
+          <ul>
+            {(todos ? candidatos : candidatos.slice(0, 3)).map((c) => (
+              <li key={c.ordem}>
+                <Link to={`/leitura/${c.ordem}`}>
+                  <span aria-hidden>{c.paraReler ? '★' : '●'}</span>
+                  <span className="vale-reler-texto">
+                    <strong>{c.titulo}</strong>
+                    <span>
+                      {c.ref} · {c.vezes === 1 ? 'lida 1×' : `lida ${c.vezes}×`}
+                      {c.paraReler ? ' · marcada' : ` · há ${Math.floor(c.dias / 30)} meses`}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {!todos && candidatos.length > 3 && (
+            <button type="button" className="linkish" onClick={() => setTodos(true)}>
+              ver todas ({candidatos.length})
+            </button>
+          )}
+        </section>
+      )}
     </section>
   )
 }

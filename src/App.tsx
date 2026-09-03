@@ -6,6 +6,7 @@ import Jornada from './pages/Jornada'
 import Indice from './pages/Indice'
 import Pesquisar from './pages/Pesquisar'
 import Entrar from './pages/Entrar'
+import Ajustes from './pages/Ajustes'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
 import { getStoredTheme, resolveTheme } from './lib/theme'
 import { authClient } from './lib/auth-client'
@@ -78,6 +79,11 @@ function Shell() {
           <NavLink to="/jornada">Jornada</NavLink>
           <NavLink to="/indice">Índice</NavLink>
           <NavLink to="/pesquisar">Pesquisar</NavLink>
+          {/* Fora do bloco de sessão: reset é local (IndexedDB) e funciona sem
+              conta — deslogado, o progresso local É o progresso. Quando o
+              menu de Perfil chegar (sessão de jornadas), esta entrada muda de
+              lugar para dentro dele. */}
+          <NavLink to="/ajustes">Ajustes</NavLink>
           {session ? (
             <span className="nav-conta-wrap">
               <button
@@ -113,6 +119,7 @@ function Shell() {
           <Route path="/indice" element={<Indice />} />
           <Route path="/pesquisar" element={<Pesquisar />} />
           <Route path="/entrar" element={<Entrar />} />
+          <Route path="/ajustes" element={<Ajustes />} />
         </Routes>
       </main>
     </div>

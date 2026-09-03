@@ -33,7 +33,13 @@ let running = false
  */
 export const MAX_PAGINAS_PULL = 500
 
-type PushProgresso = { pericopeOrdem: number; status: string; atualizadoEm: string }
+type PushProgresso = {
+  pericopeOrdem: number
+  status: string
+  historico: string[]
+  paraReler: boolean
+  atualizadoEm: string
+}
 type PushAnotacao = {
   id: string
   pericopeOrdem: number
@@ -73,6 +79,11 @@ function toPush(items: OutboxItem[]) {
       progresso.set(item.ordem, {
         pericopeOrdem: item.ordem,
         status: item.status,
+        // Item enfileirado por uma versão anterior do app não tem os campos.
+        // `[]` é neutro na união do servidor e `false` é seguro: `paraReler`
+        // não existia quando aquele item foi gravado.
+        historico: item.historico ?? [],
+        paraReler: item.paraReler ?? false,
         atualizadoEm: item.atualizadoEm,
       })
     } else if (item.kind === 'anotacao') {

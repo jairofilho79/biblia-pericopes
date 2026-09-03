@@ -34,7 +34,9 @@ import { useKeyboardNav } from '../lib/use-keyboard-nav'
 import { getReadingPrefs, type ReadingPrefs } from '../lib/reading-prefs'
 import {
   clearPosicao,
+  concluirProgresso,
   deleteAnotacao,
+  desmarcarProgresso,
   destaqueId,
   enqueuePosicao,
   getPosicao,
@@ -44,6 +46,7 @@ import {
   removeDestaque,
   saveAnotacao,
   setDestaque,
+  setParaReler,
   setPosicaoLocal,
   setProgresso,
 } from '../lib/user-db'
@@ -53,7 +56,7 @@ import { testamentLabel, testamentOf } from '../lib/testament'
 import { promptConversa } from '../lib/contexto-ia'
 import { getContextoAberto, setContextoAberto } from '../lib/contexto-collapse'
 import { inserirNoCursor, substituirTrecho } from '../lib/ditado'
-import type { Anotacao, DestaqueCor, Pericope, ProgressoStatus } from '../lib/types'
+import type { Anotacao, DestaqueCor, Pericope, Progresso, ProgressoStatus } from '../lib/types'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
 type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
@@ -136,6 +139,7 @@ export default function Leitura() {
   const [prev, setPrev] = useState<Vizinha | null>(null)
   const [next, setNext] = useState<Vizinha | null>(null)
   const [status, setStatus] = useState<ProgressoStatus>('nao_iniciado')
+  const [prog, setProg] = useState<Progresso | null>(null)
   const [notes, setNotes] = useState<Anotacao[]>([])
   const [draft, setDraft] = useState('')
   const [err, setErr] = useState('')
@@ -220,9 +224,10 @@ export default function Leitura() {
   }
 
   // Refresh estreito para o aviso de sync: mexe só no que vem do sync
-  // (destaques, notas e status) e não encosta em rascunho, seleção nem barra
-  // de ações. O efeito grande de troca de perícope reseta tudo isso — usá-lo
-  // aqui apagaria a anotação que o usuário está digitando neste instante.
+  // (destaques, notas, status, pin e histórico) e não encosta em rascunho,
+  // seleção nem barra de ações. O efeito grande de troca de perícope reseta
+  // tudo isso — usá-lo aqui apagaria a anotação que o usuário está digitando
+  // neste instante.
   useSyncRefresh(() => {
     void (async () => {
       try {
@@ -231,6 +236,9 @@ export default function Leitura() {
         // O IndexedDB já é a palavra final: o LWW resolveu quem ganhou antes
         // de o aviso sair.
         const prog = await getProgresso(ordem)
+        setProg(prog ?? null)
+        // status deriva do mesmo `prog` lido acima — badge e pin não podem
+        // discordar sobre a mesma linha.
         const proximo = prog?.status ?? 'em_andamento'
         setStatus(proximo === 'nao_iniciado' ? 'em_andamento' : proximo)
         doneRef.current = proximo === 'concluido'
@@ -280,6 +288,7 @@ export default function Leitura() {
         const hl = await listDestaques(ordem)
         setDestaques(new Map(hl.map((d) => [d.verseId, d.cor])))
         const prog = await getProgresso(ordem)
+        setProg(prog ?? null)
         const next = prog?.status ?? 'em_andamento'
         setStatus(next === 'nao_iniciado' ? 'em_andamento' : next)
         if (prog?.status === 'concluido') doneRef.current = true
@@ -626,12 +635,27 @@ export default function Leitura() {
   }
 
   async function markDone() {
-    await setProgresso(ordem, 'concluido')
+    await concluirProgresso(ordem)
     // Concluiu: o checkpoint morre (com lápide — sem ela o pull ressuscitaria)
     // e a próxima abertura começa do topo, como sempre foi.
     await clearPosicao(ordem)
     doneRef.current = true
     setStatus('concluido')
+    setProg((await getProgresso(ordem)) ?? null)
+  }
+
+  async function desmarcar() {
+    await desmarcarProgresso(ordem)
+    doneRef.current = false
+    setStatus('em_andamento')
+    setProg((await getProgresso(ordem)) ?? null)
+  }
+
+  // Pin não-destrutivo: liga/desliga sem tocar em status nem histórico —
+  // ao contrário de desmarcar, a jornada não regride.
+  async function alternarReler() {
+    await setParaReler(ordem, !prog?.paraReler)
+    setProg((await getProgresso(ordem)) ?? null)
   }
 
   function selectVerse(id: string) {
@@ -1117,15 +1141,43 @@ export default function Leitura() {
             <button type="button" className="cta" onClick={markDone}>
               Marcar como concluída
             </button>
-          ) : next ? (
-            <Link className="done-card" to={`/leitura/${next.ordem}`}>
-              <span className="badge">Concluída ✓</span>
-              <span className="done-next">
-                Próxima: <strong>{next.titulo}</strong> →
-              </span>
-            </Link>
           ) : (
-            <p className="badge">Concluída ✓</p>
+            <>
+              {next ? (
+                <Link className="done-card" to={`/leitura/${next.ordem}`}>
+                  <span className="badge">Concluída ✓</span>
+                  <span className="done-next">
+                    Próxima: <strong>{next.titulo}</strong> →
+                  </span>
+                </Link>
+              ) : (
+                <p className="badge">Concluída ✓</p>
+              )}
+              {/* Sem confirmação: é UMA perícope, e remarcar é um toque. O
+                  cartão "Próxima →" continua sendo a ação primária. */}
+              <button type="button" className="linkish desmarcar" onClick={() => void desmarcar()}>
+                Desmarcar como concluída
+              </button>
+              <button
+                type="button"
+                className="linkish reler"
+                aria-pressed={prog?.paraReler ?? false}
+                onClick={() => void alternarReler()}
+              >
+                {prog?.paraReler ? '★ Marcada para reler' : '☆ Marcar para reler'}
+              </button>
+              {prog && prog.historico.length > 0 && (
+                <p className="historico-leitura">
+                  {prog.historico.length === 1 ? 'lida 1×' : `lida ${prog.historico.length}×`} ·{' '}
+                  {prog.historico
+                    .slice(0, 3)
+                    .map((d) =>
+                      new Date(d).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+                    )
+                    .join(' · ')}
+                </p>
+              )}
+            </>
           )}
         </div>
         <nav className="pager" aria-label="Navegação entre perícopes">

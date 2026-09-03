@@ -1,7 +1,13 @@
 import { Hono } from 'hono'
 import { cabecalhoContentRange, chaveAudio } from './audio'
 import { createAuth } from './auth'
-import { TAMANHO_PAGINA_PULL, corpoExcedeLimite, paginarPull, parseSyncPush } from './sync-logic'
+import {
+  TAMANHO_PAGINA_PULL,
+  UPSERT_PROGRESSO,
+  corpoExcedeLimite,
+  paginarPull,
+  parseSyncPush,
+} from './sync-logic'
 import {
   MAX_BYTES,
   MODELO,
@@ -46,11 +52,29 @@ function despirServerEm<T extends { serverEm: string }>(linha: T): Omit<T, 'serv
   return resto
 }
 
+/**
+ * D1 devolve `historico` como TEXT e `para_reler` como 0/1. O cliente espera
+ * `string[]` e `boolean` — a conversão é aqui, não lá, para o formato do
+ * protocolo ser o mesmo do tipo `Progresso`.
+ */
+function hidratarProgresso<T extends { historico: unknown; paraReler: unknown }>(linha: T) {
+  let historico: string[] = []
+  try {
+    const bruto: unknown = JSON.parse(String(linha.historico ?? '[]'))
+    if (Array.isArray(bruto)) historico = bruto.filter((d): d is string => typeof d === 'string')
+  } catch {
+    // Linha corrompida vira histórico vazio em vez de derrubar o pull inteiro.
+  }
+  return { ...linha, historico, paraReler: Boolean(linha.paraReler) }
+}
+
 // Linhas como saem do SELECT (camelCase pelos AS). `serverEm` é interno: sai
 // da linha em despirServerEm antes de virar JSON.
 type LinhaProgresso = {
   pericopeOrdem: number
   status: string
+  historico: unknown
+  paraReler: unknown
   atualizadoEm: string
   serverEm: string
 }
@@ -102,8 +126,8 @@ type LinhaJornada = {
 // since`, com LIMIT) e o fechamento de grupo (`server_em = cursor`, sem
 // LIMIT). Ficam juntas de propósito — a lista de colunas tem que ser a mesma
 // nas duas, senão o fechamento devolveria linhas com formato diferente.
-const SELECT_PROGRESSO = `SELECT pericope_ordem AS pericopeOrdem, status, atualizado_em AS atualizadoEm,
-          server_em AS serverEm
+const SELECT_PROGRESSO = `SELECT pericope_ordem AS pericopeOrdem, status, historico,
+          para_reler AS paraReler, atualizado_em AS atualizadoEm, server_em AS serverEm
    FROM progresso WHERE user_id = ?1`
 const SELECT_ANOTACOES = `SELECT id, pericope_ordem AS pericopeOrdem, texto, verse_ref AS verseRef,
           criado_em AS criadoEm, atualizado_em AS atualizadoEm, apagado_em AS apagadoEm,
@@ -223,7 +247,7 @@ app.get('/api/sync', async (c) => {
   }
 
   return c.json({
-    progresso: progresso.map(despirServerEm),
+    progresso: progresso.map((l) => despirServerEm(hidratarProgresso(l))),
     anotacoes: anotacoes.map(despirServerEm),
     destaques: destaques.map(despirServerEm),
     posicoes: posicoes.map(despirServerEm),
@@ -259,14 +283,15 @@ app.post('/api/sync', async (c) => {
   const serverEm = new Date().toISOString()
   const stmts = [
     ...parsed.progresso.map((p) =>
-      c.env.DB.prepare(
-        `INSERT INTO progresso (user_id, pericope_ordem, status, atualizado_em, server_em)
-         VALUES (?1, ?2, ?3, ?4, ?5)
-         ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
-           status = excluded.status, atualizado_em = excluded.atualizado_em,
-           server_em = excluded.server_em
-         WHERE excluded.atualizado_em > progresso.atualizado_em`,
-      ).bind(userId, p.pericopeOrdem, p.status, p.atualizadoEm, serverEm),
+      c.env.DB.prepare(UPSERT_PROGRESSO).bind(
+        userId,
+        p.pericopeOrdem,
+        p.status,
+        JSON.stringify(p.historico),
+        p.paraReler ? 1 : 0,
+        p.atualizadoEm,
+        serverEm,
+      ),
     ),
     ...parsed.anotacoes.map((a) =>
       c.env.DB.prepare(

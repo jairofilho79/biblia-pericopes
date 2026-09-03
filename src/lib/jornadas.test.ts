@@ -61,7 +61,10 @@ function jornada(over: Partial<Jornada> = {}): Jornada {
 }
 
 function concluida(ordem: number, quando: string): [number, Progresso] {
-  return [ordem, { pericopeOrdem: ordem, status: 'concluido', atualizadoEm: quando }]
+  return [
+    ordem,
+    { pericopeOrdem: ordem, status: 'concluido', historico: [quando], paraReler: false, atualizadoEm: quando },
+  ]
 }
 
 describe('rotaDaJornada', () => {
@@ -384,7 +387,10 @@ const INDICE_TRILHAS: PericopeIndex[] = [
 ]
 
 function concluidaTrilha(ordem: number, quando: string): [number, Progresso] {
-  return [ordem, { pericopeOrdem: ordem, status: 'concluido', atualizadoEm: quando }]
+  return [
+    ordem,
+    { pericopeOrdem: ordem, status: 'concluido', historico: [quando], paraReler: false, atualizadoEm: quando },
+  ]
 }
 
 function posicaoTrilha(ordem: number, ref: string, quando: string): [number, PosicaoLeitura] {

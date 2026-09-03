@@ -2,6 +2,8 @@ export type PushProgresso = {
   pericopeOrdem: number
   status: 'nao_iniciado' | 'em_andamento' | 'concluido'
   atualizadoEm: string
+  historico: string[]
+  paraReler: boolean
 }
 
 export type PushAnotacao = {
@@ -71,6 +73,49 @@ const MAX_TEMPO_S = 86_400
 // MAX_ITENS vale para as cinco listas (progresso/anotacoes/destaques/posicoes/jornadas).
 const MAX_ITENS = 500
 const MAX_TEXTO = 20_000
+// Cópia de MAX_HISTORICO em src/lib/sync-limits.ts.
+export const MAX_HISTORICO = 50
+
+/**
+ * Upsert de `progresso`, com duas políticas de merge simultâneas na mesma
+ * linha: `status`/`para_reler` seguem last-write-wins por `atualizado_em`
+ * (estado — vira nos dois sentidos); `historico` é um conjunto que só
+ * cresce, mesclado por UNIÃO e recalculado FORA da guarda do LWW.
+ *
+ * A união tem que escapar da guarda por causa deste cenário: aparelho A
+ * conclui uma perícope offline em T2; aparelho B desmarca em T3 > T2 e
+ * sincroniza primeiro; o lote de A chega depois e perde o LWW — se a união
+ * estivesse dentro do CASE, a conclusão de A seria descartada para sempre.
+ *
+ * O `WHERE` usa `EXISTS (... NOT IN ...)` e não `excluded.historico <>
+ * progresso.historico`: com `<>`, um cliente velho que sempre envia
+ * `historico: '[]'` faria a cláusula disparar toda vez que `progresso.historico`
+ * não é vazio — mesmo sem nada de novo para gravar —, avançando `server_em`
+ * a cada push e fazendo a linha ser reentregue em todo pull, para sempre.
+ * `EXISTS` com `json_each` sobre um array vazio não produz linha nenhuma,
+ * então fica `false` incondicionalmente quando não há nada novo em
+ * `excluded.historico`, e o `WHERE` cai só no LWW puro.
+ *
+ * Extraída para cá (em vez de inline em index.ts) para que o teste em
+ * upsert-progresso.test.ts rode o SQL de verdade, não uma cópia dele.
+ */
+export const UPSERT_PROGRESSO = `INSERT INTO progresso (user_id, pericope_ordem, status, historico, para_reler, atualizado_em, server_em)
+ VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+ ON CONFLICT(user_id, pericope_ordem) DO UPDATE SET
+   status     = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
+                     THEN excluded.status     ELSE progresso.status     END,
+   para_reler = CASE WHEN excluded.atualizado_em > progresso.atualizado_em
+                     THEN excluded.para_reler ELSE progresso.para_reler END,
+   atualizado_em = MAX(excluded.atualizado_em, progresso.atualizado_em),
+   historico = (SELECT json_group_array(d) FROM (
+                  SELECT value AS d FROM json_each(excluded.historico)
+                  UNION
+                  SELECT value AS d FROM json_each(progresso.historico)
+                  ORDER BY d DESC LIMIT ${MAX_HISTORICO})),
+   server_em = excluded.server_em
+ WHERE excluded.atualizado_em > progresso.atualizado_em
+    OR EXISTS (SELECT 1 FROM json_each(excluded.historico)
+               WHERE value NOT IN (SELECT value FROM json_each(progresso.historico)))`
 
 /**
  * Teto do corpo bruto do POST /api/sync, em bytes.
@@ -122,14 +167,22 @@ function isIso(v: unknown): v is string {
   return typeof v === 'string' && ISO_CANONICAL.test(v) && !Number.isNaN(Date.parse(v))
 }
 
-function validProgresso(v: unknown): v is PushProgresso {
+function validProgresso(v: unknown): v is Omit<PushProgresso, 'historico' | 'paraReler'> & {
+  historico?: unknown
+  paraReler?: unknown
+} {
   if (typeof v !== 'object' || v === null) return false
   const p = v as Record<string, unknown>
   return (
     isOrdem(p.pericopeOrdem) &&
     typeof p.status === 'string' &&
     STATUS.has(p.status) &&
-    isIso(p.atualizadoEm)
+    isIso(p.atualizadoEm) &&
+    // Ausentes = cliente ainda não atualizado, aceito (mesma tolerância que
+    // `destaques`/`posicoes` já têm em parseSyncPush).
+    (p.historico === undefined ||
+      (Array.isArray(p.historico) && p.historico.length <= MAX_HISTORICO && p.historico.every(isIso))) &&
+    (p.paraReler === undefined || typeof p.paraReler === 'boolean')
   )
 }
 
@@ -442,7 +495,11 @@ export function parseSyncPush(body: unknown): {
     return null
   }
   return {
-    progresso,
+    progresso: progresso.map((p) => ({
+      ...p,
+      historico: Array.isArray(p.historico) ? (p.historico as string[]) : [],
+      paraReler: p.paraReler === true,
+    })),
     anotacoes: anotacoes.map((a) => ({
       ...a,
       verseRef: typeof a.verseRef === 'string' ? a.verseRef : null,

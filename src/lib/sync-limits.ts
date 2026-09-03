@@ -19,3 +19,10 @@ export const MAX_TEXTO = 20_000
  * declarar a constante lá fecharia um ciclo de import com uma `const` no meio.
  */
 export const LIMITE_NOME = 120
+
+/**
+ * Máximo de conclusões guardadas por perícope. Da 51ª releitura em diante a
+ * mais antiga cai — mantém a linha limitada e o corpo do push previsível.
+ * worker/sync-logic.ts tem a cópia deste valor (ver o aviso no topo do arquivo).
+ */
+export const MAX_HISTORICO = 50

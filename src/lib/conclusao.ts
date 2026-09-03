@@ -18,7 +18,11 @@ import { getProgresso, listAllProgresso } from './user-db'
  */
 export function contaComoLida(p: Progresso | undefined, desde: string | null): boolean {
   if (!p || p.status !== 'concluido') return false
-  return desde === null || p.atualizadoEm >= desde
+  // historico[0] é a conclusão mais nova, logo o máximo: "existe conclusão
+  // >= desde" é exatamente `historico[0] >= desde`, e continua O(1).
+  const ultima = p.historico[0]
+  if (ultima === undefined) return false
+  return desde === null || ultima >= desde
 }
 
 export async function concluidaDesde(ordem: number, desde: string | null): Promise<boolean> {

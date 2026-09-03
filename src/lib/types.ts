@@ -29,6 +29,18 @@ export type ProgressoStatus = 'nao_iniciado' | 'em_andamento' | 'concluido'
 export type Progresso = {
   pericopeOrdem: number
   status: ProgressoStatus
+  /**
+   * Conclusões desta perícope, em ISO canônico, MAIS NOVA PRIMEIRO, no máximo
+   * MAX_HISTORICO. Nunca esvaziado: desmarcar e zerar mexem em `status` e
+   * `paraReler`, o fato de ter sido lida fica.
+   *
+   * `concluidoEm` e `vezes` não são campos — são `historico[0]` e
+   * `historico.length`.
+   */
+  historico: string[]
+  /** Pin manual "quero revisitar", independente do status. */
+  paraReler: boolean
+  /** Chave do LWW. */
   atualizadoEm: string
 }
 

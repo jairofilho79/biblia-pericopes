@@ -18,6 +18,7 @@ import {
   listPericopes,
   listPericopesByBookChapter,
   loadIndex,
+  mesmosStatus,
   progressoPorLivro,
   refLabel,
   statusPorOrdem,
@@ -51,7 +52,8 @@ function ehFiltro(v: string | null): v is FiltroLeitura {
 export default function Explorar() {
   const [params, setParams] = useSearchParams()
   const q = params.get('q') ?? ''
-  const filtro: FiltroLeitura = ehFiltro(params.get('f')) ? (params.get('f') as FiltroLeitura) : 'todos'
+  const f = params.get('f')
+  const filtro: FiltroLeitura = ehFiltro(f) ? f : 'todos'
   const livroParam = params.get('livro') ?? ''
   // `cap` sem `livro` é ignorado: um capítulo não significa nada sem o livro, e
   // uma URL montada à mão não pode deixar a tela num estado que ela não desenha.
@@ -72,7 +74,11 @@ export default function Explorar() {
   )
 
   async function carregarProgresso() {
-    setStatus(statusPorOrdem(await listAllProgresso()))
+    const proximo = statusPorOrdem(await listAllProgresso())
+    // Manter a mesma referência quando o conteúdo não mudou: `status` alimenta
+    // `aceita`, que é dependência do efeito de busca no texto — um Map novo a
+    // cada sync reiniciaria uma busca em voo sem necessidade.
+    setStatus((atual) => (mesmosStatus(atual, proximo) ? atual : proximo))
   }
 
   useEffect(() => {
@@ -108,13 +114,25 @@ export default function Explorar() {
 
   // Digitar navega com replace: teclar não pode entulhar o histórico.
   const setQ = (valor: string) =>
-    mexerNaUrl((p) => (valor ? p.set('q', valor) : p.delete('q')), true)
+    mexerNaUrl((p) => {
+      if (!valor) {
+        p.delete('q')
+        return
+      }
+      p.set('q', valor)
+      // Digitar fecha o livro aberto. Com `livro` na URL o render mostra o
+      // painel do livro e nenhuma seção de resultado — a caixa ficaria muda.
+      p.delete('livro')
+      p.delete('cap')
+    }, /* replace */ !livro)
   const setFiltro = (valor: FiltroLeitura) =>
     mexerNaUrl((p) => (valor === 'todos' ? p.delete('f') : p.set('f', valor)), false)
   const abrirLivro = (b: BibleBook) =>
     mexerNaUrl((p) => {
       p.set('livro', b.name)
       p.delete('cap')
+      // Simétrico ao setQ: abrir um livro fecha a busca.
+      p.delete('q')
     }, false)
   const fecharLivro = () =>
     mexerNaUrl((p) => {
@@ -157,7 +175,11 @@ export default function Explorar() {
         setRefMiss(achado ? '' : `Nenhuma perícope contém ${r.livro.name} ${r.cap}:${r.ver ?? 1}.`)
       })
       .catch(() => {
-        if (vivo) setRefMiss('Não foi possível resolver a referência.')
+        if (!vivo) return
+        // Sem isto, uma falha depois de um acerto anterior mostrava a
+        // perícope velha E a mensagem de erro juntas.
+        setRefHit(null)
+        setRefMiss('Não foi possível resolver a referência.')
       })
     return () => {
       vivo = false
@@ -172,9 +194,14 @@ export default function Explorar() {
       return
     }
     let vivo = true
-    void listPericopes({ q: consulta.termo }).then((r) => {
-      if (vivo) setTitulos(r)
-    })
+    void listPericopes({ q: consulta.termo })
+      .then((r) => {
+        if (vivo) setTitulos(r)
+      })
+      // `loadIndex` pode falhar (offline na primeira visita); o efeito de
+      // carregamento principal já mostra o erro na tela, então aqui só evita
+      // vazar uma rejeição não tratada no console.
+      .catch(() => {})
     return () => {
       vivo = false
     }
@@ -203,6 +230,10 @@ export default function Explorar() {
     setBuscando(true)
     setErroBusca(false)
     setPreparando(!indexPronto())
+    // Zera o progresso velho: sem isto, uma indexação que falhou no meio
+    // deixava "Preparando busca…" mostrando o valor anterior ("— 40 de 66
+    // livros") até o primeiro tique do intervalo abaixo.
+    setProgressoBusca({ feitos: 0, total: 0 })
     const termo = consulta.termo
     // Debounce de 300 ms: digitar não pode disparar uma varredura por tecla.
     const timer = window.setTimeout(() => {
@@ -246,9 +277,12 @@ export default function Explorar() {
       return
     }
     let vivo = true
-    void listPericopesByBookChapter(livro.abbrev, cap ?? undefined).then((r) => {
-      if (vivo) setDoLivro(r)
-    })
+    void listPericopesByBookChapter(livro.abbrev, cap ?? undefined)
+      .then((r) => {
+        if (vivo) setDoLivro(r)
+      })
+      // Mesmo motivo do efeito de Títulos: não vazar rejeição não tratada.
+      .catch(() => {})
     return () => {
       vivo = false
     }
@@ -260,6 +294,12 @@ export default function Explorar() {
   const itensTitulos: ItemPericope[] = useMemo(
     () => titulos.filter((p) => aceita(p.ordem)).map(itemDeIndice),
     [titulos, aceita],
+  )
+  const titulos50 = useMemo(
+    // Mesmo teto da busca no texto: sem ele, `q="a"` monta 2.600 links de uma
+    // vez, e a seção barata custaria mais que a cara.
+    () => fatiarResultado(itensTitulos, LIMITE_RESULTADOS),
+    [itensTitulos],
   )
   const itensTexto: ItemPericope[] = useMemo(
     () =>
@@ -374,12 +414,16 @@ export default function Explorar() {
             </section>
           )}
 
-          {itensTitulos.length > 0 && (
+          {titulos50.hits.length > 0 && (
             <section className="secao-resultado">
               <h2 className="secao-h">
-                Títulos <span className="secao-n">{itensTitulos.length}</span>
+                Títulos{' '}
+                <span className="secao-n">
+                  {titulos50.hits.length}
+                  {titulos50.truncado ? ' (primeiros)' : ''}
+                </span>
               </h2>
-              <ListaPericopes itens={itensTitulos} concluidas={concluidas} />
+              <ListaPericopes itens={titulos50.hits} concluidas={concluidas} />
             </section>
           )}
 

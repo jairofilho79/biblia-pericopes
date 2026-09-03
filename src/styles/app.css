@@ -20,10 +20,26 @@
   --hl-verde: #cfe9c8;
   --hl-azul: #cadff2;
   --hl-rosa: #f4d0dd;
-  /* candeia: a luz quente da narração. Âmbar escuro o bastante para AA em
-     texto normal sobre --paper (o .cap-label em fala é texto, não título grande). */
-  --candle: #9a6618;
-  --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
+  /* ── realce da narração ──
+     `--candle` é a cor do tema no realce: a barra na borda do trecho em
+     fala, a barra sob a palavra atual e a cor do título falado. Aqui é
+     `--accent`, a mesma do .cap-label.
+
+     `--candle-fundo` é o véu chapado atrás do trecho: pouco no escuro,
+     médio no sépia, um pouco mais aqui — papel quase branco precisa de um
+     pouco mais de véu para o trecho se destacar.
+
+     `--candle-luz` é a luz que sobe na palavra atual, e ela é BRANCA em todo
+     tema — luz é branca, não é da cor do móvel. Aqui isso tem um efeito
+     bonito de graça: como o véu escureceu o bloco, o branco traz a palavra
+     de volta para o branco do papel. A palavra não é pintada, é acesa.
+
+     A força muda por tema porque branco rende muito diferente conforme o
+     papel: sobre papel claro ele só desfaz o véu, sobre papel escuro ele
+     salta. */
+  --candle: var(--accent);
+  --candle-fundo: color-mix(in srgb, var(--candle) 15%, transparent);
+  --candle-luz-pct: 55%;
   /* gravando: o vermelho do microfone aberto. Um só tom para claro e sépia. */
   --rec: #c0392b;
   --radius: 12px;
@@ -62,10 +78,12 @@
   --hl-verde: #24452c;
   --hl-azul: #1f3c58;
   --hl-rosa: #4e2437;
-  /* no escuro a candeia é mais clara e o halo um pouco mais forte: luz
-     translúcida sobre papel escuro some antes do que sobre papel claro. */
-  --candle: #e8b45a;
-  --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
+  /* no escuro o véu CLAREIA em vez de escurecer — verde claro translúcido
+     sobre papel escuro — e por isso basta pouco: 8% já separa o trecho. */
+  --candle: var(--accent);
+  --candle-fundo: color-mix(in srgb, var(--candle) 8%, transparent);
+  /* no escuro o branco salta sozinho: menos é mais */
+  --candle-luz-pct: 22%;
   /* no escuro o vermelho sobe um tom, senão afunda no papel. */
   --rec: #e4655a;
   color-scheme: dark;
@@ -91,8 +109,11 @@
   --hl-verde: #cfdcb4;
   --hl-azul: #c7d6e0;
   --hl-rosa: #ecc9cf;
+  /* o âmbar de sempre, no meio do caminho: 12% sobre o papel bege dá o tom
+     de verão que o tema pede sem pesar. */
   --candle: #8f5c1c;
-  --candle-glow: color-mix(in srgb, var(--candle) 14%, transparent);
+  --candle-fundo: color-mix(in srgb, var(--candle) 12%, transparent);
+  --candle-luz-pct: 45%;
   --rec: #c0392b;
   color-scheme: light;
 }
@@ -118,8 +139,9 @@
     --hl-verde: #24452c;
     --hl-azul: #1f3c58;
     --hl-rosa: #4e2437;
-    --candle: #e8b45a;
-    --candle-glow: color-mix(in srgb, var(--candle) 18%, transparent);
+    --candle: var(--accent);
+    --candle-fundo: color-mix(in srgb, var(--candle) 8%, transparent);
+    --candle-luz-pct: 22%;
     --rec: #e4655a;
     color-scheme: dark;
   }
@@ -1321,22 +1343,25 @@ button.ghost {
   }
 }
 
-/* ── Candeia: o realce da narração ──
-   A unidade em fala fica sob uma luz quente — um halo âmbar por trás, vindo
-   de uma chama à esquerda — e a palavra em fala é o ponteiro: um sublinhado
-   mais luminoso e menor, que anda de uma palavra para a seguinte. Os títulos
-   falados só ganham a cor da luz, sem halo: a candeia passa por eles.
+/* ── O realce da narração ──
+   Três peças, e só três:
 
-   Tudo isso coexiste com o foco (fundo + borda) e os destaques de cor
-   (fundo): chama e halo são pseudo-elementos atrás do texto, o foco e a cor
-   são `background-color` do próprio elemento. Nenhum apaga o outro.
+   1. o FUNDO do trecho em fala ganha um véu chapado na cor do tema;
+   2. uma BARRA na borda esquerda desse mesmo véu, da altura exata dele;
+   3. a PALAVRA atual tem uma barra embaixo e a luz dela sobe pela palavra.
 
-   Um desenho só para versículo em bloco, versículo corrido, parágrafo e
-   pergunta — o que muda é só ONDE a chama cabe. */
+   As duas primeiras são o mesmo pseudo-elemento: o véu é o fundo do ::after
+   e a barra é a borda esquerda dele. É por isso que a barra tem a altura da
+   caixa sem ninguém precisar mantê-las em sincronia — é uma caixa só.
+
+   A luz de verdade mora só na palavra. Tentar pintar luz no papel do trecho
+   inteiro não funciona num tema claro: papel quase branco não tem para onde
+   clarear, e toda tentativa vira mancha. Um véu honesto na cor do tema
+   resolve o realce; a luz fica onde ela cabe. */
 
 /* `isolation: isolate` abre um contexto de empilhamento no próprio elemento:
-   assim os pseudo-elementos com z-index -1 ficam ATRÁS do texto mas ACIMA do
-   fundo de foco/destaque dele — sem isso, "-1" os mandaria para trás do papel.
+   assim o ::after com z-index -1 fica ATRÁS do texto mas ACIMA do fundo de
+   foco/destaque dele — sem isso, "-1" o mandaria para trás do papel.
    `.verse-inline` entra aqui porque um <button> nunca é `inline` de verdade:
    o navegador o trata como inline-block, uma caixa só, que pode ter várias
    linhas dentro. */
@@ -1348,13 +1373,8 @@ button.ghost {
   isolation: isolate;
 }
 
-/* A chama (::before) e o halo (::after) existem sempre, apagados, para a
-   opacidade poder transitar nos dois sentidos — numa regra só de
-   `.verse-speaking` a saída seria seca. `background-image` não serviria
-   para o halo: gradiente não interpola. */
-.verse::before,
-.prose::before,
-.perguntas li::before,
+/* O véu existe sempre, apagado, para a opacidade poder transitar nos dois
+   sentidos — numa regra só de `.verse-speaking` a saída seria seca. */
 .verse::after,
 .verse-inline::after,
 .prose::after,
@@ -1362,119 +1382,56 @@ button.ghost {
   content: '';
   position: absolute;
   z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--candle-fundo);
+  border-inline-start: 0.2em solid var(--candle);
   opacity: 0;
   transition: opacity 200ms ease;
   pointer-events: none;
 }
 
-/* A chama: barra fina, arredondada, com o próprio brilho. */
-.verse::before,
-.prose::before,
-.perguntas li::before {
-  inset-block: 0.35em;
-  /* p e li não têm padding: a chama fica na margem do papel, à esquerda do
-     texto (e, na lista, à esquerda do número). No .verse, cabe no padding. */
-  inset-inline-start: var(--candle-x, -0.7em);
-  width: 0.22em;
-  border-radius: 999px;
-  background: var(--candle);
-  box-shadow: 0 0 0.45em var(--candle-glow);
-}
-
-.verse::before {
-  --candle-x: 0.12rem;
-}
-
-/* Em `em` porque a fonte de leitura vai de 0.95rem a 1.58rem: o número da
-   lista cresce com ela, e uma distância em rem ficaria para trás dele. O
-   padding-left do `ol` (1.7em, ver `.perguntas`) tira a chama de dentro da
-   lista; os 0.7em restantes são a mesma folga que o `.prose` tem da margem.
-   Pior caso, 375px com fonte 1.58rem (li ≈ 1.52rem): 2.4em ≈ 3.6rem à
-   esquerda do li, dos quais 1.7em ≈ 2.6rem ainda dentro do `ol` — sobra
-   ~1.06rem além da borda do conteúdo, dentro dos 2.15rem de margem
-   (--shell-pad 1.1rem + padding 1.05rem do .leitura). Não sai da tela. */
-.perguntas li::before {
-  --candle-x: calc(-1.7em - 0.7em);
-}
-
-/* O halo: luz que nasce na chama e se perde para a direita. */
-.verse::after,
-.verse-inline::after,
+/* p e li não têm padding: o véu respira um pouco para fora do texto, e a
+   barra vai parar na margem do papel — onde ela já ficava. */
 .prose::after,
 .perguntas li::after {
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--candle-glow),
-    color-mix(in srgb, var(--candle) 5%, transparent) 55%,
-    transparent
-  );
-}
-
-/* p, li e o versículo corrido não têm padding: o halo respira um pouco para
-   fora do texto (e, no p/li, vai ao encontro da chama na margem). */
-.prose::after,
-.perguntas li::after {
-  inset: -0.1em -0.4em;
+  inset: -0.25em -0.45em;
   border-radius: 6px;
 }
 
-/* na pergunta o halo abraça também o número da lista: -1.7em é exatamente o
-   padding-left do `ol` — chega ao número sem passar dele nem tocar a chama */
+/* na pergunta o véu abraça também o número da lista: -1.7em é exatamente o
+   padding-left do `ol`, então a barra encosta antes do número em vez de
+   cortá-lo ao meio. */
 .perguntas li::after {
   inset-inline-start: -1.7em;
 }
 
-/* menos que o anel de foco (3px), para o halo não vazar por fora dele */
+/* menos que o anel de foco (3px), para o véu não vazar por fora dele. No
+   corrido a barra não cabe: um versículo curto pode começar no meio da
+   linha, e uma barra ali cairia no meio da frase anterior. O véu sozinho já
+   diz qual versículo está falando. */
 .verse-inline::after {
   inset: -0.05em -0.15em;
   border-radius: 4px;
+  border-inline-start: none;
 }
 
-/* `li.prose-speaking` explícito: `.perguntas li::before` pesa mais que
-   `.prose-speaking::before` e, sem isso, a pergunta nunca acenderia. */
-.verse.verse-speaking::before,
+/* `li.prose-speaking` explícito: `.perguntas li::after` pesa mais que
+   `.prose-speaking::after` e, sem isso, a pergunta nunca acenderia. */
 .verse.verse-speaking::after,
 .verse-inline.verse-speaking::after,
-.prose-speaking::before,
 .prose-speaking::after,
-.perguntas li.prose-speaking::before,
 .perguntas li.prose-speaking::after {
   opacity: 1;
 }
 
-/* No corrido não há margem onde pôr a chama — um versículo curto pode começar
-   no meio da linha, colado ao anterior. A chama vira um sublinhado sob CADA
-   linha do versículo: no `.verse-text`, que é inline de verdade (o botão
-   não é), com `box-decoration-break: clone` para repetir o traço em cada
-   fragmento em vez de o cortar na quebra. Translúcido, para a palavra por
-   cima continuar sendo a mais luminosa. Entra crescendo da esquerda por
-   `background-size`, que interpola. */
-.verse-inline .verse-text {
-  background-image: linear-gradient(
-    color-mix(in srgb, var(--candle) 45%, transparent),
-    color-mix(in srgb, var(--candle) 45%, transparent)
-  );
-  background-size: 0% 0.12em;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  transition: background-size 200ms ease;
-}
-
-.verse-inline.verse-speaking .verse-text {
-  background-size: 100% 0.12em;
-}
-
 /* Títulos falados (h1, a referência abaixo dele, h2 das seções, "Capítulo
-   N"): só a cor e um brilho suave, por cima do relevo de leitura — sem halo,
-   o realce da unidade é mais forte que o do título de propósito. `.leitura
-   h2.` bate a regra `.leitura > .block-plain > h2` do text-shadow; `.leitura
-   .ref.` bate o `.ref, .muted` da cor. */
+   N"): só a cor. Um título é curto e já tem peso próprio; um véu atrás dele
+   competiria com o do trecho, que é o realce que importa. `.leitura h2.`
+   bate a regra `.leitura > .block-plain > h2`; `.leitura .ref.` bate o
+   `.ref, .muted` da cor. */
 [data-fala-id] {
-  transition: color 200ms ease, text-shadow 200ms ease;
+  transition: color 200ms ease;
 }
 
 .leitura h1.heading-speaking,
@@ -1482,41 +1439,121 @@ button.ghost {
 .leitura h3.heading-speaking,
 .leitura .ref.heading-speaking {
   color: var(--candle);
-  text-shadow: var(--read-shadow), 0 0 0.6em var(--candle-glow);
 }
 
-/* A palavra que anda: o sublinhado nasce da esquerda na palavra nova e se
-   recolhe pela direita na anterior. É só ancoragem: em repouso o gradiente
-   está preso à direita com largura zero; em fala, preso à esquerda com
-   largura cheia. Como `background-position` NÃO transita, só o tamanho, a
-   luz cresce de um lado e some pelo outro. */
+/* ── A palavra ──
+   Uma barra embaixo e a luz dela subindo pela palavra, apagando antes do
+   topo. Barra e luz são o MESMO `background-image`, e é isso que faz a
+   iluminação andar junto na transição: o que anima é a largura, então a luz
+   cresce na palavra nova e se recolhe na anterior sem nunca piscar.
+
+   Em repouso o gradiente está preso à direita com largura zero; em fala,
+   preso à esquerda com largura cheia. Como `background-position` NÃO
+   transita, só o tamanho, a luz nasce de um lado e some pelo outro.
+
+   A luz é branca (`--candle-luz-pct` sobre #fff), não da cor do tema: luz
+   não tem a cor do móvel que ilumina. Nos temas claros isso faz a palavra
+   voltar ao branco do papel por cima do véu — ela é acesa, não pintada.
+
+   `--candeia` é o único resto de fogo no desenho: a luz que sobe respira de
+   leve. Ele mora no trecho em fala (ver a regra da animação abaixo), não na
+   palavra — uma palavra dura ~400ms, e uma animação por palavra viraria
+   soluço em vez de chama. Assim a palavra nova entra no meio do tremor. */
 [data-w] {
-  background-image: linear-gradient(var(--candle), var(--candle));
+  background-image: linear-gradient(
+    to top,
+    var(--candle) 0 0.12em,
+    color-mix(
+        in srgb,
+        #fff calc(var(--candle-luz-pct) * var(--candeia, 1)),
+        transparent
+      )
+      0.12em,
+    transparent 100%
+  );
   background-repeat: no-repeat;
-  background-size: 0% 0.14em;
+  background-size: 0% 100%;
   background-position: 100% 100%;
   border-radius: 0.1em;
-  transition: background-size 160ms ease-out, text-shadow 160ms ease-out;
+  transition: background-size 160ms ease-out;
 }
 
 [data-w].word-speaking {
-  background-size: 100% 0.14em;
+  background-size: 100% 100%;
   background-position: 0 100%;
-  text-shadow: var(--read-shadow), 0 0 0.5em var(--candle-glow);
+}
+
+/* A tremulação. `--candeia` vai de ~0.83 a ~1.04 e multiplica a força da luz
+   que sobe na palavra. Registrado com @property porque só uma custom
+   property tipada interpola — sem isso o navegador saltaria de passo em
+   passo. O `, 1` no ponto de uso é o fallback para navegador sem @property:
+   luz parada, nada quebrado.
+
+   Os passos são irregulares de propósito: fogo não pulsa em senoide. */
+@property --candeia {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@keyframes candeia-tremula {
+  0% {
+    --candeia: 1;
+  }
+  9% {
+    --candeia: 0.9;
+  }
+  17% {
+    --candeia: 0.99;
+  }
+  28% {
+    --candeia: 0.86;
+  }
+  36% {
+    --candeia: 1.04;
+  }
+  47% {
+    --candeia: 0.92;
+  }
+  55% {
+    --candeia: 0.98;
+  }
+  63% {
+    --candeia: 0.83;
+  }
+  74% {
+    --candeia: 1.02;
+  }
+  85% {
+    --candeia: 0.91;
+  }
+  100% {
+    --candeia: 1;
+  }
+}
+
+/* no trecho, não na palavra — ver o comentário de `[data-w]` */
+.verse-speaking,
+.prose-speaking,
+.heading-speaking {
+  animation: candeia-tremula 4.2s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .verse::before,
-  .prose::before,
-  .perguntas li::before,
   .verse::after,
   .verse-inline::after,
   .prose::after,
   .perguntas li::after,
-  .verse-inline .verse-text,
   [data-fala-id],
   [data-w] {
     transition: none;
+  }
+
+  /* o realce continua aceso, só para de tremer */
+  .verse-speaking,
+  .prose-speaking,
+  .heading-speaking {
+    animation: none;
   }
 }
 

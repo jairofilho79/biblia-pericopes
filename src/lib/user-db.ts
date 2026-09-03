@@ -205,12 +205,6 @@ export async function desmarcarProgresso(ordem: number): Promise<void> {
   }))
 }
 
-/** Quantas das `ordens` estão concluídas. Alimenta a contagem da confirmação. */
-export async function contarConcluidas(ordens: number[]): Promise<number> {
-  const done = await doneSet()
-  return ordens.filter((o) => done.has(o)).length
-}
-
 /**
  * Zera o progresso das `ordens` e devolve quantas linhas mudou de fato.
  *
@@ -240,25 +234,31 @@ export async function zerarProgresso(ordens: number[]): Promise<number> {
 
   for (const ordem of ordens) {
     const anterior = await progresso.get(ordem)
-    if (!anterior || (anterior.status === 'nao_iniciado' && !anterior.paraReler)) continue
-    const linha: Progresso = {
-      pericopeOrdem: ordem,
-      status: 'nao_iniciado',
-      historico: anterior.historico ?? [],
-      paraReler: false,
-      atualizadoEm,
+    const emRepouso = !anterior || (anterior.status === 'nao_iniciado' && !anterior.paraReler)
+    if (!emRepouso) {
+      const linha: Progresso = {
+        pericopeOrdem: ordem,
+        status: 'nao_iniciado',
+        historico: anterior.historico ?? [],
+        paraReler: false,
+        atualizadoEm,
+      }
+      await progresso.put(linha)
+      await outbox.put({
+        kind: 'progresso',
+        ordem,
+        status: linha.status,
+        historico: linha.historico,
+        paraReler: false,
+        atualizadoEm,
+      } as OutboxItem)
+      mudadas++
     }
-    await progresso.put(linha)
-    await outbox.put({
-      kind: 'progresso',
-      ordem,
-      status: linha.status,
-      historico: linha.historico,
-      paraReler: false,
-      atualizadoEm,
-    } as OutboxItem)
-    mudadas++
 
+    // Independente do progresso já estar em repouso: um checkpoint órfão (LWW
+    // remoto que zerou o status sem tocar `posicoes`, ou uma corrida entre
+    // concluirProgresso e clearPosicao) tem que morrer de qualquer jeito, senão
+    // o "Continuar" da Home devolve o leitor ao meio do que ele acabou de zerar.
     const posicao = await posicoes.get(ordem)
     if (posicao) {
       await posicoes.delete(ordem)

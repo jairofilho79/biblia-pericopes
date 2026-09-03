@@ -9,7 +9,7 @@ import {
   clearOutbox,
   clearPosicao,
   concluirProgresso,
-  contarConcluidas,
+  countConcluidasNaSequencia,
   deleteAnotacao,
   deleteMeta,
   desmarcarProgresso,
@@ -703,10 +703,28 @@ describe('zerarProgresso', () => {
     expect(lapide).toBeDefined()
   })
 
-  it('contarConcluidas conta só as concluídas das ordens pedidas', async () => {
+  it('apaga checkpoint órfão mesmo com o progresso já em repouso', async () => {
+    // Reproduz a corrida que sobra um checkpoint sem progresso "em andamento"
+    // por trás: LWW remoto zerando o status sem tocar `posicoes`, ou
+    // concluirProgresso correndo com o clearPosicao separado de Leitura.tsx.
+    // Sem isto, o "Continuar" devolve o leitor ao meio do que ele acabou de
+    // zerar — a mesma falha que a lápide da posição existe para prevenir.
+    await setPosicaoLocal(9362, 'versiculo', '1:1')
+    const n = await zerarProgresso([9362])
+    expect(n).toBe(0)
+    expect(await getPosicao(9362)).toBeUndefined()
+    const lapide = (await listOutbox()).find(
+      (i) => i.kind === 'posicao' && i.posicao.pericopeOrdem === 9362 && i.apagadoEm !== null,
+    )
+    expect(lapide).toBeDefined()
+  })
+})
+
+describe('countConcluidasNaSequencia', () => {
+  it('conta só as concluídas das ordens pedidas', async () => {
     await concluirProgresso(9370)
     await setProgresso(9371, 'em_andamento')
-    expect(await contarConcluidas([9370, 9371, 9372])).toBe(1)
+    expect(await countConcluidasNaSequencia([9370, 9371, 9372])).toBe(1)
   })
 })
 

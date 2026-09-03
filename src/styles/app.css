@@ -2838,3 +2838,50 @@ fieldset.jornada-campo {
   color: var(--muted);
   margin: 1rem 0 0.45rem;
 }
+
+/* ===== Explorar: chips de recorte e seções de resultado ===== */
+.chips-filtro {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.25rem;
+}
+
+.chip-filtro {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+  min-height: 2.25rem;
+}
+
+.chip-filtro.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.secao-resultado {
+  margin-bottom: 1.75rem;
+}
+
+.secao-h {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.secao-n {
+  font-weight: 400;
+  letter-spacing: 0;
+  opacity: 0.75;
+}

@@ -13,7 +13,8 @@
 ## Global Constraints
 
 - **Nenhum teste pode ler `public/data/index.json`.** É derivado e gitignored (`.gitignore:29`), gerado por `npm run shard`. A CI roda `npm test` (passo 19) **antes** do build que o gera (passo 21): um teste assim passa localmente e quebra a CI com `ENOENT`. Fontes permitidas: `src/lib/bible-books.ts`, `data/pericopes.json` (versionado), ou fixtures literais montadas no próprio teste.
-- **Baseline de testes numa worktree limpa: 39 arquivos / 435 testes.** Na `main` o vitest também coleta `.worktrees/develop` e mostra 66 / 706 — não é cobertura a mais.
+- **Baseline de testes: 52 arquivos / 654 testes** (era 39/435 quando este plano foi escrito; a `main` foi mesclada nesta branch no commit `87b2723`, trazendo jornadas, releitura e chrome). Na `main` o vitest também coleta as outras worktrees e mostra um número maior — não é cobertura a mais.
+- **Rode `npx tsc -b` além de `npm test` antes de cada commit.** O vitest NÃO faz checagem de tipo: quando o merge tornou `historico` e `paraReler` obrigatórios em `Progresso`, a suíte continuou verde com 654 testes e só o `tsc -b` acusou o literal quebrado. Suíte verde não é evidência de build são.
 - **`src/styles/app.css` é tocado por quatro sessões: só ACRESCENTAR blocos, nunca reescrever os existentes.** Blocos novos vão no fim do arquivo. Não encostar em `.top`, `.top nav`, `.theme-menu`, `.theme-toggle`, `.ref-row`, `.ref-nav`, `.ref-arrow`, `.section-chips` — são de outra sessão. `.ref-sticky` (`app.css:2105`) é nosso.
 - **Comentários e mensagens de commit em português**, seguindo o repositório. Comentário explica *por quê*, não *o quê*.
 - **Ordem de merge acordada:** jornadas → releitura → chrome → esta. `src/App.tsx` só é editado na Task 8, e **por conteúdo, nunca por número de linha** — a sessão do chrome reescreve a nav antes e os números vão andar.
@@ -1687,7 +1688,13 @@ export async function listPericopes(opts?: {
 }
 ```
 
-Apagar `listLivros` inteira (linhas 65-76). Era usada só pelo Índice.
+**`listLivros` NÃO é apagada.** O plano original mandava apagá-la porque só o
+Índice a usava. Isso deixou de ser verdade quando a `main` foi mesclada nesta
+branch: `src/pages/Ajustes.tsx:29` (da sessão de releitura) passou a consumi-la.
+Deixe a função exatamente como está.
+
+O estreitamento acima continua seguro apesar disso: `Ajustes.tsx:31` chama
+`listPericopes({ livro })` e nunca usa a opção `q`.
 
 - [ ] **Step 2: Cobrir o comportamento novo**
 
@@ -1712,7 +1719,18 @@ Expected: PASS.
 
 - [ ] **Step 4: Rota, nav e redirects em `src/App.tsx`**
 
-**Aplicar por conteúdo — a sessão do chrome reescreveu a nav e os números de linha mudaram.** Antes de editar, avisar `biblia-pericopes-11` por `SendMessage` que `src/pages/Explorar.tsx` existe, e confirmar se ela já aplicou o diff.
+**Aplicar por conteúdo — a sessão do chrome JÁ mesclou e a nav mudou de forma.** O `App.tsx` atual tem:
+
+```tsx
+<NavLink to="/jornada">Jornada</NavLink>
+<NavLink to="/indice">Índice</NavLink>
+<NavLink to="/pesquisar">Pesquisar</NavLink>
+<PerfilMenu onOpenChange={setPerfilAberto} />
+```
+
+O `Entrar`/`Sair` solto não existe mais — `PerfilMenu` absorveu Ajustes, Sair e
+Entrar. As rotas `/jornada` e `/ajustes` também já estão lá. Nada disso é seu;
+não toque em nenhuma dessas linhas.
 
 Quatro mudanças:
 
@@ -1741,7 +1759,9 @@ import Explorar from './pages/Explorar'
 
 - [ ] **Step 5: Migalha da Leitura**
 
-Em `src/pages/Leitura.tsx`, a linha da migalha (hoje `796`, procure pelo conteúdo `<Link to="/indice">{p.livro}</Link>`):
+Em `src/pages/Leitura.tsx`, a linha da migalha — depois do merge ela está na
+**819**, mas procure pelo conteúdo `<Link to="/indice">{p.livro}</Link>` e não
+pelo número:
 
 ```tsx
 <Link to={`/explorar?livro=${encodeURIComponent(p.livro)}`}>{p.livro}</Link>
@@ -1772,9 +1792,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const searchTexto = vi.fn(async () => [])
 
+// `historico` e `paraReler` são OBRIGATÓRIOS em `Progresso` desde o merge da
+// releitura. Sem eles o `npm test` passa (o vitest não checa tipo) e só o
+// `tsc -b` do build quebra — foi exatamente o que aconteceu no commit 14b4f0d.
 vi.mock('../lib/user-db', () => ({
   listAllProgresso: async () => [
-    { pericopeOrdem: 1, status: 'concluido', atualizadoEm: '2026-09-03T00:00:00.000Z' },
+    {
+      pericopeOrdem: 1,
+      status: 'concluido',
+      historico: [],
+      paraReler: false,
+      atualizadoEm: '2026-09-03T00:00:00.000Z',
+    },
   ],
 }))
 

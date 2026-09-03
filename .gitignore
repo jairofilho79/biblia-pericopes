@@ -50,3 +50,4 @@ public/data/estudo/
 # worktrees criadas pela ferramenta nativa do Claude Code (como .worktrees/)
 .claude/worktrees/
 data/NAA.json.bak
+data/novas-pericopes.jsonl

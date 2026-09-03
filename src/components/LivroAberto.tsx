@@ -27,6 +27,18 @@ export default function LivroAberto({
 }) {
   const [campoCap, setCampoCap] = useState('')
   const [campoVer, setCampoVer] = useState('')
+  // Trocar de livro tem que limpar os campos: "3" digitado para João é um
+  // capítulo válido em Gênesis também, e ficaria no campo validado contra os
+  // limites do livro errado. O padrão de ajustar estado no render (em vez de
+  // um efeito) evita pintar um frame com o valor do livro anterior. Isto vale
+  // mesmo se a página esquecer de passar `key` — a invariante é do componente,
+  // não do consumidor.
+  const [livroAnterior, setLivroAnterior] = useState(livro)
+  if (livro !== livroAnterior) {
+    setLivroAnterior(livro)
+    setCampoCap('')
+    setCampoVer('')
+  }
 
   const capNum = Number(campoCap)
   const capOk = Number.isInteger(capNum) && capNum >= 1 && capNum <= maxChapter(livro)

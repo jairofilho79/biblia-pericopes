@@ -1,5 +1,5 @@
 import { describe, expect, it, afterEach, vi } from 'vitest'
-import { manifestoValido, carregarManifesto } from './manifesto'
+import { manifestoValido, carregarManifesto, VOZ } from './manifesto'
 import bruto from './__fixtures__/manifesto-1600.json'
 
 describe('manifestoValido', () => {
@@ -108,6 +108,6 @@ describe('carregarManifesto', () => {
     const f = vi.fn(async () => respostaJson(bruto))
     vi.stubGlobal('fetch', f)
     await carregarManifesto(1600)
-    expect((f.mock.calls as unknown[][])[0][0]).toBe('/api/audio/nt-ml/1600.json')
+    expect((f.mock.calls as unknown[][])[0][0]).toBe(`/api/audio/${VOZ}/1600.json`)
   })
 })

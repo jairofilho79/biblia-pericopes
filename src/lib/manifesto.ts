@@ -54,6 +54,28 @@ export function manifestoValido(v: unknown): v is Manifesto {
 }
 
 /**
+ * Prefixo da narração publicada no R2, e a única fonte dele no app — o player
+ * monta a URL do `.m4a` a partir daqui, e esta função a do `.json`.
+ *
+ * Cada regeração ganha um prefixo NOVO em vez de regravar o anterior: o Worker
+ * serve `/api/audio/*` como `immutable` com um ano de cache, então sobrescrever
+ * a mesma chave nunca chegaria em quem já ouviu aquela perícope.
+ *
+ * O nome diz de qual master local o áudio saiu — `tts-corpus/gam-ash/`. O
+ * prefixo anterior se chamava `nt-ml`, nome de uma primeira tentativa de
+ * narração que foi abandonada; o conteúdo servido dali era o do `gam-ash`, e o
+ * nome mentia. Achar o master certo custou meio dia. Se um dia trocar a voz,
+ * troque o nome junto.
+ *
+ * `gam-ash1` é o mesmo áudio de `nt-ml`, reprocessado para o alvo de loudness
+ * de streaming; a publicação original saiu do TTS em -24 LUFS e soava fraca ao
+ * lado de qualquer outra mídia no mesmo aparelho. Os offsets do manifesto são
+ * os mesmos: a receita não desloca amostras. Ver
+ * `scripts/normalizar-narracao.sh`.
+ */
+export const VOZ = 'gam-ash1'
+
+/**
  * Busca o manifesto da perícope. Qualquer falha — 404, rede, corpo estranho —
  * devolve `null`: sem manifesto o áudio ainda toca, só que sem realce.
  */
@@ -63,7 +85,7 @@ export async function carregarManifesto(
 ): Promise<Manifesto | null> {
   try {
     // `res.ok`, não `status === 200`: o Worker devolve 206 em GET do R2.
-    const res = await fetch(`/api/audio/nt-ml/${ordem}.json`, { signal })
+    const res = await fetch(`/api/audio/${VOZ}/${ordem}.json`, { signal })
     if (!res.ok) return null
     if (!(res.headers.get('content-type') ?? '').includes('json')) return null
     const corpo: unknown = await res.json()

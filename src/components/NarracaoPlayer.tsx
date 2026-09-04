@@ -10,7 +10,7 @@ import {
   type Ref,
 } from 'react'
 import { alinhar, type SecaoAlvos } from '../lib/alinhar-narracao'
-import { carregarManifesto, type Manifesto } from '../lib/manifesto'
+import { carregarManifesto, VOZ, type Manifesto } from '../lib/manifesto'
 import { type SecaoNarrada, formatarTempo, inicioDaSecao } from '../lib/narracao-controles'
 import { indiceDaPalavra, indiceEm } from '../lib/narracao-timeline'
 
@@ -106,7 +106,7 @@ export default function NarracaoPlayer({
   )
 
   useEffect(() => {
-    const url = `/api/audio/nt-ml/${ordem}.m4a`
+    const url = `/api/audio/${VOZ}/${ordem}.m4a`
     const ac = new AbortController()
     let vivo = true
     setSrc(null)

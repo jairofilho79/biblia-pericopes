@@ -10,6 +10,14 @@ describe('chaveAudio', () => {
     expect(chaveAudio('nt-ml/1600.json')).toBe('nt-ml/1600.json')
   })
 
+  it('aceita dígito no nome da voz', () => {
+    // Cada regeração ganha um prefixo novo (o cache é `immutable`), e eles são
+    // numerados: `nt-ml` virou `gam-ash1`. Se o regex passasse a exigir só letras
+    // no prefixo, toda a narração publicada sumiria em 404.
+    expect(chaveAudio('gam-ash1/1600.m4a')).toBe('gam-ash1/1600.m4a')
+    expect(chaveAudio('gam-ash1/1600.json')).toBe('gam-ash1/1600.json')
+  })
+
   it('rejeita travessia de caminho', () => {
     expect(chaveAudio('../segredo.m4a')).toBeNull()
     expect(chaveAudio('nt-ml/../1600.m4a')).toBeNull()

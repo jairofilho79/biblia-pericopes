@@ -51,3 +51,7 @@ public/data/estudo/
 .claude/worktrees/
 data/NAA.json.bak
 data/novas-pericopes.jsonl
+
+# Fonte da Bíblia Livre (BLIVRE) e o JSON derivado dela
+data/bliv-tr_vpl.txt
+data/BLIVRE.json

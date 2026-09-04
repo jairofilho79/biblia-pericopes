@@ -13,7 +13,7 @@ const MODEL = 'google/gemini-3-pro-image-preview'
 const PROMPT = `Create a single app icon / logo mark for a Progressive Web App called "Perícopes".
 
 App context:
-- Daily Bible study in Portuguese (NAA), reading by pericopes (narrative units), not random chapters.
+- Daily Bible study in Portuguese, reading by pericopes (narrative units), not random chapters.
 - Offline-first PWA for young people and teens who already know a little of the Bible and want to go deeper.
 - Goal: know God and Jesus through each pericope, with warm, clear, readable design — never preachy or cluttered.
 

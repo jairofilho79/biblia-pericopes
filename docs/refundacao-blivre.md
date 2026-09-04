@@ -79,7 +79,52 @@ Escopo:
 
 O app fica de pé e limpo, esperando o texto novo.
 
-### Sessão 2 — ETL da BLIVRE
+### ✅ Sessão 2 — ETL da BLIVRE (feita em 2026-09-04)
+
+**O texto trocou e a auditoria fecha:** 2.823 perícopes · 31.102 versículos ·
+cobertura **100,0000%** · 0 fora de perícope · 0 em mais de uma · 0 divergência
+com `bible-books.ts`. Os 16 avisos que restam são `limite_corrigido` do próprio
+dataset KJV, os mesmos de antes. Zero aviso de versículo ausente.
+
+**A versificação bateu de primeira.** A tabela `AJUSTES` ficou VAZIA: a BLIVRE
+segue a KJV nos 31.102 versículos. Os cinco ajustes que a NAA exigia morreram
+todos, e o motivo de cada um está escrito em `scripts/versificacao.ts`. Cinco
+números de `bible-books.ts` trocaram de lado junto (1Sm 20, 1Rs 22, 2Co 13,
+3Jo 1, Ap 12) e estão travados em teste.
+
+**Sobrescritos entregues.** 119 perícopes ganharam o campo `sobrescrito`, que a
+Leitura desenha como epígrafe acima do texto e fora da numeração. O achado que
+estava em aberto no `estado-cobertura-e-cortes.md` — "não dá para gerar, teria
+de vir de fonte NAA licenciada" — está resolvido: o Salmo 3 abre com "Salmo de
+Davi, quando ele fugia da presença de seu filho Absalão".
+
+**Módulos novos:** `blivre-texto` (colchetes), `blivre-epigrafes` (a tabela
+curada), `blivre-fonte` + `blivre-para-fonte` (VPL → `data/BLIVRE.json`),
+`extrair-texto` (recorte compartilhado). Saíram `naa-versificacao`, seu teste e
+o `fix-naa`.
+
+**Dois bugs latentes que a re-execução revelou e que ficam consertados:** o ETL
+não era re-executável (gravava o catálogo pós-corte no arquivo de onde o
+`gerarNovas` lia as perícopes pré-corte), e o `validar-cortes` tinha o mesmo
+defeito. Hoje o ETL grava também `data/raw-pericopes-brutas.jsonl` e é
+idempotente — rodar duas vezes dá byte a byte o mesmo resultado.
+
+#### O que ficou registrado para as sessões seguintes
+
+- **Sl 125** é o único dos quinze Cânticos dos Degraus sem "Cântico dos
+  degraus" na fonte. É defeito da Bíblia Livre. Não foi preenchido de
+  propósito: escrever o que a fonte não traz seria inventar Escritura.
+  Registrado em `scripts/blivre-epigrafes.ts`.
+- **Sl 72** vem "Para SalomãoDeus, dá teus juízos" — sem separador. Entrou como
+  exceção com o texto esperado verificado.
+- **Para a Sessão 5**: o manifesto de narração vai precisar de uma unidade para
+  a seção `sobrescrito`. Hoje a epígrafe já tem `data-fala-id`, mas nenhum
+  manifesto a descreve.
+- **Ressalva de qualidade ainda aberta**: a revisão editorial da BLIVRE cobre
+  ~15 livros do NT e o último release é de 2018. As amostras lidas estão boas,
+  mas a leitura por amostragem que a barra do projeto pede ainda não foi feita.
+
+### Sessão 2 — ETL da BLIVRE (escopo original)
 
 - Ingerir a BLIVRE (fonte: releases de `github.com/blivre/BibliaLivre`, formatos
   USFM/VPL; há também JSON por livro em `damarals/biblias`, diretório

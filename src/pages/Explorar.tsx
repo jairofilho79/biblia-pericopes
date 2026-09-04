@@ -94,7 +94,12 @@ export default function Explorar() {
 
   useEffect(() => {
     let vivo = true
-    Promise.all([loadIndex(), listAllProgresso()])
+    // O progresso é opcional para desenhar esta tela: sem ele o catálogo, a
+    // referência e os títulos continuam saindo do index.json, e só o ✓, as
+    // barras e os recortes ficam zerados. O Pesquisar que esta tela substituiu
+    // nem importava user-db, e funcionava com o IndexedDB quebrado — deixar uma
+    // falha de progresso derrubar a busca inteira seria regressão.
+    Promise.all([loadIndex(), listAllProgresso().catch(() => [])])
       .then(([tudo, prog]) => {
         if (!vivo) return
         setTodas(tudo)
@@ -139,13 +144,19 @@ export default function Explorar() {
     }, /* replace */ !livro)
   const setFiltro = (valor: FiltroLeitura) =>
     mexerNaUrl((p) => (valor === 'todos' ? p.delete('f') : p.set('f', valor)), false)
-  const abrirLivro = (b: BibleBook) =>
+  const abrirLivro = (b: BibleBook) => {
     mexerNaUrl((p) => {
       p.set('livro', b.name)
       p.delete('cap')
       // Simétrico ao setQ: abrir um livro fecha a busca.
       p.delete('q')
     }, false)
+    // Herdado do `selectBook` de Pesquisar.tsx:149 (main) — a lista de
+    // catálogo em repouso ocupa ~4,5 telas, e sem isto abrir um livro do fim
+    // (ex. Apocalipse) deixa o leitor no fim da lista antiga, sem ver o
+    // cabeçalho do livro nem o formulário de capítulo/versículo.
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   const fecharLivro = () =>
     mexerNaUrl((p) => {
       p.delete('livro')

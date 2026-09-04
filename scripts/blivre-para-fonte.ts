@@ -25,11 +25,15 @@ function main() {
   const livros = converterVpl(readFileSync(entrada, 'utf8'))
 
   let versiculos = 0
-  let epigrafes = 0
+  let sobrescritos = 0
+  let rotulos = 0
   for (const l of livros) {
     for (const cap of l.chapters) {
       versiculos += cap.length
-      for (const v of cap) if (v.e) epigrafes++
+      for (const v of cap) {
+        if (v.e) sobrescritos++
+        if (v.r) rotulos++
+      }
     }
   }
 
@@ -41,7 +45,10 @@ function main() {
   }
 
   writeFileSync(saida, JSON.stringify(livros))
-  console.log(`OK: ${livros.length} livros · ${versiculos.toLocaleString('pt-BR')} versículos · ${epigrafes} epígrafes → ${saida}`)
+  console.log(
+    `OK: ${livros.length} livros · ${versiculos.toLocaleString('pt-BR')} versículos · ` +
+      `${sobrescritos} sobrescritos · ${rotulos} rótulos → ${saida}`,
+  )
 }
 
 main()

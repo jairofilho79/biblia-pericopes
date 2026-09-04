@@ -35,7 +35,7 @@ describe('converterVpl', () => {
     )
     expect(livros[0].chapters[0][1]).toEqual({
       t: 'Beije-me ele com os beijos de sua boca',
-      e: 'Ela',
+      r: 'Ela',
     })
   })
 
@@ -43,7 +43,7 @@ describe('converterVpl', () => {
     const livros = converterVpl(
       vpl('SOL 1:1 Cântico dos cânticos.', 'SOL 1:2 [Ela] : Como [tu és] agradável!'),
     )
-    expect(livros[0].chapters[0][1]).toEqual({ t: 'Como tu és agradável!', e: 'Ela' })
+    expect(livros[0].chapters[0][1]).toEqual({ t: 'Como tu és agradável!', r: 'Ela' })
   })
 
   it('lança em código de livro desconhecido', () => {

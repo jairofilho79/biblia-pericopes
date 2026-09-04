@@ -36,11 +36,25 @@ describe('extrairTexto', () => {
     expect(r.texto).toBe('Capítulo 1\n1 O SENHOR é meu pastor.\n2 Ele me faz deitar.')
   })
 
-  it('a epígrafe INTERNA volta para a linha do versículo, como um narrador leria', () => {
-    const l = livro([[{ t: 'primeiro' }, { t: 'Beije-me ele', e: 'Ela' }]])
+  it('o rótulo estrutural fica na linha do versículo, como um narrador leria', () => {
+    const l = livro([[{ t: 'primeiro' }, { t: 'Beije-me ele', r: 'Ela' }]])
     const r = extrairTexto(l, 1, 1, 1, 2)
     expect(r.sobrescrito).toBeUndefined()
     expect(r.texto).toBe('Capítulo 1\n1 primeiro\n2 Ela: Beije-me ele')
+  })
+
+  it('rótulo NA ABERTURA não sobe para o topo — "Álefe" não é título do Sl 119', () => {
+    const l = livro([[{ t: 'Bem-aventurados são os puros', r: 'Álefe' }, { t: 'segundo' }]])
+    const r = extrairTexto(l, 1, 1, 1, 2)
+    expect(r.sobrescrito).toBeUndefined()
+    expect(r.texto).toBe('Capítulo 1\n1 Álefe: Bem-aventurados são os puros\n2 segundo')
+  })
+
+  it('sobrescrito no MEIO da faixa fica na linha: o topo é da abertura', () => {
+    const l = livro([[{ t: 'a' }], [{ t: 'Uivai, navios', e: 'Revelação sobre Tiro' }]])
+    const r = extrairTexto(l, 1, 1, 2, 1)
+    expect(r.sobrescrito).toBeUndefined()
+    expect(r.texto).toBe('Capítulo 1\n1 a\nCapítulo 2\n1 Revelação sobre Tiro: Uivai, navios')
   })
 
   it('a epígrafe da abertura só conta se a faixa começa nela', () => {

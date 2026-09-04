@@ -83,8 +83,11 @@ export const MAPA_LIVROS: Record<string, { name: string; abbrev: string }> = {
   REV: { name: 'Apocalipse', abbrev: 'Ap' },
 }
 
-/** Um versículo: `t` é o corpo; `e` é a epígrafe, quando existe. */
-export type VersiculoBlivre = { t: string; e?: string }
+/**
+ * Um versículo: `t` é o corpo, `e` é o sobrescrito (sobe para a epígrafe do
+ * topo) e `r` é o rótulo estrutural (fica na linha do versículo).
+ */
+export type VersiculoBlivre = { t: string; e?: string; r?: string }
 
 export type LivroBlivre = {
   abbrev: string
@@ -140,9 +143,11 @@ export function converterVpl(bruto: string): LivroBlivre[] {
 
     // A ordem importa: separar a epígrafe ANTES de tirar os colchetes, porque o
     // rótulo estrutural do Sl 119 e de Cânticos VEM entre colchetes.
-    const { epigrafe, texto } = separarEpigrafe(cod, capitulo, versiculo, corpo.trim())
+    const { epigrafe, tipo, texto } = separarEpigrafe(cod, capitulo, versiculo, corpo.trim())
     const limpo = removerColchetes(texto)
-    cap.push(epigrafe ? { t: limpo, e: epigrafe } : { t: limpo })
+    if (!epigrafe) cap.push({ t: limpo })
+    else if (tipo === 'sobrescrito') cap.push({ t: limpo, e: epigrafe })
+    else cap.push({ t: limpo, r: epigrafe })
   }
 
   return livros

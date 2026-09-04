@@ -52,7 +52,20 @@ function temRotuloEstrutural(cod: string, capitulo: number): boolean {
   return (cod === 'PSA' && capitulo === 119) || cod === 'SOL'
 }
 
-export type Separado = { epigrafe?: string; texto: string }
+/**
+ * `tipo` separa duas coisas que a fonte escreve igual:
+ *
+ * - `sobrescrito` — o cabeçalho do salmo, que vale para a passagem inteira e
+ *   sobe para a epígrafe do topo da tela.
+ * - `rotulo` — a letra do acróstico e o marcador de locutor, que valem para
+ *   AQUELE trecho e ficam na linha do versículo. "Álefe" não é o título do
+ *   Salmo 119; é o par de "Bete", oito versículos adiante.
+ */
+export type Separado = {
+  epigrafe?: string
+  tipo?: 'sobrescrito' | 'rotulo'
+  texto: string
+}
 
 /**
  * Separa a epígrafe do corpo do versículo. Devolve o texto intacto quando não
@@ -74,17 +87,22 @@ export function separarEpigrafe(
           `"${excecao.comeca}", veio "${texto.slice(0, 40)}…". A fonte mudou — reveja a tabela.`,
       )
     }
-    return { epigrafe: excecao.epigrafe, texto: texto.slice(excecao.epigrafe.length).trim() }
+    return {
+      epigrafe: excecao.epigrafe,
+      tipo: 'sobrescrito',
+      texto: texto.slice(excecao.epigrafe.length).trim(),
+    }
   }
 
   if (temRotuloEstrutural(cod, capitulo)) {
     const m = ROTULO.exec(texto)
-    if (m) return { epigrafe: m[1].trim(), texto: texto.slice(m[0].length).trim() }
+    if (m) return { epigrafe: m[1].trim(), tipo: 'rotulo', texto: texto.slice(m[0].length).trim() }
   }
 
   if (versiculo === 1 && LIVROS_COM_SOBRESCRITO.has(cod)) {
     const m = SOBRESCRITO.exec(texto)
-    if (m) return { epigrafe: m[1].trim(), texto: texto.slice(m[1].length + 1).trim() }
+    if (m)
+      return { epigrafe: m[1].trim(), tipo: 'sobrescrito', texto: texto.slice(m[1].length + 1).trim() }
   }
 
   return { texto }

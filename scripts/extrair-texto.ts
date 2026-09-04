@@ -13,10 +13,13 @@
  * - A **epígrafe de abertura** (o sobrescrito do salmo, quando a faixa começa
  *   no versículo que o traz) sai como campo `sobrescrito`, para a tela mostrar
  *   como epígrafe acima do texto e fora da numeração.
- * - A **epígrafe interna** (a letra do acróstico no Sl 119, o marcador de
- *   locutor em Cânticos) volta para a linha do versículo como `Rótulo: texto`,
- *   que é como um narrador leria. São 7 perícopes no catálogo inteiro — não
- *   valem um tipo de bloco novo atravessando parse-texto, player e realce.
+ * - **Rótulo estrutural** (a letra do acróstico no Sl 119, o marcador de
+ *   locutor em Cânticos) fica SEMPRE na linha do versículo, como `Rótulo:
+ *   texto` — que é como um narrador leria. Nunca sobe para o topo: "Álefe" não
+ *   é o título do Salmo 119, é o par de "Bete" oito versículos adiante.
+ * - Um sobrescrito que caia no MEIO da faixa (uma perícope que atravessa o
+ *   início de outro capítulo de Isaías, por exemplo) também fica na linha: o
+ *   topo é da abertura, e só dela.
  */
 import type { LivroBlivre } from './blivre-fonte.ts'
 
@@ -71,7 +74,8 @@ export function extrairTexto(
         sobrescrito = verso.e
         linhas.push(`${v} ${verso.t}`)
       } else {
-        linhas.push(verso.e ? `${v} ${verso.e}: ${verso.t}` : `${v} ${verso.t}`)
+        const rotulo = verso.r ?? verso.e
+        linhas.push(rotulo ? `${v} ${rotulo}: ${verso.t}` : `${v} ${verso.t}`)
       }
       versiculos++
     }

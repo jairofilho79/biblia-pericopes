@@ -5,6 +5,7 @@ describe('separarEpigrafe — sobrescritos dos Salmos', () => {
   it('separa o sobrescrito curto', () => {
     const r = separarEpigrafe('PSA', 23, 1, 'Salmo de Davi:O SENHOR é meu pastor, nada me faltará.')
     expect(r.epigrafe).toBe('Salmo de Davi')
+    expect(r.tipo).toBe('sobrescrito')
     expect(r.texto).toBe('O SENHOR é meu pastor, nada me faltará.')
   })
 
@@ -37,6 +38,13 @@ describe('separarEpigrafe — sobrescritos dos Salmos', () => {
     expect(r.texto).toBe(t)
   })
 
+  it('a letra do acróstico é rótulo, não sobrescrito — nem no versículo 1', () => {
+    // Se "Álefe" virasse sobrescrito, o Salmo 119 abriria com ela no topo e as
+    // outras 21 letras ficariam no meio do texto. Ela é par de "Bete".
+    const r = separarEpigrafe('PSA', 119, 1, '[Álefe] :Bem-aventurados são os puros')
+    expect(r.tipo).toBe('rotulo')
+  })
+
   it('usa a tabela de exceções onde a fonte esqueceu o dois-pontos', () => {
     // Sl 72:1 vem "Para SalomãoDeus, dá teus juízos ao rei" — sem separador nenhum.
     const r = separarEpigrafe('PSA', 72, 1, 'Para SalomãoDeus, dá teus juízos ao rei, e tua justiça ao filho do rei.')
@@ -53,12 +61,14 @@ describe('separarEpigrafe — rótulos estruturais', () => {
   it('separa a letra do acróstico no Salmo 119', () => {
     const r = separarEpigrafe('PSA', 119, 9, '[Bete] : Com que um rapaz purificará o seu caminho?')
     expect(r.epigrafe).toBe('Bete')
+    expect(r.tipo).toBe('rotulo')
     expect(r.texto).toBe('Com que um rapaz purificará o seu caminho?')
   })
 
   it('separa o marcador de locutor em Cânticos', () => {
     const r = separarEpigrafe('SOL', 1, 2, '[Ela]  : Beije-me ele com os beijos de sua boca')
     expect(r.epigrafe).toBe('Ela')
+    expect(r.tipo).toBe('rotulo')
     expect(r.texto).toBe('Beije-me ele com os beijos de sua boca')
   })
 

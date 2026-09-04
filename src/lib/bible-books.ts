@@ -346,7 +346,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
       58,
       30,
       24,
-      43,
+      42,
       15,
       23,
       29,
@@ -419,7 +419,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
       21,
       43,
       29,
-      54
+      53
     ]
   },
   {
@@ -1485,7 +1485,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
       18,
       33,
       21,
-      13
+      14
     ]
   },
   {
@@ -1696,7 +1696,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
     "testament": "nt",
     "section": "Cartas Gerais",
     "versesPerChapter": [
-      15
+      14
     ]
   },
   {
@@ -1725,7 +1725,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
       21,
       11,
       19,
-      18,
+      17,
       18,
       20,
       8,

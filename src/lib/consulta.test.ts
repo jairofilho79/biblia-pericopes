@@ -143,18 +143,21 @@ describe('parseConsulta — cobertura dos 66', () => {
 })
 
 /**
- * Os cinco pares de capítulos que a NAA teve corrigidos em 2026-09-03 (versos
+ * Os cinco pares de capítulos que precisaram de conserto em 2026-09-03 (versos
  * que estavam no capítulo errado). `bible-books.ts` guarda `versesPerChapter`
  * à mão e ficou com os números antigos por algumas horas — tempo em que a busca
  * recusava `Sl 110:7` dizendo "Salmos 110 tem 5 versículos", uma afirmação
  * falsa sobre a Bíblia, e aceitava `Sl 111:12`, que não existe.
  *
- * `scripts/auditar-cobertura.ts` compara os 1189 capítulos contra a NAA e é
- * quem PEGA uma divergência nova — mas lê `data/NAA.json`, que é gitignored,
+ * `scripts/auditar-cobertura.ts` compara os 1189 capítulos contra a fonte e é
+ * quem PEGA uma divergência nova — mas lê `data/BLIVRE.json`, que é gitignored,
  * então não roda na CI. Estes casos são a metade que roda: não descobrem
  * divergência nova, impedem que estes dez valores voltem sem ninguém notar.
+ *
+ * Os dez sobreviveram à troca da NAA pela Bíblia Livre: as duas concordam
+ * nestes capítulos.
  */
-describe('versificação dos capítulos corrigidos na NAA', () => {
+describe('versificação dos capítulos consertados', () => {
   it('os versículos que existem são aceitos como referência', () => {
     for (const q of ['2Sm 22:51', 'Sl 110:7', 'Is 4:6', 'Is 12:6', 'Os 3:5']) {
       expect(parseConsulta(q).ref, q).not.toBeNull()
@@ -171,6 +174,40 @@ describe('versificação dos capítulos corrigidos na NAA', () => {
       // apareceu comparando os 1189 capítulos contra a NAA.
       ['Is 13:23', 'Isaías 13 tem 22 versículos.'],
       ['Os 4:20', 'Oséias 4 tem 19 versículos.'],
+    ]
+    for (const [q, motivo] of esperado) {
+      const c = parseConsulta(q)
+      expect(c.ref, q).toBeNull()
+      expect(c.refForaDeFaixa?.motivo, q).toBe(motivo)
+    }
+  })
+})
+
+/**
+ * Os cinco pontos em que a NAA e a Bíblia Livre discordam — os únicos cinco em
+ * 31.102 versículos. A BLIVRE segue a KJV, que é de onde vêm os limites das
+ * perícopes, e `bible-books.ts` teve de trocar de lado junto com a fonte.
+ *
+ * Em três deles a NAA numerava em separado o que a KJV mantém dentro do
+ * versículo anterior; num, o inverso; e o Ap 12:18 nem existe na BLIVRE.
+ * Nenhum texto se perde em nenhum dos casos — muda o número, não o conteúdo.
+ */
+describe('versificação onde a Bíblia Livre diverge da NAA', () => {
+  it('aceita o último versículo que a BLIVRE de fato tem', () => {
+    for (const q of ['1Sm 20:42', '1Rs 22:53', '2Co 13:14', '3Jo 1:14', 'Ap 12:17']) {
+      expect(parseConsulta(q).ref, q).not.toBeNull()
+    }
+  })
+
+  it('recusa o versículo que só a NAA tinha, com o número certo', () => {
+    const esperado: [string, string][] = [
+      ['1Sm 20:43', '1 Samuel 20 tem 42 versículos.'],
+      ['1Rs 22:54', '1 Reis 22 tem 53 versículos.'],
+      ['3Jo 1:15', '3 João 1 tem 14 versículos.'],
+      ['Ap 12:18', 'Apocalipse 12 tem 17 versículos.'],
+      // O caso inverso: a NAA fechava a carta em 13:13 e a BLIVRE tem o 14,
+      // então quem passa a não existir é o 15.
+      ['2Co 13:15', '2 Coríntios 13 tem 14 versículos.'],
     ]
     for (const [q, motivo] of esperado) {
       const c = parseConsulta(q)

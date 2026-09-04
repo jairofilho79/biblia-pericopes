@@ -2673,6 +2673,7 @@ fieldset.jornada-campo {
   font-size: 0.9rem;
   font-family: var(--font-ui);
   color: var(--muted);
+}
 
 /* ── Menu Perfil ─────────────────────────────────────────────────────────
    Reúne tema, tipografia, Ajustes e conta. É o popover mais alto do app:

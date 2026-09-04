@@ -136,6 +136,17 @@ Regras que valem para qualquer sessão:
 9. **Teste nunca lê `public/data/` nem `data/`** — são derivados e/ou gitignored. Passa
    local e quebra a CI com ENOENT, porque `npm test` roda antes do build que os gera.
    Use fixture inline, `data/pericopes.json` (versionado) ou `src/lib/bible-books.ts`.
+10b. **Depois de qualquer merge que toque `src/styles/app.css`, confira o balanceamento
+    de chaves.** CSS inválido não quebra NADA do pipeline: `tsc -b` passa, `npm test`
+    passa, o lint não olha CSS e o build gera o bundle normalmente. Uma chave faltando
+    engole todas as regras seguintes em silêncio — aconteceu no merge do chrome
+    (601898b) e matou 217 linhas, inclusive o menu Perfil inteiro. Só apareceu quando
+    alguém abriu o app no navegador.
+
+    ```
+    node -e "const c=require('fs').readFileSync('src/styles/app.css','utf8').replace(/\/\*[\s\S]*?\*\//g,''); let n=0; for(const ch of c){if(ch==='{')n++;else if(ch==='}')n--} console.log('nivel final (0 = ok):', n)"
+    ```
+
 10. Contagem honesta de testes na `main` exige excluir as worktrees, senão o vitest
     coleta as das outras sessões:
 

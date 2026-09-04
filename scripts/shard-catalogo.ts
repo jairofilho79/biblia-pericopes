@@ -77,8 +77,13 @@ function main(): void {
     else porSlug.set(slug, { livro: p.livro, itens: [p] })
   }
 
+  // O índice sai NA ORDEM DE `seq` porque o catálogo já vem assim, e o app não
+  // reordena — a navegação anda por posição no array. Emitir na ordem de `ordem`
+  // esperando que o consumidor ordene erraria os três caminhos de navegação de
+  // uma vez, em silêncio. O campo vai junto para a ordem ser verificável.
   const indice = catalogo.map((p) => ({
     ordem: p.ordem,
+    seq: p.seq,
     livro: p.livro,
     abbrev: p.abbrev,
     capitulo_inicio: p.capitulo_inicio,

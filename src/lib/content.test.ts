@@ -66,6 +66,7 @@ describe('loadIndex', () => {
         ordem: 0, livro: 'Gênesis', abbrev: 'Gn',
         capitulo_inicio: 1, versiculo_inicio: 1, capitulo_fim: 2, versiculo_fim: 3,
         titulo_pericope_pt: 'A criação', minutos: 5,
+        seq: 0,
       },
     ]
     const fetchMock = vi.fn(async (_url: string) => respostaJson(idx))
@@ -192,6 +193,7 @@ describe('listPericopes com q', () => {
         versiculo_fim: 16,
         titulo_pericope_pt: 'P1',
         minutos: 1,
+        seq: 0,
       },
     ]
     vi.stubGlobal('fetch', vi.fn(async () => respostaJson(idx)))
@@ -204,5 +206,36 @@ describe('listPericopes com q', () => {
     expect(await listPericopes({ q: '3:16' })).toEqual([])
     // E o título continua casando, que é o que sobrou.
     expect((await listPericopes({ q: 'P1' })).map((p) => p.ordem)).toEqual([1])
+  })
+})
+
+// Depois do recorte do catálogo existe ordem 3000 entre ordens 1000: as 195
+// perícopes novas entram na posição canônica sem renumerar as existentes, porque
+// `ordem` é chave de progresso, anotação, destaque, jornada e do áudio no R2.
+// A navegação já era imune a isso — `ordensDoTestamento` faz filter+map e
+// `proximaNoTestamento` pega seq[i±1], ou seja, POSIÇÃO. Este teste trava o
+// contrato: quem quebrar isso ordenando por `ordem` erra os três caminhos de
+// navegação de uma vez (pager do rodapé, swipe e atalhos ←/→ passam todos por
+// irAnterior/irProxima em Leitura.tsx).
+describe('navegação com ordem não crescente (pós-recorte)', () => {
+  const naVT = (ordem: number): Pericope =>
+    ({ ordem, livro: 'Gênesis', abbrev: 'Gn', titulo_pericope_pt: `P${ordem}` }) as Pericope
+  // Ordem de LEITURA correta, com ordem numérica fora de ordem de propósito.
+  const lista = [naVT(1000), naVT(3000), naVT(1001), naVT(3001), naVT(1002)]
+
+  it('próxima segue a posição no array, não o valor de ordem', () => {
+    expect(proximaNoTestamento(lista, 1000)).toBe(3000)
+    expect(proximaNoTestamento(lista, 3000)).toBe(1001)
+    expect(proximaNoTestamento(lista, 3001)).toBe(1002)
+  })
+
+  it('anterior segue a posição no array', () => {
+    expect(anteriorNoTestamento(lista, 1001)).toBe(3000)
+    expect(anteriorNoTestamento(lista, 3000)).toBe(1000)
+  })
+
+  it('as pontas continuam sendo pontas', () => {
+    expect(anteriorNoTestamento(lista, 1000)).toBeNull()
+    expect(proximaNoTestamento(lista, 1002)).toBeNull()
   })
 })

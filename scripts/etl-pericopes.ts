@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url'
 import { BOOK_MAP } from './book-map.ts'
 import { resolveBounds } from './pericope-bounds.ts'
 import { ajustarVersificacao } from './versificacao.ts'
+import { gerarNovas } from './gerar-novas.ts'
+import { ordenarParaLeitura, atribuirSeq } from './aplicar-cortes.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const naaPath = join(root, 'data/NAA.json')
@@ -140,10 +142,29 @@ function main() {
     lines.push(JSON.stringify(raw))
   }
 
+  // --- RECORTE ---
+  // As perícopes grandes demais viram várias. `ordem` das existentes NUNCA muda
+  // (é chave de progresso, anotação, destaque, jornada e do áudio no R2); as
+  // novas entram com ordem >= 3000 na POSIÇÃO CANÔNICA, e `seq` passa a ser a
+  // ordem de leitura. Ver scripts/cortes.ts e docs/estado-cobertura-e-cortes.md.
+  const existentes = lines.map((l) => JSON.parse(l) as Record<string, unknown> & { ordem: number })
+  const novas = gerarNovas(root)
+  const naOrdemDeLeitura = ordenarParaLeitura(
+    existentes as unknown as Parameters<typeof ordenarParaLeitura>[0],
+    novas,
+  )
+  const comSeq = atribuirSeq(naOrdemDeLeitura)
+
+  const substituidas = new Set(novas.map((n) => n.substitui))
+  console.log(
+    `Recorte: ${substituidas.size} perícopes viraram ${novas.length} · ` +
+      `catálogo ${existentes.length} → ${comSeq.length}`,
+  )
+
   mkdirSync(dirname(outPath), { recursive: true })
-  writeFileSync(outPath, lines.join('\n') + '\n')
+  writeFileSync(outPath, comSeq.map((x) => JSON.stringify(x)).join('\n') + '\n')
   writeFileSync(warnPath, JSON.stringify(warnings, null, 2))
-  console.log(`OK: ${lines.length} perícopes → ${outPath}`)
+  console.log(`OK: ${comSeq.length} perícopes → ${outPath}`)
   console.log(`Avisos: ${warnings.length} → ${warnPath}`)
 }
 

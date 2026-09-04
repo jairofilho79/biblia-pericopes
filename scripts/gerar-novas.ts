@@ -63,10 +63,7 @@ function extrair(book: NaaBook, ci: number, vi: number, cf: number, vf: number):
   return linhas.join('\n')
 }
 
-function main() {
-  const outArg = process.argv.find((a) => a.startsWith('--out='))
-  const outPath = outArg ? outArg.slice('--out='.length) : join(root, 'data/novas-pericopes.jsonl')
-
+export function gerarNovas(root: string): Nova[] {
   const naa = JSON.parse(readFileSync(join(root, 'data/NAA.json'), 'utf8')) as NaaBook[]
   const byAbbrev = new Map(naa.map((b) => [b.abbrev, b]))
   const rows = readFileSync(join(root, 'data/raw-pericopes.jsonl'), 'utf8')
@@ -130,6 +127,14 @@ function main() {
     })
   }
 
+  return novas
+}
+
+/** Executável: grava o JSONL para inspeção. O ETL usa `gerarNovas` direto. */
+function main() {
+  const outArg = process.argv.find((a) => a.startsWith('--out='))
+  const outPath = outArg ? outArg.slice('--out='.length) : join(root, 'data/novas-pericopes.jsonl')
+  const novas = gerarNovas(root)
   writeFileSync(outPath, novas.map((x) => JSON.stringify(x)).join('\n') + '\n')
   const chars = novas.reduce((s, x) => s + x.texto_naa.length, 0)
   console.log(`${novas.length} perícopes novas → ${outPath}`)
@@ -139,4 +144,4 @@ function main() {
   console.log(`  texto bíblico: ${(chars / 1000).toFixed(0)} mil chars`)
 }
 
-main()
+if (process.argv[1]?.endsWith('gerar-novas.ts')) main()

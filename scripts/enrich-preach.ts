@@ -354,7 +354,9 @@ async function runFill(list: Pericope[], opts: ReturnType<typeof parseArgs>) {
   const costLog: { ordem: number; usage: Usage }[] = []
 
   const persist = () => {
-    writeCatalog([...byOrdem.values()].sort((a, b) => a.ordem - b.ordem))
+    // Mesma ordenação do enrich-pericopes: este script REGRAVA o catálogo, e
+    // ordenar por `ordem` aqui desfaria a ordem de leitura sem erro nenhum.
+    writeCatalog([...byOrdem.values()].sort((a, b) => (a.seq ?? a.ordem) - (b.seq ?? b.ordem)))
   }
 
   const publish = () => {

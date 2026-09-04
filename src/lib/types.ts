@@ -1,6 +1,20 @@
 /** Metadados de uma perícope: o que o índice de boot carrega. */
 export type PericopeIndex = {
+  /**
+   * ID estável e opaco. NÃO é a posição de leitura — para isso existe `seq`.
+   * É chave de dado de usuário em progresso, anotacoes, destaques,
+   * posicao_leitura e jornada.inicio_ordem, é a rota /leitura/:ordem, e é o nome
+   * do arquivo de áudio no R2. Nunca renumerar: renumerar reatribui histórico de
+   * leitura à passagem errada, em silêncio.
+   */
   ordem: number
+  /**
+   * Posição de leitura, densa a partir de 0. O `index.json` já sai do shard
+   * ordenado por ela e o app NÃO reordena — a navegação anda por posição no
+   * array. Existe porque as perícopes novas entram no meio do catálogo com
+   * `ordem >= 3000`, e sem separar os dois papéis seria preciso renumerar.
+   */
+  seq: number
   livro: string
   abbrev: string
   capitulo_inicio: number
@@ -84,8 +98,11 @@ export type PosicaoLeitura = {
 
 export type RawPericope = {
   ordem: number
-  titulo_en: string
-  livro_en: string
+  /** Posição de leitura. Ver PericopeIndex.seq. */
+  seq: number
+  /** Ausente nas perícopes nascidas do recorte: elas não vêm do dataset inglês. */
+  titulo_en?: string
+  livro_en?: string
   livro: string
   abbrev: string
   capitulo_inicio: number

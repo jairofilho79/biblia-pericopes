@@ -20,6 +20,8 @@ export type Editorial = Pick<
 export function montarPericope(raw: RawPericope, editorial: Editorial): Pericope {
   return {
     ordem: raw.ordem,
+    // Sem isto o catálogo sai com seq undefined e o shard não tem como ordenar.
+    seq: raw.seq,
     livro: raw.livro,
     abbrev: raw.abbrev,
     capitulo_inicio: raw.capitulo_inicio,

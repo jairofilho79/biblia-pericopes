@@ -31,6 +31,7 @@ function peri(ordem: number, livro: string, abbrev: string, cap = 1): PericopeIn
     versiculo_fim: 10,
     titulo_pericope_pt: `${livro} ${cap}`,
     minutos: 3,
+    seq: ordem,
   }
 }
 
@@ -256,6 +257,7 @@ describe('tamanhoDoEscopo', () => {
     const longa: PericopeIndex[] = [peri(0, 'X', 'X'), peri(1, 'X', 'X')].map((p, i) => ({
       ...p,
       minutos: i === 0 ? 40 : 50, // 90 min → 1h30, arredonda para 2h
+      seq: i,
     }))
     expect(tamanhoDoEscopo(longa)).toEqual({ total: 2, duracao: '~2 h' })
   })
@@ -374,6 +376,7 @@ function periTrilha(ordem: number, livro: string, abbrev: string, cap = 1): Peri
     versiculo_fim: 10,
     titulo_pericope_pt: `${livro} ${cap}`,
     minutos: 3,
+    seq: ordem,
   }
 }
 

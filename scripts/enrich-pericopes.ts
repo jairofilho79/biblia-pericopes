@@ -430,7 +430,10 @@ function merge(raw: RawPericope, ai: AiPartial): Pericope {
 
 const STUB_PATTERNS = [
   /forma uma unidade narrativa/i,
-  /Antes de ler /i,
+  // Ancorado no molde inteiro, não só em "Antes de ler ": a frase solta é
+  // português natural ("Antes de ler o diálogo, note por que ele existe") e
+  // marcava como stub material bom, mandando reenriquecer o que já estava certo.
+  /^Antes de ler [^:]{1,60}: estamos no livro de /i,
   /Resuma mentalmente o que ocorreu/i,
   /Leia-o como um bloco contínuo/i,
   /o detalhe do que acontece virá na leitura e na resenha/i,
@@ -530,7 +533,10 @@ function assembleCatalog(allRaw: RawPericope[]): Pericope[] {
     const cached = readCached(raw.ordem)
     catalog.push(cached ? montarPericope(raw, cached) : merge(raw, localEnrich(raw)))
   }
-  catalog.sort((a, b) => a.ordem - b.ordem)
+  // Ordena por `seq` (posição de leitura), não por `ordem` (ID). Depois do
+  // recorte existe ordem 3000 no meio de ordens 1000, e ordenar por ordem
+  // jogaria as perícopes novas para o fim do catálogo.
+  catalog.sort((a, b) => (a.seq ?? a.ordem) - (b.seq ?? b.ordem))
   writeFileSync(outPath, JSON.stringify(catalog))
   return catalog
 }

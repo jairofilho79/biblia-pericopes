@@ -279,3 +279,61 @@ describe('alinhar — recusas', () => {
     expect(r[1]!.palavras).toHaveLength(2)
   })
 })
+
+describe('alinhar — a narração normalizou o que a tela mostra cru', () => {
+  const uma = (u: Partial<Manifesto['unidades'][number]>): Manifesto => ({
+    ordem: 1,
+    dur_total: 10,
+    unidades: [
+      { i: 0, secao: 'resenha', texto: 'Resenha.', inicio: 0, dur: 1, palavras: [{ t: 'Resenha.', i: 0, d: 1 }] },
+      { i: 1, secao: 'resenha', texto: 'um dois', inicio: 2, dur: 2, palavras: [{ t: 'um', i: 2, d: 1 }, { t: 'dois', i: 3, d: 1 }], ...u },
+    ],
+  })
+  const conteudo = (r: ReturnType<typeof alinhar>) => r.filter((a) => !a.id.startsWith('cabecalho-'))
+
+  it('"SENHOR" na tela e "Senhor" na fala alinham', () => {
+    const m = uma({
+      texto: 'diz o Senhor,',
+      palavras: [{ t: 'diz', i: 2, d: 1 }, { t: 'o', i: 3, d: 1 }, { t: 'Senhor,', i: 4, d: 1 }],
+    })
+    const r = conteudo(alinhar(m, [{ secao: 'resenha', alvos: [{ id: 'r-0', texto: 'diz o SENHOR,' }] }]))
+    expect(r.map((a) => a.id)).toEqual(['r-0'])
+    expect(r[0]!.palavras).toHaveLength(3)
+  })
+
+  it('colchete editorial da NAA, que a voz não fala, não derruba a seção', () => {
+    const m = uma({
+      texto: 'Ditas estas coisas',
+      palavras: [{ t: 'Ditas', i: 2, d: 1 }, { t: 'estas', i: 3, d: 1 }, { t: 'coisas', i: 4, d: 1 }],
+    })
+    const r = conteudo(alinhar(m, [{ secao: 'resenha', alvos: [{ id: 'r-0', texto: '[Ditas estas coisas]' }] }]))
+    expect(r.map((a) => a.id)).toEqual(['r-0'])
+    expect(r[0]!.palavras).toHaveLength(3)
+  })
+
+  it('palavra de verdade diferente continua derrubando a seção', () => {
+    const r = conteudo(alinhar(uma({}), [{ secao: 'resenha', alvos: [{ id: 'r-0', texto: 'um tres' }] }]))
+    expect(r).toEqual([])
+  })
+
+  it('descarta "Capítulo N." mesmo quando o token seguinte só difere na caixa', () => {
+    const m: Manifesto = {
+      ordem: 1,
+      dur_total: 10,
+      unidades: [
+        { i: 0, secao: 'texto', texto: 'Texto bíblico.', inicio: 0, dur: 1, palavras: [{ t: 'Texto', i: 0, d: 0.5 }, { t: 'bíblico.', i: 0.5, d: 0.5 }] },
+        {
+          i: 1,
+          secao: 'texto',
+          texto: 'Capítulo 1. Senhor disse',
+          inicio: 2,
+          dur: 4,
+          palavras: [{ t: 'Capítulo', i: 2, d: 1 }, { t: '1.', i: 3, d: 1 }, { t: 'Senhor', i: 4, d: 1 }, { t: 'disse', i: 5, d: 1 }],
+        },
+      ],
+    }
+    const r = alinhar(m, [{ secao: 'texto', alvos: [{ id: 'v-1', texto: 'SENHOR disse' }] }])
+    expect(r.map((a) => a.id)).toEqual(['cabecalho-texto', 'cap-1', 'v-1'])
+    expect(r[2]!.palavras).toHaveLength(2)
+  })
+})

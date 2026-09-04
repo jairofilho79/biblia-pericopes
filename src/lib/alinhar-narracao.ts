@@ -31,6 +31,23 @@ export function tokens(texto: string): string[] {
 
 const PREFIXO = /^(Capítulo|Reflexão)\s+(\d+)\.\s+/
 
+/**
+ * O manifesto guarda o texto COMO FOI FALADO, e a gravação normalizou o que a
+ * voz não devia gritar: o "SENHOR" versalete da NAA foi para "Senhor" e os
+ * colchetes editoriais sumiram. A tela mostra o texto do catálogo, com os dois.
+ * Exigir igualdade byte a byte reprovava 15% das seções — Salmos quase inteiro,
+ * porque lá o Nome está em quase todo versículo.
+ *
+ * A folga vale SÓ na comparação manifesto × tela. A checagem interna do
+ * manifesto (`palavras[k].t` contra o próprio `texto`) continua exata: ali uma
+ * diferença de caixa é sinal de alinhamento errado, não de normalização.
+ */
+const semCaixaNemColchete = (s: string) => s.toLowerCase().replace(/[[\]]/g, '')
+
+function mesmoToken(narrado: string, naTela: string): boolean {
+  return narrado === naTela || semCaixaNemColchete(narrado) === semCaixaNemColchete(naTela)
+}
+
 type TokenManifesto = { tok: string; inicio: number }
 
 /**
@@ -63,7 +80,7 @@ function fluxoDoManifesto(unidades: UnidadeManifesto[], telaTok: string[]): Flux
     const m = PREFIXO.exec(u.texto)
     if (m) {
       const n = tokens(m[0].trimEnd()).length
-      if (n < tk.length && telaTok[fluxo.length] === tk[n]) {
+      if (n < tk.length && mesmoToken(tk[n]!, telaTok[fluxo.length] ?? '')) {
         ini = n
         // "Reflexão N." não ganha marcador: a tela numera a lista sozinha e
         // não há elemento para realçar.
@@ -97,7 +114,9 @@ function alinharConteudo(conteudo: UnidadeManifesto[], alvos: Alvo[]): AlvoAlinh
 
   const fluxo = fluxoDoManifesto(conteudo, telaTok)
   if (!fluxo || fluxo.tokens.length !== telaTok.length) return []
-  for (let k = 0; k < fluxo.tokens.length; k++) if (fluxo.tokens[k]!.tok !== telaTok[k]) return []
+  for (let k = 0; k < fluxo.tokens.length; k++) {
+    if (!mesmoToken(fluxo.tokens[k]!.tok, telaTok[k]!)) return []
+  }
 
   const ultima = conteudo[conteudo.length - 1]!
   const fimSecao = ultima.inicio + ultima.dur

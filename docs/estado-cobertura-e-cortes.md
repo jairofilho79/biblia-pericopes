@@ -217,3 +217,18 @@ nunca a citá-lo como se fosse texto do trecho — o que seria inventar Escritur
 
 Decisão pendente do usuário: aceitar assim, ou conseguir os sobrescritos de uma
 fonte NAA e reprocessar os Salmos.
+
+## Efeito visível de aposentar as ordens 1100-1104
+
+Levantado pela sessão da fusão Índice/Pesquisa: quando as cinco saírem do
+`index.json`, qualquer `progresso`, `destaque` ou `anotacao` que exista para elas
+vira dado órfão. As telas não quebram — elas só leem progresso de ordem presente
+no índice — mas **o ✓ some sem explicação** para quem tiver lido uma das cinco.
+
+Medido no D1 em 2026-09-03: é exatamente **1 linha**, de `progresso`, na ordem
+1100. Zero anotações, zero destaques. Ou seja, o efeito real é o ✓ do próprio
+dono sumindo de "Livro 1 dos Salmos" — que ele já aceitou ao decidir aposentar.
+
+Some junto a barra de Salmos, que hoje mostra 1 de 5 concluída e passa a mostrar
+0 de 148. Não é bug, é o denominador mudando; mas parece bug, e por isso está
+escrito aqui.

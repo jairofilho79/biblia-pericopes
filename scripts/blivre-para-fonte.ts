@@ -12,7 +12,13 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { converterVpl } from './blivre-fonte.ts'
-import { DUPLICADAS, PARENTESES_ORFAOS, CORRECOES } from './blivre-correcoes.ts'
+import {
+  DUPLICADAS,
+  PARENTESES_ORFAOS,
+  CORRECOES,
+  SUBSCRICOES,
+  OMISSOES,
+} from './blivre-correcoes.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const entrada = join(root, 'data/bliv-tr_vpl.txt')
@@ -49,7 +55,8 @@ function main() {
   console.log(
     `OK: ${livros.length} livros · ${versiculos.toLocaleString('pt-BR')} versículos · ` +
       `${sobrescritos} sobrescritos · ${rotulos} rótulos · ` +
-      `${DUPLICADAS.length + PARENTESES_ORFAOS.length + CORRECOES.length} correções → ${saida}`,
+      `${DUPLICADAS.length + PARENTESES_ORFAOS.length + CORRECOES.length} correções · ` +
+      `${SUBSCRICOES.length} subscrições fora · ${OMISSOES.length} frases restauradas → ${saida}`,
   )
 }
 

@@ -17,7 +17,7 @@ const sampleDir = join(root, 'data/preach-sample')
 
 const DEFAULT_MODEL = 'google/gemini-3.7-flash'
 
-const SYSTEM_PROMPT = `Você gera tópicos de pregação para uma perícope bíblica (versão NAA). Português brasileiro. Público: jovem/adolescente que já leu a Bíblia uma vez — inteligente, sem vocabulário grande.
+const SYSTEM_PROMPT = `Você gera tópicos de pregação para uma perícope bíblica (versão Bíblia Livre, BLIVRE). Português brasileiro. Público: jovem/adolescente que já leu a Bíblia uma vez — inteligente, sem vocabulário grande.
 Responda APENAS com JSON válido (sem markdown de cerca):
 {
   "topicos_pregar": "..."
@@ -32,7 +32,7 @@ topicos_pregar — para o pregador ler rápido no púlpito:
 - 5–7 bullets na linha de raciocínio; 4–6 mensagens.
 - Cada bullet: 1 observação específica DESTE trecho + 1 palavra-chave em **negrito**.
 - Palavras-chave e termos importantes em **negrito** (markdown **assim**).
-- Sem sermão escrito, sem introdução, sem citar a NAA versículo a versículo.
+- Sem sermão escrito, sem introdução, sem citar o texto versículo a versículo.
 - Não escreva briefing para outro agente. Só os tópicos.`
 
 type PreachFields = { topicos_pregar: string }
@@ -71,7 +71,7 @@ Referência: ${refLabel(p)}
 Resenha (já na app):
 ${p.resenha}
 
-Texto NAA:
+Texto bíblico:
 ${p.texto}`
 }
 

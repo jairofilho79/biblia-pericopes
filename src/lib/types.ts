@@ -29,6 +29,13 @@ export type PericopeIndex = {
 /** Perícope completa: índice + o conteúdo que vem dos shards do livro. */
 export type Pericope = PericopeIndex & {
   texto: string
+  /**
+   * Epígrafe que vem ANTES do versículo 1 e fora da numeração: o sobrescrito
+   * do salmo ("Salmo de Davi, quando ele fugia da presença de seu filho
+   * Absalão"), o título de seção de Provérbios, a revelação de Isaías.
+   * 125 perícopes têm. Ver scripts/blivre-epigrafes.ts.
+   */
+  sobrescrito?: string
   /** O que saber ANTES de ler o texto */
   contexto_historico_literario: string
   /** Apanhado do que aconteceu e por quê; Deus/Jesus só quando couber com naturalidade */
@@ -110,6 +117,8 @@ export type RawPericope = {
   capitulo_fim: number
   versiculo_fim: number
   texto: string
+  /** Epígrafe do versículo de abertura. Ver SOBRESCRITO em Pericope. */
+  sobrescrito?: string
 }
 
 export type JornadaTipo = 'sequencia' | 'bloco' | 'livro' // 'cronologica' depois

@@ -103,7 +103,13 @@ function main(): void {
   for (const [slug, { itens }] of porSlug) {
     writeFileSync(
       join(outDir, 'texto', `${slug}.json`),
-      JSON.stringify(itens.map((p) => ({ ordem: p.ordem, texto: p.texto }))),
+      JSON.stringify(
+        itens.map((p) => ({
+          ordem: p.ordem,
+          texto: p.texto,
+          ...(p.sobrescrito ? { sobrescrito: p.sobrescrito } : {}),
+        })),
+      ),
     )
     writeFileSync(
       join(outDir, 'estudo', `${slug}.json`),

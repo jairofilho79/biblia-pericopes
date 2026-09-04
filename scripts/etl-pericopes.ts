@@ -1,5 +1,5 @@
 /**
- * ETL: KJV_Pericopes bounds × NAA.json → data/raw-pericopes.jsonl
+ * ETL: limites do KJV_Pericopes × data/BLIVRE.json → data/raw-pericopes.jsonl
  * Usage: npx tsx scripts/etl-pericopes.ts
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
@@ -10,14 +10,17 @@ import { resolveBounds } from './pericope-bounds.ts'
 import { ajustarVersificacao } from './versificacao.ts'
 import { gerarNovas } from './gerar-novas.ts'
 import { ordenarParaLeitura, atribuirSeq } from './aplicar-cortes.ts'
+import { extrairTexto } from './extrair-texto.ts'
+import type { LivroBlivre } from './blivre-fonte.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const naaPath = join(root, 'data/NAA.json')
+const fontePath = join(root, 'data/BLIVRE.json')
 const kjvPath = join(root, 'data/raw/PericopeGroupedKJVVerses.json')
 const outPath = join(root, 'data/raw-pericopes.jsonl')
+/** As perícopes ANTES do recorte — é delas que os cortes partem. */
+const brutasPath = join(root, 'data/raw-pericopes-brutas.jsonl')
 const warnPath = join(root, 'data/etl-warnings.json')
 
-type NaaBook = { abbrev: string; name: string; chapters: string[][] }
 type KjvRow = {
   Pericope: string
   'Reference Start': string
@@ -28,46 +31,9 @@ type KjvRow = {
 
 type Warning = { ordem: number; type: string; detail: string }
 
-function extractVerses(
-  book: NaaBook,
-  cStart: number,
-  vStart: number,
-  cEnd: number,
-  vEnd: number,
-): { text: string; count: number; warnings: string[] } {
-  const warnings: string[] = []
-  const lines: string[] = []
-  let count = 0
-  let lastChapter = -1
-
-  for (let c = cStart; c <= cEnd; c++) {
-    const chapter = book.chapters[c - 1]
-    if (!chapter) {
-      warnings.push(`capítulo ${c} ausente em ${book.name}`)
-      continue
-    }
-    const from = c === cStart ? vStart : 1
-    const to = c === cEnd ? vEnd : chapter.length
-    if (c !== lastChapter) {
-      lines.push(`Capítulo ${c}`)
-      lastChapter = c
-    }
-    for (let v = from; v <= to; v++) {
-      const verse = chapter[v - 1]
-      if (verse == null) {
-        warnings.push(`${book.name} ${c}:${v} ausente na NAA`)
-        continue
-      }
-      lines.push(`${v} ${verse}`)
-      count++
-    }
-  }
-  return { text: lines.join('\n'), count, warnings }
-}
-
 function main() {
-  const naa = JSON.parse(readFileSync(naaPath, 'utf8')) as NaaBook[]
-  const byAbbrev = new Map(naa.map((b) => [b.abbrev, b]))
+  const fonte = JSON.parse(readFileSync(fontePath, 'utf8')) as LivroBlivre[]
+  const byAbbrev = new Map(fonte.map((b) => [b.abbrev, b]))
   const kjv = JSON.parse(readFileSync(kjvPath, 'utf8')) as KjvRow[]
   const warnings: Warning[] = []
   const lines: string[] = []
@@ -108,18 +74,18 @@ function main() {
     }
     const book = byAbbrev.get(mapped.abbrev)
     if (!book) {
-      warnings.push({ ordem: i, type: 'abbrev_naa', detail: mapped.abbrev })
+      warnings.push({ ordem: i, type: 'abbrev_fonte', detail: mapped.abbrev })
       continue
     }
 
-    const { text, count, warnings: w } = extractVerses(
+    const { texto, sobrescrito, versiculos: count, avisos } = extrairTexto(
       book,
       start.capitulo,
       start.versiculo,
       end.capitulo,
       end.versiculo,
     )
-    for (const detail of w) {
+    for (const detail of avisos) {
       warnings.push({ ordem: i, type: 'versiculo', detail })
     }
     if (count === 0) {
@@ -137,7 +103,8 @@ function main() {
       versiculo_inicio: start.versiculo,
       capitulo_fim: end.capitulo,
       versiculo_fim: end.versiculo,
-      texto: text,
+      texto,
+      ...(sobrescrito ? { sobrescrito } : {}),
     }
     lines.push(JSON.stringify(raw))
   }
@@ -148,7 +115,9 @@ function main() {
   // novas entram com ordem >= 3000 na POSIÇÃO CANÔNICA, e `seq` passa a ser a
   // ordem de leitura. Ver scripts/cortes.ts e docs/estado-cobertura-e-cortes.md.
   const existentes = lines.map((l) => JSON.parse(l) as Record<string, unknown> & { ordem: number })
-  const novas = gerarNovas(root)
+  mkdirSync(dirname(brutasPath), { recursive: true })
+  writeFileSync(brutasPath, lines.join('\n') + '\n')
+  const novas = gerarNovas(root, existentes as unknown as Parameters<typeof gerarNovas>[1])
   const naOrdemDeLeitura = ordenarParaLeitura(
     existentes as unknown as Parameters<typeof ordenarParaLeitura>[0],
     novas,

@@ -35,7 +35,7 @@ PÚBLICO: pessoas lendo a Bíblia pela segunda vez. Já conhecem um pouco, quere
 
 Missão: embasar na Palavra com insights de especialista; traduzir o essencial em português fácil e direto; e — só quando o texto abrir espaço com honestidade — ajudar a conhecer melhor a Deus e a Jesus.
 
-Recebe o título da perícope em inglês e o texto bíblico na versão NAA.
+Recebe o título da perícope em inglês e o texto bíblico na versão Bíblia Livre (BLIVRE).
 Não altere nem “corrija” o texto bíblico.
 Não invente citações literais fora do trecho dado.
 Evite jargão denso, polêmica denominacional e frases feitas piedosas.
@@ -359,7 +359,7 @@ async function openRouterEnrich(
   const model = process.env.OPENROUTER_MODEL || 'google/gemini-3.7-flash'
   const user = `Título (EN): ${raw.titulo_en}
 Referência: ${raw.livro} ${raw.capitulo_inicio}:${raw.versiculo_inicio}–${raw.capitulo_fim}:${raw.versiculo_fim}
-Texto NAA:
+Texto bíblico:
 ${raw.texto}`
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {

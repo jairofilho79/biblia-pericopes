@@ -4,7 +4,7 @@
  * A separação importa: `data/enriched/<ordem>.json` guarda o objeto inteiro,
  * texto bíblico incluído. Montar o catálogo a partir do cache cru congelava a
  * estrutura na forma em que ela estava quando a IA rodou — uma correção de
- * limites no ETL ou um conserto na NAA nunca chegavam ao app.
+ * limites no ETL ou uma troca de fonte nunca chegavam ao app.
  *
  * Regra: limites e `texto` vêm SEMPRE do raw; título, contexto, resenha,
  * perguntas e tópicos vêm do cache.
@@ -29,6 +29,7 @@ export function montarPericope(raw: RawPericope, editorial: Editorial): Pericope
     capitulo_fim: raw.capitulo_fim,
     versiculo_fim: raw.versiculo_fim,
     texto: raw.texto,
+    ...(raw.sobrescrito ? { sobrescrito: raw.sobrescrito } : {}),
     titulo_pericope_pt: editorial.titulo_pericope_pt,
     contexto_historico_literario: editorial.contexto_historico_literario,
     resenha: editorial.resenha,

@@ -1,4 +1,4 @@
-/** English KJV book name → NAA name + abbrev */
+/** English KJV book name → nome e abreviatura em português */
 export const BOOK_MAP: Record<string, { name: string; abbrev: string }> = {
   Genesis: { name: 'Gênesis', abbrev: 'Gn' },
   Exodus: { name: 'Êxodo', abbrev: 'Êx' },

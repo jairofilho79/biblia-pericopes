@@ -1,11 +1,11 @@
 /**
- * Confere a tabela de cortes contra o catálogo e a NAA, antes de qualquer
+ * Confere a tabela de cortes contra o catálogo e a fonte bíblica, antes de qualquer
  * geração. Um corte errado só aparece depois de gastar LLM e TTS — este script
  * é a barreira barata.
  *
  * Verifica, por corte: a perícope original existe e bate com `de`; as partes
  * cobrem exatamente a faixa dela, sem buraco e sem sobreposição; e cada faixa
- * existe de fato na NAA.
+ * existe de fato na fonte.
  *
  * Usage: npx tsx scripts/validar-cortes.ts
  */
@@ -16,7 +16,7 @@ import { CORTES, faixasDeSalmos } from './cortes.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-type NaaBook = { abbrev: string; chapters: string[][] }
+type LivroFonte = { abbrev: string; chapters: unknown[][] }
 type Row = {
   ordem: number
   livro: string
@@ -36,9 +36,9 @@ function parseFaixa(f: string) {
 }
 
 function main() {
-  const naa = JSON.parse(readFileSync(join(root, 'data/NAA.json'), 'utf8')) as NaaBook[]
-  const lens = new Map(naa.map((b) => [b.abbrev, b.chapters.map((c) => c.length)]))
-  const rows = readFileSync(join(root, 'data/raw-pericopes.jsonl'), 'utf8')
+  const fonte = JSON.parse(readFileSync(join(root, 'data/BLIVRE.json'), 'utf8')) as LivroFonte[]
+  const lens = new Map(fonte.map((b) => [b.abbrev, b.chapters.map((c) => c.length)]))
+  const rows = readFileSync(join(root, 'data/raw-pericopes-brutas.jsonl'), 'utf8')
     .split('\n')
     .filter(Boolean)
     .map((l) => JSON.parse(l) as Row)
@@ -50,7 +50,7 @@ function main() {
   for (const corte of CORTES) {
     const r = porOrdem.get(corte.ordem)
     if (!r) {
-      erros.push(`#${corte.ordem}: não existe no catálogo`)
+      erros.push(`#${corte.ordem}: não existe nas perícopes brutas`)
       continue
     }
     const real = `${r.livro} ${r.capitulo_inicio}:${r.versiculo_inicio}-${r.capitulo_fim}:${r.versiculo_fim}`
@@ -60,7 +60,7 @@ function main() {
     }
     const l = lens.get(r.abbrev)
     if (!l) {
-      erros.push(`#${corte.ordem}: abbrev ${r.abbrev} fora da NAA`)
+      erros.push(`#${corte.ordem}: abbrev ${r.abbrev} fora da fonte`)
       continue
     }
 

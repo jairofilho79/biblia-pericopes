@@ -157,3 +157,18 @@ alcançável por um cliente normal. Registrados para não se perderem.
   específicos por página).
 - Feedback do botão "Sair" só via `title`/aria-live (usuário de toque não
   vê indicação visível de falha).
+
+- `src/pages/Explorar.tsx` tem 483 linhas (398 de código, 56 de comentário),
+  contra as ~190 que a spec da fusão projetou — e a mesma spec prometia
+  "nenhum arquivo passa de 200". São 11 `useState`, 5 `useEffect` e 6
+  `useMemo` num arquivo só, e as três seções que carregam dados (Referência,
+  Títulos, livro aberto) repetem o mesmo formato: efeito com bandeira `vivo`,
+  `.then` que seta estado, `.catch` que engole. É um hook pedindo para
+  nascer. Levantado na revisão final da branch e deliberadamente NÃO pago
+  antes do merge: não é defeito, os testes cobrem o comportamento, e refatorar
+  na mesma rodada em que quatro sessões mexeram no repositório trocaria risco
+  conhecido por risco novo. É a dívida que a próxima mudança nesta tela paga.
+- A extração de lógica pura para `src/lib/` (`catalogo.ts`, `item-pericope.ts`)
+  nasceu de um conserto de aviso de lint, não de decisão de desenho, e por isso
+  parou onde o lint parou. Vale decidir de propósito o que mais sai de
+  `Explorar.tsx` quando a refatoração acima acontecer.

@@ -5,6 +5,7 @@
  * Usage: npx tsx scripts/auditar-cobertura.ts [--tamanhos]
  */
 import { readFileSync } from 'node:fs'
+import { BIBLE_BOOKS } from '../src/lib/bible-books.ts'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -100,13 +101,39 @@ function main() {
   }
 
   const cobertos = total - buracos.length
+  // `src/lib/bible-books.ts` guarda versesPerChapter À MÃO e nenhum script o
+  // gera. A busca por referência valida contra ELE, não contra a NAA — então um
+  // conserto na NAA que não chegue lá faz o parser recusar versículo que existe.
+  // Aconteceu: consertar 5 capítulos embaralhados deixou 10 números velhos, e
+  // "Sl 110:7" passou a responder "Salmos 110 tem 5 versículos".
+  const divergentes: string[] = []
+  for (const b of BIBLE_BOOKS) {
+    const real = lens.get(b.abbrev)
+    if (!real) {
+      divergentes.push(`${b.abbrev} (${b.name}) não existe na NAA`)
+      continue
+    }
+    if (real.length !== b.versesPerChapter.length) {
+      divergentes.push(`${b.abbrev}: ${b.versesPerChapter.length} capítulos declarados, NAA tem ${real.length}`)
+    }
+    b.versesPerChapter.forEach((v, i) => {
+      if (v !== real[i]) divergentes.push(`${b.abbrev} ${i + 1}: bible-books ${v} · NAA ${real[i]}`)
+    })
+  }
+
   console.log(`Perícopes: ${rows.length}`)
   console.log(`Versículos na NAA: ${total}`)
   console.log(`Cobertos: ${cobertos} (${((cobertos / total) * 100).toFixed(4)}%)`)
   console.log(`Fora de qualquer perícope: ${buracos.length}`)
   console.log(`Em mais de uma perícope: ${duplos.length}`)
   console.log(`Referências fora do texto NAA: ${foraDaNaa.length}`)
+  console.log(`bible-books.ts divergindo da NAA: ${divergentes.length}`)
 
+  if (divergentes.length) {
+    console.log('\n--- bible-books.ts × NAA ---')
+    for (const d of divergentes) console.log(`  ${d}`)
+    process.exitCode = 1
+  }
   if (buracos.length) {
     console.log('\n--- BURACOS ---')
     for (const f of agrupar(buracos)) {

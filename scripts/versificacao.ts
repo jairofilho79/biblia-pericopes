@@ -1,14 +1,35 @@
 /**
- * Ajustes de faixa por diferença de versificação KJV × NAA.
+ * Ajustes de faixa por diferença de versificação entre o dataset KJV de
+ * perícopes e a tradução que preenche o texto.
  *
- * O dataset de perícopes é KJV. A NAA tem quatro versículos que a KJV não tem
- * — todos finais de capítulo, todos a segunda metade de um versículo que a KJV
- * manteve junto — e por isso nenhuma perícope os reivindica. E tem o caso
- * inverso: uma perícope cuja faixa termina num versículo que a NAA não tem.
+ * **Com a Bíblia Livre, a tabela está vazia — e isso é o resultado, não um
+ * esquecimento.** A BLIVRE segue a versificação da KJV nos 31.102 versículos:
+ * a auditoria de cobertura fecha sem um único ajuste. A máquina fica de pé
+ * porque a tabela é o lugar certo para a próxima divergência, se a fonte trocar.
  *
- * Cada ajuste é uma decisão editorial, não um conserto mecânico: por isso o
- * motivo fica escrito aqui e não num commit que ninguém relê.
+ * Para o histórico: a NAA exigia CINCO ajustes, e nenhum sobreviveu à troca.
+ * Ficam escritos aqui porque cada um foi uma decisão editorial, e saber por que
+ * morreram vale mais do que um commit que ninguém relê.
+ *
+ * - **544 — 1Sm 20:43.** A NAA numerava em separado a despedida ("Davi se
+ *   levantou e foi embora"), que a KJV mantém dentro de 20:42. A BLIVRE fecha
+ *   o capítulo em 42, como a KJV. Nada de texto se perde: a frase está no 42.
+ * - **707 — 1Rs 22:54.** Mesmo caso: o veredito sobre Acazias ("serviu a Baal
+ *   e o adorou") é 22:53 na BLIVRE, e o texto está lá inteiro.
+ * - **2542 — 3Jo 1:15.** Mesmo caso: "A paz esteja com você" fecha o 1:14.
+ * - **2316 — 2Co 13:14.** Era o caso inverso: a perícope declarava terminar
+ *   num versículo que a NAA não tinha, e o fim precisava encolher. A BLIVRE
+ *   tem o 13:14 ("A graça do Senhor Jesus Cristo… seja com todos vós"), então
+ *   a faixa declarada pelo dataset vale como está.
+ * - **2613 — Ap 12:18.** Era o único discutível: mover o início da perícope da
+ *   besta para que "o dragão se pôs em pé sobre a areia do mar" abrisse a cena
+ *   em vez de fechar a anterior. Na BLIVRE o versículo nem existe — o capítulo
+ *   12 termina em 17 — e a frase está dentro do 13:1, que já é o primeiro
+ *   versículo da perícope: "E eu fiquei parado sobre a areia do mar. E vi subir
+ *   do mar uma besta…". A decisão continua valendo; ela só não precisa mais de
+ *   ajuste para acontecer.
  */
+
 import type { ParsedRef } from './book-map.ts'
 
 export type Ajuste = {
@@ -23,64 +44,23 @@ export type Ajuste = {
   motivo: string
 }
 
-export const AJUSTES: Ajuste[] = [
-  {
-    ordem: 544,
-    livroEn: '1 Samuel',
-    fim: { capitulo: 20, versiculo: 43 },
-    motivo:
-      '1Sm 20:43 ("Davi se levantou e foi embora; Jônatas voltou para a cidade") ' +
-      'é a segunda metade do que a KJV numera como 20:42. Fecha a despedida.',
-  },
-  {
-    ordem: 707,
-    livroEn: '1 Kings',
-    fim: { capitulo: 22, versiculo: 54 },
-    motivo:
-      '1Rs 22:54 ("serviu a Baal e o adorou") é o veredito do resumo do reinado ' +
-      'de Acazias, que a KJV fecha em 22:53.',
-  },
-  {
-    ordem: 2542,
-    livroEn: '3 John',
-    fim: { capitulo: 1, versiculo: 15 },
-    motivo:
-      '3Jo 1:15 ("A paz esteja com você…") é a saudação final da carta; a KJV ' +
-      'a mantém dentro de 1:14.',
-  },
-  {
-    ordem: 2613,
-    livroEn: 'Revelation',
-    inicio: { capitulo: 12, versiculo: 18 },
-    motivo:
-      'Ap 12:18 ("o dragão se pôs em pé sobre a areia do mar") ABRE a perícope ' +
-      'da besta que sai do mar, não fecha a da perseguição à mulher: é a ' +
-      'montagem da cena seguinte. A KJV lê a frase como 13:1a. Único dos ' +
-      'quatro em que a escolha é discutível, e a decisão é deliberada.',
-  },
-  {
-    ordem: 2316,
-    livroEn: '2 Corinthians',
-    fim: { capitulo: 13, versiculo: 13 },
-    motivo:
-      'Caso inverso: a perícope declara terminar em 2Co 13:14, versículo que a ' +
-      'NAA não tem — ela fecha a carta em 13:13. Encolhe o fim para o que existe.',
-  },
-]
-
-const porOrdem = new Map(AJUSTES.map((a) => [a.ordem, a]))
+export const AJUSTES: Ajuste[] = []
 
 /**
  * Aplica o ajuste da `ordem`, se houver. Devolve os limites inalterados quando
  * não há ajuste, e lança quando o livro não bate — sinal de que o dataset
  * mudou de ordem e a tabela precisa ser revista, nunca ignorada em silêncio.
+ *
+ * `tabela` existe para o teste exercitar a máquina enquanto `AJUSTES` está
+ * vazia; a produção sempre usa o padrão.
  */
 export function ajustarVersificacao(
   ordem: number,
   start: ParsedRef,
   end: ParsedRef,
+  tabela: Ajuste[] = AJUSTES,
 ): { start: ParsedRef; end: ParsedRef; ajustado: boolean } {
-  const a = porOrdem.get(ordem)
+  const a = tabela.find((x) => x.ordem === ordem)
   if (!a) return { start, end, ajustado: false }
   if (start.livroEn !== a.livroEn) {
     throw new Error(

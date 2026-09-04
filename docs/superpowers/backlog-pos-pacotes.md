@@ -132,11 +132,19 @@ alcançável por um cliente normal. Registrados para não se perderem.
   `docs/superpowers/specs/2026-09-03-chrome-header-perfil-design.md`.
 - ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
   regras viraram uma (ambas no topo, sem `@media` em volta).
-- CSS órfão depois da fusão: `.pesquisar .testament-h`, `.pesquisar .section-h`
-  (`app.css:2042-2056`) e o bloco `.modo-busca`/`.modo-btn`
-  (`app.css:2227-2251`) ficaram sem elemento quando `Pesquisar.tsx` foi
-  apagado. Não removidos junto de propósito: quatro sessões editavam o
-  arquivo na mesma rodada e a remoção conflitaria. Limpeza segura agora.
+- CSS órfão depois da fusão Índice/Pesquisa (apagar `Indice.tsx` E
+  `Pesquisar.tsx` deixou seletores de dois arquivos sem elemento, não só um):
+  `.pesquisar .testament-h`, `.pesquisar .section-h` (`app.css:2042-2056`); o
+  bloco `.modo-busca`/`.modo-btn` (`app.css:2227-2251`); `.book-group`
+  (`app.css:2037-2040`); `.book-list`, `.book-chip` e variantes
+  (`.book-chip .book-abbrev`, `.book-chip.active`,
+  `.book-chip.active .book-abbrev`) (`app.css:2059-2096`); `.search-hit` e
+  variantes (`.search-hit a`, `.search-hit a strong`, `.search-hit a span`)
+  e `.catalog-hint` (`app.css:2201-2226`); e `.book-group-head` com
+  `.book-group-head h2` (`app.css:2291-2299`). Não removidos junto de
+  propósito: quatro sessões editavam o arquivo na mesma rodada e a remoção
+  conflitaria. Limpeza segura agora — conferir de novo antes de apagar, o
+  código-fonte muda rápido e as linhas acima podem ter se deslocado.
 
 ## UI geral
 

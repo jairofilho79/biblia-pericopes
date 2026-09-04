@@ -54,6 +54,9 @@ export default function Explorar() {
   const q = params.get('q') ?? ''
   const f = params.get('f')
   const filtro: FiltroLeitura = ehFiltro(f) ? f : 'todos'
+  // Precisa vir ANTES da derivação de `livro`: a exclusão mútua usa o termo
+  // APARADO (`consulta.termo`), não o `q` cru — ver comentário abaixo.
+  const consulta = useMemo(() => parseConsulta(q), [q])
   const livroParam = params.get('livro') ?? ''
   // Busca e livro aberto são estados EXCLUSIVOS, e a exclusão precisa valer na
   // DERIVAÇÃO, não só nos manipuladores: uma URL que chegue com os dois — link
@@ -61,7 +64,12 @@ export default function Explorar() {
   // `abrirLivro`, e mostraria o painel do livro com a caixa de busca cheia e
   // muda. Entre os dois, a consulta vence: a seção "Livros" do resultado
   // devolve o livro a um toque, e o caminho contrário não existe.
-  const livro: BibleBook | undefined = !q && livroParam ? bookByName(livroParam) : undefined
+  //
+  // `consulta.termo`, não `q`: `q` cru conta um espaço como busca ativa, e
+  // `?q=%20&livro=João` suprimiria o livro por causa de um espaço — apagar
+  // esse espaço faria o livro reaparecer sem o leitor ter escolhido nada.
+  const livro: BibleBook | undefined =
+    !consulta.termo && livroParam ? bookByName(livroParam) : undefined
   const capParam = Number(params.get('cap'))
   const cap = livro && Number.isInteger(capParam) && capParam >= 1 ? capParam : null
 
@@ -70,7 +78,6 @@ export default function Explorar() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
 
-  const consulta = useMemo(() => parseConsulta(q), [q])
   const aceita = useMemo(() => filtroDeOrdens(status, filtro), [status, filtro])
   const concluidas = useMemo(
     () => new Set([...status].filter(([, s]) => s === 'concluido').map(([o]) => o)),
@@ -119,15 +126,16 @@ export default function Explorar() {
   // Digitar navega com replace: teclar não pode entulhar o histórico.
   const setQ = (valor: string) =>
     mexerNaUrl((p) => {
+      // Mesma exclusão dos dois lados: apagar o texto também não pode revelar
+      // um painel de livro que o leitor nunca escolheu abrir (`?q=amor&livro=
+      // João` apagado até vazio não é o mesmo que ter clicado em "João").
+      p.delete('livro')
+      p.delete('cap')
       if (!valor) {
         p.delete('q')
         return
       }
       p.set('q', valor)
-      // Digitar fecha o livro aberto. Com `livro` na URL o render mostra o
-      // painel do livro e nenhuma seção de resultado — a caixa ficaria muda.
-      p.delete('livro')
-      p.delete('cap')
     }, /* replace */ !livro)
   const setFiltro = (valor: FiltroLeitura) =>
     mexerNaUrl((p) => (valor === 'todos' ? p.delete('f') : p.set('f', valor)), false)

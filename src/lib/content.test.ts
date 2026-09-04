@@ -171,15 +171,38 @@ describe('mesmosStatus', () => {
 })
 
 describe('listPericopes com q', () => {
-  it('casa só o título — nome de livro não entra pela busca de texto', async () => {
+  it('casa só o título: nome de livro e referência não entram mais pela busca', async () => {
     // `loadIndex` guarda o índice num módulo singleton; o teste de 'loadIndex'
     // acima já populou esse cache com outro fixture. resetModules() força uma
     // instância nova de content.ts, isolada do resto do arquivo.
     vi.resetModules()
-    vi.stubGlobal('fetch', vi.fn(async () => respostaJson(ALL)))
+    // capitulo/versiculo populados de propósito: com a fixture de `peri()`
+    // (livro/ordem só) a asserção de "3:16" passaria de graça mesmo com a
+    // implementação antiga, porque capitulo_inicio ficaria `undefined`. Aqui
+    // "13:16" é o caso citado no comentário do código-fonte: a implementação
+    // antiga casava "3:16" contra o INÍCIO de 13:16 por ser substring.
+    const idx: PericopeIndex[] = [
+      {
+        ordem: 1,
+        livro: 'Gn',
+        abbrev: 'Gn',
+        capitulo_inicio: 13,
+        versiculo_inicio: 16,
+        capitulo_fim: 13,
+        versiculo_fim: 16,
+        titulo_pericope_pt: 'P1',
+        minutos: 1,
+      },
+    ]
+    vi.stubGlobal('fetch', vi.fn(async () => respostaJson(idx)))
     const { listPericopes } = await import('./content')
 
-    const r = await listPericopes({ q: 'P1' })
-    expect(r.map((p) => p.ordem)).toEqual([1])
+    // Estas duas são o ponto do estreitamento. Antes dele, `q` casava também
+    // `p.livro` e o `${cap}:${ver}` do INÍCIO da perícope — "3:16" chegava a
+    // casar 13:16 e 23:16.
+    expect(await listPericopes({ q: 'Gn' })).toEqual([])
+    expect(await listPericopes({ q: '3:16' })).toEqual([])
+    // E o título continua casando, que é o que sobrou.
+    expect((await listPericopes({ q: 'P1' })).map((p) => p.ordem)).toEqual([1])
   })
 })

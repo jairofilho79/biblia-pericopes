@@ -58,6 +58,7 @@ import { notificarSync } from '../lib/sync-event'
 // Os dois últimos testes mexem no tempo (debounce de 300 ms da busca no texto).
 // Sem timers falsos eles ficariam lentos e instáveis.
 beforeEach(() => {
+  ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
   vi.useFakeTimers({ shouldAdvanceTime: true })
 })
 afterEach(() => {
@@ -142,8 +143,16 @@ describe('Explorar', () => {
       vi.advanceTimersByTime(400)
     })
     const antes = searchTexto.mock.calls.length
+    // Dois `act` separados, não um: `carregarProgresso` é assíncrono (tem
+    // `await listAllProgresso()`), então o `setStatus` só assenta num
+    // microtask depois de `notificarSync()` retornar. Adiantar o relógio no
+    // MESMO `act` corria o risco de o efeito de busca nem ter visto o Map
+    // novo ainda — o teste passaria por acidente de escalonamento, não
+    // porque `mesmosStatus` está funcionando.
     await act(async () => {
       notificarSync()
+    })
+    await act(async () => {
       vi.advanceTimersByTime(400)
     })
     expect(searchTexto.mock.calls.length).toBe(antes)

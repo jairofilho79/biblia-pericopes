@@ -49,7 +49,7 @@ describe('iniciarPrefetch', () => {
     vi.spyOn(shardsModule, 'carregarTexto').mockImplementation(async () => {
       // Simular delay para deixar segunda chamada acontecer
       await new Promise((resolve) => setTimeout(resolve, 10))
-      return new Map<number, string>()
+      return new Map()
     })
     vi.spyOn(shardsModule, 'carregarEstudo').mockResolvedValue(new Map())
 
@@ -95,7 +95,7 @@ describe('iniciarPrefetch', () => {
       return fakeIndex as any
     })
     vi.spyOn(shardsModule, 'shardCarregado').mockReturnValue(false)
-    vi.spyOn(shardsModule, 'carregarTexto').mockResolvedValue(new Map<number, string>())
+    vi.spyOn(shardsModule, 'carregarTexto').mockResolvedValue(new Map())
     vi.spyOn(shardsModule, 'carregarEstudo').mockResolvedValue(new Map())
 
     // Primeira tentativa falha

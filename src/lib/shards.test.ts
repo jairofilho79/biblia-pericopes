@@ -29,8 +29,22 @@ describe('carregarTexto', () => {
 
     const mapa = await carregarTexto('genesis')
 
-    expect(mapa.get(7)).toBe('No princípio')
+    expect(mapa.get(7)).toEqual({ texto: 'No princípio' })
     expect((fetchMock.mock.calls[0] as unknown[])[0]).toContain('data/texto/genesis.json')
+  })
+
+  it('carrega o sobrescrito junto com o texto', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        respostaJson([{ ordem: 3049, texto: 'Capítulo 3\n1 Ah SENHOR', sobrescrito: 'Salmo de Davi' }]),
+      ),
+    )
+
+    expect((await carregarTexto('salmos')).get(3049)).toEqual({
+      texto: 'Capítulo 3\n1 Ah SENHOR',
+      sobrescrito: 'Salmo de Davi',
+    })
   })
 
   it('não busca o mesmo livro duas vezes', async () => {
@@ -53,7 +67,7 @@ describe('carregarTexto', () => {
 
     await expect(carregarTexto('levitico')).rejects.toThrow('offline')
     expect(shardCarregado('texto', 'levitico')).toBe(false)
-    expect((await carregarTexto('levitico')).get(2)).toBe('b')
+    expect((await carregarTexto('levitico')).get(2)).toEqual({ texto: 'b' })
   })
 })
 

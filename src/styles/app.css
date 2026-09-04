@@ -1050,6 +1050,23 @@ button.ghost {
   }
 }
 
+/*
+ * Sobrescrito do salmo — epígrafe, não versículo. Fica acima do texto, em
+ * itálico e com um recuo, para o olho ver de cara que não é a fala do salmo:
+ * "Salmo de Davi, quando ele fugia da presença de seu filho Absalão".
+ */
+.sobrescrito {
+  margin: 0 0 1.1rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--read-ink);
+  border-left-color: color-mix(in srgb, var(--read-ink) 25%, transparent);
+  color: color-mix(in srgb, var(--read-ink) 72%, transparent);
+  font-style: italic;
+  font-size: 0.95em;
+  line-height: 1.5;
+  text-shadow: var(--read-shadow);
+}
+
 .texto-biblico {
   font-family: var(--read-font);
   font-size: var(--read-size);
@@ -2885,4 +2902,12 @@ fieldset.jornada-campo {
   font-weight: 400;
   letter-spacing: 0;
   opacity: 0.75;
+}
+
+/* Crédito da tradução: exigência da licença, não decoração — legível, sem gritar. */
+.ajustes-credito {
+  max-width: 60ch;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }

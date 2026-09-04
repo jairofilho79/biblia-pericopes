@@ -173,6 +173,32 @@ export default function Ajustes() {
       <p className="ajustes-aviso" role="status" aria-live="polite">
         {aviso}
       </p>
+
+      {/*
+        Crédito da tradução. Não é cortesia: a licença CC BY 3.0 Brasil da
+        Bíblia Livre exige a atribuição (§4b) e, quando há adaptação, exige que
+        a mudança seja indicada (§3b) — daí a frase sobre os colchetes.
+        Ver docs/licencas.md.
+      */}
+      <h2>Sobre o texto bíblico</h2>
+      <p className="muted ajustes-credito">
+        Todas as Escrituras em português citadas são da{' '}
+        <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noreferrer">
+          Bíblia Livre (BLIVRE)
+        </a>
+        , Copyright © Diego Santos, Mario Sérgio e Marco Teles — fevereiro de 2018. Licença{' '}
+        <a href="https://creativecommons.org/licenses/by/3.0/br/" target="_blank" rel="noreferrer">
+          Creative Commons Atribuição 3.0 Brasil
+        </a>
+        .
+      </p>
+      <p className="muted ajustes-credito">
+        O texto foi adaptado neste app: a Bíblia Livre marca entre colchetes as
+        palavras que o tradutor supriu e o original não traz — as palavras foram
+        mantidas e os colchetes, removidos, para a leitura e a narração. Os
+        sobrescritos dos Salmos aparecem como epígrafe, acima do texto e fora da
+        numeração dos versículos.
+      </p>
     </section>
   )
 }

@@ -54,7 +54,7 @@ async function carregar(tipo: Tipo, slug: string): Promise<Map<number, unknown>>
     const mapa = new Map<number, unknown>()
     for (const linha of linhas) {
       const { ordem, ...resto } = linha
-      mapa.set(ordem, tipo === 'texto' ? (resto as { texto: string }).texto : resto)
+      mapa.set(ordem, resto)
     }
     prontos.set(k, mapa)
     emVoo.delete(k)
@@ -69,8 +69,15 @@ async function carregar(tipo: Tipo, slug: string): Promise<Map<number, unknown>>
   return p
 }
 
-export async function carregarTexto(slug: string): Promise<Map<number, string>> {
-  return (await carregar('texto', slug)) as Map<number, string>
+/**
+ * O shard de texto carrega o par, não só a string: o `sobrescrito` é texto
+ * bíblico ("Salmo de Davi, quando ele fugia…") e viaja junto com o texto, não
+ * com o material editorial.
+ */
+export type TextoShard = { texto: string; sobrescrito?: string }
+
+export async function carregarTexto(slug: string): Promise<Map<number, TextoShard>> {
+  return (await carregar('texto', slug)) as Map<number, TextoShard>
 }
 
 export async function carregarEstudo(slug: string): Promise<Map<number, EstudoShard>> {

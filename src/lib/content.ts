@@ -57,7 +57,7 @@ export async function getPericope(ordem: number): Promise<Pericope | undefined> 
   const bloco = estudo.get(ordem)
   const corpo = texto.get(ordem)
   if (bloco === undefined || corpo === undefined) return undefined
-  return { ...meta, texto: corpo, ...bloco }
+  return { ...meta, ...corpo, ...bloco }
 }
 
 export async function listLivros(testament?: Testament): Promise<string[]> {

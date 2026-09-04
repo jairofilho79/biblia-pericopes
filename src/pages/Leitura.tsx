@@ -904,8 +904,23 @@ export default function Leitura() {
 
       <section className="block block-plain" id="texto" tabIndex={-1}>
         <h2 className={tituloClass('', 'cabecalho-texto') || undefined} data-fala-id="cabecalho-texto">
-          Texto (NAA)
+          Texto (Bíblia Livre)
         </h2>
+        {p.sobrescrito && (
+          /*
+           * Sobrescrito do salmo: vem ANTES do versículo 1 e fora da numeração,
+           * porque é isso que ele é no hebraico. "Quando ele fugia da presença
+           * de seu filho Absalão" é a diferença entre um lamento genérico e uma
+           * oração datada.
+           */
+          <p
+            className={falaClass('sobrescrito', 'sobrescrito')}
+            data-fala-id="sobrescrito"
+            data-verse-id="sobrescrito"
+          >
+            <TextoFalado texto={p.sobrescrito} ativo={falando === 'sobrescrito'} />
+          </p>
+        )}
         <div className="texto-biblico">
           {prefs.layout === 'corrido'
             ? groupCorrido(blocks).map((g, gi) => (

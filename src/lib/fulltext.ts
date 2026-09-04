@@ -177,7 +177,7 @@ async function buildIndex(): Promise<Entrada[]> {
     // Um livro por vez: a busca é a única coisa que o usuário está esperando
     // aqui, mas 66 requisições paralelas afogariam uma conexão móvel.
     for (const slug of slugs) {
-      for (const [ordem, texto] of await carregarTexto(slug)) textos.set(ordem, texto)
+      for (const [ordem, t] of await carregarTexto(slug)) textos.set(ordem, t.texto)
       progresso = { feitos: progresso.feitos + 1, total: slugs.length }
     }
     const out = meta.flatMap((p) => {

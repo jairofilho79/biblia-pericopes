@@ -45,7 +45,7 @@ vi.mock('./content', async (importOriginal) => {
 vi.mock('./shards', () => ({
   carregarTexto: async (slug: string) =>
     new Map(
-      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, p.texto]),
+      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, { texto: p.texto }]),
     ),
   carregarEstudo: async () => new Map(),
   shardCarregado: () => true,

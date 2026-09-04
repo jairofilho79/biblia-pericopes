@@ -72,7 +72,7 @@ Resenha (já na app):
 ${p.resenha}
 
 Texto NAA:
-${p.texto_naa}`
+${p.texto}`
 }
 
 async function openRouterPreach(

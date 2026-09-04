@@ -9,7 +9,7 @@ const raw = {
   versiculo_inicio: 28,
   capitulo_fim: 7,
   versiculo_fim: 7,
-  texto_naa: 'Capítulo 6\n28 No dia em que...\nCapítulo 7\n1 O SENHOR disse...',
+  texto: 'Capítulo 6\n28 No dia em que...\nCapítulo 7\n1 O SENHOR disse...',
   titulo_en: 'God Commands Moses and Aaron',
 }
 
@@ -22,7 +22,7 @@ const cacheVelho = {
   versiculo_inicio: 1,
   capitulo_fim: 7,
   versiculo_fim: 7,
-  texto_naa: 'Capítulo 7\n1 O SENHOR disse...',
+  texto: 'Capítulo 7\n1 O SENHOR disse...',
   titulo_pericope_pt: 'A ordem de Deus para Moisés e Arão',
   contexto_historico_literario: 'contexto escrito pela IA',
   resenha: 'resenha escrita pela IA',
@@ -35,7 +35,7 @@ describe('montarPericope', () => {
     const p = montarPericope(raw, cacheVelho)
     expect(p.capitulo_inicio).toBe(6)
     expect(p.versiculo_inicio).toBe(28)
-    expect(p.texto_naa).toBe(raw.texto_naa)
+    expect(p.texto).toBe(raw.texto)
   })
 
   it('preserva o material editorial do cache', () => {
@@ -64,7 +64,7 @@ describe('cacheDesatualizado', () => {
   })
 
   it('não acusa quando cache e raw batem', () => {
-    const emDia = { ...cacheVelho, capitulo_inicio: 6, versiculo_inicio: 28, texto_naa: raw.texto_naa }
+    const emDia = { ...cacheVelho, capitulo_inicio: 6, versiculo_inicio: 28, texto: raw.texto }
     expect(cacheDesatualizado(raw, emDia)).toBe(false)
   })
 

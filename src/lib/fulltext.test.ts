@@ -18,7 +18,7 @@ function peri(ordem: number, livro: string, abbrev: string, texto: string): Peri
     titulo_pericope_pt: `Título ${ordem}`,
     minutos: 1,
     seq: ordem,
-    texto_naa: texto,
+    texto: texto,
     contexto_historico_literario: '',
     resenha: '',
     perguntas_reflexao: [],
@@ -38,14 +38,14 @@ vi.mock('./content', async (importOriginal) => {
   const real = await importOriginal<typeof import('./content')>()
   return {
     ...real,
-    loadIndex: async () => FIXTURES.map(({ texto_naa: _t, ...meta }) => meta),
+    loadIndex: async () => FIXTURES.map(({ texto: _t, ...meta }) => meta),
   }
 })
 
 vi.mock('./shards', () => ({
   carregarTexto: async (slug: string) =>
     new Map(
-      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, p.texto_naa]),
+      FIXTURES.filter((p) => livroSlug(p.livro) === slug).map((p) => [p.ordem, p.texto]),
     ),
   carregarEstudo: async () => new Map(),
   shardCarregado: () => true,
@@ -180,7 +180,7 @@ describe('buildIndex — recuperação de falha', () => {
         loadIndex: async () => {
           chamadas += 1
           if (chamadas === 1) throw new Error('offline')
-          return FIXTURES.map(({ texto_naa: _t, ...meta }) => meta)
+          return FIXTURES.map(({ texto: _t, ...meta }) => meta)
         },
       }
     })

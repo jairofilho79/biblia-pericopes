@@ -68,13 +68,13 @@ function main() {
     if (!existsSync(saidaF)) continue
     const e = JSON.parse(readFileSync(join(dirEntrada, f), 'utf8'))
     const m = JSON.parse(readFileSync(saidaF, 'utf8'))
-    const alvo = normalizar(e.texto_naa)
+    const alvo = normalizar(e.texto)
 
     const itens: { campo: string; citacao: string; linhaProvavel: string | null }[] = []
     for (const campo of CAMPOS) {
       for (const c of citacoes(m[campo] ?? '')) {
         if (alvo.includes(normalizar(c))) continue
-        itens.push({ campo, citacao: c, linhaProvavel: linhaMaisParecida(c, e.texto_naa) })
+        itens.push({ campo, citacao: c, linhaProvavel: linhaMaisParecida(c, e.texto) })
       }
     }
     if (itens.length) {

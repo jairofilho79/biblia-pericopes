@@ -28,7 +28,7 @@ export type PericopeIndex = {
 
 /** Perícope completa: índice + o conteúdo que vem dos shards do livro. */
 export type Pericope = PericopeIndex & {
-  texto_naa: string
+  texto: string
   /** O que saber ANTES de ler o texto */
   contexto_historico_literario: string
   /** Apanhado do que aconteceu e por quê; Deus/Jesus só quando couber com naturalidade */
@@ -109,7 +109,7 @@ export type RawPericope = {
   versiculo_inicio: number
   capitulo_fim: number
   versiculo_fim: number
-  texto_naa: string
+  texto: string
 }
 
 export type JornadaTipo = 'sequencia' | 'bloco' | 'livro' // 'cronologica' depois

@@ -42,7 +42,7 @@ export type Nova = {
   versiculo_fim: number
   /** Título provisório; o definitivo vem do enriquecimento. */
   titulo_provisorio: string
-  texto_naa: string
+  texto: string
 }
 
 /** Mesmo formato do ETL: "Capítulo N" como cabeçalho, "V texto" por versículo. */
@@ -95,7 +95,7 @@ export function gerarNovas(root: string): Nova[] {
         capitulo_fim: cf,
         versiculo_fim: vf,
         titulo_provisorio: parte.titulo,
-        texto_naa: extrair(book, ci, vi, cf, vf),
+        texto: extrair(book, ci, vi, cf, vf),
       })
     }
   }
@@ -123,7 +123,7 @@ export function gerarNovas(root: string): Nova[] {
       versiculo_fim: vf,
       titulo_provisorio:
         f.salmos.length > 1 ? `Salmos ${primeiro}–${ultimo}` : `Salmo ${primeiro}`,
-      texto_naa: extrair(sl, primeiro, 1, ultimo, vf),
+      texto: extrair(sl, primeiro, 1, ultimo, vf),
     })
   }
 
@@ -136,7 +136,7 @@ function main() {
   const outPath = outArg ? outArg.slice('--out='.length) : join(root, 'data/novas-pericopes.jsonl')
   const novas = gerarNovas(root)
   writeFileSync(outPath, novas.map((x) => JSON.stringify(x)).join('\n') + '\n')
-  const chars = novas.reduce((s, x) => s + x.texto_naa.length, 0)
+  const chars = novas.reduce((s, x) => s + x.texto.length, 0)
   console.log(`${novas.length} perícopes novas → ${outPath}`)
   console.log(`  cortes manuais: ${novas.filter((x) => x.abbrev !== 'Sl').length}`)
   console.log(`  salmos: ${novas.filter((x) => x.abbrev === 'Sl').length}`)

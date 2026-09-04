@@ -391,7 +391,7 @@ export async function setDestaque(
   verseId: string,
   cor: DestaqueCor,
 ): Promise<Destaque | null> {
-  // Recusa no ponto de escrita: parseTextoNaa emite blocos órfãos com ids como
+  // Recusa no ponto de escrita: parseTexto emite blocos órfãos com ids como
   // "x:1", e o Worker rejeita qualquer verseId fora de "capitulo:versiculo" —
   // um único item assim no outbox travaria o sync inteiro para sempre (mesma
   // lógica do corte em MAX_TEXTO em saveAnotacao).

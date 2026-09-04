@@ -1,7 +1,7 @@
 /**
  * Fatia o catálogo em quatro conjuntos servíveis:
  *   public/data/index.json        — metadados de todas as perícopes (~480 KB)
- *   public/data/texto/<slug>.json — texto_naa por livro (4,3 MB no total)
+ *   public/data/texto/<slug>.json — texto por livro (4,3 MB no total)
  *   public/data/estudo/<slug>.json— contexto/resenha/perguntas/tópicos (9,0 MB)
  *   public/data/versao.json       — hash desta geração, lido pelo vite.config
  *
@@ -92,7 +92,7 @@ function main(): void {
     versiculo_fim: p.versiculo_fim,
     titulo_pericope_pt: p.titulo_pericope_pt,
     // Pré-calculado aqui para a Home não precisar do texto só para dizer "~5 min".
-    minutos: readingMinutes(p.texto_naa),
+    minutos: readingMinutes(p.texto),
   }))
 
   for (const sub of ['texto', 'estudo']) {
@@ -103,7 +103,7 @@ function main(): void {
   for (const [slug, { itens }] of porSlug) {
     writeFileSync(
       join(outDir, 'texto', `${slug}.json`),
-      JSON.stringify(itens.map((p) => ({ ordem: p.ordem, texto_naa: p.texto_naa }))),
+      JSON.stringify(itens.map((p) => ({ ordem: p.ordem, texto: p.texto }))),
     )
     writeFileSync(
       join(outDir, 'estudo', `${slug}.json`),

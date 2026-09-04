@@ -6,7 +6,7 @@
  * estrutura na forma em que ela estava quando a IA rodou — uma correção de
  * limites no ETL ou um conserto na NAA nunca chegavam ao app.
  *
- * Regra: limites e `texto_naa` vêm SEMPRE do raw; título, contexto, resenha,
+ * Regra: limites e `texto` vêm SEMPRE do raw; título, contexto, resenha,
  * perguntas e tópicos vêm do cache.
  */
 import type { Pericope, RawPericope } from '../src/lib/types.ts'
@@ -28,7 +28,7 @@ export function montarPericope(raw: RawPericope, editorial: Editorial): Pericope
     versiculo_inicio: raw.versiculo_inicio,
     capitulo_fim: raw.capitulo_fim,
     versiculo_fim: raw.versiculo_fim,
-    texto_naa: raw.texto_naa,
+    texto: raw.texto,
     titulo_pericope_pt: editorial.titulo_pericope_pt,
     contexto_historico_literario: editorial.contexto_historico_literario,
     resenha: editorial.resenha,
@@ -45,7 +45,7 @@ export function cacheDesatualizado(
   raw: RawPericope,
   cached: Pick<
     Pericope,
-    'capitulo_inicio' | 'versiculo_inicio' | 'capitulo_fim' | 'versiculo_fim' | 'texto_naa'
+    'capitulo_inicio' | 'versiculo_inicio' | 'capitulo_fim' | 'versiculo_fim' | 'texto'
   > | null,
 ): boolean {
   if (!cached) return true
@@ -54,6 +54,6 @@ export function cacheDesatualizado(
     cached.versiculo_inicio !== raw.versiculo_inicio ||
     cached.capitulo_fim !== raw.capitulo_fim ||
     cached.versiculo_fim !== raw.versiculo_fim ||
-    cached.texto_naa !== raw.texto_naa
+    cached.texto !== raw.texto
   )
 }

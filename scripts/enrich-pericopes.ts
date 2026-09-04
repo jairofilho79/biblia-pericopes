@@ -302,7 +302,7 @@ function localEnrich(raw: RawPericope): Omit<
   | 'versiculo_inicio'
   | 'capitulo_fim'
   | 'versiculo_fim'
-  | 'texto_naa'
+  | 'texto'
 > {
   const ref =
     raw.capitulo_inicio === raw.capitulo_fim && raw.versiculo_inicio === raw.versiculo_fim
@@ -310,7 +310,7 @@ function localEnrich(raw: RawPericope): Omit<
       : `${raw.livro} ${raw.capitulo_inicio}:${raw.versiculo_inicio}–${raw.capitulo_fim}:${raw.versiculo_fim}`
 
   const titulo = translateTitle(raw.titulo_en)
-  const preview = raw.texto_naa.split('\n').filter((l) => !l.startsWith('Capítulo')).slice(0, 3).join(' ')
+  const preview = raw.texto.split('\n').filter((l) => !l.startsWith('Capítulo')).slice(0, 3).join(' ')
 
   return {
     titulo_pericope_pt: titulo,
@@ -360,7 +360,7 @@ async function openRouterEnrich(
   const user = `Título (EN): ${raw.titulo_en}
 Referência: ${raw.livro} ${raw.capitulo_inicio}:${raw.versiculo_inicio}–${raw.capitulo_fim}:${raw.versiculo_fim}
 Texto NAA:
-${raw.texto_naa}`
+${raw.texto}`
 
   const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -709,7 +709,7 @@ async function main() {
           costLog.push({
             ordem: raw.ordem,
             titulo_en: raw.titulo_en,
-            chars_texto: raw.texto_naa.length,
+            chars_texto: raw.texto.length,
             usage: r.usage,
           })
         } else {

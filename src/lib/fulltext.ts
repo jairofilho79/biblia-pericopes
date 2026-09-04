@@ -41,8 +41,8 @@ export function normalize(s: string): string {
 }
 
 /**
- * Quebra o `texto_naa` em linhas indexadas, com as mesmas regras do
- * `parseTextoNaa`: "Capítulo N" reinicia o capítulo corrente e não é versículo;
+ * Quebra o `texto` em linhas indexadas, com as mesmas regras do
+ * `parseTexto`: "Capítulo N" reinicia o capítulo corrente e não é versículo;
  * "N texto" abre um versículo; qualquer outra linha continua o versículo
  * anterior.
  */
@@ -162,7 +162,7 @@ export function progressoDoIndice(): { feitos: number; total: number } {
 
 /**
  * Índice preguiçoso em cache de módulo: uma segunda cópia normalizada dos 2647
- * `texto_naa` (~13 MiB de heap extra, aceito de propósito). Construído na
+ * `texto` (~13 MiB de heap extra, aceito de propósito). Construído na
  * primeira busca, nunca no carregamento da leitura, e uma vez só — chamadas
  * concorrentes compartilham a mesma promessa.
  */

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { groupCorrido, parseTextoNaa } from './parse-texto'
+import { groupCorrido, parseTexto } from './parse-texto'
 
 describe('groupCorrido', () => {
   it('agrupa versículos por capítulo, com rótulo', () => {
-    const blocks = parseTextoNaa('Capítulo 1\n1 No princípio\n2 A terra\nCapítulo 2\n1 Assim foram')
+    const blocks = parseTexto('Capítulo 1\n1 No princípio\n2 A terra\nCapítulo 2\n1 Assim foram')
     const groups = groupCorrido(blocks)
     expect(groups).toHaveLength(2)
     expect(groups[0]).toMatchObject({ chapter: 1, label: 'Capítulo 1' })
@@ -13,7 +13,7 @@ describe('groupCorrido', () => {
   })
 
   it('versículos órfãos antes do primeiro capítulo formam grupo com label null', () => {
-    const blocks = parseTextoNaa('linha solta\nCapítulo 3\n1 Verso um')
+    const blocks = parseTexto('linha solta\nCapítulo 3\n1 Verso um')
     const groups = groupCorrido(blocks)
     expect(groups).toHaveLength(2)
     expect(groups[0].label).toBeNull()
@@ -24,6 +24,6 @@ describe('groupCorrido', () => {
 
   it('entrada vazia retorna []', () => {
     expect(groupCorrido([])).toEqual([])
-    expect(groupCorrido(parseTextoNaa(''))).toEqual([])
+    expect(groupCorrido(parseTexto(''))).toEqual([])
   })
 })

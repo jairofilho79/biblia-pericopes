@@ -23,7 +23,7 @@ beforeEach(() => {
 describe('carregarTexto', () => {
   it('mapeia ordem → texto e busca o arquivo do livro', async () => {
     const fetchMock = vi.fn(async () =>
-      respostaJson([{ ordem: 7, texto_naa: 'No princípio' }]),
+      respostaJson([{ ordem: 7, texto: 'No princípio' }]),
     )
     vi.stubGlobal('fetch', fetchMock)
 
@@ -34,7 +34,7 @@ describe('carregarTexto', () => {
   })
 
   it('não busca o mesmo livro duas vezes', async () => {
-    const fetchMock = vi.fn(async () => respostaJson([{ ordem: 1, texto_naa: 'a' }]))
+    const fetchMock = vi.fn(async () => respostaJson([{ ordem: 1, texto: 'a' }]))
     vi.stubGlobal('fetch', fetchMock)
 
     await carregarTexto('exodo')
@@ -48,7 +48,7 @@ describe('carregarTexto', () => {
     const fetchMock = vi
       .fn()
       .mockRejectedValueOnce(new Error('offline'))
-      .mockResolvedValueOnce(respostaJson([{ ordem: 2, texto_naa: 'b' }]))
+      .mockResolvedValueOnce(respostaJson([{ ordem: 2, texto: 'b' }]))
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(carregarTexto('levitico')).rejects.toThrow('offline')

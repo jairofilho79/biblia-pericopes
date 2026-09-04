@@ -273,7 +273,7 @@ describe('user-db v3 (destaques)', () => {
     }
   })
 
-  // parseTextoNaa emite blocos órfãos com ids fora de "capitulo:versiculo"
+  // parseTexto emite blocos órfãos com ids fora de "capitulo:versiculo"
   // (ex.: "x:1"); o Worker rejeita o outbox inteiro se um item assim chegar
   // lá, então o guard tem que barrar a escrita ANTES do outbox existir.
   it('setDestaque com verseId inválido não escreve nada (nem linha, nem outbox)', async () => {

@@ -111,7 +111,7 @@ function main() {
       continue
     }
     const entrada = JSON.parse(readFileSync(join(dirEntrada, `${ordem}.json`), 'utf8')) as {
-      texto_naa: string
+      texto: string
       titulo_provisorio: string
       livro: string
     }
@@ -141,7 +141,7 @@ function main() {
 
     // O material tem de falar DESTE trecho: pelo menos algumas palavras de
     // conteúdo em comum com o texto bíblico.
-    const doTexto = palavrasDoTexto(entrada.texto_naa)
+    const doTexto = palavrasDoTexto(entrada.texto)
     const doMaterial = palavrasDoTexto(`${m.contexto_historico_literario} ${m.resenha}`)
     const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
     if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
@@ -150,7 +150,7 @@ function main() {
     // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura
     // inventada, e é a falha mais grave possível aqui. Fica como AVISO e não
     // erro porque citar outro livro da Bíblia é legítimo e comum.
-    const alvo = normalizar(entrada.texto_naa)
+    const alvo = normalizar(entrada.texto)
     const suspeitas = [
       ...citacoes(m.contexto_historico_literario ?? ''),
       ...citacoes(m.resenha ?? ''),

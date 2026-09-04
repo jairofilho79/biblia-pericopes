@@ -21,7 +21,7 @@ import {
 import { paragraphize } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
 import { useWakeLock } from '../lib/use-wake-lock'
-import { groupCorrido, parseTextoNaa, type VerseBlock } from '../lib/parse-texto'
+import { groupCorrido, parseTexto, type VerseBlock } from '../lib/parse-texto'
 import {
   blocoDeRolagem,
   fracaoLida,
@@ -182,14 +182,14 @@ export default function Leitura() {
 
   // Memoizado: o parser roda uma vez por perícope, não a cada render — e os
   // handlers de seleção precisam dos blocos antes dos returns antecipados.
-  const blocks = useMemo(() => (p ? parseTextoNaa(p.texto_naa) : []), [p])
+  const blocks = useMemo(() => (p ? parseTexto(p.texto) : []), [p])
   const selecionados = useMemo(
     () => (selection ? versesInRange(blocks, selection.start, selection.end) : []),
     [blocks, selection],
   )
   // Só o texto bíblico entra na conta: contexto, resenha e reflexão são
   // leitura de primeira classe, mas o "~N min" é do texto da NAA.
-  const minutos = useMemo(() => (p ? readingMinutes(p.texto_naa) : 1), [p])
+  const minutos = useMemo(() => (p ? readingMinutes(p.texto) : 1), [p])
   // Os MESMOS parágrafos que a página mostra (paragraphize com os mesmos
   // limites) alimentam os alvos de alinhamento da narração das seções em
   // prosa.

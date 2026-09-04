@@ -137,7 +137,7 @@ function main() {
       versiculo_inicio: start.versiculo,
       capitulo_fim: end.capitulo,
       versiculo_fim: end.versiculo,
-      texto_naa: text,
+      texto: text,
     }
     lines.push(JSON.stringify(raw))
   }

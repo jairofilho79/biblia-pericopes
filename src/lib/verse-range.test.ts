@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseTextoNaa } from './parse-texto'
+import { parseTexto } from './parse-texto'
 import {
   nextSelection,
   parseVerseRef,
@@ -11,7 +11,7 @@ import {
 import type { Pericope } from './types'
 
 const TEXTO = 'Capítulo 1\n1 Um\n2 Dois\n3 Três\nCapítulo 2\n1 Quatro\n2 Cinco'
-const blocks = parseTextoNaa(TEXTO)
+const blocks = parseTexto(TEXTO)
 const gn = { abbrev: 'Gn' } as Pericope
 
 describe('versesInRange', () => {

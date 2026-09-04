@@ -3,7 +3,7 @@ export type TextoBlock =
   | { kind: 'verse'; id: string; chapter: number; verse: number; text: string }
 
 /** Parse NAA plain text: "Capítulo N" headers + "N verse text" lines. */
-export function parseTextoNaa(raw: string): TextoBlock[] {
+export function parseTexto(raw: string): TextoBlock[] {
   const blocks: TextoBlock[] = []
   let chapter = 0
   let orphan = 0

@@ -54,7 +54,7 @@ async function carregar(tipo: Tipo, slug: string): Promise<Map<number, unknown>>
     const mapa = new Map<number, unknown>()
     for (const linha of linhas) {
       const { ordem, ...resto } = linha
-      mapa.set(ordem, tipo === 'texto' ? (resto as { texto_naa: string }).texto_naa : resto)
+      mapa.set(ordem, tipo === 'texto' ? (resto as { texto: string }).texto : resto)
     }
     prontos.set(k, mapa)
     emVoo.delete(k)

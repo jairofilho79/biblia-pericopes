@@ -32,7 +32,14 @@ cobertura: o catálogo é estritamente mais rico (testamento, seção, `abbrev`,
 `versesPerChapter`) e o `<select>` estritamente mais pobre.
 
 Consequência: a estrutura do catálogo passa a vir de `BIBLE_BOOKS`, não de
-`listLivros()`. `listLivros()` só era usada pelo Índice e **é apagada**.
+`listLivros()`.
+
+**Correção pós-escrita (Task 8):** este texto originalmente mandava apagar
+`listLivros()` por "só era usada pelo Índice". Deixou de valer: a sessão de
+releitura, mesclada depois deste documento ter sido escrito, fez
+`Ajustes.tsx` passar a consumi-la (para o `<select>` de livro do formulário
+de marcar perícope como lida). A função foi deliberadamente preservada na
+implementação — só `listPericopes` foi estreitada (ver §2).
 
 ### A busca do Índice erra referências
 
@@ -125,7 +132,8 @@ teclado por cima do catálogo, que é justamente o que a tela quer mostrar.
 | `src/components/LivroAberto.tsx` | novo, ~120 | Cabeçalho, formulário cap/vers, lista |
 | `src/components/ListaPericopes.tsx` | novo, ~45 | `<ul>` de perícopes com ✓, ref e snippet opcional |
 | `src/lib/consulta.ts` | novo, ~70 | Parser puro da consulta |
-| `src/lib/content.ts` | +~35 | Predicado do filtro, junto de `progressoPorLivro`; `listLivros` sai; `listPericopes` fica só com o casamento de título (perde as cláusulas de livro e de `cap:ver`) |
+| `src/lib/content.ts` | +~35 | Predicado do filtro, junto de `progressoPorLivro`; `listPericopes` fica só com o casamento de título (perde as cláusulas de livro e de `cap:ver`) — `listLivros` **preservada**, ver correção acima |
+| `src/lib/bible-books.ts` | tocado | `norm` renomeada para `normalizarNome` e exportada — `consulta.ts` (§3) precisa dela para casar livro/abbrev sem diacríticos |
 | `src/lib/fulltext.ts` | +~5 | `searchTexto` ganha o predicado de filtro |
 | `src/pages/Indice.tsx` | apagado | |
 | `src/pages/Pesquisar.tsx` | apagado | |

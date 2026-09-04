@@ -28,6 +28,20 @@ vi.mock('../lib/fulltext', async (original) => ({
   progressoDoIndice: () => ({ feitos: 66, total: 66 }),
 }))
 
+// 60 títulos, todos casando "muitos": mais que LIMITE_RESULTADOS (50), para o
+// teste do teto em "Títulos" (ver descrição do it() abaixo).
+const MUITOS_TITULOS = Array.from({ length: 60 }, (_, i) => ({
+  ordem: 1000 + i,
+  livro: 'Provérbios',
+  abbrev: 'Pv',
+  capitulo_inicio: 1,
+  versiculo_inicio: i + 1,
+  capitulo_fim: 1,
+  versiculo_fim: i + 1,
+  titulo_pericope_pt: `Muitos resultados ${i}`,
+  minutos: 1,
+}))
+
 vi.mock('../lib/content', async (original) => {
   const real = await original<typeof import('../lib/content')>()
   const ALL = [
@@ -46,7 +60,8 @@ vi.mock('../lib/content', async (original) => {
   return {
     ...real,
     loadIndex: async () => ALL,
-    listPericopes: async () => [],
+    listPericopes: async (opts?: { q?: string }) =>
+      opts?.q === 'muitos' ? MUITOS_TITULOS : [],
     listPericopesByBookChapter: async () => ALL,
     findPericopeByRef: async () => ALL[0],
   }
@@ -156,5 +171,17 @@ describe('Explorar', () => {
       vi.advanceTimersByTime(400)
     })
     expect(searchTexto.mock.calls.length).toBe(antes)
+  })
+
+  it('Títulos tem teto de 50, mesmo com mais casos no índice', async () => {
+    // O conserto tinha número medido: sem teto, `q="a"` montava ~2.600 links
+    // por tecla. O mock de `listPericopes` devolve 60 para "muitos" — acima
+    // do teto — só para este teste; os outros continuam recebendo [].
+    await montar('/explorar?q=muitos')
+    const secoes = [...host.querySelectorAll<HTMLElement>('.secao-resultado')]
+    const secaoTitulos = secoes.find((s) => s.querySelector('.secao-h')?.textContent?.startsWith('Títulos'))
+    expect(secaoTitulos).toBeDefined()
+    expect(secaoTitulos?.querySelectorAll('.peri-list li')).toHaveLength(50)
+    expect(secaoTitulos?.querySelector('.secao-h')?.textContent).toContain('(primeiros)')
   })
 })

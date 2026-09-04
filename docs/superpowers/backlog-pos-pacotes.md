@@ -140,11 +140,16 @@ alcançável por um cliente normal. Registrados para não se perderem.
   (`.book-chip .book-abbrev`, `.book-chip.active`,
   `.book-chip.active .book-abbrev`) (`app.css:2059-2096`); `.search-hit` e
   variantes (`.search-hit a`, `.search-hit a strong`, `.search-hit a span`)
-  e `.catalog-hint` (`app.css:2201-2226`); e `.book-group-head` com
-  `.book-group-head h2` (`app.css:2291-2299`). Não removidos junto de
-  propósito: quatro sessões editavam o arquivo na mesma rodada e a remoção
-  conflitaria. Limpeza segura agora — conferir de novo antes de apagar, o
-  código-fonte muda rápido e as linhas acima podem ter se deslocado.
+  e `.catalog-hint` (`app.css:2201-2226`); `.book-group-head` com
+  `.book-group-head h2` (`app.css:2291-2299`); e `.peri-list.compact`, duas
+  ocorrências (`app.css:2274`, `app.css:2287`) — a prop `compact` de
+  `ListaPericopes` nunca teve consumidor (nem produção, nem teste; a Task 8
+  removeu a prop e o parâmetro, era o mesmo defeito já corrigido em
+  `CatalogoLivros` no pré-flight, só não replicado aqui na hora). Não
+  removidos junto de propósito: quatro sessões editavam o arquivo na mesma
+  rodada e a remoção conflitaria. Limpeza segura agora — conferir de novo
+  antes de apagar, o código-fonte muda rápido e as linhas acima podem ter se
+  deslocado.
 
 ## UI geral
 

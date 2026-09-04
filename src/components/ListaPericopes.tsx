@@ -4,14 +4,12 @@ import type { ItemPericope } from '../lib/item-pericope'
 export default function ListaPericopes({
   itens,
   concluidas,
-  compact = false,
 }: {
   itens: ItemPericope[]
   concluidas: Set<number>
-  compact?: boolean
 }) {
   return (
-    <ul className={compact ? 'peri-list compact' : 'peri-list'}>
+    <ul className="peri-list">
       {itens.map((it) => {
         const done = concluidas.has(it.ordem)
         return (

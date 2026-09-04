@@ -4,12 +4,12 @@ import { SkeletonIndice } from '../components/Skeleton'
 import CatalogoLivros from '../components/CatalogoLivros'
 import LivroAberto from '../components/LivroAberto'
 import ListaPericopes from '../components/ListaPericopes'
-// `itemDeIndice` e `ItemPericope` NÃO moram mais no arquivo do componente:
-// exportar função pura ao lado de um componente dispara
-// `react(only-export-components)` e quebra o fast refresh. Foram extraídos para
+// `itemDeIndice`, `itemDeHit` e `ItemPericope` NÃO moram no arquivo do
+// componente: exportar função pura ao lado de um componente dispara
+// `react(only-export-components)` e quebra o fast refresh. Moram em
 // `src/lib/item-pericope.ts`, seguindo o que o repositório já faz com toda
 // lógica pura (mesmo movimento de `src/lib/perfil-secoes.ts`, commit d9ced2e).
-import { itemDeIndice, type ItemPericope } from '../lib/item-pericope'
+import { itemDeHit, itemDeIndice, type ItemPericope } from '../lib/item-pericope'
 import { bookByName, type BibleBook } from '../lib/bible-books'
 import {
   contagemPorLivro,
@@ -29,7 +29,6 @@ import {
   fatiarResultado,
   indexPronto,
   LIMITE_RESULTADOS,
-  marcarTrecho,
   MIN_CHARS,
   progressoDoIndice,
   searchTexto,
@@ -128,7 +127,11 @@ export default function Explorar() {
     setParams(proximo, { replace })
   }
 
-  // Digitar navega com replace: teclar não pode entulhar o histórico.
+  // Digitar navega com replace: teclar não pode entulhar o histórico. Mas o
+  // `replace` é `!livro`, não sempre `true`: a primeira tecla que fecha um
+  // livro aberto (`livro` ainda válido neste render) vira `push` de
+  // propósito, para o botão voltar DEVOLVER o livro em vez de pular direto
+  // para antes dele ter sido aberto — mesma lógica de `abrirLivro`.
   const setQ = (valor: string) =>
     mexerNaUrl((p) => {
       // Mesma exclusão dos dois lados: apagar o texto também não pode revelar
@@ -181,6 +184,12 @@ export default function Explorar() {
     }, false)
 
   // ---- Seção Referência ----
+  // Única seção que NÃO passa por `aceita`: Livros, Títulos e No texto
+  // filtram pelo recorte de leitura ativo, mas quem digita uma referência
+  // exata ("Jo 3:16") quer aquela perícope específica, não um recorte —
+  // filtrar aqui esconderia a perícope certa atrás de "0 resultados" só
+  // porque já foi lida. É a única exceção à regra "tudo passa por `aceita`",
+  // e é deliberada.
   const [refHit, setRefHit] = useState<PericopeIndex | null>(null)
   const [refMiss, setRefMiss] = useState('')
   useEffect(() => {
@@ -325,14 +334,7 @@ export default function Explorar() {
     [itensTitulos],
   )
   const itensTexto: ItemPericope[] = useMemo(
-    () =>
-      resultado.hits.map((h) => ({
-        ordem: h.ordem,
-        titulo: h.titulo,
-        ref: h.refLabel,
-        verseId: h.verseId || undefined,
-        trecho: marcarTrecho(h.snippet, resultado.termo),
-      })),
+    () => resultado.hits.map((h) => itemDeHit(h, resultado.termo)),
     [resultado],
   )
   const itensLivro: ItemPericope[] = useMemo(
@@ -400,6 +402,9 @@ export default function Explorar() {
               <h2 className="secao-h">Referência</h2>
               {consulta.refForaDeFaixa && <p className="muted">{consulta.refForaDeFaixa.motivo}</p>}
               {refMiss && <p className="muted">{refMiss}</p>}
+              {/* Sem `aceita` de propósito — ver comentário no efeito acima
+                  que preenche `refHit`. Com `?f=lidos` e uma referência já
+                  lida, ela aparece aqui mesmo com o livro zerado em Livros. */}
               {refHit && (
                 <ListaPericopes
                   itens={[
@@ -433,6 +438,7 @@ export default function Explorar() {
                 contagem={contagem}
                 filtro={filtro}
                 onAbrir={abrirLivro}
+                nivelTestamento={3}
               />
             </section>
           )}

@@ -68,8 +68,12 @@ describe('parseConsulta — a colisão jo/jó', () => {
   })
 
   it('entrada decomposta (NFD) não vira referência errada', () => {
-    // "jó 1" com o acento decomposto: "o" + U+0301
-    const decomposto = 'jó 1'
+    // `.normalize('NFD')` explícito, não o acento decomposto digitado no
+    // fonte: guardado literalmente, qualquer ferramenta que normalize o
+    // arquivo para NFC (comum em editores e formatadores) colapsa a linha
+    // numa cópia da de baixo, e o teste passa a validar a mesma entrada duas
+    // vezes sem que ninguém perceba.
+    const decomposto = 'jó 1'.normalize('NFD')
     expect(parseConsulta(decomposto).ref?.livro.name).toBe('Jó')
     // e a forma pré-composta continua igual
     expect(parseConsulta('jó 1').ref?.livro.name).toBe('Jó')

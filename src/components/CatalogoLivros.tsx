@@ -9,6 +9,13 @@ export default function CatalogoLivros({
   contagem,
   filtro,
   onAbrir,
+  // No repouso o `h1` da página é sr-only, então `testament-h` como `h2` é o
+  // primeiro título visível — certo. Mas dentro da seção "Livros" dos
+  // resultados, aquele `h2` já existe (`secao-h`): dois `h2` irmãos em
+  // relação de contenção (um dentro do outro) quebram a hierarquia para
+  // quem navega por título com leitor de tela. `nivelTestamento={3}` rebaixa
+  // para `h3` só nesse caso.
+  nivelTestamento = 2,
 }: {
   livros?: BibleBook[]
   /** Progresso REAL do livro — nunca obedece ao filtro. */
@@ -17,12 +24,14 @@ export default function CatalogoLivros({
   contagem: Map<string, number>
   filtro: FiltroLeitura
   onAbrir: (livro: BibleBook) => void
+  nivelTestamento?: 2 | 3
 }) {
+  const TestamentoTag = nivelTestamento === 3 ? 'h3' : 'h2'
   return (
     <div className="catalogo">
       {agruparLivros(livros).map((g) => (
         <div key={g.testament} className="testament-block">
-          <h2 className="testament-h">{testamentLabel(g.testament)}</h2>
+          <TestamentoTag className="testament-h">{testamentLabel(g.testament)}</TestamentoTag>
           {g.secoes.map((s) => (
             <div key={s.secao} className="section-block">
               <h3 className="section-h">{s.secao}</h3>

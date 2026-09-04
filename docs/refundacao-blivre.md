@@ -123,9 +123,15 @@ idempotente — rodar duas vezes dá byte a byte o mesmo resultado.
 - **Para a Sessão 5**: o manifesto de narração vai precisar de uma unidade para
   a seção `sobrescrito`. Hoje a epígrafe já tem `data-fala-id`, mas nenhum
   manifesto a descreve.
-- **Ressalva de qualidade ainda aberta**: a revisão editorial da BLIVRE cobre
-  ~15 livros do NT e o último release é de 2018. As amostras lidas estão boas,
-  mas a leitura por amostragem que a barra do projeto pede ainda não foi feita.
+- ✅ **A revisão editorial foi feita — pela comparação, não pela leitura.** A
+  da Bíblia Livre parou em ~15 livros do NT em 2018; a nossa varreu os 31.102
+  versículos comparando comprimento contra as duas testemunhas e produziu 84
+  candidatos para ler um a um. Saíram **14 subscrições de escriba** (nota de
+  copista colada no último versículo de catorze epístolas, que NÃO é Escritura)
+  e voltaram **28 frases omitidas**. Os outros 56 candidatos eram concisão
+  legítima, divisão de versículo ou crux de tradução, e ficaram intactos.
+- **Branches**: `main` é a V1 (NAA, em produção). Todo este trabalho vive em
+  **`v2-biblia-livre`**. Não misturar.
 
 ### Sessão 2 — ETL da BLIVRE (escopo original)
 

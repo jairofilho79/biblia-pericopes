@@ -121,7 +121,7 @@ describe('tabelas', () => {
     expect(Object.keys(EXCECOES)).toEqual(['PSA 72:1'])
   })
 
-  it('o buraco conhecido da fonte é o Salmo 125', () => {
-    expect(SEM_SOBRESCRITO).toEqual(['PSA 125:1'])
+  it('não há buraco de sobrescrito sem solução — o Sl 125 foi devolvido em blivre-correcoes', () => {
+    expect(SEM_SOBRESCRITO).toEqual([])
   })
 })

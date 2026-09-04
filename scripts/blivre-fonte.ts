@@ -10,6 +10,7 @@
  *
  * O que sai daqui alimenta o ETL no lugar do antigo `data/NAA.json`.
  */
+import { corrigirVersiculo } from './blivre-correcoes.ts'
 import { separarEpigrafe } from './blivre-epigrafes.ts'
 import { removerColchetes } from './blivre-texto.ts'
 
@@ -141,9 +142,12 @@ export function converterVpl(bruto: string): LivroBlivre[] {
       )
     }
 
-    // A ordem importa: separar a epígrafe ANTES de tirar os colchetes, porque o
-    // rótulo estrutural do Sl 119 e de Cânticos VEM entre colchetes.
-    const { epigrafe, tipo, texto } = separarEpigrafe(cod, capitulo, versiculo, corpo.trim())
+    // A ordem importa duas vezes: corrigir ANTES de separar a epígrafe (o Sl 125
+    // recupera o sobrescrito e o Sl 80 conserta o dele), e separar a epígrafe
+    // ANTES de tirar os colchetes (o rótulo do Sl 119 e de Cânticos VEM entre
+    // colchetes).
+    const corrigido = corrigirVersiculo(cod, capitulo, versiculo, corpo.trim())
+    const { epigrafe, tipo, texto } = separarEpigrafe(cod, capitulo, versiculo, corrigido)
     const limpo = removerColchetes(texto)
     if (!epigrafe) cap.push({ t: limpo })
     else if (tipo === 'sobrescrito') cap.push({ t: limpo, e: epigrafe })

@@ -34,13 +34,15 @@ export const EXCECOES: Record<string, { epigrafe: string; comeca: string }> = {
 }
 
 /**
- * Buracos conhecidos da fonte: o sobrescrito deveria existir e não existe.
+ * Buracos conhecidos da fonte que este módulo NÃO resolve.
  *
- * O Salmo 125 é o único dos quinze Cânticos dos Degraus (120–134) que não traz
- * "Cântico dos degraus". É defeito da Bíblia Livre. Fica registrado e NÃO é
- * preenchido: escrever o que a fonte não traz seria inventar Escritura.
+ * Está vazio. O único que havia — o Salmo 125, o único dos quinze Cânticos dos
+ * Degraus sem "Cântico dos degraus" — foi devolvido em `blivre-correcoes.ts`,
+ * depois de conferido contra a KJV ("A Song of degrees.") e contra os outros
+ * catorze da própria fonte. A lista fica de pé como o lugar de registrar o
+ * próximo buraco que apareça e não puder ser resolvido com testemunha.
  */
-export const SEM_SOBRESCRITO: string[] = ['PSA 125:1']
+export const SEM_SOBRESCRITO: string[] = []
 
 /** Rótulo estrutural entre colchetes, seguido de dois-pontos. */
 const ROTULO = /^\[([^\]]{1,30})\]\s*:\s*/

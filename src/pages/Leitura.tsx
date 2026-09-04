@@ -816,7 +816,7 @@ export default function Leitura() {
     <article className="leitura" ref={rootRef}>
       <p className="crumb">
         <Link to="/">Hoje</Link> · {testamentLabel(testamentOf(p))} ·{' '}
-        <Link to="/indice">{p.livro}</Link>
+        <Link to={`/explorar?livro=${encodeURIComponent(p.livro)}`}>{p.livro}</Link>
       </p>
       <h1 className={tituloClass('', 'titulo') || undefined} data-fala-id="titulo">
         {p.titulo_pericope_pt}

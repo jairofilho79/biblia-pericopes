@@ -132,6 +132,24 @@ alcançável por um cliente normal. Registrados para não se perderem.
   `docs/superpowers/specs/2026-09-03-chrome-header-perfil-design.md`.
 - ~~Seletor `.book-group` duplicado no CSS.~~ Feito em 2026-09-02: as duas
   regras viraram uma (ambas no topo, sem `@media` em volta).
+- CSS órfão depois da fusão Índice/Pesquisa (apagar `Indice.tsx` E
+  `Pesquisar.tsx` deixou seletores de dois arquivos sem elemento, não só um):
+  `.pesquisar .testament-h`, `.pesquisar .section-h` (`app.css:2042-2056`); o
+  bloco `.modo-busca`/`.modo-btn` (`app.css:2227-2251`); `.book-group`
+  (`app.css:2037-2040`); `.book-list`, `.book-chip` e variantes
+  (`.book-chip .book-abbrev`, `.book-chip.active`,
+  `.book-chip.active .book-abbrev`) (`app.css:2059-2096`); `.search-hit` e
+  variantes (`.search-hit a`, `.search-hit a strong`, `.search-hit a span`)
+  e `.catalog-hint` (`app.css:2201-2226`); `.book-group-head` com
+  `.book-group-head h2` (`app.css:2291-2299`); e `.peri-list.compact`, duas
+  ocorrências (`app.css:2274`, `app.css:2287`) — a prop `compact` de
+  `ListaPericopes` nunca teve consumidor (nem produção, nem teste; a Task 8
+  removeu a prop e o parâmetro, era o mesmo defeito já corrigido em
+  `CatalogoLivros` no pré-flight, só não replicado aqui na hora). Não
+  removidos junto de propósito: quatro sessões editavam o arquivo na mesma
+  rodada e a remoção conflitaria. Limpeza segura agora — conferir de novo
+  antes de apagar, o código-fonte muda rápido e as linhas acima podem ter se
+  deslocado.
 
 ## UI geral
 
@@ -139,3 +157,18 @@ alcançável por um cliente normal. Registrados para não se perderem.
   específicos por página).
 - Feedback do botão "Sair" só via `title`/aria-live (usuário de toque não
   vê indicação visível de falha).
+
+- `src/pages/Explorar.tsx` tem 483 linhas (398 de código, 56 de comentário),
+  contra as ~190 que a spec da fusão projetou — e a mesma spec prometia
+  "nenhum arquivo passa de 200". São 11 `useState`, 5 `useEffect` e 6
+  `useMemo` num arquivo só, e as três seções que carregam dados (Referência,
+  Títulos, livro aberto) repetem o mesmo formato: efeito com bandeira `vivo`,
+  `.then` que seta estado, `.catch` que engole. É um hook pedindo para
+  nascer. Levantado na revisão final da branch e deliberadamente NÃO pago
+  antes do merge: não é defeito, os testes cobrem o comportamento, e refatorar
+  na mesma rodada em que quatro sessões mexeram no repositório trocaria risco
+  conhecido por risco novo. É a dívida que a próxima mudança nesta tela paga.
+- A extração de lógica pura para `src/lib/` (`catalogo.ts`, `item-pericope.ts`)
+  nasceu de um conserto de aviso de lint, não de decisão de desenho, e por isso
+  parou onde o lint parou. Vale decidir de propósito o que mais sai de
+  `Explorar.tsx` quando a refatoração acima acontecer.

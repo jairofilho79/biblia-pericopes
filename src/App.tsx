@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Leitura from './pages/Leitura'
 import Jornada from './pages/Jornada'
-import Indice from './pages/Indice'
-import Pesquisar from './pages/Pesquisar'
+import Explorar from './pages/Explorar'
 import Entrar from './pages/Entrar'
 import Ajustes from './pages/Ajustes'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
@@ -57,8 +56,7 @@ function Shell() {
         {/* "Hoje" saiu: a marca à esquerda já é o mesmo <NavLink to="/">. */}
         <nav>
           <NavLink to="/jornada">Jornada</NavLink>
-          <NavLink to="/indice">Índice</NavLink>
-          <NavLink to="/pesquisar">Pesquisar</NavLink>
+          <NavLink to="/explorar">Explorar</NavLink>
           {/* PerfilMenu absorve Ajustes, Sair e Entrar — a entrada solta de
               /ajustes que a fase de releitura pôs na nav mudou de lugar para
               dentro dele, como o comentário dela previa. */}
@@ -70,8 +68,9 @@ function Shell() {
           <Route path="/" element={<Home />} />
           <Route path="/leitura/:ordem" element={<Leitura />} />
           <Route path="/jornada" element={<Jornada />} />
-          <Route path="/indice" element={<Indice />} />
-          <Route path="/pesquisar" element={<Pesquisar />} />
+          <Route path="/explorar" element={<Explorar />} />
+          <Route path="/indice" element={<Navigate to="/explorar" replace />} />
+          <Route path="/pesquisar" element={<Navigate to="/explorar" replace />} />
           <Route path="/entrar" element={<Entrar />} />
           <Route path="/ajustes" element={<Ajustes />} />
         </Routes>

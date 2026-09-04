@@ -141,3 +141,41 @@ describe('parseConsulta — cobertura dos 66', () => {
     }
   })
 })
+
+/**
+ * Os cinco pares de capítulos que a NAA teve corrigidos em 2026-09-03 (versos
+ * que estavam no capítulo errado). `bible-books.ts` guarda `versesPerChapter`
+ * à mão e ficou com os números antigos por algumas horas — tempo em que a busca
+ * recusava `Sl 110:7` dizendo "Salmos 110 tem 5 versículos", uma afirmação
+ * falsa sobre a Bíblia, e aceitava `Sl 111:12`, que não existe.
+ *
+ * `scripts/auditar-cobertura.ts` compara os 1189 capítulos contra a NAA e é
+ * quem PEGA uma divergência nova — mas lê `data/NAA.json`, que é gitignored,
+ * então não roda na CI. Estes casos são a metade que roda: não descobrem
+ * divergência nova, impedem que estes dez valores voltem sem ninguém notar.
+ */
+describe('versificação dos capítulos corrigidos na NAA', () => {
+  it('os versículos que existem são aceitos como referência', () => {
+    for (const q of ['2Sm 22:51', 'Sl 110:7', 'Is 4:6', 'Is 12:6', 'Os 3:5']) {
+      expect(parseConsulta(q).ref, q).not.toBeNull()
+    }
+  })
+
+  it('os versículos que não existem são recusados, com o número certo', () => {
+    const esperado: [string, string][] = [
+      ['2Sm 23:40', '2 Samuel 23 tem 39 versículos.'],
+      ['Sl 111:12', 'Salmos 111 tem 10 versículos.'],
+      ['Is 5:31', 'Isaías 5 tem 30 versículos.'],
+      // Is 13 não produz sintoma pela busca (a perícope cobre o capítulo
+      // inteiro), e por isso passou despercebido na primeira medição: só
+      // apareceu comparando os 1189 capítulos contra a NAA.
+      ['Is 13:23', 'Isaías 13 tem 22 versículos.'],
+      ['Os 4:20', 'Oséias 4 tem 19 versículos.'],
+    ]
+    for (const [q, motivo] of esperado) {
+      const c = parseConsulta(q)
+      expect(c.ref, q).toBeNull()
+      expect(c.refForaDeFaixa?.motivo, q).toBe(motivo)
+    }
+  })
+})

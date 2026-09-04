@@ -13,21 +13,27 @@ lote de TTS, `npm run shard`, ou qualquer coisa que regenere o catálogo.**
 | 3 | Conserto dos 5 capítulos embaralhados na `NAA.json` | ✅ feito |
 | 4 | Conserto do merge do `enrich` (estrutura sempre do raw) | ✅ feito |
 | 5 | Auditoria repetível + testes | ✅ feito |
-| 6 | Commit das correções | ⬜ pendente — a pedido, nada commitado ainda |
-| 7 | Reenriquecer as 23 perícopes com material escrito sobre texto velho | ✅ feito (subagents, US$ 0) |
-| 8 | Regravar o áudio dessas 23 | ✅ feito (US$ 0,507, publicado no R2) |
-| 9 | 4 casos de versificação KJV×NAA | ⬜ a fazer (leva a cobertura a 100,000%) |
-| 10 | Spec dos cortes | ⬜ a fazer |
-| 11 | Campo `seq` (ordem de leitura ≠ identidade) | ⬜ a fazer |
-| 12 | Cortar Salmos (5 → 148) | ⬜ a fazer |
-| 13 | Cortar 15 grandes do AT (→ ~52) | ⬜ a fazer |
-| 14 | Material editorial das ~200 novas (CINCO campos, com `topicos_pregar`) | ⬜ a fazer (subagents, US$ 0) |
-| 15 | Aposentar ordens 1100-1104 + redirect | ⬜ a fazer |
-| 16 | Áudio das ~200 novas | ⬜ a fazer (~US$ 3,84) |
+| 6 | Commit das correções | ✅ feito |
+| 7 | Reenriquecer as 23 perícopes com material escrito sobre texto velho | ✅ feito |
+| 8 | Regravar o áudio dessas 23 | ✅ feito (US$ 0,507) |
+| 9 | 4 casos de versificação KJV×NAA | ✅ feito — **cobertura 100,0000%** |
+| 10 | Spec dos cortes | ✅ feito (`scripts/cortes.ts`, com o motivo de cada um) |
+| 11 | Campo `seq` (ordem de leitura ≠ identidade) | ✅ feito |
+| 12 | Cortar Salmos (5 → 148) | ✅ feito |
+| 13 | Cortar 14 grandes do AT (→ 47) | ✅ feito |
+| 14 | Material editorial das 195 (cinco campos) | ✅ feito (US$ 0, subagents) |
+| 15 | Aposentar ordens 1100-1104 | ✅ feito |
+| 16 | Áudio das 195 | ✅ feito (US$ 4,07 · 6.085 unidades · 15,8 h) |
 
-Orçamento de TTS: **~US$ 4,40** no total, dos quais US$ 0,507 já gastos nas 23. Saldo OpenRouter em 2026-09-03 18:35 era
-US$ 2,82; o usuário vai recarregar para US$ 10 (folga para retries e para a ressalva
-de preço do OpenRouter sobre o áudio do `gpt-audio-mini`).
+**ENCERRADO em 2026-09-03.** Catálogo em 2823 perícopes, cobertura 100,0000%,
+narração publicada. Gasto total de TTS: US$ 4,65.
+
+O áudio das 19 perícopes aposentadas está em `tts-corpus/gam-ash-aposentadas/`,
+fora do corpus ativo e não apagado — desfazer continua barato.
+
+Gasto real de TTS: **US$ 4,65** — US$ 0,507 nas 23, US$ 0,077 nas 5 de
+versificação, US$ 4,07 nas 195. Estimativa original era US$ 4,40; a diferença é
+que o material das novas saiu mais denso que a média do catálogo.
 
 ## O que as etapas 1-5 mudaram
 

@@ -111,10 +111,13 @@ idempotente — rodar duas vezes dá byte a byte o mesmo resultado.
 
 #### O que ficou registrado para as sessões seguintes
 
-- **Sl 125** é o único dos quinze Cânticos dos Degraus sem "Cântico dos
-  degraus" na fonte. É defeito da Bíblia Livre. Não foi preenchido de
-  propósito: escrever o que a fonte não traz seria inventar Escritura.
-  Registrado em `scripts/blivre-epigrafes.ts`.
+- **65 defeitos da fonte corrigidos** (`scripts/blivre-correcoes.ts`), sem
+  nenhuma marca na tela. O método é o que importa e vale para a próxima:
+  conferir contra **duas testemunhas independentes** — a KJV que já está no
+  repo (`data/raw/PericopeGroupedKJVVerses.json`, mesma linhagem Textus
+  Receptus) e a **Almeida de 1911** (domínio público, ancestral da BLIVRE).
+  Só corrige onde as duas concordam contra a BLIVRE. A comparação derrubou
+  dois candidatos que pareciam duplicata e eram português correto.
 - **Sl 72** vem "Para SalomãoDeus, dá teus juízos" — sem separador. Entrou como
   exceção com o texto esperado verificado.
 - **Para a Sessão 5**: o manifesto de narração vai precisar de uma unidade para

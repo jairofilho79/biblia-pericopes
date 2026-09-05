@@ -347,6 +347,35 @@ KJV traz "taches of brass". Está certa, só é desconhecida. **Não se corrige:
 explica**, e foi o que a perícope 136 fez, no parágrafo das palavras do trecho.
 É a mesma regra de `estopa` em Isaías 1.
 
+## Em aberto: duas glosas entre colchetes que talvez não sejam aparato
+
+A regra que tira nota do tradutor pega `[Ou: perfeito]` e `[ou: anciãos]`,
+que trazem dois-pontos. A varredura completa achou mais quatro colchetes com
+"ou" **sem** dois-pontos, e eles não são todos a mesma coisa:
+
+| referência | conteúdo | o que parece ser |
+|---|---|---|
+| `Jó 33:15` | `[ou em]` | preposição suprida, legítima — "em sonho, [ou em] visão" |
+| `Ap 3:4` | `[ou seja, pessoas]` | aparato: explica "nomes" |
+| `Ap 1:20` | `[ou mensageiros]` | aparato: leitura alternativa de "anjos" |
+| `Jo 19:13` | `[ou pavimento]` | **duvidoso** — pode ser tradução, não aparato |
+
+O caso de João 19:13 é o que trava a decisão. O texto bíblico traduz nomes
+estrangeiros o tempo todo por conta própria ("Rabi, que traduzido quer dizer
+Mestre"), e `Litóstrotos [ou pavimento]` pode ser exatamente isso, e não uma
+nota de rodapé vazada. Tirar seria apagar tradução; deixar é ler aparato em voz
+alta.
+
+**Não decidi.** São três casos, o critério não é mecânico, e improvisar uma
+regra aqui foi justamente o que o dono pediu para não fazer enquanto a corrida
+não termina.
+
+O mesmo cuidado evitou um erro na família das contrações: há dois casos de
+preposição seguida de artigo entre colchetes, e só um é defeito. `Ap 1:13`
+(`semelhante a [o] Filho`) precisa virar *ao*; `Is 1:14` (`cansado de as
+suportar`) é português correto e uma regra geral o teria estragado. Virou
+correção pontual, não regra.
+
 ## Nem todo defeito precisa de correção na fonte
 
 Uma parte do catálogo se resolve sozinha quando a ETL roda, porque o defeito

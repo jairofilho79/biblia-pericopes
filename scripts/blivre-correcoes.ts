@@ -308,6 +308,20 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'REV 1:13',
+    de: 'semelhante a [o] Filho',
+    para: 'semelhante ao Filho',
+    motivo:
+      'Contração perdida. KJV "like unto the Son of man"; Almeida 1911 "semelhante ao Filho do homem". Varri o padrão inteiro antes de escrever isto: há só dois casos de preposição seguida de artigo entre colchetes, e o outro (Is 1:14, "cansado de as suportar") é português correto — por isso a correção é pontual e não virou regra.',
+  },
+  {
+    ref: 'JUD 1:11',
+    de: 'por interesse por [interesse de] lucro',
+    para: 'por [interesse de] lucro',
+    motivo:
+      '"por interesse" duplicado. KJV "ran greedily after the error of Balaam for reward"; Almeida 1911 "se lançaram no erro de Balaão por interesse". Não entra em DUPLICADAS porque a segunda ocorrência está partida por colchete.',
+  },
+  {
     ref: 'HEB 13:3',
     de: 'Lembrai-vos dos prisoneiros',
     para: 'Lembrai-vos dos prisioneiros',

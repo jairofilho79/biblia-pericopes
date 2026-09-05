@@ -167,24 +167,35 @@ function aplicar() {
   // guarda, o primeiro lote a chegar não aplicava nada, porque batia nos
   // títulos velhos que ele mesmo tinha vindo substituir.
   const pendentes = new Set(ordens(dEntrada).filter((o) => !novos.has(o)))
+  const emColisao = new Set<number>()
   for (const c of pares) {
     const tocaNovo = novos.has(c.a.ordem) || novos.has(c.b.ordem)
     const esperaFila = pendentes.has(c.a.ordem) || pendentes.has(c.b.ordem)
     if (c.forca >= 0.85 && tocaNovo && !esperaFila) {
-      problemas.push(`${c.a.ordem}×${c.b.ordem}: ainda colidem — "${c.a.titulo}" / "${c.b.titulo}"`)
+      problemas.push(`${c.a.ordem}×${c.b.ordem}: colidem — "${c.a.titulo}" / "${c.b.titulo}"`)
+      emColisao.add(c.a.ordem)
+      emColisao.add(c.b.ordem)
     }
   }
 
-  if (problemas.length) {
-    console.log(`❌ ${problemas.length} problema(s); nada gravado:`)
-    for (const x of problemas.slice(0, 40)) console.log(`  ${x}`)
-    if (problemas.length > 40) console.log(`  … e mais ${problemas.length - 40}`)
+  // Sem âncora é motivo para não gravar NADA: é sinal de que o lote inteiro veio
+  // errado. Colisão não — ela é local, e travar as outras mil por causa de um
+  // par empurra o trabalho todo para o fim da fila. Pula-se o par e segue.
+  const semAncora = problemas.filter((x) => x.includes('sem âncora') || x.includes('vazio'))
+  if (semAncora.length) {
+    console.log(`❌ ${semAncora.length} problema(s) de âncora; nada gravado:`)
+    for (const x of semAncora.slice(0, 40)) console.log(`  ${x}`)
     process.exitCode = 1
     return
+  }
+  if (emColisao.size) {
+    console.log(`⚠️  ${problemas.length} par(es) em colisão — pulados, o resto vai:`)
+    for (const x of problemas.slice(0, 20)) console.log(`  ${x}`)
   }
 
   let n = 0
   for (const [o, t] of novos) {
+    if (emColisao.has(o)) continue
     const arq = join(materialDir, `${o}.json`)
     const m = JSON.parse(readFileSync(arq, 'utf8'))
     if (m.titulo_pericope_pt === t) continue

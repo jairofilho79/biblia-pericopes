@@ -113,7 +113,12 @@ function main() {
   console.log(`  aguardando o dono     ${aguardando.length}`)
   console.log(`\ndefeitos catalogados: ${TODAS_AS_REFS.length} em ${DEFEITOS.length} classes`)
   if (descongeladas.length) {
-    console.log(`\n⚠️  DESCONGELADAS nesta rodada (avisar a Sessão 4): ${descongeladas.join(', ')}`)
+    // Não é item de ação por rodada. O dono decidiu esperar a corrida acabar
+    // para liberar a narração de uma vez: enquanto os achados continuam
+    // mudando a NATUREZA do conserto — 23 defeitos viraram regra de ETL num
+    // dia —, avisar a cada rodada é ruído, e narrar em cima de uma lista
+    // provisória é pagar duas vezes.
+    console.log(`\n   saíram do congelamento nesta rodada: ${descongeladas.join(', ')}`)
   } else {
     console.log('\n✅ nenhuma perícope saiu do congelamento')
   }

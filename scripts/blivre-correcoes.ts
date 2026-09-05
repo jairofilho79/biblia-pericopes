@@ -308,6 +308,19 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'HEB 13:3',
+    de: 'Lembrai-vos dos prisoneiros',
+    para: 'Lembrai-vos dos prisioneiros',
+    motivo: 'Caiu o "i". A própria fonte grafa "prisioneiros" nas outras 17 ocorrências do corpus.',
+  },
+  {
+    ref: 'JAM 1:13',
+    de: 'e ele mesmo tenta ninguém',
+    para: 'e ele mesmo a ninguém tenta',
+    motivo:
+      'Falta a negação, e sem ela o versículo afirma que Deus tenta — o contrário exato do que a frase inteira sustenta. KJV "neither tempteth he any man"; Almeida 1911 "e a ninguem tenta".',
+  },
+  {
     ref: 'ROM 15:19',
     de: 'no poder do Espíritode Deus',
     para: 'no poder do Espírito de Deus',

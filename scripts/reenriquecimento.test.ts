@@ -295,7 +295,10 @@ describe('portão — parágrafo que a leitura descartaria em silêncio', () => 
 
   const TEXTO =
     'Capítulo 1\n1 No princípio criou Deus os céus e a terra.\n2 E a terra estava desordenada e vazia, e as trevas estavam sobre a face do abismo.'
-  const P = 'Princípio criou Deus céus terra desordenada vazia trevas abismo movia águas. '.repeat(3)
+  // Enchimento DIFERENTE por campo: repetir o mesmo texto nos dois dispara,
+  // com razão, a checagem de repetição entre contexto e resenha.
+  const C = 'Princípio criou Deus céus terra desordenada vazia abismo. '.repeat(3)
+  const R = 'Trevas movia águas separou luz chamou tarde manhã dia. '.repeat(3)
 
   const material = (contexto: string, resenha: string) => ({
     ordem: 1,
@@ -324,16 +327,77 @@ describe('portão — parágrafo que a leitura descartaria em silêncio', () => 
   }
 
   it('aceita a resenha com o quarto parágrafo — o das palavras do trecho', () => {
-    expect(julgar([P, P].join('\n\n'), [P, P, P, P].join('\n\n')).problemas).toEqual([])
+    expect(julgar([C, C].join('\n\n'), [R, R, R, R].join('\n\n')).problemas).toEqual([])
   })
 
   it('reprova o quinto parágrafo da resenha, que nunca chegaria à tela nem ao áudio', () => {
-    const v = julgar([P, P].join('\n\n'), [P, P, P, P, P].join('\n\n'))
+    const v = julgar([C, C].join('\n\n'), [R, R, R, R, R].join('\n\n'))
     expect(v.problemas.join(' ')).toMatch(/resenha com 5 parágrafos/)
   })
 
   it('reprova o terceiro parágrafo do contexto pelo mesmo motivo', () => {
-    const v = julgar([P, P, P].join('\n\n'), [P, P].join('\n\n'))
+    const v = julgar([C, C, C].join('\n\n'), [R, R].join('\n\n'))
     expect(v.problemas.join(' ')).toMatch(/contexto com 3 parágrafos/)
+  })
+})
+
+describe('portão — repetição entre campos da cadeia', () => {
+  let base: string
+  let d: Dirs
+
+  const TEXTO =
+    'Capítulo 3\n1 SENHOR, como se multiplicam meus adversários! Muitos se levantam contra mim.\n2 Muitos dizem de minha alma: Não há salvação para ele em Deus.'
+  const ENCHE_C = 'Adversários levantam multiplicam salvação alma SENHOR trono fuga. '
+  const ENCHE_R = 'Muitos dizem contra ele naquela noite escura de Jerusalém antiga. '
+
+  const material = (contexto: string, resenha: string) => ({
+    ordem: 1,
+    titulo_pericope_pt: 'Dormir no meio do golpe',
+    contexto_historico_literario: contexto,
+    resenha,
+    perguntas_reflexao: ['p1', 'p2'],
+    topicos_pregar:
+      'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
+  })
+
+  beforeEach(() => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(
+      join(d.entrada, '1.json'),
+      JSON.stringify(montarEntrada(bruta({ ordem: 1, abbrev: 'Sl', texto: TEXTO }))),
+    )
+  })
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  const julgar = (c: string, r: string) => {
+    writeFileSync(join(d.saida, '1.json'), JSON.stringify(material(c, r)))
+    return conferirSaidas(d, [1])[0]
+  }
+
+  it('reprova quando a resenha repete uma frase inteira do contexto', () => {
+    const frase =
+      'Absalão era o filho de Davi que tomou o trono do pai e o obrigou a fugir de Jerusalém a pé.'
+    const v = julgar(frase + ' ' + ENCHE_C.repeat(3), ENCHE_R.repeat(3) + ' ' + frase + ' ' + ENCHE_R.repeat(2))
+    expect(v.ok).toBe(false)
+    expect(v.problemas.join(' ')).toMatch(/resenha repete o contexto/)
+  })
+
+  it('não reprova quando os dois citam o MESMO versículo — Escritura repete de direito', () => {
+    const citacao = '"Muitos dizem de minha alma: Não há salvação para ele em Deus"'
+    const v = julgar(
+      ENCHE_C.repeat(3) + ' O salmo abre assim: ' + citacao + '.',
+      ENCHE_R.repeat(3) + ' A acusação volta: ' + citacao + '. ' + ENCHE_R.repeat(2),
+    )
+    expect(v.problemas).toEqual([])
+  })
+
+  it('não reprova coincidência curta de vocabulário', () => {
+    const v = julgar(
+      'Davi foge de Jerusalém enquanto os adversários se multiplicam. ' + ENCHE_C.repeat(3),
+      'Os adversários se multiplicam, e o salmo conta como ele dormiu. ' + ENCHE_R.repeat(3),
+    )
+    expect(v.problemas).toEqual([])
   })
 })

@@ -57,6 +57,40 @@ function citacoes(texto: string): string[] {
     .filter((c) => !c.includes('…') && !c.includes('...'))
 }
 
+/**
+ * Maior sequência de palavras que dois campos repartem, ignorando o que está
+ * entre aspas — Escritura citada nos dois lugares é repetição de direito, e é o
+ * caso comum: o contexto abre com o versículo e a resenha volta a ele.
+ *
+ * Serve à regra da cadeia: a resenha é escrita COM o contexto na mão, então
+ * repetir uma frase dele é sinal de que os campos foram escritos em paralelo,
+ * cada um do zero, e o leitor vai ler a mesma informação duas vezes.
+ */
+export function maiorTrechoRepetido(a: string, b: string): number {
+  const semAspas = (t: string) => (t ?? '').replace(/[“”"][^“”"]*[“”"]/g, ' ')
+  const palavras = (t: string) => normalizar(semAspas(t)).split(' ').filter(Boolean)
+  const pa = palavras(a)
+  const pb = palavras(b)
+  if (!pa.length || !pb.length) return 0
+  // Programação dinâmica clássica de subsequência contígua comum, em palavras.
+  let anterior = new Array<number>(pb.length + 1).fill(0)
+  let melhor = 0
+  for (let i = 1; i <= pa.length; i++) {
+    const atual = new Array<number>(pb.length + 1).fill(0)
+    for (let j = 1; j <= pb.length; j++) {
+      if (pa[i - 1] === pb[j - 1]) {
+        atual[j] = anterior[j - 1] + 1
+        if (atual[j] > melhor) melhor = atual[j]
+      }
+    }
+    anterior = atual
+  }
+  return melhor
+}
+
+/** Acima disto não é vocabulário em comum, é a mesma frase escrita duas vezes. */
+const MAX_REPETICAO = 8
+
 /** Normaliza para comparar citação com o texto bíblico sem tropeçar em pontuação. */
 function normalizar(s: string): string {
   return s
@@ -150,6 +184,14 @@ export function validarMaterial(
   const nRes = paragrafos(m.resenha)
   if (nCtx > MAX_PARAGRAFOS.contexto) p.push(`contexto com ${nCtx} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.contexto})`)
   if (nRes > MAX_PARAGRAFOS.resenha) p.push(`resenha com ${nRes} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.resenha})`)
+
+  // A cadeia: a resenha é escrita com o contexto na frente, então repetir uma
+  // frase dele significa que os dois foram escritos do zero, em paralelo — e o
+  // leitor lê a mesma informação duas vezes seguidas.
+  const repetido = maiorTrechoRepetido(m.contexto_historico_literario, m.resenha)
+  if (repetido > MAX_REPETICAO) {
+    p.push(`resenha repete o contexto em ${repetido} palavras seguidas`)
+  }
 
   for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
     const v = m[campo] ?? ''

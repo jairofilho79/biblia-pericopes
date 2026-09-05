@@ -207,6 +207,47 @@ entrada: o mínimo para chegar preparado, com 1 insight que prepara a leitura.
 **Não é resumo do enredo** — não entregue o desfecho. 1–2 parágrafos densos,
 ~2 frases curtas cada, separados por `\n\n`. Entre 200 e 3.000 caracteres.
 
+**A regra da chave.** Não entregar o desfecho **não é** não entregar nada. O que
+o contexto guarda é *o que a passagem vai fazer*. O que ele entrega, sempre, é
+*o que o leitor precisaria saber antes e não tem como descobrir sozinho*: quem é
+essa pessoa, quando isso é, onde fica esse lugar, o que essa palavra significava,
+quanto valia essa medida, o que aconteceu antes que explica esta cena.
+
+A primeira versão desta instrução dizia só "não entregue o desfecho", e foi lida
+como "não entregue informação". O resultado, medido nas 2.823: **44% dos
+contextos terminam mandando o leitor reparar em alguma coisa**, esse parágrafo
+final ocupa metade do campo, e só **5%** trazem um marcador de tempo histórico.
+O campo se chama histórico-literário e faz história num caso a cada vinte. E não
+é falta de espaço: a mediana é de 390 caracteres contra um teto de 3.000.
+
+**Pelo menos um dado duro por contexto.** Dado duro é a frase que alguém poderia
+conferir e dizer "está certo" ou "está errado": uma distância, uma data, um
+cargo, um costume, uma palavra explicada, uma lei citada, um episódio anterior
+contado com nome. Opinião, expectativa e convite não contam.
+
+| ❌ só aponta | ✅ entrega |
+| --- | --- |
+| Repare no que essas duas tarefas garantem. | Tirar a cinza e repor a lenha eram as duas tarefas que mantinham o altar aceso a noite inteira, quando não havia sacrifício nenhum acontecendo. |
+| Duas coisas ficam proibidas nela e uma é obrigatória. Guarde isso enquanto lê. | Nesta oferta ficam proibidos o fermento e o mel, e o sal é obrigatório em toda ela. |
+| Vale acompanhar quem fala com quem, e o que cada um sabe quando decide. | Hamã é chamado de agageu. Agague era o rei de Amaleque que Saul poupou, em 1 Samuel 15 — o povo que Israel tinha ordem de destruir. A briga deste capítulo é mais velha que os dois homens dela. |
+
+**Proibido: o parágrafo que só manda reparar.** "Repare em duas coisas", "preste
+atenção em", "guarde isso enquanto lê", "vale acompanhar", "leve a pergunta com
+você". Cada uma funciona sozinha; juntas viraram metade do campo. Se você quer
+que o leitor repare em alguma coisa, **diga a coisa** — ele repara sozinho quando
+chegar lá. No máximo uma frase dessas por contexto, e nunca como parágrafo
+inteiro.
+
+**Palavra que o leitor não decodifica é dívida do contexto, não da resenha.** Se
+a perícope chama alguém de agageu, arquita, queneu; se marca o quinto mês, o mês
+de Adar; se mede em côvados, talentos, denários — e o leitor precisa disso para
+entender a CENA, e não só a palavra —, o lugar é aqui, porque o contexto é lido
+antes e a resenha chega tarde para a leitura.
+
+**Teste de bolso:** apague do seu contexto todas as frases que mandam o leitor
+observar algo. Se o que sobra tem menos de duas frases, ou não tem nenhum fato
+conferível, o contexto não está escrito.
+
 **3. `resenha`** — lida **depois** da passagem. O que aconteceu e por quê, em
 palavras simples e precisas, e o que o texto realmente afirma. Integre o insight
 à história em vez de pendurar curiosidade à parte.
@@ -261,7 +302,11 @@ Regras:
   **O parágrafo nunca é dispensado** — o que muda é o que ele carrega.
 
 **4. `perguntas_reflexao`** — exatamente **duas**. Afiadas, em linguagem jovem,
-nunca de sim/não. Deus e Jesus só se couberem ao trecho.
+nunca de sim/não. Deus e Jesus só se couberem ao trecho. Cada uma abre com uma
+frase curta que **afirma um fato do trecho** e só então pergunta — é o que 93%
+do acervo já faz, e é o que faz o leitor voltar ao texto em vez de olhar para
+dentro no vazio. **Varie a abertura da interrogação:** "O que você…" abre 638
+perguntas, "O que muda…" 229, "Onde você já…" 116.
 
 **5. `topicos_pregar`** — para o pregador ler rápido no púlpito. Duas seções,
 nesta ordem, cada título numa linha só:
@@ -276,6 +321,15 @@ Mensagens a levar
 ```
 
 - **5 a 7** bullets na linha de raciocínio; **4 a 6** nas mensagens.
+- **Nas Mensagens a levar, a mensagem vem presa a alguma coisa do trecho** — um
+  objeto, um nome, um gesto, uma medida. A conclusão pode ser geral; o gancho
+  não. Hoje **57% das mensagens do acervo não têm uma única palavra do próprio
+  texto bíblico**, e mensagem sem gancho serve para qualquer perícope — o mesmo
+  defeito que produziu os títulos soltos.
+  - ❌ `- A fé tem centro; nem tudo pesa **igual**.`
+  - ✅ `- O mal em escala grande costuma precisar de uma assinatura **distraída**, não de um monstro.`
+  - ❌ `- Escolha o que dura: a mentira tem validade **curta**.`
+  - ✅ `- Quem se apoia em cana sai ferido pelo próprio **socorro** que buscou.`
 - Cada bullet: uma observação específica DESTE trecho + uma palavra-chave em
   `**negrito**`.
 - Sem sermão escrito, sem introdução, sem citação versículo a versículo.

@@ -294,6 +294,43 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'NUM 23:3', 'NUM 23:19', 'NUM 24:1', 'NUM 24:21', 'NUM 31:9',
     ],
   },
+  // Jeremias e os Salmos, na última rodada. O saltério mostrou o mesmo perfil
+  // de Lucas, Atos e Levítico 25: concentração alta num livro só.
+  {
+    classe: 'erro de digitação (Jeremias)',
+    refs: [
+      'JER 16:5', 'JER 17:20', 'JER 18:15', 'JER 19:6',
+      'JER 20:4', 'JER 20:7',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Salmos 1—33)',
+    refs: [
+      'PSA 3:2', 'PSA 5:5', 'PSA 9:1', 'PSA 10:4', 'PSA 10:8', 'PSA 10:13',
+      'PSA 11:1', 'PSA 14:1', 'PSA 16:3', 'PSA 17:7', 'PSA 17:13', 'PSA 17:14',
+      'PSA 18:7', 'PSA 18:10', 'PSA 20:4', 'PSA 21:8', 'PSA 22:10', 'PSA 25:16',
+      'PSA 27:8', 'PSA 28:3', 'PSA 29:3', 'PSA 30:9', 'PSA 31:19', 'PSA 31:22',
+      'PSA 32:8', 'PSA 33:6', 'PSA 33:20', 'PSA 33:22',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Salmos 34—54)',
+    refs: [
+      'PSA 34:18', 'PSA 35:2', 'PSA 35:12', 'PSA 36:2', 'PSA 36:11',
+      'PSA 37:14', 'PSA 37:20', 'PSA 37:21', 'PSA 39:11', 'PSA 40:16',
+      'PSA 42:7', 'PSA 44:18', 'PSA 44:19', 'PSA 45:8', 'PSA 48:4',
+      'PSA 49:14', 'PSA 50:17', 'PSA 52:7', 'PSA 53:1', 'PSA 54:5',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Salmos 55—74)',
+    refs: [
+      'PSA 55:11', 'PSA 55:19', 'PSA 57:3', 'PSA 62:3', 'PSA 64:10',
+      'PSA 65:5', 'PSA 65:9', 'PSA 66:10', 'PSA 67:2', 'PSA 68:9',
+      'PSA 68:27', 'PSA 68:30', 'PSA 69:20', 'PSA 69:28',
+      'PSA 73:18', 'PSA 74:5',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

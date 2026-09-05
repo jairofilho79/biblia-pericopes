@@ -308,6 +308,34 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'PSA 37:21',
+    de: 'O perverso toma emprestado, e paga de volta',
+    para: 'O perverso toma emprestado, e não paga de volta',
+    motivo:
+      'Falta a negação, e sem ela o contraste da frase se desfaz — o perverso passa a fazer o mesmo que o justo. KJV "The wicked borroweth, and payeth not again"; Almeida 1911 "O impio toma emprestado, e não paga".',
+  },
+  {
+    ref: 'PSA 57:3',
+    de: 'ao que procura me demorar',
+    para: 'ao que procura me devorar',
+    motivo:
+      'Uma letra, e a frase deixa de fazer sentido. KJV "him that would swallow me up"; Almeida 1911 "o que procura devorar-me".',
+  },
+  {
+    ref: 'PSA 29:3',
+    de: 'A voz do SEHOR',
+    para: 'A voz do SENHOR',
+    motivo:
+      'O nome divino grafado errado. A própria fonte escreve "SENHOR" 6.537 vezes, e esta é a única ocorrência de "SEHOR" no corpus inteiro.',
+  },
+  {
+    ref: 'PSA 33:22',
+    de: 'tua bondade, SENOR',
+    para: 'tua bondade, SENHOR',
+    motivo:
+      'O nome divino grafado errado. A própria fonte escreve "SENHOR" 6.537 vezes, e esta é a única ocorrência de "SENOR" no corpus inteiro.',
+  },
+  {
     ref: 'GEN 19:26',
     de: 'se tornou estátua de sai',
     para: 'se tornou estátua de sal',

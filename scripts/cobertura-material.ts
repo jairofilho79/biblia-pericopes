@@ -47,14 +47,31 @@ export const VAZIAS = new Set(
 const conteudo = (s: string) =>
   [...s.matchAll(PALAVRA)].map((m) => radical(m[0])).filter((w) => !VAZIAS.has(w))
 
-export type Verso = { numero: number; texto: string }
+export type Verso = { capitulo: number; numero: number; texto: string }
 
-/** `Capítulo 1\n1 No princípio…\n2 E a terra…` → versículos. */
+/** `25:8` — a referência dentro da perícope, com o capítulo na frente. */
+export const ref = (v: { capitulo: number; numero: number }) => `${v.capitulo}:${v.numero}`
+
+/**
+ * `Capítulo 1\n1 No princípio…\n2 E a terra…` → versículos, COM o capítulo.
+ *
+ * O capítulo não é enfeite. A unidade do material é a PERÍCOPE, e 63 delas
+ * atravessam capítulo — nessas os números de versículo reiniciam. Enquanto esta
+ * função devolvia só o número, o relatório de Pv 22:17-24:22 saía com os
+ * números andando para trás ("20-21 · 2-4"), e dois versículos de capítulos
+ * diferentes com o mesmo número eram tratados como o mesmo.
+ */
 export function versos(texto: string): Verso[] {
   const out: Verso[] = []
+  let capitulo = 0
   for (const linha of texto.split('\n')) {
+    const cap = /^Cap[íi]tulo\s+(\d+)/.exec(linha.trim())
+    if (cap) {
+      capitulo = Number(cap[1])
+      continue
+    }
     const m = /^(\d+)\s+(.+)$/.exec(linha.trim())
-    if (m) out.push({ numero: Number(m[1]), texto: m[2] })
+    if (m) out.push({ capitulo, numero: Number(m[1]), texto: m[2] })
   }
   return out
 }
@@ -79,7 +96,7 @@ export function vocabularioComum(pericopes: { texto: string }[], corte = COMUM_D
   return new Set([...n].filter(([, c]) => c >= corte).map(([w]) => w))
 }
 
-export type Bloco = { de: number; ate: number; versiculos: number[] }
+export type Bloco = { de: string; ate: string; versiculos: string[] }
 
 /**
  * Versículo TOCADO: o material fala de alguma palavra que só ele traz.
@@ -120,24 +137,38 @@ export function blocosMudos(
     for (const w of new Set(conteudo(v.texto))) frequencia.set(w, (frequencia.get(w) ?? 0) + 1)
   }
   const noMaterial = new Set(conteudo(material))
-  const mudos: number[] = []
+  const mudos: Verso[] = []
   for (const v of vs) {
     const proprias = [...new Set(conteudo(v.texto))].filter(
       (w) => frequencia.get(w) === 1 && !comum.has(w),
     )
-    if (!tocado(proprias, noMaterial)) mudos.push(v.numero)
+    if (!tocado(proprias, noMaterial)) mudos.push(v)
   }
 
+  // Seguido = mesmo capítulo E número em sequência. Sem o capítulo, o último
+  // versículo de um e o primeiro do seguinte pareciam vizinhos ou distantes ao
+  // acaso, conforme os números tivessem calhado de encaixar.
   const blocos: Bloco[] = []
-  let corrente: number[] = []
-  for (const n of mudos) {
-    if (corrente.length && n === corrente.at(-1)! + 1) corrente.push(n)
-    else {
-      if (corrente.length >= minimoBloco) blocos.push({ de: corrente[0], ate: corrente.at(-1)!, versiculos: corrente })
-      corrente = [n]
+  let corrente: Verso[] = []
+  const fecha = () => {
+    if (corrente.length >= minimoBloco) {
+      blocos.push({
+        de: ref(corrente[0]),
+        ate: ref(corrente.at(-1)!),
+        versiculos: corrente.map(ref),
+      })
     }
   }
-  if (corrente.length >= minimoBloco) blocos.push({ de: corrente[0], ate: corrente.at(-1)!, versiculos: corrente })
+  for (const v of mudos) {
+    const anterior = corrente.at(-1)
+    if (anterior && v.capitulo === anterior.capitulo && v.numero === anterior.numero + 1) {
+      corrente.push(v)
+    } else {
+      fecha()
+      corrente = [v]
+    }
+  }
+  fecha()
   return blocos
 }
 
@@ -202,7 +233,7 @@ if (process.argv[1]?.endsWith('cobertura-material.ts')) {
   if (process.argv.includes('--lista') || so) {
     for (const { p, mudos, fracao } of achados) {
       console.log(
-        `${p.ordem}\t${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}\t${(100 * fracao).toFixed(0)}% mudo\t${mudos.map((b) => (b.de === b.ate ? b.de : `${b.de}-${b.ate}`)).join(' · ')}`,
+        `${p.ordem}\t${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}\t${(100 * fracao).toFixed(0)}% mudo\t${mudos.map((b) => `${b.de}-${b.ate}`).join(' · ')}`,
       )
     }
   }

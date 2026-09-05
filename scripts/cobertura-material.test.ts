@@ -19,7 +19,7 @@ describe('blocosMudos', () => {
   it('acha o bloco seguido de que o material não fala', () => {
     const b = blocosMudos(LV18, MATERIAL_ESTREITO)
     expect(b).toHaveLength(1)
-    expect(b[0]).toMatchObject({ de: 19, ate: 20 })
+    expect(b[0]).toMatchObject({ de: '18:19', ate: '18:20' })
   })
 
   it('não acusa quando a tese alcança o trecho inteiro', () => {
@@ -46,11 +46,37 @@ describe('densidadeDeNomes', () => {
   })
 })
 
+describe('perícope que atravessa capítulo', () => {
+  // A unidade do material é a PERÍCOPE, não o capítulo — e 63 delas cruzam a
+  // fronteira. Sem o capítulo, o versículo 26 de um e o 1 do seguinte deixavam
+  // de ser vizinhos ou passavam a ser, conforme os números calhassem.
+  const doisCapitulos =
+    'Capítulo 25\n26 Fonte turva.\n27 Comer mel demais.\n' +
+    'Capítulo 26\n1 Como neve no verão.\n2 Como pardal que voa.\n'
+
+  it('não junta o fim de um capítulo com o começo do outro', () => {
+    const b = blocosMudos(doisCapitulos, 'nada em comum aqui')
+    expect(b.map((x) => [x.de, x.ate])).toEqual([
+      ['25:26', '25:27'],
+      ['26:1', '26:2'],
+    ])
+  })
+
+  it('numera o versículo com o capítulo na frente', () => {
+    expect(versos(doisCapitulos).map((v) => `${v.capitulo}:${v.numero}`)).toEqual([
+      '25:26',
+      '25:27',
+      '26:1',
+      '26:2',
+    ])
+  })
+})
+
 describe('versos', () => {
   it('lê o número e ignora a linha do capítulo', () => {
     expect(versos('Capítulo 3\n1 Primeiro.\n2 Segundo.')).toEqual([
-      { numero: 1, texto: 'Primeiro.' },
-      { numero: 2, texto: 'Segundo.' },
+      { capitulo: 3, numero: 1, texto: 'Primeiro.' },
+      { capitulo: 3, numero: 2, texto: 'Segundo.' },
     ])
   })
 })

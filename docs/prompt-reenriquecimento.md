@@ -169,13 +169,19 @@ seu raciocínio ser algo que não seja esta perícope.
 
 ## A regra da perícope inteira
 
+**A unidade é a PERÍCOPE, nunca o capítulo.** Ela pode ser um capítulo inteiro,
+um pedaço dele, ou atravessar a fronteira — 63 das 2.823 cruzam. O material
+responde exatamente pelo trecho que a entrada traz, nem mais nem menos: não é
+dívida sua o que está no capítulo e fora da perícope.
+
 O dono formulou assim, e ela vale para os cinco campos:
 
 > "Se explica X e não combina com a perícope inteira, então está errado. Teria
 > que refazer para abranger tudo, não só um pedaço. Se não, não existiria o
 > versículo, certo?"
 
-O caso que a revelou foi **Lv 18**. O material lia o capítulo como proteção da
+O caso que a revelou foi **Lv 18:1-30**, onde a perícope calha de ser o capítulo
+inteiro. O material a lia como proteção da
 casa — "mãe, irmã, nora, tia, a mulher do irmão" — e é uma leitura boa e
 verdadeira. Só que a lista do capítulo tem mais coisa do que parentesco, e o que
 sobrava do lado de fora da tese ficava sem uma palavra. **O áudio lê o versículo

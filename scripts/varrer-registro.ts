@@ -54,7 +54,11 @@ export const PADROES: { re: RegExp; motivo: string; negavel?: boolean }[] = [
   // "a gente de lá", "chega a gente que…" — aí gente é substantivo e a frase
   // está correta. O coloquialismo é o "a gente" que faz as vezes de "nós",
   // e esse vem colado num verbo.
-  { re: /\ba gente\b(?!\s+(?:que|de|do|da|dos|das|com|sem|em|no|na|comum|bo[ma]s?|simples|humilde|pobre|ric[ao])\b)/gi, motivo: '"a gente" no lugar de "nós"' },
+  // A fronteira é `(?<!\p{L})` e não `\b`, e a diferença é um falso-positivo
+  // real: o `\b` do JavaScript é ASCII, então "alcanç**a gente** e animais"
+  // casava, porque o `ç` conta como fronteira de palavra. Achado por um
+  // subagente do conserto de registro, em 1Sm 15.
+  { re: /(?<!\p{L})a gente(?!\p{L})(?!\s+(?:que|de|do|da|dos|das|com|sem|em|no|na|comum|bo[ma]s?|simples|humilde|pobre|ric[ao])(?!\p{L}))/giu, motivo: '"a gente" no lugar de "nós"' },
   { re: /\btem (essa|aquela) cara\b/gi, motivo: 'construção coloquial' },
 ]
 

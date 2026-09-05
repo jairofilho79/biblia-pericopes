@@ -77,3 +77,13 @@ describe('inventario', () => {
     expect(inventario('Arão funde o bezerro, e Moisés quebra as tábuas')).toBe(false)
   })
 })
+
+describe('inventario — a série fechada por aposto', () => {
+  it('absolve os três topônimos quando o fim diz o que eles são', () => {
+    expect(inventario('Bezer, Ramote e Golã, cidades do homicida')).toBe(false)
+  })
+
+  it('continua acusando a série que termina em item solto', () => {
+    expect(inventario('Jetro propõe chefes de mil, cem, cinquenta e dez')).toBe(true)
+  })
+})

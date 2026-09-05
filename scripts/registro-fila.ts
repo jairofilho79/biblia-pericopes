@@ -129,7 +129,7 @@ function aplicar() {
   let n = 0
   for (const o of ordens(dSaida)) {
     const devolvido = JSON.parse(readFileSync(join(dSaida, `${o}.json`), 'utf8')) as {
-      campos: Record<string, string>
+      campos: Record<string, string | string[]>
     }
     const m = materialDe(o)
     const antes = varrer(m).length
@@ -140,7 +140,15 @@ function aplicar() {
       continue
     }
     for (const [campo, valor] of Object.entries(devolvido.campos)) {
-      if (typeof valor !== 'string' || !valor.trim()) {
+      // `perguntas_reflexao` é ARRAY no material, não string. A primeira versão
+      // deste guarda recusava array como "campo vazio" e pulava a perícope em
+      // silêncio — seis das sete afetadas não gravariam nada. Achado por um
+      // subagente antes de eu rodar o aplicar.
+      const vazio =
+        typeof valor === 'string'
+          ? !valor.trim()
+          : !Array.isArray(valor) || valor.length === 0
+      if (vazio) {
         problemas.push(`${o}: campo ${campo} vazio`)
         continue
       }

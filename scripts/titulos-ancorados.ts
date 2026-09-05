@@ -102,11 +102,18 @@ export function ancorar(titulo: string, texto: string): Veredito {
  * dois-pontos com oração do outro lado, a série é premissa e não é inventário —
  * "Mirra, canela e cássia: o azeite da santa unção" está certo.
  */
+const FUNCIONAL = /(?<!\p{L})(de|do|da|dos|das|que|em|no|na|nos|nas|para|com|onde|sobre|ao|aos)(?!\p{L})/iu
+
 export function inventario(titulo: string): boolean {
-  const depoisDoDoisPontos = titulo.split(':')[1]?.trim()
-  if (depoisDoDoisPontos) return false
-  const itens = titulo.split(/,| e /).filter((x) => x.trim()).length
-  return itens >= 3
+  if (titulo.split(':')[1]?.trim()) return false
+  const itens = titulo.split(/,| e /).map((x) => x.trim()).filter(Boolean)
+  // Série fechada por aposto não é lista: "Bezer, Ramote e Golã, cidades do
+  // homicida" tem três topônimos e uma oração que diz o que eles são. Foi um
+  // subagente que apontou o caso, depois de a regra o ter obrigado a trocar os
+  // três nomes — que eram a âncora mais forte que o trecho oferecia — por uma
+  // paráfrase. A marca do aposto é a palavra funcional no ÚLTIMO segmento.
+  if (itens.length > 1 && FUNCIONAL.test(itens.at(-1)!)) return false
+  return itens.length >= 3
 }
 
 if (process.argv[1]?.endsWith('titulos-ancorados.ts')) {

@@ -30,6 +30,7 @@ public/data/index.json
 public/data/versao.json
 public/data/texto/
 public/data/estudo/
+public/data/trilha.json
 
 # Editor directories and files
 .vscode/*

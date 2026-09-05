@@ -23,8 +23,18 @@ describe('chaveAudio', () => {
     expect(chaveAudio('nt-ml/../1600.m4a')).toBeNull()
   })
 
+  it('aceita nome de registro, não só número', () => {
+    // A trilha é servida por registro, não por ordem: `trilha-v1/santuario.m4a`.
+    expect(chaveAudio('trilha-v1/santuario.m4a')).toBe('trilha-v1/santuario.m4a')
+    expect(chaveAudio('trilha-v1/santuario-2.m4a')).toBe('trilha-v1/santuario-2.m4a')
+  })
+
   it('rejeita nomes fora do formato', () => {
-    expect(chaveAudio('nt-ml/abc.m4a')).toBeNull()
+    expect(chaveAudio('nt-ml/1600.mp4')).toBeNull()
+    expect(chaveAudio('trilha-v1/Santuario.m4a')).toBeNull()
+    expect(chaveAudio('trilha-v1/santuario_2.m4a')).toBeNull()
+    expect(chaveAudio('trilha-v1/-santuario.m4a')).toBeNull()
+    expect(chaveAudio('trilha-v1/.m4a')).toBeNull()
     expect(chaveAudio('nt-ml/1600.mp3')).toBeNull()
     expect(chaveAudio('NT-ML/1600.m4a')).toBeNull()
     expect(chaveAudio('nt-ml/1600.m4a/extra')).toBeNull()

@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "dev:worker": "wrangler dev",
-    "shard": "tsx scripts/shard-catalogo.ts",
+    "shard": "tsx scripts/shard-catalogo.ts && tsx scripts/montar-trilha.ts",
     "etl": "tsx scripts/etl-pericopes.ts",
     "enrich": "tsx scripts/enrich-pericopes.ts --local",
     "enrich:force": "tsx scripts/enrich-pericopes.ts --local --force",
@@ -29,7 +29,8 @@
     "reenrich:status": "tsx scripts/reenriquecimento.ts status",
     "reenrich:claim": "tsx scripts/reenriquecimento.ts claim",
     "reenrich:aplicar": "tsx scripts/reenriquecimento.ts aplicar",
-    "reenrich:soltar-travas": "tsx scripts/reenriquecimento.ts soltar-travas"
+    "reenrich:soltar-travas": "tsx scripts/reenriquecimento.ts soltar-travas",
+    "trilha": "tsx scripts/montar-trilha.ts"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",

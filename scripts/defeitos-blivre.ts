@@ -282,6 +282,7 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'REV 9:18', 'REV 10:4', 'REV 12:12', 'REV 13:5',
       'REV 13:8', 'REV 13:16', 'REV 15:2', 'REV 16:9',
       'REV 2:14', 'REV 2:23', 'REV 3:4',
+      'REV 16:21', 'REV 17:3', 'REV 17:4', 'REV 19:1',
     ],
   },
 ]

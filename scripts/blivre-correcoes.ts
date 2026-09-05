@@ -308,6 +308,13 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'REV 17:4',
+    de: 'e adorada com ouro',
+    para: 'e adornada com ouro',
+    motivo:
+      'Caiu o "n", e o verbo trocado muda a frase de enfeite para culto. A própria fonte grafa "adornada" 5 vezes, inclusive na mesma construção em Ap 18:16.',
+  },
+  {
     ref: 'REV 3:4',
     de: 'Mas também em Sardo',
     para: 'Mas também em Sardes',

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { varrer } from './varrer-registro.ts'
+import { ABSOLVIDAS, varrer } from './varrer-registro.ts'
 
 const material = (extra: Record<string, unknown>) => ({
   ordem: 1,
@@ -126,5 +126,19 @@ describe('o que a varredura NÃO pode marcar', () => {
   it('não marca "de boa" depois de verbo de nomear', () => {
     expect(varrer(material({ resenha: 'É a morte que um israelita chamaria de boa.' }))).toEqual([])
     expect(varrer(material({ resenha: 'O profeta ficou de boa.' }))).toHaveLength(1)
+  })
+})
+
+describe('ABSOLVIDAS', () => {
+  it('cala a marca no par perícope+campo já julgado', () => {
+    const absolvida = [...ABSOLVIDAS][0]
+    const [ordem, campo] = absolvida.split(':')
+    const material = { ordem: Number(ordem), [campo]: 'isso tem cara de coisa' }
+    expect(varrer(material)).toEqual([])
+  })
+
+  it('não cala a mesma marca noutra perícope', () => {
+    const [, campo] = [...ABSOLVIDAS][0].split(':')
+    expect(varrer({ ordem: 999999, [campo]: 'isso tem cara de coisa' }).length).toBeGreaterThan(0)
   })
 })

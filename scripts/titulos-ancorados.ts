@@ -102,11 +102,24 @@ export function ancorar(titulo: string, texto: string): Veredito {
  * dois-pontos com oração do outro lado, a série é premissa e não é inventário —
  * "Mirra, canela e cássia: o azeite da santa unção" está certo.
  */
+/** Numeral por extenso, para juntar "vinte e oito" num item só. */
+const NUMERAL =
+  /^(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzentos|trezentos|mil)(\s+\p{L}+)?$/iu
+
 const FUNCIONAL = /(?<!\p{L})(de|do|da|dos|das|que|em|no|na|nos|nas|para|com|onde|sobre|ao|aos)(?!\p{L})/iu
 
 export function inventario(titulo: string): boolean {
   if (titulo.split(':')[1]?.trim()) return false
-  const itens = titulo.split(/,| e /).map((x) => x.trim()).filter(Boolean)
+  const bruto = titulo.split(/,| e /).map((x) => x.trim()).filter(Boolean)
+  // "vinte e oito anos" não é série de dois: é UM número. Sem esta junção, o
+  // medidor acusava de inventário títulos com numeral composto — apontado por
+  // um subagente que teve de contornar a regra em 2Rs 15.
+  const itens: string[] = []
+  for (const item of bruto) {
+    const anterior = itens.at(-1)
+    if (anterior && NUMERAL.test(anterior) && NUMERAL.test(item)) itens[itens.length - 1] = `${anterior} e ${item}`
+    else itens.push(item)
+  }
   // Série fechada por aposto não é lista: "Bezer, Ramote e Golã, cidades do
   // homicida" tem três topônimos e uma oração que diz o que eles são. Foi um
   // subagente que apontou o caso, depois de a regra o ter obrigado a trocar os

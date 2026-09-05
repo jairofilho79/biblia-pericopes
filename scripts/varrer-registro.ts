@@ -90,6 +90,41 @@ const CAMPOS = [
   'topicos_pregar',
 ] as const
 
+/**
+ * Campos já lidos por um revisor e absolvidos: a marca é falso-positivo.
+ *
+ * Três causas, todas confirmadas caso a caso: `cara` no sentido de dispendiosa
+ * ("uma cor cara de conseguir", "a tropa mais cara"); `gente` como substantivo
+ * ("é a gente daquele pátio", "a gente nova odiava Deus"); e `piada` usada para
+ * DESCREVER o deboche de alguém do texto — os genros de Ló, os meninos de
+ * Betel —, que é dizer a coisa certa.
+ *
+ * A absolvição é do par perícope+campo, e vale enquanto o campo não for
+ * reescrito: se ele mudar, a varredura volta a olhá-lo do zero. Sem esta lista
+ * as dezoito voltariam à conta a cada rodada e ninguém saberia se eram trabalho
+ * pendente ou trabalho já julgado.
+ */
+export const ABSOLVIDAS = new Set<string>([
+  '270:resenha',
+  '280:topicos_pregar',
+  '319:topicos_pregar',
+  '442:contexto_historico_literario',
+  '529:resenha',
+  '580:topicos_pregar',
+  '714:resenha',
+  '714:topicos_pregar',
+  '922:resenha',
+  '1659:topicos_pregar',
+  '1739:topicos_pregar',
+  '1740:resenha',
+  '1880:topicos_pregar',
+  '1991:perguntas_reflexao',
+  '1991:resenha',
+  '1994:topicos_pregar',
+  '2004:topicos_pregar',
+  '2347:resenha',
+])
+
 export function varrer(material: Record<string, unknown>): Suspeita[] {
   const ordem = Number(material.ordem)
   const achadas: Suspeita[] = []
@@ -98,6 +133,7 @@ export function varrer(material: Record<string, unknown>): Suspeita[] {
     ['perguntas_reflexao', (material.perguntas_reflexao as string[] | undefined)?.join(' ') ?? ''],
   ]
   for (const [campo, texto] of alvos) {
+    if (ABSOLVIDAS.has(`${ordem}:${campo}`)) continue
     for (const { re, motivo, negavel } of PADROES) {
       for (const m of texto.matchAll(new RegExp(re.source, re.flags))) {
         const i = m.index ?? 0

@@ -59,7 +59,7 @@ describe.skipIf(!existsSync(CATALOGO))('contra o catálogo de verdade', () => {
     }[]
     const soltos = d.filter((p) => !ancorar(p.titulo_pericope_pt, p.texto).ancorado).length
     // Trava para baixo: a reescrita dos títulos só pode diminuir este número.
-    expect(soltos).toBeLessThanOrEqual(808)
+    expect(soltos).toBeLessThanOrEqual(735)
   })
 })
 
@@ -85,5 +85,15 @@ describe('inventario — a série fechada por aposto', () => {
 
   it('continua acusando a série que termina em item solto', () => {
     expect(inventario('Jetro propõe chefes de mil, cem, cinquenta e dez')).toBe(true)
+  })
+})
+
+describe('inventario — numeral composto', () => {
+  it('não conta "vinte e oito" como dois itens', () => {
+    expect(inventario('Vinte e oito anos, três versículos')).toBe(false)
+  })
+
+  it('continua acusando a série de coisas', () => {
+    expect(inventario('A mesa, os pratos e as colheres')).toBe(true)
   })
 })

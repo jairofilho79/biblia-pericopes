@@ -18,16 +18,38 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 export type Titulo = { ordem: number; titulo: string; ref?: string }
-export type Colisao = { a: Titulo; b: Titulo; comuns: string[]; identicos: boolean }
+export type Colisao = {
+  a: Titulo
+  b: Titulo
+  comuns: string[]
+  identicos: boolean
+  /**
+   * Quanto do título MENOR é dividido com o outro. Contagem crua engana: dois
+   * títulos de seis palavras que dividem duas são parecidos de longe; dois de
+   * três palavras que dividem duas são quase o mesmo título.
+   */
+  forca: number
+}
 
 /**
  * Palavras que qualquer título divide sem significar nada. Sem esta lista,
  * "A casa de Deus" e "A palavra de Deus" colidiriam por "deus"... e por "de".
  */
 const VAZIAS = new Set([
-  'que', 'com', 'para', 'por', 'dos', 'das', 'uma', 'não', 'nao', 'como', 'mais',
-  'sem', 'seu', 'sua', 'ele', 'ela', 'quem', 'onde', 'entre', 'sobre', 'até',
-  'ate', 'depois', 'antes', 'quando', 'mesmo', 'mesma', 'todo', 'toda', 'tudo',
+  // conjunções e advérbios
+  'que', 'como', 'mais', 'quem', 'onde', 'quando', 'depois', 'antes', 'ainda',
+  'também', 'tambem', 'ate', 'até', 'entre', 'sobre', 'contra', 'assim',
+  // preposições e contrações — contar "para" como conteúdo fazia "Sete dias
+  // para fazer" e "Sete dias depois que para" dividirem uma palavra falsa
+  'com', 'para', 'por', 'pelo', 'pela', 'pelos', 'pelas', 'dos', 'das', 'nos',
+  'nas', 'num', 'numa', 'nele', 'nela', 'dele', 'dela', 'deles', 'delas',
+  // determinantes e pronomes
+  'uma', 'não', 'nao', 'sem', 'seu', 'sua', 'seus', 'suas', 'ele', 'ela',
+  'este', 'esta', 'esse', 'essa', 'aquele', 'aquela', 'isso', 'isto',
+  'mesmo', 'mesma', 'todo', 'toda', 'todos', 'todas', 'tudo', 'cada',
+  // verbos de ligação e auxiliares
+  'ser', 'era', 'foi', 'são', 'sao', 'está', 'esta', 'tem', 'têm', 'teve',
+  'vai', 'vem', 'fica', 'ficou',
 ])
 
 /** Palavras de conteúdo do título, sem acento e sem as vazias. */
@@ -58,12 +80,13 @@ export function colisoes(titulos: Titulo[], minimo = 2): Colisao[] {
         b: titulos[j],
         comuns,
         identicos: titulos[i].titulo.trim() === titulos[j].titulo.trim(),
+        forca: comuns.length / Math.max(1, Math.min(palavras[i].size, palavras[j].size)),
       })
     }
   }
-  // Idênticos primeiro, depois os que dividem mais palavras.
+  // Idênticos primeiro, depois os mais parecidos proporcionalmente.
   return achadas.sort(
-    (x, y) => Number(y.identicos) - Number(x.identicos) || y.comuns.length - x.comuns.length,
+    (x, y) => Number(y.identicos) - Number(x.identicos) || y.forca - x.forca || y.comuns.length - x.comuns.length,
   )
 }
 
@@ -72,6 +95,8 @@ function main() {
     process.argv.find((a) => a.startsWith(`--${n}=`))?.split('=')[1] ?? p
   const dir = arg('dir', 'data/enriched')
   const minimo = Number(arg('minimo', '2'))
+  // Metade do título menor em comum já é o mesmo título com outras palavras.
+  const forcaMin = Number(arg('forca', '0.5'))
 
   const titulos: Titulo[] = readdirSync(dir)
     .filter((f) => f.endsWith('.json'))
@@ -84,15 +109,16 @@ function main() {
     }))
     .sort((a, b) => a.ordem - b.ordem)
 
-  const achadas = colisoes(titulos, minimo)
+  const todas = colisoes(titulos, minimo)
+  const achadas = todas.filter((c) => c.forca >= forcaMin)
   const identicos = achadas.filter((c) => c.identicos).length
   console.log(
-    `${titulos.length} títulos · ${achadas.length} par(es) com ${minimo}+ palavras em comum · ${identicos} idêntico(s)`,
+    `${titulos.length} títulos · ${achadas.length} par(es) com força ≥ ${forcaMin} · ${identicos} idêntico(s) · ${todas.length - achadas.length} par(es) fracos omitidos`,
   )
   for (const c of achadas) {
     const marca = c.identicos ? '‼️ ' : '  '
     console.log(`${marca}${c.a.ordem} «${c.a.titulo}»`)
-    console.log(`   ${c.b.ordem} «${c.b.titulo}»   [${c.comuns.join(', ')}]`)
+    console.log(`   ${c.b.ordem} «${c.b.titulo}»   [${c.comuns.join(', ')}] força ${c.forca.toFixed(2)}`)
   }
 }
 

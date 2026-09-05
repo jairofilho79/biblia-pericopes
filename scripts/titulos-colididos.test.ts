@@ -8,6 +8,11 @@ describe('palavrasDoTitulo', () => {
     expect(palavrasDoTitulo('O pacto que Deus fez sozinho')).toEqual(['pacto', 'deus', 'fez', 'sozinho'])
   })
 
+  it('preposição não é palavra de conteúdo — "para" fazia dois títulos colidirem à toa', () => {
+    expect(palavrasDoTitulo('Sete dias para fazer um sacerdote')).not.toContain('para')
+    expect(palavrasDoTitulo('Sete dias depois que para')).toEqual(['sete', 'dias'])
+  })
+
   it('a mesma palavra com e sem acento é a mesma palavra', () => {
     expect(palavrasDoTitulo('A bênção')).toEqual(palavrasDoTitulo('A bencao'))
   })
@@ -37,6 +42,29 @@ describe('colisoes', () => {
     ])
     expect(r[0].identicos).toBe(true)
     expect([r[0].a.ordem, r[0].b.ordem]).toEqual([1, 3])
+  })
+
+  it('força mede proporção, não contagem: título curto colide mais fácil', () => {
+    const [curto] = colisoes([t(1, 'A cerca branca'), t(2, 'A cerca branca e a porta colorida')])
+    expect(curto.forca).toBe(1)
+    // Dividem duas palavras, mas cada título carrega muitas outras: de longe
+    // não são o mesmo título.
+    const [longo] = colisoes([
+      t(3, 'O sangue derramado fechou a aliança no monte alto'),
+      t(4, 'A aliança escrita com sangue sobre a casa inteira'),
+    ])
+    expect(longo.comuns.sort()).toEqual(['alianca', 'sangue'])
+    expect(longo.forca).toBeLessThan(0.5)
+  })
+
+  it('título idêntico tem força 1 e vem na frente', () => {
+    const r = colisoes([
+      t(1, 'A cerca branca e a porta colorida'),
+      t(2, 'O poço que virou juramento e sinal'),
+      t(3, 'A cerca branca e a porta colorida'),
+    ])
+    expect(r[0].identicos).toBe(true)
+    expect(r[0].forca).toBe(1)
   })
 
   it('catálogo sem colisão devolve lista vazia', () => {

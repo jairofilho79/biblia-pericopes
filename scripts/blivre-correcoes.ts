@@ -30,6 +30,11 @@
  * (condicional + reflexivo: "se se circuncidar").
  */
 export const DUPLICADAS: [string, string][] = [
+  // A regra do cabeçalho tem uma exceção achada na produção: `se se` é
+  // português correto na condicional ("se se circuncidar"), mas em Ef 5:13
+  // — "tudo o que se se torna visível é luz" — não há condicional nenhuma, e
+  // o segundo `se` é digitação. Entrou depois de eu conferir a frase inteira.
+  ['EPH 5:13', 'se'],
   ['NUM 16:33', 'a'],
   ['JDG 6:34', 'a'],
   ['1KI 1:51', 'que'],

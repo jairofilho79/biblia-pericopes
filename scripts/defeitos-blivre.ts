@@ -193,6 +193,38 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'ROM 4:3', 'ROM 7:2', 'ROM 8:36', 'ROM 15:19',
     ],
   },
+  {
+    classe: 'erro de digitação (1 Coríntios)',
+    refs: [
+      '1CO 1:14', '1CO 1:29', '1CO 2:9', '1CO 5:2',
+      '1CO 5:5', '1CO 7:5', '1CO 7:21', '1CO 7:26',
+      '1CO 7:29', '1CO 10:23', '1CO 11:8', '1CO 12:24',
+      '1CO 13:10', '1CO 14:15', '1CO 14:30', '1CO 15:6',
+      '1CO 15:17', '1CO 15:24', '1CO 16:2', '1CO 16:19',
+      '1CO 16:20',
+    ],
+  },
+  {
+    classe: 'erro de digitação (2 Coríntios)',
+    refs: [
+      '2CO 1:22', '2CO 3:1', '2CO 6:12', '2CO 8:15',
+      '2CO 10:12', '2CO 11:11', '2CO 11:17', '2CO 12:8',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Gálatas)',
+    refs: [
+      'GAL 1:15', 'GAL 1:19', 'GAL 3:6', 'GAL 3:8',
+      'GAL 5:21',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Efésios)',
+    refs: [
+      'EPH 1:3', 'EPH 4:14', 'EPH 5:13', 'EPH 6:7',
+      'EPH 6:13',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

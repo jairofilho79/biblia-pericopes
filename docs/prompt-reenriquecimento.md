@@ -263,6 +263,26 @@ tela é deixá-lo sozinho justamente onde ele mais precisa de companhia. Dizer o
 que o texto diz, sem crueza e sem eufemismo, vale para a lei tanto quanto para
 a narrativa.
 
+**Não cite na convenção bibliográfica.** "2 Reis 14", "8:15", "Jeroboão II" são
+formas que só funcionam para quem já sabe ler citação bíblica — e o leitor deste
+app pode não saber. Escreva por extenso, do jeito que se fala:
+
+- ❌ "como diz 2 Reis 14" → ✅ "como conta o segundo livro dos Reis, no capítulo 14"
+- ❌ "em 1 Samuel 16" → ✅ "no primeiro livro de Samuel, capítulo 16"
+- ❌ "Êxodo 8:15 e 8:32" → ✅ "Êxodo, no capítulo 8, versículos 15 e 32"
+- ❌ "Jeroboão II" → ✅ "Jeroboão Segundo"
+
+Há um segundo motivo, que tornou isto visível: o material é lido em voz alta, e
+a voz lê "2 Reis" como *dois Reis* e "8:15" como hora. Consertar só na fala não
+dá — o realce exige que a tela e o áudio digam a mesma coisa —, e a forma por
+extenso serve aos dois de uma vez.
+
+**Número que o texto não dá, você não inventa.** "Centenas de pessoas", "dezenas
+de anos", "milhares de soldados": se a passagem não conta, escreva "uma
+multidão", "muitos", "um grupo". Quantidade inventada é irmã da citação
+inventada — soa precisa, não é verificável, e o leitor que for conferir não
+acha. Quando o texto DÁ o número, use o dele, exato.
+
 **Aspas duplas servem só para texto copiado da Bíblia Livre — nunca para
 ênfase.** Se você quer destacar uma palavra sua, use *itálico* ou nada. Aspas
 de ênfase viram aviso de citação suspeita no portão, e aviso que é ruído esconde

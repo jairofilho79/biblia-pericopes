@@ -607,3 +607,78 @@ describe('portão — perícope curta não pode ser reprovada por ser curta', ()
     expect(v.problemas.join(' ')).toMatch(/palavras em comum/)
   })
 })
+
+describe('portão — referência em convenção bibliográfica é conhecimento tácito', () => {
+  let base: string
+  let d: Dirs
+
+  const TEXTO =
+    'Capítulo 1\n1 No princípio criou Deus os céus e a terra.\n2 E a terra estava desordenada e vazia, e as trevas estavam sobre a face do abismo.'
+  // Frases distintas por seção: repetir o mesmo enchimento dispara, com razão,
+  // a checagem de repetição entre contexto e resenha.
+  const C = (n: number) =>
+    `Parágrafo ${n} do contexto: o princípio, o abismo coberto e a terra ainda vazia antes de qualquer luz aparecer sobre ela.`
+  const P = (n: number) =>
+    `Trecho ${n} da resenha: as trevas cobriam tudo, e o Espírito se movia sobre as águas enquanto nada tinha forma.`
+  const LISTA = ['- Abismo é a massa de água sem fundo que cobria tudo.', '- Trevas é a escuridão completa antes da luz.'].join('\n')
+
+  const material = (contexto: string, resenha: string) => ({
+    ordem: 1,
+    titulo_pericope_pt: 'A criação',
+    contexto_historico_literario: contexto,
+    resenha,
+    perguntas_reflexao: ['p1', 'p2'],
+    topicos_pregar:
+      'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
+  })
+
+  beforeEach(() => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(join(d.entrada, '1.json'), JSON.stringify(montarEntrada(bruta({ ordem: 1, texto: TEXTO }))))
+  })
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  const julgar = (contexto: string, resenha: string) => {
+    writeFileSync(join(d.saida, '1.json'), JSON.stringify(material(contexto, resenha)))
+    return conferirSaidas(d, [1])[0]
+  }
+
+  const ctxOk = [C(1), C(2)].join('\n\n')
+  const resOk = [P(3), P(4), P(5), LISTA].join('\n\n')
+
+  it('aprova o material que não usa a convenção', () => {
+    expect(julgar(ctxOk, resOk).problemas).toEqual([])
+  })
+
+  it('reprova "2 Reis 14" — a voz lê "dois Reis" e o leitor precisa saber a convenção', () => {
+    const v = julgar([C(1), 'Como conta 2 Reis 14, o profeta veio de Gate-Hefer.'].join('\n\n'), resOk)
+    expect(v.problemas.join(' ')).toMatch(/2 Reis/)
+  })
+
+  it('reprova nas duas seções, contexto e resenha', () => {
+    expect(julgar([C(1), 'Ver 1 Samuel aqui neste ponto da leitura.'].join('\n\n'), resOk).ok).toBe(false)
+    expect(julgar(ctxOk, [P(3), 'Ver 1 Coríntios aqui.', P(5), LISTA].join('\n\n')).ok).toBe(false)
+  })
+
+  it('reprova capítulo:versículo, que a voz pode ler como hora', () => {
+    const v = julgar([C(1), 'A frase aparece em 8:15 e volta depois, no fim.'].join('\n\n'), resOk)
+    expect(v.problemas.join(' ')).toMatch(/8:15/)
+  })
+
+  it('reprova algarismo romano depois de nome, que a voz lê como cardinal', () => {
+    const v = julgar([C(1), 'Foi quando Jeroboão II assumiu o trono do norte.'].join('\n\n'), resOk)
+    expect(v.problemas.join(' ')).toMatch(/Jeroboão II/)
+  })
+
+  it('aceita a forma por extenso, que serve à tela e à voz', () => {
+    const bom = [C(1), 'Como conta o segundo livro dos Reis, o profeta veio de Gate-Hefer, e isso muda a leitura da cena inteira.'].join('\n\n')
+    expect(julgar(bom, resOk).problemas).toEqual([])
+  })
+
+  it('não confunde numeral que não é referência de livro', () => {
+    const v = julgar([C(1), 'Foram 2 homens, e o segundo trouxe 3 cordeiros para o altar naquela mesma manhã de festa.'].join('\n\n'), resOk)
+    expect(v.problemas).toEqual([])
+  })
+})

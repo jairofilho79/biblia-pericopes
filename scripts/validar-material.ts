@@ -91,6 +91,29 @@ export function maiorTrechoRepetido(a: string, b: string): number {
 /** Acima disto não é vocabulário em comum, é a mesma frase escrita duas vezes. */
 const MAX_REPETICAO = 8
 
+/**
+ * Referência escrita na convenção bibliográfica — "2 Reis 14", "8:15",
+ * "Jeroboão II".
+ *
+ * São defeito por DOIS motivos, e o primeiro basta sozinho: escrever assim é
+ * **conhecimento tácito**. O leitor deste app abriu a Bíblia pela segunda vez e
+ * pode não saber ler citação bíblica; "o segundo livro dos Reis" diz a mesma
+ * coisa sem exigir a convenção.
+ *
+ * O segundo motivo é o áudio, e é o que tornou isto visível: a voz lê "2 Reis"
+ * como *dois Reis* e "8:15" como hora. Não dá para consertar só na fala, porque
+ * o alinhamento do realce exige igualdade de token entre a tela e o que se ouve
+ * (`mesmoToken` em `src/lib/alinhar-narracao.ts` tolera só caixa e colchete) —
+ * normalizar de um lado só apagaria o realce da seção inteira, em silêncio.
+ */
+const LIVROS_NUMERADOS =
+  'Samuel|Reis|Crônicas|Coríntios|Tessalonicenses|Timóteo|Pedro|João|Macabeus'
+const CONVENCOES: { re: RegExp; que: string }[] = [
+  { re: new RegExp(`\\b[123]\\s+(?:${LIVROS_NUMERADOS})\\b`, 'g'), que: 'livro citado por número' },
+  { re: /\b\d{1,3}:\d{1,3}\b/g, que: 'capítulo:versículo' },
+  { re: /\b\p{Lu}\p{Ll}+\s+(I{1,3}|IV|VI{0,3}|IX|XI{0,3})\b/gu, que: 'algarismo romano' },
+]
+
 /** Normaliza para comparar citação com o texto bíblico sem tropeçar em pontuação. */
 function normalizar(s: string): string {
   return s
@@ -192,6 +215,17 @@ export function validarMaterial(
   const nRes = paragrafos(m.resenha)
   if (nCtx > MAX_PARAGRAFOS.contexto) p.push(`contexto com ${nCtx} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.contexto})`)
   if (nRes > MAX_PARAGRAFOS.resenha) p.push(`resenha com ${nRes} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.resenha})`)
+
+  // Convenção bibliográfica: conhecimento tácito na tela, e número lido errado
+  // na voz. A forma por extenso serve aos dois.
+  for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
+    const v = m[campo] ?? ''
+    for (const { re, que } of CONVENCOES) {
+      for (const achado of v.match(new RegExp(re.source, re.flags)) ?? []) {
+        p.push(`${campo}: ${que} — "${achado}"; escreva por extenso`)
+      }
+    }
+  }
 
   // A cadeia: a resenha é escrita com o contexto na frente, então repetir uma
   // frase dele significa que os dois foram escritos do zero, em paralelo — e o

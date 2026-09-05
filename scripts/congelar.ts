@@ -23,6 +23,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CODIGOS_VPL, DEFEITOS, TODAS_AS_REFS, pericopesAfetadas, type Faixa } from './defeitos-blivre.ts'
 import { colisoes } from './titulos-colididos.ts'
+import { dirs, conferirSaidas } from './reenriquecimento.ts'
 import { varrer } from './varrer-registro.ts'
 
 const root = join(import.meta.dirname, '..')
@@ -46,6 +47,15 @@ function main() {
     .map((f) => Number(f.slice(0, -5)))
   const mats = prontas.map((o) => JSON.parse(readFileSync(join(dirSaida, `${o}.json`), 'utf8')))
 
+  // O que o portão reprova ainda vai ser reescrito, então não pode ser narrado.
+  // Antes isto não entrava na conta porque nada reprovava; entrou no dia em que
+  // uma regra nova reprovou material já escrito e já congelado.
+  const reprovadasPeloPortao = new Set(
+    conferirSaidas(dirs(join(root, 'data/reenriquecimento')))
+      .filter((v) => !v.ok)
+      .map((v) => v.ordem),
+  )
+
   const porTexto = pericopesAfetadas(raw, abbrevPorCodigo)
   const porRegistro = new Set(mats.flatMap((m) => varrer(m)).map((s) => s.ordem))
   const porTitulo = new Set(
@@ -64,8 +74,11 @@ function main() {
   const congeladasAntes: number[] = anterior?.congeladas ?? []
   const aguardando: number[] = anterior?.aguardando_decisao_do_dono ?? []
 
-  const risco = (o: number) => porTexto.has(o) || porRegistro.has(o) || aguardando.includes(o)
-  const reescrita = prontas.filter((o) => porTexto.has(o) || porRegistro.has(o)).sort((a, b) => a - b)
+  const risco = (o: number) =>
+    porTexto.has(o) || porRegistro.has(o) || reprovadasPeloPortao.has(o) || aguardando.includes(o)
+  const reescrita = prontas
+    .filter((o) => porTexto.has(o) || porRegistro.has(o) || reprovadasPeloPortao.has(o))
+    .sort((a, b) => a - b)
   const soTitulo = prontas.filter((o) => porTitulo.has(o) && !risco(o)).sort((a, b) => a - b)
   const congeladas = prontas.filter((o) => !risco(o) && !porTitulo.has(o)).sort((a, b) => a - b)
 
@@ -93,7 +106,9 @@ function main() {
 
   console.log(`prontas ${prontas.length}`)
   console.log(`  congeladas            ${congeladas.length}`)
-  console.log(`  reescrita certa       ${reescrita.length}  (texto ${[...porTexto].filter((o) => prontas.includes(o)).length} · registro ${porRegistro.size})`)
+  console.log(
+    `  reescrita certa       ${reescrita.length}  (texto ${[...porTexto].filter((o) => prontas.includes(o)).length} · registro ${porRegistro.size} · portão ${reprovadasPeloPortao.size})`,
+  )
   console.log(`  só título pode mudar  ${soTitulo.length}`)
   console.log(`  aguardando o dono     ${aguardando.length}`)
   console.log(`\ndefeitos catalogados: ${TODAS_AS_REFS.length} em ${DEFEITOS.length} classes`)

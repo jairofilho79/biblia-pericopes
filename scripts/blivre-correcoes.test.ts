@@ -188,9 +188,9 @@ describe('as tabelas', () => {
   it('o tamanho das tabelas está travado', () => {
     expect(DUPLICADAS).toHaveLength(49)
     expect(PARENTESES_ORFAOS).toHaveLength(11)
-    expect(CORRECOES).toHaveLength(144)
+    expect(CORRECOES).toHaveLength(173)
     expect(SUBSCRICOES).toHaveLength(14)
-    expect(OMISSOES).toHaveLength(32)
+    expect(OMISSOES).toHaveLength(36)
   })
 
   it('toda omissão restaurada diz de onde veio a frase', () => {

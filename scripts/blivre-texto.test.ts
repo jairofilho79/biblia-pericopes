@@ -176,3 +176,23 @@ describe('ponto final colado na frase seguinte', () => {
     expect(removerColchetes('etc.algo assim')).toBe('etc.algo assim')
   })
 })
+
+describe('parêntese folgado', () => {
+  it('fecha o espaço por dentro dos dois lados', () => {
+    expect(removerColchetes('Deus ( que me separou ) se agradou')).toBe(
+      'Deus (que me separou) se agradou',
+    )
+  })
+
+  it('não mexe no parêntese que já está justo', () => {
+    expect(removerColchetes('o Cântico do Arco (está no livro de Jasher).')).toBe(
+      'o Cântico do Arco (está no livro de Jasher).',
+    )
+  })
+
+  it('não come o espaço de fora', () => {
+    expect(removerColchetes('a lei (de Moisés) e os profetas')).toBe(
+      'a lei (de Moisés) e os profetas',
+    )
+  })
+})

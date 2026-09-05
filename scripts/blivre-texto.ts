@@ -18,6 +18,14 @@
 const HIFEN_SOLTO = /\s*\[-/g
 /** Espaço antes de pontuação, que sobra quando o colchete some. */
 const ESPACO_ANTES_DE_PONTUACAO = /\s+([,;.!?:])/g
+
+/**
+ * `( que me separou` e `pela sua graça )` — a fonte abre e fecha parêntese com
+ * espaço por dentro em 18 lugares dos 339. Não é defeito da Bíblia Livre: é
+ * espaço em branco, o mesmo material que `removerColchetes` já limpa em volta
+ * dos colchetes, e cabe aqui e não numa receita a versículo.
+ */
+const PARENTESE_FOLGADO = /\(\s+|\s+\)/g
 /**
  * Pontuação colada na palavra seguinte, que a fonte produz junto com o espaço
  * errado. Fora os dois-pontos: eles separam o sobrescrito do versículo e quem
@@ -106,6 +114,7 @@ export function removerColchetes(texto: string): string {
     .replace(PEDACO_QUE_ABRE, '$1')
     .replace(HIFEN_SOLTO, '-')
     .replace(/[[\]]/g, '')
+    .replace(PARENTESE_FOLGADO, (m) => (m.startsWith('(') ? '(' : ')'))
     .replace(ESPACO_ANTES_DE_PONTUACAO, '$1')
     .replace(PONTUACAO_SEM_ESPACO, '$1 ')
     .replace(PONTO_SEM_ESPACO, '$1. ')

@@ -17,7 +17,41 @@ function mascararEmail(email: string): string {
   return `${email.slice(0, 2)}…${email.slice(at)}`
 }
 
-export function createAuth(env: Env) {
+/**
+ * O envio do OTP, com a falha visível para quem chamou.
+ *
+ * O better-auth roda `sendVerificationOTP` dentro de `runInBackgroundOrAwait`,
+ * que faz try/catch e despeja a exceção no próprio logger — a rota responde
+ * `{ success: true }` mesmo quando nada saiu. Foi assim que um 403 do Resend
+ * ("onboarding@resend.dev só entrega para o dono da conta") virou um "código
+ * enviado" na tela, sem código nenhum a caminho. `aoFalhar` é o fio que leva
+ * essa falha de volta para a rota, que a transforma em 502.
+ *
+ * O bloqueio pela allowlist NÃO é falha de envio: ele continua silencioso de
+ * propósito, senão a resposta diria a um estranho quais e-mails existem.
+ */
+export function criarEnviadorOtp(env: Env, aoFalhar: (err: unknown) => void) {
+  return async ({ email, otp }: { email: string; otp: string }): Promise<void> => {
+    if (!isEmailAllowed(email, env.ALLOWED_EMAILS)) {
+      console.log(`allowlist: bloqueado envio para ${mascararEmail(email)}`)
+      return // resposta genérica de sucesso, sem enviar
+    }
+    try {
+      await sendOtpEmail(env, email, otp)
+    } catch (err) {
+      aoFalhar(err)
+      throw err // o better-auth ainda registra; o aviso acima é o que a rota lê
+    }
+  }
+}
+
+/**
+ * `aoFalharEnvio` é chamado antes de `handler` resolver enquanto não houver
+ * `advanced.backgroundTasks.handler` configurado: sem ele o better-auth
+ * *espera* o envio (ver createAuth em better-auth/dist/context). Se algum dia
+ * quisermos envio de fundo de verdade, a rota precisa mudar junto.
+ */
+export function createAuth(env: Env, aoFalharEnvio: (err: unknown) => void = () => {}) {
   return betterAuth({
     baseURL: env.APP_URL,
     secret: env.BETTER_AUTH_SECRET,
@@ -75,13 +109,7 @@ export function createAuth(env: Env) {
         otpLength: 6,
         expiresIn: 600,
         allowedAttempts: 3,
-        async sendVerificationOTP({ email, otp }) {
-          if (!isEmailAllowed(email, env.ALLOWED_EMAILS)) {
-            console.log(`allowlist: bloqueado envio para ${mascararEmail(email)}`)
-            return // resposta genérica de sucesso, sem enviar
-          }
-          await sendOtpEmail(env, email, otp)
-        },
+        sendVerificationOTP: criarEnviadorOtp(env, aoFalharEnvio),
       }),
     ],
   })

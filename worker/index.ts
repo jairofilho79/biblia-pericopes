@@ -30,7 +30,26 @@ import type { Env } from './env.d'
 
 const app = new Hono<{ Bindings: Env }>()
 
-app.on(['GET', 'POST'], '/api/auth/*', (c) => createAuth(c.env).handler(c.req.raw))
+// O better-auth responde `{ success: true }` ao pedido de OTP mesmo quando o
+// envio do e-mail estourou — ele engole a exceção no próprio logger. Sem esta
+// tradução, uma falha de envio chega ao usuário como "código enviado" e ele
+// espera para sempre por um e-mail que nunca saiu.
+app.on(['GET', 'POST'], '/api/auth/*', async (c) => {
+  // Um `createAuth` por requisição (é assim que a rota sempre funcionou), então
+  // esta variável é privada desta requisição — não há corrida entre pedidos.
+  let falhaEnvio: unknown = null
+  const auth = createAuth(c.env, (err) => {
+    falhaEnvio = err
+  })
+  const res = await auth.handler(c.req.raw)
+  // Só reescreve uma resposta de sucesso: se o better-auth já sinalizou algo
+  // (rate limit, e-mail inválido), o motivo dele é mais específico que o nosso.
+  if (falhaEnvio !== null && res.ok) {
+    console.error('[otp] envio falhou', falhaEnvio)
+    return c.json({ erro: 'Não foi possível enviar o e-mail agora. Tente de novo em instantes.' }, 502)
+  }
+  return res
+})
 
 async function requireUserId(c: { env: Env; req: { raw: Request } }): Promise<string | null> {
   const auth = createAuth(c.env)

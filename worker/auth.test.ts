@@ -1,6 +1,6 @@
 import { APIError } from 'better-auth'
-import { describe, expect, it } from 'vitest'
-import { createAuth } from './auth'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createAuth, criarEnviadorOtp } from './auth'
 import type { Env } from './env.d'
 
 function fakeEnv(overrides: Partial<Env> = {}): Env {
@@ -78,5 +78,61 @@ describe('createAuth — trustedOrigins', () => {
   it('não inclui localhost quando APP_URL é de produção', () => {
     const auth = createAuth(fakeEnv({ APP_URL: 'https://biblia-pericopes.workers.dev' }))
     expect(auth.options.trustedOrigins).toEqual(['https://biblia-pericopes.workers.dev'])
+  })
+})
+
+describe('criarEnviadorOtp — a falha de envio não pode virar sucesso na tela', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  const envComResend = () => fakeEnv({ RESEND_API_KEY: 'chave' })
+
+  it('avisa o chamador quando o Resend recusa o envio (403 do remetente sandbox)', async () => {
+    // O 403 real que a produção devolveu: onboarding@resend.dev só entrega
+    // para o dono da conta. Antes deste aviso o erro morria no logger do
+    // better-auth e a rota respondia 200.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 403,
+        text: async () => '{"statusCode":403,"name":"validation_error"}',
+      }),
+    )
+    const falhas: unknown[] = []
+    const enviar = criarEnviadorOtp(envComResend(), (err) => falhas.push(err))
+
+    await expect(enviar({ email: 'outra@pessoa.com', otp: '123456' })).rejects.toThrow(
+      /Falha ao enviar e-mail \(403\)/,
+    )
+    expect(falhas).toHaveLength(1)
+    expect(String(falhas[0])).toMatch(/403/)
+  })
+
+  it('não avisa nada quando o envio dá certo', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }))
+    const falhas: unknown[] = []
+    const enviar = criarEnviadorOtp(envComResend(), (err) => falhas.push(err))
+
+    await expect(enviar({ email: 'dono@x.com', otp: '123456' })).resolves.toBeUndefined()
+    expect(falhas).toEqual([])
+  })
+
+  it('e-mail fora da allowlist não é falha de envio: segue silencioso e sem avisar', async () => {
+    // Aqui o silêncio é de propósito (não revelar quem está cadastrado).
+    // Se isto virasse 502, a allowlist viraria um oráculo de enumeração.
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const falhas: unknown[] = []
+    const enviar = criarEnviadorOtp(
+      fakeEnv({ RESEND_API_KEY: 'chave', ALLOWED_EMAILS: 'dono@x.com' }),
+      (err) => falhas.push(err),
+    )
+
+    await expect(enviar({ email: 'intruso@x.com', otp: '123456' })).resolves.toBeUndefined()
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(falhas).toEqual([])
   })
 })

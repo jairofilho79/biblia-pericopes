@@ -510,3 +510,100 @@ describe('portão — a lista de palavras que fecha a resenha', () => {
     expect(v.problemas.join(' ')).toMatch(/não termina em frase/)
   })
 })
+
+describe('portão — perícope curta não pode ser reprovada por ser curta', () => {
+  let base: string
+  let d: Dirs
+
+  /** Monta uma resenha válida: 3 parágrafos de prosa + a lista das palavras. */
+  const resenhaCom = (p1: string, p2: string, p3: string, itens: string[]) =>
+    [p1, p2, p3, itens.map((i) => `- ${i}`).join('\n')].join('\n\n')
+
+  const TOPICOS =
+    'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**'
+
+  const material = (contexto: string, resenha: string) => ({
+    ordem: 1,
+    titulo_pericope_pt: 'Um título digno',
+    contexto_historico_literario: contexto,
+    resenha,
+    perguntas_reflexao: ['p1', 'p2'],
+    topicos_pregar: TOPICOS,
+  })
+
+  const semear = (texto: string) => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(
+      join(d.entrada, '1.json'),
+      JSON.stringify(montarEntrada(bruta({ ordem: 1, texto }))),
+    )
+  }
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  const julgar = (m: unknown) => {
+    writeFileSync(join(d.saida, '1.json'), JSON.stringify(m))
+    return conferirSaidas(d, [1])[0]
+  }
+
+  it('aprova a perícope de um versículo — o texto dela não TEM 5 palavras para dividir', () => {
+    // 1Sm 25:1 inteiro: oito palavras de conteúdo no texto todo.
+    semear(
+      'Capítulo 25\n1 E morreu Samuel, e juntou-se todo Israel, e o choraram, e o sepultaram em sua casa em Ramá. E levantou-se Davi, e se foi ao deserto de Parã.',
+    )
+    const v = julgar(
+      material(
+        'Samuel foi o último juiz de Israel e o profeta por quem a palavra chegava ao povo e ao palácio. A morte dele cabe num versículo só, encaixado entre dois capítulos em que Davi decide sozinho o que fazer com quem lhe fez mal. Quem tinha autoridade para corrigir o rei acabou de sair de cena.',
+        resenhaCom(
+          'A frase tem quatro verbos para Samuel e um só para Davi: Israel se junta, chora e sepulta.',
+          'O último verbo vira as costas para o funeral e desce para o deserto, longe de todos.',
+          'Uma frase curta tira duas coisas do lugar: o povo perde o profeta e o rei perde quem ouvia.',
+          [
+            'Ramá era a cidade dele, e foi de lá que julgou o povo durante anos.',
+            'Sepultar em sua casa quer dizer enterrar no terreno da própria família.',
+          ],
+        ),
+      ),
+    )
+    expect(v.problemas).toEqual([])
+  })
+
+  it('a perícope mais curta do catálogo tem 4 palavras de conteúdo, e ainda assim é aprovável', () => {
+    semear('Capítulo 1\n1 Palavras do Pregador, filho de Davi, rei em Jerusalém.')
+    const v = julgar(
+      material(
+        'O livro abre com uma credencial em vez de um argumento: quem fala se apresenta pelo cargo e pela linhagem antes de dizer qualquer coisa sobre a vida. Guardar isso ajuda, porque o resto do livro vai passar páginas desmontando exatamente o que essa apresentação promete.',
+        resenhaCom(
+          'O Pregador abre dizendo apenas quem é, e nada mais do que isso.',
+          'Um título assim carrega autoridade e distância ao mesmo tempo, e o resto do livro vive de contestá-lo.',
+          'A frase inteira é uma apresentação, e ela prepara a queda que vem em seguida.',
+          [
+            'Pregador traduz a palavra de quem fala diante de uma assembleia reunida.',
+            'Jerusalém era onde o rei julgava, e não apenas onde ele morava.',
+          ],
+        ),
+      ),
+    )
+    expect(v.problemas).toEqual([])
+  })
+
+  it('mas material realmente genérico continua reprovando, mesmo em trecho curto', () => {
+    semear('Capítulo 25\n1 E morreu Samuel, e juntou-se todo Israel, e o choraram em Ramá.')
+    const v = julgar(
+      material(
+        'Considerações amplas sobre assuntos inteiramente alheios ao que vem depois destas linhas soltas, seguidas de outras ponderações igualmente distantes de qualquer coisa concreta que alguém pudesse encontrar adiante lendo com atenção.',
+        resenhaCom(
+          'Reflexões genéricas sobre temas distantes daquilo que a passagem trata.',
+          'Outras considerações igualmente desligadas do parágrafo anterior e do seguinte.',
+          'Mais frases vagas que caberiam praticamente em qualquer passagem escrita.',
+          [
+            'Alguma explicação inventada que não corresponde a nada do trecho.',
+            'Outra explicação igualmente desligada daquilo que a passagem afirma.',
+          ],
+        ),
+      ),
+    )
+    expect(v.problemas.join(' ')).toMatch(/palavras em comum/)
+  })
+})

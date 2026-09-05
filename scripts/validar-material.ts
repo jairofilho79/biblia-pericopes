@@ -155,7 +155,15 @@ export function validarMaterial(
   const doTexto = palavrasDoTexto(`${entrada.texto} ${entrada.sobrescrito ?? ''}`)
   const doMaterial = palavrasDoTexto(`${m.contexto_historico_literario} ${m.resenha}`)
   const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
-  if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
+  // Limiar PROPORCIONAL. Cinco palavras em comum é uma barra razoável para uma
+  // perícope de mil caracteres, e é impossível para uma de um versículo: o
+  // texto de 1Sm 25:1 tem oito palavras de conteúdo no total, e o de Ec 1:1
+  // tem quatro. Com o limiar fixo, 196 perícopes curtas eram reprovadas por
+  // serem curtas, e uma delas jamais poderia passar.
+  const minimoComuns = Math.min(5, Math.max(1, Math.ceil(doTexto.size * 0.25)))
+  if (comuns < minimoComuns) {
+    p.push(`só ${comuns} palavras em comum com o texto (mínimo ${minimoComuns}) — material genérico?`)
+  }
 
   // Citação que o material apresenta como do texto tem de estar NO texto.
   // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura

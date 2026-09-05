@@ -119,6 +119,21 @@ foram achadas por leitura, não por varredura.
 | Js 13:5 | "desde Baal-Gade **o pdo** monte Hermom" | "desde Baal-gad, **ao pé do** monte Hermon" | "from Baal-gad **under** mount Hermon" | **ao pé do** |
 | Js 13:6 | "filhos de Israel**:;**somente repartirás" | "filhos de Israel**: tão sómente** faze" | "children of Israel**: only** divide thou" | **: somente** |
 
+## 8. Palavra trocada e verbo faltando (2 versículos)
+
+| ref | BLIVRE | Almeida 1911 | KJV | correção |
+|---|---|---|---|---|
+| 1Sm 24:19 | "o deixará ir **saro** e salvo?" | — | "let him go well away?" | **são** e salvo |
+| 1Sm 27:9 | "E Davi **aquela terra**" *(sem verbo)* | "E David **feria** aquella terra" | "And David **smote** the land" | E Davi **feria** aquela terra |
+
+Em 1Sm 27:9 o verbo some e a frase fica sem predicado. A forma escolhida é o
+imperfeito, que é o de Almeida e o dos verbos vizinhos no próprio versículo
+("não deixava", "levava", "voltava", "vinha").
+
+**Falso positivo da mesma varredura:** `saro` também aparece em 2Rs 20:5 — "eis
+que eu te **saro**" —, e ali é o verbo *sarar*, conjugado certo. Só a primeira
+ocorrência é defeito.
+
 ## Achados que NÃO são defeitos
 
 **1Sm 13:1** — "Havia já Saul reinado um ano; e reinado que houve dois anos
@@ -154,7 +169,7 @@ reescrever no escuro.
 
 ## Placar
 
-**42 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**44 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

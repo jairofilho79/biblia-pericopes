@@ -308,6 +308,13 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'GEN 19:26',
+    de: 'se tornou estátua de sai',
+    para: 'se tornou estátua de sal',
+    motivo:
+      'Uma letra num dos versículos mais conhecidos da Bíblia, e "sai" não é palavra naquela posição. KJV "she became a pillar of salt"; Almeida 1911 "ficou convertida n\'uma estatua de sal" — e a própria fonte grafa "sal" 29 vezes.',
+  },
+  {
     ref: 'REV 17:4',
     de: 'e adorada com ouro',
     para: 'e adornada com ouro',

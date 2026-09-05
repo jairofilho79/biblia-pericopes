@@ -285,6 +285,15 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'REV 16:21', 'REV 17:3', 'REV 17:4', 'REV 19:1',
     ],
   },
+  {
+    classe: 'erro de digitação (Gênesis, Levítico e Números)',
+    refs: [
+      'GEN 19:15', 'GEN 19:17', 'GEN 19:26',
+      'LEV 25:6', 'LEV 25:7', 'LEV 25:13', 'LEV 25:29', 'LEV 25:30',
+      'LEV 25:32', 'LEV 25:33', 'LEV 25:44', 'LEV 25:54',
+      'NUM 23:3', 'NUM 23:19', 'NUM 24:1', 'NUM 24:21', 'NUM 31:9',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

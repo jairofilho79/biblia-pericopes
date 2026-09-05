@@ -308,6 +308,27 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: '1PE 2:20',
+    de: 'e suportais, isso é a Deus',
+    para: 'e suportais, isso é agradável a Deus',
+    motivo:
+      'Caiu a palavra do predicado e a frase não fecha. KJV "this is acceptable with God"; Almeida 1911 "isso é agradavel a Deus".',
+  },
+  {
+    ref: '2PE 3:16',
+    de: 'em duas as [suas] cartas',
+    para: 'em todas as [suas] cartas',
+    motivo:
+      'Como está, o texto afirma que Paulo escreveu DUAS cartas. KJV "as also in all his epistles"; Almeida 1911 "em todas as suas epistolas".',
+  },
+  {
+    ref: '1JO 2:26',
+    de: 'acerca dos que vos tentam vos enganar',
+    para: 'acerca dos que tentam vos enganar',
+    motivo:
+      '"vos" duplicado. KJV "concerning them that seduce you"; Almeida 1911 "ácerca dos que vos enganam" — nas duas o pronome aparece uma vez só.',
+  },
+  {
     ref: 'REV 1:13',
     de: 'semelhante a [o] Filho',
     para: 'semelhante ao Filho',

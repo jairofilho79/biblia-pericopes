@@ -261,6 +261,21 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       '1JO 5:14', 'JUD 1:5',
     ],
   },
+  {
+    classe: 'erro de digitação (Pedro, João e Apocalipse)',
+    refs: [
+      '1JO 2:23', '1JO 2:26', '1JO 2:27',
+      '2PE 1:3', '2PE 1:17', '2PE 2:9', '2PE 3:8', '2PE 3:16',
+      'JUD 1:11', 'REV 1:13', 'REV 1:17',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Tiago e 1 Pedro)',
+    refs: [
+      'JAM 5:4', 'JAM 5:11', '1PE 2:19', '1PE 2:20',
+      '1PE 3:6', '1PE 4:4',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

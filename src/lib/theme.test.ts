@@ -18,12 +18,21 @@ describe('theme', () => {
     expect(resolveTheme()).toBe('light')
   })
 
-  it('setThemePref("sepia") grava, aplica e vira a preferência', () => {
-    expect(setThemePref('sepia')).toBe('sepia')
-    expect(localStorage.getItem('pericopes-theme')).toBe('sepia')
-    expect(document.documentElement.dataset.theme).toBe('sepia')
-    expect(getThemePref()).toBe('sepia')
-    expect(resolveTheme()).toBe('sepia')
+  it('tema sépia gravado vira claro, e não segue o sistema', () => {
+    // Sépia era um tema CLARO. Cair no ramo de valor desconhecido levaria a
+    // preferência para 'system', e quem escolheu papel bege acordaria no
+    // escuro se o sistema estivesse escuro.
+    localStorage.setItem('pericopes-theme', 'sepia')
+    expect(getStoredTheme()).toBe('light')
+    expect(getThemePref()).toBe('light')
+    expect(resolveTheme()).toBe('light')
+  })
+
+  it('sépia migrado não é confundido com lixo desconhecido', () => {
+    localStorage.setItem('pericopes-theme', 'roxo')
+    expect(getThemePref()).toBe('system')
+    localStorage.setItem('pericopes-theme', 'sepia')
+    expect(getThemePref()).toBe('light')
   })
 
   it('setThemePref("system") remove a chave e aplica o resolvido', () => {
@@ -51,7 +60,7 @@ describe('theme', () => {
   })
 
   it('trocar de tema gravado sobrescreve o anterior', () => {
-    setThemePref('sepia')
+    setThemePref('light')
     expect(setThemePref('dark')).toBe('dark')
     expect(localStorage.getItem('pericopes-theme')).toBe('dark')
     expect(getThemePref()).toBe('dark')

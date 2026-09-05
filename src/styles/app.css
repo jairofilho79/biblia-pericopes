@@ -14,7 +14,7 @@
      `--flame` é o âmbar VIVO: tudo que é luz e nunca texto (barra de
      progresso, a chama da marca). Precisa de 3:1 — e sobre papel quase branco
      o âmbar vivo original (#d98613) dava só 2,53:1, por isso este é mais
-     fundo. Ver src/styles/paleta.test.ts: mexeu aqui, o teste cobra. */
+     fundo. Ver scripts/paleta.test.ts: mexeu aqui, o teste cobra. */
   --accent: #92500a;
   --accent-soft: #f6e5c8;
   --flame: #c4780e;

@@ -1,8 +1,14 @@
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
 
-const css = readFileSync(fileURLToPath(new URL('./app.css', import.meta.url)), 'utf8')
+/**
+ * Mora em scripts/ e não em src/ por dois motivos que se somam: o
+ * `tsconfig.app` trava `types: ["vite/client"]`, então `node:fs` não
+ * typechecaria lá; e o vitest stuba import de CSS, o que faz `?raw` devolver
+ * string vazia. `scripts/` é onde este repo já põe teste que lê arquivo de
+ * disco — ver scripts/blivre-correcoes.test.ts.
+ */
+const css = readFileSync(new URL('../src/styles/app.css', import.meta.url), 'utf8')
 
 /**
  * A paleta é a marca, e a marca é acessibilidade: quem trocar um hex aqui

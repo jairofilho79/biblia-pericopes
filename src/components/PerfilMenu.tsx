@@ -10,7 +10,6 @@ import LeituraPrefs from './LeituraPrefs'
 const TEMAS: { id: ThemePref; label: string }[] = [
   { id: 'system', label: 'Sistema' },
   { id: 'light', label: 'Claro' },
-  { id: 'sepia', label: 'Sépia' },
   { id: 'dark', label: 'Escuro' },
 ]
 

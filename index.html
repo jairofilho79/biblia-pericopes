@@ -13,7 +13,12 @@
       (function () {
         try {
           var t = localStorage.getItem('pericopes-theme')
-          if (t !== 'light' && t !== 'dark' && t !== 'sepia') {
+          // DUPLICAÇÃO DELIBERADA de src/lib/theme.ts: o sépia foi
+          // aposentado e migra para 'light'. Não deixe cair no ramo do
+          // matchMedia abaixo — sépia era um tema CLARO, e quem o escolheu
+          // acordaria no escuro. Mudou lá, mude aqui.
+          if (t === 'sepia') t = 'light'
+          if (t !== 'light' && t !== 'dark') {
             t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
           }
           document.documentElement.dataset.theme = t

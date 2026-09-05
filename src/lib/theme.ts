@@ -1,16 +1,33 @@
 const KEY = 'pericopes-theme'
 
-export type Theme = 'light' | 'dark' | 'sepia'
+export type Theme = 'light' | 'dark'
 
 /** Preferência armazenada; 'system' = nenhuma chave gravada. */
 export type ThemePref = Theme | 'system'
 
-const TEMAS: Theme[] = ['light', 'dark', 'sepia']
+const TEMAS: Theme[] = ['light', 'dark']
+
+/**
+ * O sépia foi aposentado no rebranding para aiPericopes: ele já era, na
+ * prática, o tema âmbar (`--accent: #8a5a2b` sobre papel bege), e manter os
+ * dois era oferecer uma escolha que não escolhia nada.
+ *
+ * A migração é EXPLÍCITA para 'light' e não pode virar `null`: sépia era um
+ * tema CLARO, e cair no ramo de valor desconhecido levaria a preferência para
+ * 'system' — quem escolheu papel bege acordaria no escuro. O storage não é
+ * reescrito; a próxima escolha do usuário sobrescreve sozinha.
+ *
+ * DUPLICAÇÃO DELIBERADA: o script inline de index.html faz o mesmo mapa antes
+ * de qualquer bundle. Mudou aqui, mude lá.
+ */
+function migrar(v: string | null): Theme | null {
+  if (v === 'sepia') return 'light'
+  return TEMAS.includes(v as Theme) ? (v as Theme) : null
+}
 
 export function getStoredTheme(): Theme | null {
   try {
-    const v = localStorage.getItem(KEY)
-    return TEMAS.includes(v as Theme) ? (v as Theme) : null
+    return migrar(localStorage.getItem(KEY))
   } catch {
     return null
   }

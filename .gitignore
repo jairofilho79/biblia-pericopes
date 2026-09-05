@@ -61,3 +61,4 @@ data/raw-pericopes-brutas.jsonl
 # Área de trabalho do reenriquecimento (Sessão 3) — entrada derivável, saída vai para data/enriched/
 data/reenriquecimento/
 data/titulos/
+data/registro/

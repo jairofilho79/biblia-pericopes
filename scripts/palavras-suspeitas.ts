@@ -113,4 +113,6 @@ function main(): void {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) main()
+// O caminho do projeto tem espaços, e `file://${argv[1]}` não bate com
+// a URL escapada de import.meta — o idioma do resto do repo é o sufixo.
+if (process.argv[1]?.endsWith('palavras-suspeitas.ts')) main()

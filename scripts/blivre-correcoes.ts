@@ -454,6 +454,90 @@ export const CORRECOES: Correcao[] = [
     motivo:
       'Letra a mais no nome do rei. KJV "Jeroboam"; Almeida 1911 "Jeroboão" — e a própria fonte grafa "Jeroboão" certo nas dezenas de outras ocorrências.',
   },
+
+  // --- Ortografia provada pela própria fonte ---
+  // Para erro de acento a regra das duas testemunhas é canhão em passarinho,
+  // e pior: a Almeida de 1911 é anterior às reformas ortográficas, então ela
+  // grafa `benção` e `fossemos` sem que isso queira dizer nada. A testemunha
+  // boa aqui é a Bíblia Livre contra si mesma — ela escreve `princípio` 98
+  // vezes e `principio` 2. Contar é mais firme do que interpretar.
+  { ref: 'PRO 1:7', de: 'o principio do conhecimento',
+    para: 'o princípio do conhecimento',
+    motivo: 'A testemunha aqui é a própria fonte: a Bíblia Livre escreve `princípio` 98 vezes e `principio` 2. Não é decisão de tradução, é grafia da casa.' },
+  { ref: 'REV 22:13', de: 'o principio e o fim',
+    para: 'o princípio e o fim',
+    motivo: 'Mesmo caso de Pv 1:7: a própria fonte escreve `princípio` 98 vezes contra 2 sem acento.' },
+  { ref: 'ACT 13:2', de: 'o Espirito Santo',
+    para: 'o Espírito Santo',
+    motivo: 'A própria fonte escreve `Espírito` 598 vezes. Esta é a única sem acento.' },
+  { ref: 'MAT 7:17', de: 'a arvore má',
+    para: 'a árvore má',
+    motivo: 'A própria fonte escreve `árvore` 101 vezes e `arvore` uma.' },
+  { ref: 'PSA 72:19', de: 'Amem, e amém!',
+    para: 'Amém, e amém!',
+    motivo: 'A própria fonte escreve `amém` certo na segunda vez, três palavras adiante — ela se contradiz dentro da mesma linha.' },
+  { ref: 'JDG 3:19', de: 'E sairam-se',
+    para: 'E saíram-se',
+    motivo: 'A própria fonte escreve `saíram` 133 vezes contra duas sem o acento, e sem ele a palavra lê-se como outra coisa.' },
+  { ref: '1SA 23:13', de: 'e sairam de Queila',
+    para: 'e saíram de Queila',
+    motivo: 'Mesmo caso de Jz 3:19: a própria fonte escreve `saíram` 133 vezes e sem acento só duas.' },
+  { ref: 'ISA 43:7', de: 'para minha gloria',
+    para: 'para minha glória',
+    motivo: 'A própria fonte escreve `glória` 354 vezes e `gloria` duas.' },
+  { ref: 'REV 20:8', de: 'dos quais o numero',
+    para: 'dos quais o número',
+    motivo: 'A própria fonte escreve `número` 104 vezes, e esta é a única sem acento.' },
+  { ref: 'JER 52:4', de: 'no decimo mês',
+    para: 'no décimo mês',
+    motivo: 'A própria fonte escreve `décimo` 70 vezes, e esta é a única sem acento.' },
+  { ref: 'JER 25:36', de: 'dos lideres do rebanho',
+    para: 'dos líderes do rebanho',
+    motivo: 'A própria fonte escreve `líderes` 65 vezes, e esta é a única sem acento.' },
+  { ref: '2TI 3:3', de: 'sem dominio próprio',
+    para: 'sem domínio próprio',
+    motivo: 'A própria fonte escreve `domínio` 51 vezes, e esta é a única sem acento.' },
+  { ref: '2CH 36:21', de: 'de sua ruina',
+    para: 'de sua ruína',
+    motivo: 'A própria fonte escreve `ruína` 28 vezes, e esta é a única sem acento.' },
+  { ref: 'EZE 31:12', de: 'mais terrivel',
+    para: 'mais terrível',
+    motivo: 'A própria fonte escreve `terrível` 19 vezes, e esta é a única sem acento.' },
+  { ref: '1CO 15:52', de: 'à ultima trombeta',
+    para: 'à última trombeta',
+    motivo: 'A própria fonte escreve `última` 11 vezes, e esta é a única sem acento.' },
+  { ref: 'LUK 4:40', de: 'troxeram-lhe',
+    para: 'trouxeram-lhe',
+    motivo: 'A própria fonte escreve `trouxeram` 40 vezes e `troxeram` uma. É o segundo defeito desta mesma linha, ao lado de `varias`.' },
+  { ref: 'LUK 4:40', de: 'de varias doenças',
+    para: 'de várias doenças',
+    motivo: 'A própria fonte escreve `várias` 10 vezes; no mesmo versículo há ainda `troxeram` por `trouxeram`.' },
+  { ref: 'GAL 3:24', de: 'fossemos justificados',
+    para: 'fôssemos justificados',
+    motivo: 'A Almeida de 1911 também escreve `fossemos`, mas ela é anterior às reformas ortográficas e por isso não serve de testemunha para acento. Quem serve é a própria fonte, que escreve `fôssemos` 10 vezes.' },
+  { ref: 'HEB 12:17', de: 'herdar a benção',
+    para: 'herdar a bênção',
+    motivo: 'Como em Gl 3:24, a Almeida de 1911 grafa `benção` por ser de antes das reformas. A própria fonte escreve `bênção` 58 vezes e `benção` duas.' },
+  { ref: 'JAM 3:10', de: 'procedem benção e maldição',
+    para: 'procedem bênção e maldição',
+    motivo: 'Mesmo caso de Hb 12:17: a própria fonte escreve `bênção` 58 vezes e `benção` duas.' },
+
+  // --- Letra ou espaço, conferidos nas duas testemunhas ---
+  { ref: 'ACT 9:4', de: 'ouviu ma voz',
+    para: 'ouviu uma voz',
+    motivo: 'KJV: "heard a voice"; Almeida: "ouviu uma voz". A letra que caiu é o `u` do artigo, e as duas testemunhas dizem a mesma coisa.' },
+  { ref: 'LAM 3:6', de: 'como os que já morrera há',
+    para: 'como os que já morreram há',
+    motivo: 'KJV: "as they that be dead of old"; Almeida: "como os que estavam mortos ha muito". O sujeito é plural — `os que` —, e nenhuma das duas põe o verbo no futuro.' },
+  { ref: 'MAR 12:37', de: 'é so eu filho',
+    para: 'é seu filho',
+    motivo: 'Um espaço no lugar errado partiu `seu` em duas palavras. Almeida: "como é logo seu filho?"; KJV: "whence is he then his son?". O `pois` que a Bíblia Livre já traz faz o trabalho do `logo`, então só o `seu` precisa voltar.' },
+  { ref: 'REV 10:4', de: 'eu estava a pondo de',
+    para: 'eu estava a ponto de',
+    motivo: 'KJV: "I was about to write". `a pondo de` não é construção do português; `a ponto de` é, e é o que as duas testemunhas dizem.' },
+  { ref: 'DEU 4:42', de: 'destas cidades salvara a vida',
+    para: 'destas cidades salvasse a vida',
+    motivo: '`salvara` é o imperfeito do subjuntivo ESPANHOL — o mesmo rastro de base castelhana que deixou `preguntar` em Dt 13:14 e outros três lugares. Em português a forma é `salvasse`, e é o modo que as duas testemunhas pedem: KJV "that fleeing... he might live", Almeida "e se acolhesse a uma d\'estas cidades, e vivesse".' },
 ]
 
 
@@ -592,11 +676,18 @@ export const OMISSOES: Correcao[] = [
     motivo: 'KJV: "Commanding his accusers to come unto thee".' },
 ]
 
-const porRef = new Map<string, { dup?: string; paren?: boolean; sub?: boolean; manual?: Correcao }>()
-for (const [ref, palavra] of DUPLICADAS) porRef.set(ref, { ...porRef.get(ref), dup: palavra })
-for (const ref of PARENTESES_ORFAOS) porRef.set(ref, { ...porRef.get(ref), paren: true })
-for (const ref of SUBSCRICOES) porRef.set(ref, { ...porRef.get(ref), sub: true })
-for (const c of [...CORRECOES, ...OMISSOES]) porRef.set(c.ref, { ...porRef.get(c.ref), manual: c })
+// `manuais` é lista, e não um só: há versículo com dois defeitos — Lc 4:40 traz
+// `troxeram` e `varias` na mesma linha. Enquanto isto era um campo único, a
+// segunda receita apagava a primeira sem dizer nada, e o defeito seguia servido.
+const porRef = new Map<string, { dup?: string; paren?: boolean; sub?: boolean; manuais: Correcao[] }>()
+const entrada = (ref: string) => porRef.get(ref) ?? { manuais: [] }
+for (const [ref, palavra] of DUPLICADAS) porRef.set(ref, { ...entrada(ref), dup: palavra })
+for (const ref of PARENTESES_ORFAOS) porRef.set(ref, { ...entrada(ref), paren: true })
+for (const ref of SUBSCRICOES) porRef.set(ref, { ...entrada(ref), sub: true })
+for (const c of [...CORRECOES, ...OMISSOES]) {
+  const e = entrada(c.ref)
+  porRef.set(c.ref, { ...e, manuais: [...e.manuais, c] })
+}
 
 /**
  * Aplica as correções registradas para o versículo. Devolve o texto intacto
@@ -643,13 +734,13 @@ export function corrigirVersiculo(
     saida = saida.replace(FIM_SUBSCRICAO, '')
   }
 
-  if (alvo.manual) {
-    if (!saida.includes(alvo.manual.de)) {
+  for (const m of alvo.manuais) {
+    if (!saida.includes(m.de)) {
       throw new Error(
-        `Correção em ${ref} não encontrou "${alvo.manual.de}". A fonte mudou — reveja a tabela.`,
+        `Correção em ${ref} não encontrou "${m.de}". A fonte mudou — reveja a tabela.`,
       )
     }
-    saida = saida.replace(alvo.manual.de, alvo.manual.para)
+    saida = saida.replace(m.de, m.para)
   }
 
   return saida

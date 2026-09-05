@@ -156,19 +156,39 @@ describe('as tabelas', () => {
     }
   })
 
-  it('nenhuma referência aparece em duas tabelas', () => {
-    const todas = [
-      ...DUPLICADAS.map(([r]) => r),
-      ...PARENTESES_ORFAOS,
-      ...CORRECOES.map((c) => c.ref),
+  // CORRECOES PODE repetir uma referência — Lc 4:40 tem dois defeitos na mesma
+  // linha —, mas cada tabela vale por si, e um mesmo versículo em duas tabelas
+  // diferentes é engano de digitação, não intenção.
+  it('nenhuma referência aparece em duas tabelas diferentes', () => {
+    const porTabela = [
+      DUPLICADAS.map(([r]) => r),
+      PARENTESES_ORFAOS,
+      [...new Set(CORRECOES.map((c) => c.ref))],
     ]
+    const todas = porTabela.flat()
     expect(new Set(todas).size).toBe(todas.length)
+  })
+
+  it('receitas que dividem a mesma referência mexem em trechos diferentes', () => {
+    const porRef = new Map<string, string[]>()
+    for (const c of CORRECOES) porRef.set(c.ref, [...(porRef.get(c.ref) ?? []), c.de])
+    for (const [ref, des] of porRef) {
+      if (des.length === 1) continue
+      // Uma contida na outra faria a segunda troca cair dentro do texto que a
+      // primeira já reescreveu — e o guard só acusaria isso em produção.
+      for (const a of des) {
+        for (const b of des) {
+          if (a !== b) expect(a.includes(b), `${ref}: "${a}" contém "${b}"`).toBe(false)
+        }
+      }
+      expect(new Set(des).size, ref).toBe(des.length)
+    }
   })
 
   it('o tamanho das tabelas está travado', () => {
     expect(DUPLICADAS).toHaveLength(49)
     expect(PARENTESES_ORFAOS).toHaveLength(11)
-    expect(CORRECOES).toHaveLength(50)
+    expect(CORRECOES).toHaveLength(75)
     expect(SUBSCRICOES).toHaveLength(14)
     expect(OMISSOES).toHaveLength(28)
   })
@@ -230,5 +250,17 @@ describe('as correções achadas lendo e por varredura', () => {
     expect(c.de).not.toContain('será humilhado')
     expect(c.para).toContain('exaltar a si mesmo será humilhado')
     expect(c.para).toContain('humilhar a si mesmo será exaltado')
+  })
+})
+
+describe('dois defeitos no mesmo versículo', () => {
+  it('aplica as duas receitas, e não só a última', () => {
+    const duas = CORRECOES.filter((c) => c.ref === 'LUK 4:40')
+    expect(duas.length, 'Lc 4:40 devia ter duas receitas').toBe(2)
+    const bruto =
+      'Quando o sol estava se pondo, troxeram-lhe todos os que estavam enfermos de varias doenças. Ele punha as mãos sobre cada um deles e os curava.'
+    const saida = corrigirVersiculo('LUK', 4, 40, bruto)
+    expect(saida).toContain('trouxeram-lhe')
+    expect(saida).toContain('várias doenças')
   })
 })

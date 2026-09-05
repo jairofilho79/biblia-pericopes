@@ -308,6 +308,20 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'REV 3:4',
+    de: 'Mas também em Sardo',
+    para: 'Mas também em Sardes',
+    motivo:
+      'Nome da cidade trocado. A própria fonte grafa "Sardes" nas outras duas ocorrências (Ap 1:11 e 3:1), e a carta inteira é endereçada a ela.',
+  },
+  {
+    ref: 'REV 2:14',
+    de: 'colocarmeios',
+    para: 'colocar meios',
+    motivo:
+      'Palavras coladas. KJV "to cast a stumblingblock"; Almeida 1911 "pôr tropeço" — as duas trazem verbo e objeto separados.',
+  },
+  {
     ref: '1PE 2:20',
     de: 'e suportais, isso é a Deus',
     para: 'e suportais, isso é agradável a Deus',

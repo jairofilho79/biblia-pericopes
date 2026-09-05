@@ -162,8 +162,15 @@ function aplicar() {
     b: { ordem: number; titulo: string }
     forca: number
   }[]
+  // Pendente = está na fila e ainda não voltou. Colidir com um título que ainda
+  // VAI ser reescrito não é problema — é a fila no meio do caminho. Sem esta
+  // guarda, o primeiro lote a chegar não aplicava nada, porque batia nos
+  // títulos velhos que ele mesmo tinha vindo substituir.
+  const pendentes = new Set(ordens(dEntrada).filter((o) => !novos.has(o)))
   for (const c of pares) {
-    if (c.forca >= 0.85 && (novos.has(c.a.ordem) || novos.has(c.b.ordem))) {
+    const tocaNovo = novos.has(c.a.ordem) || novos.has(c.b.ordem)
+    const esperaFila = pendentes.has(c.a.ordem) || pendentes.has(c.b.ordem)
+    if (c.forca >= 0.85 && tocaNovo && !esperaFila) {
       problemas.push(`${c.a.ordem}×${c.b.ordem}: ainda colidem — "${c.a.titulo}" / "${c.b.titulo}"`)
     }
   }

@@ -104,7 +104,7 @@ export function ancorar(titulo: string, texto: string): Veredito {
  */
 /** Numeral por extenso, para juntar "vinte e oito" num item só. */
 const NUMERAL =
-  /^(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzentos|trezentos|mil)(\s+\p{L}+)?$/iu
+  /^(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzentos|trezentos|quatrocentos|quinhentos|seiscentos|setecentos|oitocentos|novecentos|mil|milhares)(\s+\p{L}+)?$/iu
 
 const FUNCIONAL = /(?<!\p{L})(de|do|da|dos|das|que|em|no|na|nos|nas|para|com|onde|sobre|ao|aos)(?!\p{L})/iu
 

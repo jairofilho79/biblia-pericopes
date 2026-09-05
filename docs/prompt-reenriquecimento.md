@@ -31,7 +31,6 @@ Cada entrada traz:
 | `titulo_provisorio` | rótulo de trabalho, **não** o título final. Para as antigas vem em inglês, do dataset de origem. Não traduza palavra a palavra; escreva um título melhor. |
 | `texto` | o texto bíblico, com `Capítulo N` como separador e o número na frente de cada versículo |
 | `sobrescrito` | quando existe (salmos, alguns provérbios): a inscrição que abre o salmo. **Leia sempre.** |
-| `material_anterior` | só nas perícopes novas (`ordem >= 3000`). Ver a seção própria. |
 
 ### Saída
 
@@ -271,25 +270,23 @@ ele deve aparecer no contexto.
 Nada de NAA, ARC, NVI ou de memória. Se a BLIVRE tem uma construção antiga
 ("E aconteceu que…"), você comenta o que está lá; não reescreve.
 
-## Quando vier `material_anterior` (perícopes novas, `ordem >= 3000`)
+## Toda perícope é escrita do zero
 
-Essas já foram escritas no padrão que queremos — o problema é só que citam outra
-tradução. Seu trabalho:
+Não existe material anterior. Você não recebe nenhum, e não deve procurar
+nenhum em lugar nenhum do repositório — nem o que já está no app, nem o de uma
+perícope vizinha.
 
-- **Preserve o pensamento**: o insight, o ângulo, o achado literário, a estrutura
-  dos tópicos. Não recomece do zero, e não invente um ângulo novo só para
-  parecer diferente.
-- **Reancore no texto**: toda citação passa a ser da BLIVRE, exata. Se a BLIVRE
-  não sustenta uma afirmação que dependia da palavra da outra versão, refaça a
-  frase para dizer o que **esta** tradução diz.
-- Se a BLIVRE trouxer algo que a anterior não tinha (um sobrescrito, uma
-  expressão mais forte), aproveite.
-- O resto do briefing continua valendo integralmente — inclusive as contagens de
-  bullets e os limites de tamanho.
+O motivo é duplo. O material que existe hoje foi escrito sobre **outra
+tradução**, então ele traz junto o vocabulário e as escolhas dela, que não são
+as da Bíblia Livre. E, mais grave, ele carrega conhecimento tácito herdado: uma
+frase que só funciona porque quem a escreveu sabia de algo que não está escrito
+em lugar nenhum. Isso é o que faz o leitor desistir — ele sente que falta uma
+peça e não tem como saber qual.
 
-Quando **não** vier `material_anterior`, escreva do zero. Não procure o material
-antigo em lugar nenhum: ele foi escrito por um modelo mais fraco, sobre outra
-tradução, e olhar para ele só puxaria a qualidade para baixo.
+Sua única fonte é a perícope: o `texto`, o `sobrescrito` quando houver, e os
+campos que você mesmo já escreveu nesta ordem. É por isso que a unidade de
+trabalho é a perícope inteira, e não um campo: dentro dela, tudo o que o leitor
+precisa tem de estar.
 
 ## Antes de entregar cada perícope
 

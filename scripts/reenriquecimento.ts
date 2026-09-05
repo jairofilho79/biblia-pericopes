@@ -36,17 +36,6 @@ import { validarMaterial, type Material } from './validar-material.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
-/** Onde a ordem passa a ser reescrita fresca em vez de reancorada. */
-export const PRIMEIRA_NOVA = 3000
-
-export type MaterialAnterior = {
-  titulo_pericope_pt: string
-  contexto_historico_literario: string
-  resenha: string
-  perguntas_reflexao: string[]
-  topicos_pregar: string
-}
-
 export type Entrada = {
   ordem: number
   livro: string
@@ -55,13 +44,6 @@ export type Entrada = {
   titulo_provisorio: string
   texto: string
   sobrescrito?: string
-  /**
-   * Só para as perícopes novas (ordem >= 3000). Elas já estão no padrão de
-   * qualidade — o trabalho é reancorar na Bíblia Livre sem perder o insight.
-   * Para as antigas o campo fica ausente de propósito: mostrar o material do
-   * gemini ancoraria o subagent no patamar que estamos justamente trocando.
-   */
-  material_anterior?: MaterialAnterior
 }
 
 export type Bruta = {
@@ -88,12 +70,18 @@ export function referencia(r: Bruta): string {
 }
 
 /**
- * O título que vai para o subagent é deliberadamente *provisório*: para as
- * antigas é o título em inglês do dataset KJV — o mesmo insumo que a versão
- * anterior recebeu — e nunca o título em português já escrito, que travaria a
- * reescrita no que existe hoje.
+ * A entrada carrega APENAS a perícope: texto bíblico, sobrescrito e um título
+ * provisório. Nenhum material antigo entra — nem o das 2.628 do gemini, nem o
+ * das 195 novas, que era a última exceção e caiu por decisão do dono: material
+ * escrito sobre outra tradução traz junto o contexto dela, e conhecimento
+ * tácito herdado é o pior de todos, porque ninguém sabe de onde veio.
+ *
+ * O título é deliberadamente *provisório* — para as antigas, o título em inglês
+ * do dataset KJV; para as novas, o rótulo de trabalho da tabela de cortes.
+ * Nunca o título em português já escrito, que travaria a reescrita no que
+ * existe hoje.
  */
-export function montarEntrada(r: Bruta, anterior?: MaterialAnterior): Entrada {
+export function montarEntrada(r: Bruta): Entrada {
   return {
     ordem: r.ordem,
     livro: r.livro,
@@ -102,7 +90,6 @@ export function montarEntrada(r: Bruta, anterior?: MaterialAnterior): Entrada {
     titulo_provisorio: r.titulo_provisorio ?? r.titulo_en ?? '',
     texto: r.texto,
     ...(r.sobrescrito ? { sobrescrito: r.sobrescrito } : {}),
-    ...(r.ordem >= PRIMEIRA_NOVA && anterior ? { material_anterior: anterior } : {}),
   }
 }
 
@@ -281,14 +268,7 @@ function preparar(d: Dirs): void {
   criarDirs(d)
   let n = 0
   for (const r of carregarBrutas()) {
-    const fCache = join(root, 'data/enriched', `${r.ordem}.json`)
-    const anterior = existsSync(fCache)
-      ? (JSON.parse(readFileSync(fCache, 'utf8')) as MaterialAnterior)
-      : undefined
-    writeFileSync(
-      join(d.entrada, `${r.ordem}.json`),
-      JSON.stringify(montarEntrada(r, anterior), null, 2),
-    )
+    writeFileSync(join(d.entrada, `${r.ordem}.json`), JSON.stringify(montarEntrada(r), null, 2))
     n++
   }
   console.log(`${n} entradas em ${d.entrada}`)

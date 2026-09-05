@@ -45,29 +45,26 @@ describe('referencia', () => {
 })
 
 describe('montarEntrada', () => {
-  const anterior = {
-    titulo_pericope_pt: 'A criação',
-    contexto_historico_literario: 'ctx',
-    resenha: 'res',
-    perguntas_reflexao: ['a', 'b'],
-    topicos_pregar: 'top',
-  }
-
-  it('a antiga NÃO leva o material anterior — mostrá-lo ancoraria no patamar que estamos trocando', () => {
-    const e = montarEntrada(bruta({ ordem: 42 }), anterior)
-    expect(e.material_anterior).toBeUndefined()
-    expect(e.titulo_provisorio).toBe('The Creation')
+  it('leva o título provisório em inglês das antigas, e o rótulo de corte das novas', () => {
+    expect(montarEntrada(bruta({ ordem: 42 })).titulo_provisorio).toBe('The Creation')
+    expect(
+      montarEntrada(bruta({ ordem: 3000, titulo_en: undefined, titulo_provisorio: 'Caim e Abel' }))
+        .titulo_provisorio,
+    ).toBe('Caim e Abel')
   })
 
-  it('a nova leva, porque o trabalho dela é reancorar sem perder o insight', () => {
-    const e = montarEntrada(bruta({ ordem: 3000, titulo_provisorio: 'Caim e Abel' }), anterior)
-    expect(e.material_anterior).toEqual(anterior)
-    expect(e.titulo_provisorio).toBe('Caim e Abel')
+  it('NUNCA carrega material anterior — nem o das antigas, nem o das novas', () => {
+    for (const ordem of [42, 3000]) {
+      const e = montarEntrada(bruta({ ordem })) as Record<string, unknown>
+      expect(e.material_anterior).toBeUndefined()
+      expect(Object.keys(e).sort()).toEqual(
+        ['abbrev', 'livro', 'ordem', 'referencia', 'texto', 'titulo_provisorio'].sort(),
+      )
+    }
   })
 
-  it('carrega o sobrescrito quando existe', () => {
-    const e = montarEntrada(bruta({ sobrescrito: 'Salmo de Davi' }))
-    expect(e.sobrescrito).toBe('Salmo de Davi')
+  it('carrega o sobrescrito quando existe — ele é texto bíblico da própria perícope', () => {
+    expect(montarEntrada(bruta({ sobrescrito: 'Salmo de Davi' })).sobrescrito).toBe('Salmo de Davi')
   })
 })
 

@@ -23,6 +23,14 @@ porque o realce por palavra alinha o texto exibido contra o texto gravado.
 jeito (é leitura da NAA, obra derivada). Esta é a única janela em que
 reenriquecer sai de graça.
 
+> **Corrigido em execução (2026-09-05).** A tabela abaixo previa dois trabalhos
+> diferentes. A medição derrubou isso: **192 das 195** novas citam frase que não
+> existe na Bíblia Livre, então "só re-citação" seria reescrita de qualquer
+> jeito. E o dono decidiu depois que nenhuma perícope recebe material anterior —
+> material escrito sobre outra tradução traz o contexto dela, e conhecimento
+> tácito herdado afasta o leitor. **As 2.823 são escritas do zero.** O briefing
+> vigente é `docs/prompt-reenriquecimento.md`.
+
 ## Escopo: 2.628 + 195, e são trabalhos diferentes
 
 | | quantas | trabalho |

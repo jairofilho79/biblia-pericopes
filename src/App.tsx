@@ -45,9 +45,13 @@ function Shell() {
     <div className="shell">
       <header className={`top${headerHidden ? ' top-hidden' : ''}`}>
         <NavLink to="/" className="brand">
+          {/* favicon.svg e não brand/logo.png: o PNG ainda é a marca verde
+              antiga e brigava com o âmbar. O SVG é a marca nova e é código —
+              serve até os rasterizados serem regerados a partir da logo
+              definitiva. Ver o fim do plano do rebranding. */}
           <img
             className="brand-mark"
-            src={`${import.meta.env.BASE_URL}brand/logo.png`}
+            src={`${import.meta.env.BASE_URL}favicon.svg`}
             alt=""
             width={32}
             height={32}

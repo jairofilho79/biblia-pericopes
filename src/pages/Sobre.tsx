@@ -103,6 +103,18 @@ export default function Sobre() {
         simplesmente não aparece, e o texto continua inteiro. A trilha instrumental que
         acompanha a leitura ainda não foi publicada; quando for, ganha um bloco aqui.
       </p>
+
+      <h2>A cor</h2>
+      <p className="muted ajustes-credito">
+        O âmbar deste app não é enfeite: ele marca onde a máquina entrou. Os títulos das
+        seções, os controles e a barra de progresso são âmbar porque são a voz do app. O
+        texto bíblico não é — ele fica em tinta, sem a cor da marca, e é essa ausência que o
+        distingue de tudo o mais que você lê aqui.
+      </p>
+      <p className="muted ajustes-credito">
+        A única exceção é passageira: enquanto a narração lê, o âmbar percorre o versículo e
+        vai embora atrás dela. É a máquina em ação, não uma marca no texto.
+      </p>
     </section>
   )
 }

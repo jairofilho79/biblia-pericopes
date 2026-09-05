@@ -69,3 +69,13 @@ describe('Sobre — a divulgação que as políticas de uso exigem', () => {
     expect(texto()).toMatch(/escritos por um modelo de\s+linguagem/i)
   })
 })
+
+describe('Sobre — a regra da cor', () => {
+  // A tese do rebranding: âmbar é a voz do app, e a Escritura se distingue
+  // pela AUSÊNCIA da marca. A regra tem de estar dita em algum lugar, não só
+  // aplicada — senão é só decoração que ninguém decodifica.
+  it('explica de onde vem o âmbar e o que ele significa', () => {
+    expect(texto()).toContain('âmbar')
+    expect(texto()).toMatch(/Escritura|texto bíblico/i)
+  })
+})

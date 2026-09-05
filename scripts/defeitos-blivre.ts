@@ -52,6 +52,79 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
     classe: 'espaço perdido ou sobrando',
     refs: ['ZEC 7:1', 'ZEC 7:13', 'MRK 14:16', 'LUK 6:1'],
   },
+  // Lucas — 44 defeitos achados numa rodada só, mais do que todo o Antigo
+  // Testamento junto. O livro entrou na Bíblia Livre bem mais sujo que os
+  // outros, e vale relerem-no inteiro antes de publicar.
+  {
+    classe: 'letra trocada ou faltando (Lucas)',
+    refs: [
+      'LUK 1:63', 'LUK 2:38', 'LUK 2:48', 'LUK 3:1', 'LUK 9:40', 'LUK 11:42',
+      'LUK 21:15', 'LUK 24:39', 'LUK 4:25', 'LUK 6:6', 'LUK 6:34', 'LUK 12:28',
+      // O único que muda o sentido: "nem um cabelo de vossa cabeça parecerá",
+      // onde as duas testemunhas trazem PERECERÁ (KJV "perish", Almeida 1911
+      // "não perecerá nem um cabello"). Frase de consolo virou frase sem pé.
+      'LUK 21:18',
+    ],
+  },
+  {
+    classe: 'concordância (Lucas)',
+    refs: ['LUK 1:2', 'LUK 2:1', 'LUK 2:32', 'LUK 8:37', 'LUK 9:5', 'LUK 15:16',
+      'LUK 13:4', 'LUK 14:8', 'LUK 18:43', 'LUK 22:56'],
+  },
+  {
+    classe: 'palavra faltando (Lucas)',
+    refs: [
+      'LUK 1:5', 'LUK 2:6', 'LUK 3:11', 'LUK 8:8', 'LUK 10:21', 'LUK 24:21',
+      // "querem andar roupas compridas" — falta o COM, e as duas testemunhas
+      // o trazem (KJV "walk in long robes", Almeida "andar com vestidos").
+      'LUK 20:46',
+      // O pior de toda a corrida: falta a ORAÇÃO INTEIRA "será humilhado".
+      // "Qualquer que exaltar a si mesmo, e aquele que humilhar a si mesmo,
+      // será exaltado" — o versículo afirma o contrário do que diz. KJV:
+      // "shall be abased"; Almeida 1911: "será humilhado".
+      'LUK 14:11',
+    ],
+  },
+  {
+    classe: 'palavra sobrando ou duplicada (Lucas)',
+    refs: ['LUK 1:24', 'LUK 9:10', 'LUK 10:25', 'LUK 10:38', 'LUK 14:14', 'LUK 21:10'],
+  },
+  {
+    classe: 'espaço perdido ou sobrando (Lucas)',
+    refs: [
+      'LUK 9:23', 'LUK 9:56', 'LUK 10:37', 'LUK 19:27', 'LUK 20:16',
+      'LUK 6:39', 'LUK 17:14', 'LUK 21:34', 'LUK 22:38', 'LUK 22:60', 'LUK 23:46',
+    ],
+  },
+  {
+    classe: 'acento errado (Lucas)',
+    refs: ['LUK 7:13', 'LUK 9:33', 'LUK 23:29'],
+  },
+  // A Paixão de Marcos e o começo de João, achados na mesma rodada. Marcos 14
+  // a 16 tem duas aspas curvas que nunca fecham, o que engole o versículo
+  // seguinte inteiro dentro da citação.
+  {
+    classe: 'aspa que não fecha (Marcos)',
+    refs: ['MRK 14:58', 'MRK 14:70'],
+  },
+  {
+    classe: 'palavra colada, faltando ou duplicada (Marcos 14—16)',
+    refs: ['MRK 15:24', 'MRK 15:44', 'MRK 15:46', 'MRK 16:4', 'MRK 16:7', 'MRK 16:14'],
+  },
+  {
+    classe: 'palavra partida ou colada (João)',
+    refs: ['JHN 2:7', 'JHN 4:54', 'JHN 6:34', 'JHN 6:64'],
+  },
+  {
+    classe: 'palavra duplicada ou trocada (João)',
+    refs: ['JHN 2:17', 'JHN 2:20', 'JHN 3:26', 'JHN 4:9', 'JHN 6:1', 'JHN 7:22', 'JHN 7:23'],
+  },
+  {
+    classe: 'pontuação ou construção quebrada (Lucas)',
+    refs: [
+      'LUK 7:2', 'LUK 11:9', 'LUK 14:5', 'LUK 18:29', 'LUK 22:67', 'LUK 23:49', 'LUK 23:50',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

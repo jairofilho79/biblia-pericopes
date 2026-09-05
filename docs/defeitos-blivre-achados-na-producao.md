@@ -168,6 +168,109 @@ profeta em paralelo com a exigência feita a ela, e não como mais uma proibiç�
 | Mc 14:16 | "**seusdiscípulos**" | "his **disciples**" | **seus discípulos** |
 | Lc 6:1 | "no segundo **sábadodepois** do primeiro" | "on the second **sabbath after** the first" | **sábado depois** |
 
+## 11. O Novo Testamento é o trecho mais sujo da Bíblia Livre
+
+Vinte subagents leram Mateus, Marcos, Lucas e o começo de João em duas rodadas,
+sem se ver. O resultado desmonta a suposição com que este documento começou —
+de que os defeitos eram raros e espalhados:
+
+| livro | defeitos |
+|---|---|
+| Lucas | **58** |
+| João 1—7 | 11 |
+| Marcos | 10 |
+| Mateus | 1 |
+| todo o Antigo Testamento | 50 |
+
+Lucas sozinho tem mais defeitos que os 39 livros do Antigo Testamento juntos, e
+João acumulou 11 em apenas sete capítulos. Não é acaso de amostragem: cada lote
+foi escrito por um subagent diferente, cego para os outros, e cada um tropeçou
+na sua parte. **A qualidade da Bíblia Livre não é uniforme entre os livros**, e
+o Novo Testamento é onde ela é pior.
+
+### Os dois que mudam o sentido
+
+`Lc 14:11` traz **"Porque qualquer que exaltar a si mesmo, e aquele que humilhar
+a si mesmo, será exaltado"**. Falta a oração inteira *será humilhado*, e o
+versículo, como está, **afirma o contrário do que diz** — as duas metades da
+frase passam a ter o mesmo desfecho. A KJV traz "whosoever exalteth himself
+shall be abased" e a Almeida 1911, "qualquer que a si mesmo se exaltar será
+humilhado". É o defeito mais grave de toda a corrida, e num versículo que muita
+gente sabe de cor.
+
+`Lc 21:18` traz **"nem um cabelo de vossa cabeça parecerá"** onde as duas
+testemunhas dizem *perecerá* (KJV "perish", Almeida "não perecerá nem um
+cabello"). Uma promessa de proteção virou frase sem pé, no meio de um trecho
+sobre perseguição.
+
+### Marcos 14—16: duas aspas que nunca fecham
+
+`Mc 14:58` abre `“Nós o ouvimos dizer…` e não fecha, engolindo o versículo 59
+inteiro dentro da citação; `Mc 14:70` fecha uma aspa que nunca foi aberta. Isso
+não é cosmético: o app usa aspas para decidir o que é fala de personagem.
+
+### João: maiúscula inconsistente na mesma perícope
+
+`os Judeus` em Jo 2:18, 5:18, 6:52 e 7:15 contra `os judeus` em Jo 2:20, 5:16,
+6:41 e 7:1 — e `Sábado` contra `sábado` dentro de Jo 5. Não é defeito de
+tradução e não entra na lista de correções, mas atrapalha a citação byte a byte
+e vale uniformizar junto.
+
+Todos foram conferidos por mim contra o texto bruto antes de entrar aqui.
+Um candidato ficou de fora: `Lc 14:18`, "E cada um deles todos
+começou a dar desculpas", que a KJV sustenta ("they all with one consent began
+to make excuse"). Pela regra fundadora, KJV concordando não é defeito.
+
+**O único que muda o sentido — duas testemunhas:**
+
+`Lc 21:18` traz **"nem um cabelo de vossa cabeça parecerá"**. Almeida 1911 diz
+"não perecerá nem um cabello da vossa cabeça" e a KJV diz "there shall not a
+hair of your head perish". Uma promessa de proteção virou uma frase sem pé —
+e ela está no meio de um trecho sobre perseguição, onde justamente mais pesa.
+
+**Segundo caso com duas testemunhas:** `Lc 20:46`, "querem andar roupas
+compridas", falta o *com* (KJV "walk **in** long robes", Almeida "andar **com**
+vestidos compridos").
+
+**Letra trocada ou faltando (8):** `surpeenderam` (1:63) · `agradeci` por
+agradecia (2:38) · `ficarm` (2:48) · `tetraca` (3:1, com *tetrarca* grafado
+certo duas vezes no mesmo versículo) · `exupulsassem` (9:40) · `Mais ai de vós`
+por *Mas* (11:42) · `não posam` (21:15) · `que sou em mesmo` por *eu mesmo*
+(24:39).
+
+**Concordância (8):** `das palavra` (1:2) · `todo a terra` (2:1) · `as gentios`
+(2:32) · `toda o povo` (8:37) · `a todo os que` (9:5) · `ninguém as dava` para *os grãos* (15:16) ·
+`E o todo o povo` (18:43) · `o olhos` (22:56).
+
+**Palavra faltando (6):** falta o verbo em "sua mulher das filhas de Arão"
+(1:5) e em "enquanto eles ali, completaram-se" (2:6) · `com o não tem` (3:11) ·
+"Depois que disse coisas" (8:8) · `Graças te dou, o Pai` por *ó Pai* (10:21) ·
+`que libertar a Israel` por *libertaria* (24:21).
+
+**Palavra sobrando ou duplicada (5):** `Isabel, sua mulher, Isabel` (1:24) ·
+vírgula em "os apóstolos, voltaram" (9:10) · `para ter para herdar` (10:25) ·
+`que eles, enquanto eles caminhavam` (10:38) · `Então lhe disse: Então se
+levantará` — com *lhe* onde cabe *lhes* (21:10).
+
+**Espaço perdido ou sobrando (10):** `siga- me` (9:23) · `salvá-las.E` (9:56) ·
+`com ele.Então` (10:37) · `trazei- os` (19:27) · `a outros.E` (20:16) ·
+`sacerdotes.E` (17:14) · `d esta vida` (21:34) · `duas espadas.E` (22:38) · `o que dizes.E` (22:60) ·
+`meu espírito.E` (23:46).
+
+**Acento errado (3):** `intima compaixão` (7:13) · `saíndo` com acento indevido
+(9:33) · `deram a luz` sem crase (23:29).
+
+**Pontuação ou construção quebrada (6):** período sem verbo principal em 7:2 ·
+`será vos dado` com a ordem trocada (11:9) · `que há ninguém que, tenha deixado`, sem a negação (18:29) ·
+`dizendo, Tu és o Cristo?` com
+vírgula onde cabe dois-pontos (22:67) · `as mulheres que acompanhando-o desde a
+Galileia, tinham o seguido` (23:49) · ponto partindo a frase antes do parêntese
+em 23:50.
+
+**Nenhuma citação do material atravessa essas emendas.** Todos os subagents
+foram instruídos a citar fragmento menor quando a frase passava por cima do
+erro, e cada um confirmou isso por script.
+
 ## Um defeito que era MEU, não da Bíblia Livre
 
 `conseguiamapenas` e `haviasomente`, em Ag 2:16, **não eram da fonte**. O VPL
@@ -219,7 +322,14 @@ reescrever no escuro.
 
 ## Placar
 
-**53 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
-achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
-é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
-entra sem as duas testemunhas.
+**130 versículos** para corrigir, em 31.102 — 50 no Antigo Testamento, 80 no
+Novo. E o padrão que se repete a cada achado: a varredura mecânica levanta o
+candidato, e **a maioria dos candidatos é falso positivo** — 21 nos acentos, 2
+na grafia espanholada. Nenhuma correção entra sem as duas testemunhas.
+
+A distribuição diz mais que o total. Os primeiros 50 saíram de 39 livros; os 80
+seguintes, de quatro. Ler o texto perícope por perícope acha o que a varredura
+por comprimento não acha — e o que ela achou aqui é que **o resto do Novo
+Testamento precisa ser lido com a mesma lupa antes de publicar**. Atos, as
+cartas e o Apocalipse ainda não foram escritos nesta corrida; pela taxa de
+Lucas e João, é razoável esperar mais uma centena de defeitos ali.

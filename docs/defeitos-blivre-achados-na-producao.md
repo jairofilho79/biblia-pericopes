@@ -314,10 +314,21 @@ conteúdo: entre os colchetes de uma letra só, `e` (403×), `é` (120×), `o`
 `n` (6×), `s` (2×) e `d` (1×), mais `igo` (1×). E colam para lados **opostos**:
 `dele [s]` fecha a palavra anterior, `[n] um` abre a seguinte.
 
-É o segundo defeito meu da mesma família — o primeiro foi `conseguiam[apenas]`
-virando `conseguiamapenas`. A lição que fica: **toda regra de espaçamento em
-volta do colchete precisa ser conferida contra o corpus inteiro, não contra os
-exemplos que eu tinha na frente.**
+### E um terceiro: nota do tradutor lida em voz alta
+
+`1Co 13:10` traz `Mas quando vier o [que é] completo,[Ou: perfeito] então…` e
+`1Tm 5:17` traz `Os presbíteros [ou: anciãos] que lideram bem`. Aqui o colchete
+não marca palavra suprida: marca **aparato crítico**, uma leitura alternativa
+dirigida a quem estuda. Desembrulhar deixava o app servindo *"quando vier o que
+é completo, Ou: perfeito então o que é em parte"* — e a narração lia isso em voz
+alta. São dois casos no corpus, e agora o aparato sai inteiro.
+
+São três defeitos meus na mesma família: `conseguiam[apenas]` virando
+`conseguiamapenas`, `com [igo]` virando `com igo`, e agora `[Ou: perfeito]`
+sendo lido como se fosse Escritura. A lição, que já custou três vezes: **o
+colchete da Bíblia Livre não tem um significado só, e toda regra sobre ele
+precisa ser conferida contra o corpus inteiro — nunca contra os exemplos que eu
+tenho na frente.**
 
 Corrigido em `scripts/blivre-texto.ts`. Não precisa de correção na fonte: entra
 sozinho quando a ETL rodar de novo, junto com as outras correções.

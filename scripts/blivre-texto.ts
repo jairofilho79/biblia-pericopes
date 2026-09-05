@@ -56,11 +56,23 @@ const COLCHETE_COLADO = /(\p{L})\[(?=\p{L})/gu
  * (×6), `s` (×2) e `d` (×1), mais `igo` (×1). E eles colam para lados
  * OPOSTOS: `dele [s]` fecha a palavra anterior, `[n] um` abre a seguinte.
  */
+/**
+ * Nota do tradutor entre colchetes: `[Ou: perfeito]`, `[ou: anciãos]`.
+ *
+ * Aqui o colchete não traz palavra suprida — traz **aparato crítico**, uma
+ * leitura alternativa dirigida a quem estuda. Desembrulhar deixava o app
+ * servindo "quando vier o que é completo, Ou: perfeito então o que é em
+ * parte", e a narração lia isso em voz alta. Aparato sai inteiro, junto com a
+ * pontuação que sobra na frente dele. São dois casos no corpus.
+ */
+const NOTA_DO_TRADUTOR = /\s*\[\s*(?:[Oo]u|[Ll]it|isto é|ou seja)\s*[:.][^\]]*\]/g
+
 const PEDACO_QUE_FECHA = /(\p{L})\s\[(s|igo)\]/gu
 const PEDACO_QUE_ABRE = /\[(n|d)\]\s(?=\p{L})/gu
 
 export function removerColchetes(texto: string): string {
   return texto
+    .replace(NOTA_DO_TRADUTOR, '')
     .replace(COLCHETE_COLADO, '$1 [')
     .replace(PEDACO_QUE_FECHA, '$1$2')
     .replace(PEDACO_QUE_ABRE, '$1')

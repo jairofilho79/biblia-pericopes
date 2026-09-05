@@ -110,3 +110,24 @@ describe('colchete com pedaço de palavra, não com palavra', () => {
     expect(removerColchetes('obras, [ó] Senhor')).toBe('obras, ó Senhor')
   })
 })
+
+describe('nota do tradutor entre colchetes', () => {
+  // O app servia "o que é completo, Ou: perfeito então o que é em parte" — e
+  // a narração lia o aparato crítico em voz alta. São dois casos no corpus.
+  it('some inteira, com a pontuação que sobra na frente', () => {
+    expect(removerColchetes('Mas quando vier o [que é] completo,[Ou: perfeito] então o que é em parte')).toBe(
+      'Mas quando vier o que é completo, então o que é em parte',
+    )
+  })
+
+  it('pega também a forma minúscula', () => {
+    expect(removerColchetes('Os presbíteros [ou: anciãos] que lideram bem')).toBe(
+      'Os presbíteros que lideram bem',
+    )
+  })
+
+  it('não confunde com colchete de palavra suprida', () => {
+    expect(removerColchetes('Deus [é] nosso refúgio')).toBe('Deus é nosso refúgio')
+    expect(removerColchetes('e [o] porei sobre eles')).toBe('e o porei sobre eles')
+  })
+})

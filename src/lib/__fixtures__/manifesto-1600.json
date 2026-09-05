@@ -533,8 +533,8 @@
    "i": 5,
    "secao": "texto",
    "arquivo": "u05.mp3",
-   "texto": "Capítulo 1. Livro da genealogia de Jesus Cristo, filho de Davi, filho de Abraão.",
-   "chars": 80,
+   "texto": "Capítulo 1. Livro da geração de Jesus Cristo, filho de Davi, filho de Abraão.",
+   "chars": 77,
    "inicio": 42.14,
    "dur": 6.531,
    "palavras": [
@@ -559,7 +559,7 @@
      "d": 0.08
     },
     {
-     "t": "genealogia",
+     "t": "geração",
      "i": 44.283,
      "d": 0.701
     },
@@ -614,8 +614,8 @@
    "i": 6,
    "secao": "texto",
    "arquivo": "u06.mp3",
-   "texto": "Abraão gerou Isaque; Isaque gerou Jacó; Jacó gerou Judá e os seus irmãos;",
-   "chars": 73,
+   "texto": "Abraão gerou a Isaque; e Isaque gerou a Jacó; e Jacó gerou a",
+   "chars": 60,
    "inicio": 49.071,
    "dur": 6.896,
    "palavras": [
@@ -630,37 +630,37 @@
      "d": 0.281
     },
     {
-     "t": "Isaque;",
+     "t": "a",
      "i": 50.073,
      "d": 0.521
     },
     {
-     "t": "Isaque",
+     "t": "Isaque;",
      "i": 51.296,
      "d": 0.501
     },
     {
-     "t": "gerou",
+     "t": "e",
      "i": 51.858,
      "d": 0.321
     },
     {
-     "t": "Jacó;",
+     "t": "Isaque",
      "i": 52.259,
      "d": 0.361
     },
     {
-     "t": "Jacó",
+     "t": "gerou",
      "i": 53.421,
      "d": 0.321
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 53.963,
      "d": 0.301
     },
     {
-     "t": "Judá",
+     "t": "Jacó;",
      "i": 54.343,
      "d": 0.301
     },
@@ -670,17 +670,17 @@
      "d": 0.02
     },
     {
-     "t": "os",
+     "t": "Jacó",
      "i": 54.905,
      "d": 0.08
     },
     {
-     "t": "seus",
+     "t": "gerou",
      "i": 55.025,
      "d": 0.18
     },
     {
-     "t": "irmãos;",
+     "t": "a",
      "i": 55.266,
      "d": 0.501
     }
@@ -690,8 +690,8 @@
    "i": 7,
    "secao": "texto",
    "arquivo": "u07.mp3",
-   "texto": "Judá gerou Perez e Zera, cuja mãe foi Tamar; Perez gerou Esrom; Esrom gerou Arão;",
-   "chars": 81,
+   "texto": "Judá e a seus irmãos. E Judá gerou de Tamar a Perez e a Zerá;",
+   "chars": 61,
    "inicio": 56.367,
    "dur": 7.21,
    "palavras": [
@@ -701,72 +701,72 @@
      "d": 0.28
     },
     {
-     "t": "gerou",
+     "t": "e",
      "i": 56.928,
      "d": 0.26
     },
     {
-     "t": "Perez",
+     "t": "a",
      "i": 57.288,
      "d": 0.36
     },
     {
-     "t": "e",
+     "t": "seus",
      "i": 57.729,
      "d": 0.02
     },
     {
-     "t": "Zera,",
+     "t": "irmãos.",
      "i": 57.809,
      "d": 0.32
     },
     {
-     "t": "cuja",
+     "t": "E",
      "i": 58.61,
      "d": 0.24
     },
     {
-     "t": "mãe",
+     "t": "Judá",
      "i": 58.93,
      "d": 0.18
     },
     {
-     "t": "foi",
+     "t": "gerou",
      "i": 59.191,
      "d": 0.12
     },
     {
-     "t": "Tamar;",
+     "t": "de",
      "i": 59.371,
      "d": 0.401
     },
     {
-     "t": "Perez",
+     "t": "Tamar",
      "i": 60.433,
      "d": 0.36
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 60.833,
      "d": 0.24
     },
     {
-     "t": "Esrom;",
+     "t": "Perez",
      "i": 61.133,
      "d": 0.441
     },
     {
-     "t": "Esrom",
+     "t": "e",
      "i": 62.235,
      "d": 0.421
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 62.756,
      "d": 0.24
     },
     {
-     "t": "Arão;",
+     "t": "Zerá;",
      "i": 63.056,
      "d": 0.32
     }
@@ -776,43 +776,43 @@
    "i": 8,
    "secao": "texto",
    "arquivo": "u08.mp3",
-   "texto": "Arão gerou Aminadabe; Aminadabe gerou Naassom; Naassom gerou Salmom;",
-   "chars": 68,
+   "texto": "e Perez gerou a Esrom, e Esrom gerou a",
+   "chars": 38,
    "inicio": 63.977,
    "dur": 6.008,
    "palavras": [
     {
-     "t": "Arão",
+     "t": "e",
      "i": 64.057,
      "d": 0.28
     },
     {
-     "t": "gerou",
+     "t": "Perez",
      "i": 64.418,
      "d": 0.3
     },
     {
-     "t": "Aminadabe;",
+     "t": "gerou",
      "i": 64.758,
      "d": 0.681
     },
     {
-     "t": "Aminadabe",
+     "t": "a",
      "i": 66.08,
      "d": 0.661
     },
     {
-     "t": "gerou",
+     "t": "Esrom,",
      "i": 66.801,
      "d": 0.28
     },
     {
-     "t": "Naassom;",
+     "t": "e",
      "i": 67.141,
      "d": 0.521
     },
     {
-     "t": "Naassom",
+     "t": "Esrom",
      "i": 68.283,
      "d": 0.541
     },
@@ -822,7 +822,7 @@
      "d": 0.3
     },
     {
-     "t": "Salmom;",
+     "t": "a",
      "i": 69.344,
      "d": 0.441
     }
@@ -832,48 +832,48 @@
    "i": 9,
    "secao": "texto",
    "arquivo": "u09.mp3",
-   "texto": "Salmom gerou Boaz, cuja mãe foi Raabe; Boaz gerou Obede, cuja mãe foi Rute; e Obede gerou Jessé;",
-   "chars": 96,
+   "texto": "Arão. E Arão gerou a Aminadabe; e Aminadabe gerou a Naassom; e Naassom gerou a Salmom. E Salmom",
+   "chars": 95,
    "inicio": 70.385,
    "dur": 9.117,
    "palavras": [
     {
-     "t": "Salmom",
+     "t": "Arão.",
      "i": 70.645,
      "d": 0.401
     },
     {
-     "t": "gerou",
+     "t": "E",
      "i": 71.126,
      "d": 0.26
     },
     {
-     "t": "Boaz,",
+     "t": "Arão",
      "i": 71.447,
      "d": 0.461
     },
     {
-     "t": "cuja",
+     "t": "gerou",
      "i": 72.228,
      "d": 0.24
     },
     {
-     "t": "mãe",
+     "t": "a",
      "i": 72.569,
      "d": 0.18
     },
     {
-     "t": "foi",
+     "t": "Aminadabe;",
      "i": 72.85,
      "d": 0.16
     },
     {
-     "t": "Raabe;",
+     "t": "e",
      "i": 73.07,
      "d": 0.461
     },
     {
-     "t": "Boaz",
+     "t": "Aminadabe",
      "i": 74.412,
      "d": 0.421
     },
@@ -883,47 +883,47 @@
      "d": 0.281
     },
     {
-     "t": "Obede,",
+     "t": "a",
      "i": 75.254,
      "d": 0.421
     },
     {
-     "t": "cuja",
+     "t": "Naassom;",
      "i": 76.095,
      "d": 0.24
     },
     {
-     "t": "mãe",
+     "t": "e",
      "i": 76.416,
      "d": 0.18
     },
     {
-     "t": "foi",
+     "t": "Naassom",
      "i": 76.677,
      "d": 0.16
     },
     {
-     "t": "Rute;",
+     "t": "gerou",
      "i": 76.897,
      "d": 0.341
     },
     {
-     "t": "e",
+     "t": "a",
      "i": 77.919,
      "d": 0.02
     },
     {
-     "t": "Obede",
+     "t": "Salmom.",
      "i": 78.039,
      "d": 0.421
     },
     {
-     "t": "gerou",
+     "t": "E",
      "i": 78.52,
      "d": 0.281
     },
     {
-     "t": "Jessé;",
+     "t": "Salmom",
      "i": 78.861,
      "d": 0.361
     }
@@ -933,33 +933,33 @@
    "i": 10,
    "secao": "texto",
    "arquivo": "u10.mp3",
-   "texto": "Jessé gerou o rei Davi; e o rei Davi gerou Salomão, cuja mãe foi aquela que tinha sido mulher de Urias;",
-   "chars": 103,
+   "texto": "gerou de Raabe a Boaz; e Boaz gerou de Rute a Obede; e Obede gerou a Jessé. E Jessé gerou ao",
+   "chars": 92,
    "inicio": 79.902,
    "dur": 7.732,
    "palavras": [
     {
-     "t": "Jessé",
+     "t": "gerou",
      "i": 80.002,
      "d": 0.361
     },
     {
-     "t": "gerou",
+     "t": "de",
      "i": 80.523,
      "d": 0.341
     },
     {
-     "t": "o",
+     "t": "Raabe",
      "i": 80.924,
      "d": 0.02
     },
     {
-     "t": "rei",
+     "t": "a",
      "i": 81.044,
      "d": 0.16
     },
     {
-     "t": "Davi;",
+     "t": "Boaz;",
      "i": 81.264,
      "d": 0.3
     },
@@ -969,77 +969,77 @@
      "d": 0.02
     },
     {
-     "t": "o",
+     "t": "Boaz",
      "i": 82.366,
      "d": 0.02
     },
     {
-     "t": "rei",
+     "t": "gerou",
      "i": 82.466,
      "d": 0.16
     },
     {
-     "t": "Davi",
+     "t": "de",
      "i": 82.666,
      "d": 0.26
     },
     {
-     "t": "gerou",
+     "t": "Rute",
      "i": 83.087,
      "d": 0.28
     },
     {
-     "t": "Salomão,",
+     "t": "a",
      "i": 83.448,
      "d": 0.501
     },
     {
-     "t": "cuja",
+     "t": "Obede;",
      "i": 84.509,
      "d": 0.24
     },
     {
-     "t": "mãe",
+     "t": "e",
      "i": 84.81,
      "d": 0.2
     },
     {
-     "t": "foi",
+     "t": "Obede",
      "i": 85.09,
      "d": 0.16
     },
     {
-     "t": "aquela",
+     "t": "gerou",
      "i": 85.311,
      "d": 0.361
     },
     {
-     "t": "que",
+     "t": "a",
      "i": 85.731,
      "d": 0.08
     },
     {
-     "t": "tinha",
+     "t": "Jessé.",
      "i": 85.851,
      "d": 0.22
     },
     {
-     "t": "sido",
+     "t": "E",
      "i": 86.152,
      "d": 0.2
     },
     {
-     "t": "mulher",
+     "t": "Jessé",
      "i": 86.392,
      "d": 0.341
     },
     {
-     "t": "de",
+     "t": "gerou",
      "i": 86.793,
      "d": 0.08
     },
     {
-     "t": "Urias;",
+     "t": "ao",
      "i": 86.933,
      "d": 0.481
     }
@@ -1049,53 +1049,53 @@
    "i": 11,
    "secao": "texto",
    "arquivo": "u11.mp3",
-   "texto": "Salomão gerou Roboão; Roboão gerou Abias; Abias gerou Asa;",
-   "chars": 58,
+   "texto": "rei Davi; e o rei Davi gerou Salomão da",
+   "chars": 39,
    "inicio": 88.034,
    "dur": 5.721,
    "palavras": [
     {
-     "t": "Salomão",
+     "t": "rei",
      "i": 88.275,
      "d": 0.502
     },
     {
-     "t": "gerou",
+     "t": "Davi;",
      "i": 88.897,
      "d": 0.241
     },
     {
-     "t": "Roboão;",
+     "t": "e",
      "i": 89.198,
      "d": 0.522
     },
     {
-     "t": "Roboão",
+     "t": "o",
      "i": 90.302,
      "d": 0.482
     },
     {
-     "t": "gerou",
+     "t": "rei",
      "i": 90.884,
      "d": 0.241
     },
     {
-     "t": "Abias;",
+     "t": "Davi",
      "i": 91.206,
      "d": 0.562
     },
     {
-     "t": "Abias",
+     "t": "gerou",
      "i": 92.37,
      "d": 0.482
     },
     {
-     "t": "gerou",
+     "t": "Salomão",
      "i": 92.892,
      "d": 0.281
     },
     {
-     "t": "Asa;",
+     "t": "da",
      "i": 93.293,
      "d": 0.301
     }
@@ -1105,43 +1105,43 @@
    "i": 12,
    "secao": "texto",
    "arquivo": "u12.mp3",
-   "texto": "Asa gerou Josafá; Josafá gerou Jorão; Jorão gerou Uzias;",
-   "chars": 56,
+   "texto": "que fora mulher de Urias. E Salomão gerou a",
+   "chars": 43,
    "inicio": 94.155,
    "dur": 5.878,
    "palavras": [
     {
-     "t": "Asa",
+     "t": "que",
      "i": 94.456,
      "d": 0.261
     },
     {
-     "t": "gerou",
+     "t": "fora",
      "i": 94.797,
      "d": 0.301
     },
     {
-     "t": "Josafá;",
+     "t": "mulher",
      "i": 95.158,
      "d": 0.481
     },
     {
-     "t": "Josafá",
+     "t": "de",
      "i": 96.281,
      "d": 0.461
     },
     {
-     "t": "gerou",
+     "t": "Urias.",
      "i": 96.903,
      "d": 0.321
     },
     {
-     "t": "Jorão;",
+     "t": "E",
      "i": 97.324,
      "d": 0.381
     },
     {
-     "t": "Jorão",
+     "t": "Salomão",
      "i": 98.247,
      "d": 0.381
     },
@@ -1151,7 +1151,7 @@
      "d": 0.341
     },
     {
-     "t": "Uzias;",
+     "t": "a",
      "i": 99.17,
      "d": 0.582
     }
@@ -1161,53 +1161,53 @@
    "i": 13,
    "secao": "texto",
    "arquivo": "u13.mp3",
-   "texto": "Uzias gerou Jotão; Jotão gerou Acaz; Acaz gerou Ezequias;",
-   "chars": 57,
+   "texto": "Roboão; e Roboão gerou a Abias; e Abias gerou",
+   "chars": 45,
    "inicio": 100.433,
    "dur": 5.878,
    "palavras": [
     {
-     "t": "Uzias",
+     "t": "Roboão;",
      "i": 100.553,
      "d": 0.461
     },
     {
-     "t": "gerou",
+     "t": "e",
      "i": 101.055,
      "d": 0.261
     },
     {
-     "t": "Jotão;",
+     "t": "Roboão",
      "i": 101.396,
      "d": 0.441
     },
     {
-     "t": "Jotão",
+     "t": "gerou",
      "i": 102.559,
      "d": 0.361
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 103.041,
      "d": 0.281
     },
     {
-     "t": "Acaz;",
+     "t": "Abias;",
      "i": 103.382,
      "d": 0.522
     },
     {
-     "t": "Acaz",
+     "t": "e",
      "i": 104.545,
      "d": 0.421
     },
     {
-     "t": "gerou",
+     "t": "Abias",
      "i": 105.027,
      "d": 0.281
     },
     {
-     "t": "Ezequias;",
+     "t": "gerou",
      "i": 105.368,
      "d": 0.702
     }
@@ -1217,28 +1217,28 @@
    "i": 14,
    "secao": "texto",
    "arquivo": "u14.mp3",
-   "texto": "Ezequias gerou Manassés; Manassés gerou Amom; Amom gerou Josias;",
-   "chars": 64,
+   "texto": "a Asa. E Asa gerou a Josafá; e Josafá",
+   "chars": 37,
    "inicio": 106.71,
    "dur": 6.426,
    "palavras": [
     {
-     "t": "Ezequias",
+     "t": "a",
      "i": 106.79,
      "d": 0.621
     },
     {
-     "t": "gerou",
+     "t": "Asa.",
      "i": 107.451,
      "d": 0.3
     },
     {
-     "t": "Manassés;",
+     "t": "E",
      "i": 107.791,
      "d": 0.641
     },
     {
-     "t": "Manassés",
+     "t": "Asa",
      "i": 109.212,
      "d": 0.601
     },
@@ -1248,22 +1248,22 @@
      "d": 0.3
     },
     {
-     "t": "Amom;",
+     "t": "a",
      "i": 110.253,
      "d": 0.34
     },
     {
-     "t": "Amom",
+     "t": "Josafá;",
      "i": 111.455,
      "d": 0.34
     },
     {
-     "t": "gerou",
+     "t": "e",
      "i": 111.895,
      "d": 0.3
     },
     {
-     "t": "Josias;",
+     "t": "Josafá",
      "i": 112.275,
      "d": 0.661
     }
@@ -1273,23 +1273,23 @@
    "i": 15,
    "secao": "texto",
    "arquivo": "u15.mp3",
-   "texto": "Josias gerou Jeconias e os seus irmãos, no tempo do exílio na Babilônia.",
-   "chars": 72,
+   "texto": "gerou a Jorão; e Jorão gerou a Uzias. E Uzias gerou a Jotão;",
+   "chars": 60,
    "inicio": 113.536,
    "dur": 5.068,
    "palavras": [
     {
-     "t": "Josias",
+     "t": "gerou",
      "i": 113.656,
      "d": 0.481
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 114.177,
      "d": 0.28
     },
     {
-     "t": "Jeconias",
+     "t": "Jorão;",
      "i": 114.518,
      "d": 0.721
     },
@@ -1299,47 +1299,47 @@
      "d": 0.02
     },
     {
-     "t": "os",
+     "t": "Jorão",
      "i": 115.359,
      "d": 0.06
     },
     {
-     "t": "seus",
+     "t": "gerou",
      "i": 115.459,
      "d": 0.18
     },
     {
-     "t": "irmãos,",
+     "t": "a",
      "i": 115.699,
      "d": 0.441
     },
     {
-     "t": "no",
+     "t": "Uzias.",
      "i": 116.561,
      "d": 0.08
     },
     {
-     "t": "tempo",
+     "t": "E",
      "i": 116.741,
      "d": 0.32
     },
     {
-     "t": "do",
+     "t": "Uzias",
      "i": 117.101,
      "d": 0.06
     },
     {
-     "t": "exílio",
+     "t": "gerou",
      "i": 117.242,
      "d": 0.421
     },
     {
-     "t": "na",
+     "t": "a",
      "i": 117.722,
      "d": 0.06
     },
     {
-     "t": "Babilônia.",
+     "t": "Jotão;",
      "i": 117.843,
      "d": 0.541
     }
@@ -1349,68 +1349,68 @@
    "i": 16,
    "secao": "texto",
    "arquivo": "u16.mp3",
-   "texto": "Depois do exílio na Babilônia, Jeconias gerou Salatiel; e Salatiel gerou Zorobabel;",
-   "chars": 83,
+   "texto": "e Jotão gerou a Acaz; e Acaz gerou a Ezequias. E Ezequias",
+   "chars": 57,
    "inicio": 119.004,
    "dur": 6.896,
    "palavras": [
     {
-     "t": "Depois",
+     "t": "e",
      "i": 119.305,
      "d": 0.401
     },
     {
-     "t": "do",
+     "t": "Jotão",
      "i": 119.766,
      "d": 0.08
     },
     {
-     "t": "exílio",
+     "t": "gerou",
      "i": 119.906,
      "d": 0.421
     },
     {
-     "t": "na",
+     "t": "a",
      "i": 120.367,
      "d": 0.08
     },
     {
-     "t": "Babilônia,",
+     "t": "Acaz;",
      "i": 120.488,
      "d": 0.581
     },
     {
-     "t": "Jeconias",
+     "t": "e",
      "i": 121.55,
      "d": 0.541
     },
     {
-     "t": "gerou",
+     "t": "Acaz",
      "i": 122.131,
      "d": 0.281
     },
     {
-     "t": "Salatiel;",
+     "t": "gerou",
      "i": 122.492,
      "d": 0.642
     },
     {
-     "t": "e",
+     "t": "a",
      "i": 123.755,
      "d": 0.02
     },
     {
-     "t": "Salatiel",
+     "t": "Ezequias.",
      "i": 123.896,
      "d": 0.601
     },
     {
-     "t": "gerou",
+     "t": "E",
      "i": 124.577,
      "d": 0.301
     },
     {
-     "t": "Zorobabel;",
+     "t": "Ezequias",
      "i": 124.978,
      "d": 0.722
     }
@@ -1420,53 +1420,53 @@
    "i": 17,
    "secao": "texto",
    "arquivo": "u17.mp3",
-   "texto": "Zorobabel gerou Abiúde; Abiúde gerou Eliaquim; Eliaquim gerou Azor;",
-   "chars": 67,
+   "texto": "gerou a Manassés; e Manassés gerou a Amom; e",
+   "chars": 44,
    "inicio": 126.3,
    "dur": 6.713,
    "palavras": [
     {
-     "t": "Zorobabel",
+     "t": "gerou",
      "i": 126.46,
      "d": 0.721
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 127.282,
      "d": 0.341
     },
     {
-     "t": "Abiúde;",
+     "t": "Manassés;",
      "i": 127.703,
      "d": 0.521
     },
     {
-     "t": "Abiúde",
+     "t": "e",
      "i": 128.905,
      "d": 0.521
     },
     {
-     "t": "gerou",
+     "t": "Manassés",
      "i": 129.526,
      "d": 0.321
     },
     {
-     "t": "Eliaquim;",
+     "t": "gerou",
      "i": 129.927,
      "d": 0.601
     },
     {
-     "t": "Eliaquim",
+     "t": "a",
      "i": 131.27,
      "d": 0.561
     },
     {
-     "t": "gerou",
+     "t": "Amom;",
      "i": 131.931,
      "d": 0.321
     },
     {
-     "t": "Azor;",
+     "t": "e",
      "i": 132.372,
      "d": 0.441
     }
@@ -1476,13 +1476,13 @@
    "i": 18,
    "secao": "texto",
    "arquivo": "u18.mp3",
-   "texto": "Azor gerou Sadoque; Sadoque gerou Aquim; Aquim gerou Eliúde;",
-   "chars": 60,
+   "texto": "Amom gerou a Josias. E Josias gerou a Jeconias,",
+   "chars": 47,
    "inicio": 133.414,
    "dur": 5.224,
    "palavras": [
     {
-     "t": "Azor",
+     "t": "Amom",
      "i": 133.514,
      "d": 0.362
     },
@@ -1492,37 +1492,37 @@
      "d": 0.281
     },
     {
-     "t": "Sadoque;",
+     "t": "a",
      "i": 134.358,
      "d": 0.543
     },
     {
-     "t": "Sadoque",
+     "t": "Josias.",
      "i": 135.464,
      "d": 0.482
     },
     {
-     "t": "gerou",
+     "t": "E",
      "i": 136.006,
      "d": 0.281
     },
     {
-     "t": "Aquim;",
+     "t": "Josias",
      "i": 136.368,
      "d": 0.322
     },
     {
-     "t": "Aquim",
+     "t": "gerou",
      "i": 137.172,
      "d": 0.301
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 137.553,
      "d": 0.301
     },
     {
-     "t": "Eliúde;",
+     "t": "Jeconias,",
      "i": 137.915,
      "d": 0.522
     }
@@ -1532,53 +1532,53 @@
    "i": 19,
    "secao": "texto",
    "arquivo": "u19.mp3",
-   "texto": "Eliúde gerou Eleazar; Eleazar gerou Matã; Matã gerou Jacó.",
-   "chars": 58,
+   "texto": "e a seus irmãos no tempo do exílio babilônico.",
+   "chars": 46,
    "inicio": 139.038,
    "dur": 5.46,
    "palavras": [
     {
-     "t": "Eliúde",
+     "t": "e",
      "i": 139.138,
      "d": 0.442
     },
     {
-     "t": "gerou",
+     "t": "a",
      "i": 139.64,
      "d": 0.281
     },
     {
-     "t": "Eleazar;",
+     "t": "seus",
      "i": 139.981,
      "d": 0.542
     },
     {
-     "t": "Eleazar",
+     "t": "irmãos",
      "i": 141.085,
      "d": 0.522
     },
     {
-     "t": "gerou",
+     "t": "no",
      "i": 141.647,
      "d": 0.261
     },
     {
-     "t": "Matã;",
+     "t": "tempo",
      "i": 141.969,
      "d": 0.321
     },
     {
-     "t": "Matã",
+     "t": "do",
      "i": 143.032,
      "d": 0.301
     },
     {
-     "t": "gerou",
+     "t": "exílio",
      "i": 143.494,
      "d": 0.281
     },
     {
-     "t": "Jacó.",
+     "t": "babilônico.",
      "i": 143.835,
      "d": 0.341
     }
@@ -1588,8 +1588,8 @@
    "i": 20,
    "secao": "texto",
    "arquivo": "u20.mp3",
-   "texto": "E Jacó gerou José, marido de Maria, da qual nasceu Jesus, que se chama o Cristo.",
-   "chars": 80,
+   "texto": "E depois do exílio babilônico Jeconias gerou a Salatiel; e Salatiel gerou a Zorobabel. E Zorobabel",
+   "chars": 98,
    "inicio": 144.898,
    "dur": 6.06,
    "palavras": [
@@ -1599,77 +1599,77 @@
      "d": 0.02
     },
     {
-     "t": "Jacó",
+     "t": "depois",
      "i": 145.079,
      "d": 0.321
     },
     {
-     "t": "gerou",
+     "t": "do",
      "i": 145.52,
      "d": 0.281
     },
     {
-     "t": "José,",
+     "t": "exílio",
      "i": 145.881,
      "d": 0.341
     },
     {
-     "t": "marido",
+     "t": "babilônico",
      "i": 146.845,
      "d": 0.381
     },
     {
-     "t": "de",
+     "t": "Jeconias",
      "i": 147.266,
      "d": 0.06
     },
     {
-     "t": "Maria,",
+     "t": "gerou",
      "i": 147.386,
      "d": 0.441
     },
     {
-     "t": "da",
+     "t": "a",
      "i": 147.928,
      "d": 0.1
     },
     {
-     "t": "qual",
+     "t": "Salatiel;",
      "i": 148.109,
      "d": 0.201
     },
     {
-     "t": "nasceu",
+     "t": "e",
      "i": 148.35,
      "d": 0.341
     },
     {
-     "t": "Jesus,",
+     "t": "Salatiel",
      "i": 148.751,
      "d": 0.522
     },
     {
-     "t": "que",
+     "t": "gerou",
      "i": 149.614,
      "d": 0.08
     },
     {
-     "t": "se",
+     "t": "a",
      "i": 149.734,
      "d": 0.08
     },
     {
-     "t": "chama",
+     "t": "Zorobabel.",
      "i": 149.895,
      "d": 0.261
     },
     {
-     "t": "o",
+     "t": "E",
      "i": 150.216,
      "d": 0.04
     },
     {
-     "t": "Cristo.",
+     "t": "Zorobabel",
      "i": 150.336,
      "d": 0.421
     }
@@ -1679,153 +1679,153 @@
    "i": 21,
    "secao": "texto",
    "arquivo": "u21.mp3",
-   "texto": "Assim, todas as gerações, desde Abraão até Davi, são catorze; desde Davi até o exílio na Babilônia, catorze gerações; e desde o exílio na Babilônia até Cristo, catorze gerações.",
-   "chars": 177,
+   "texto": "gerou a Abiúde; e Abiúde gerou a Eliaquim; e Eliaquim gerou a Azor. E Azor gerou a Sadoque; e Sadoque gerou a Aquim; e Aquim gerou a Eliúde. E",
+   "chars": 142,
    "inicio": 151.358,
    "dur": 14.55,
    "palavras": [
     {
-     "t": "Assim,",
+     "t": "gerou",
      "i": 151.458,
      "d": 0.34
     },
     {
-     "t": "todas",
+     "t": "a",
      "i": 152.259,
      "d": 0.34
     },
     {
-     "t": "as",
+     "t": "Abiúde;",
      "i": 152.639,
      "d": 0.08
     },
     {
-     "t": "gerações,",
+     "t": "e",
      "i": 152.739,
      "d": 0.64
     },
     {
-     "t": "desde",
+     "t": "Abiúde",
      "i": 153.66,
      "d": 0.32
     },
     {
-     "t": "Abraão",
+     "t": "gerou",
      "i": 154.04,
      "d": 0.44
     },
     {
-     "t": "até",
+     "t": "a",
      "i": 154.56,
      "d": 0.18
     },
     {
-     "t": "Davi,",
+     "t": "Eliaquim;",
      "i": 154.82,
      "d": 0.26
     },
     {
-     "t": "são",
+     "t": "e",
      "i": 155.521,
      "d": 0.14
     },
     {
-     "t": "catorze;",
+     "t": "Eliaquim",
      "i": 155.721,
      "d": 0.6
     },
     {
-     "t": "desde",
+     "t": "gerou",
      "i": 156.762,
      "d": 0.32
     },
     {
-     "t": "Davi",
+     "t": "a",
      "i": 157.122,
      "d": 0.28
     },
     {
-     "t": "até",
+     "t": "Azor.",
      "i": 157.782,
      "d": 0.18
     },
     {
-     "t": "o",
+     "t": "E",
      "i": 158.043,
      "d": 0.02
     },
     {
-     "t": "exílio",
+     "t": "Azor",
      "i": 158.143,
      "d": 0.38
     },
     {
-     "t": "na",
+     "t": "gerou",
      "i": 158.583,
      "d": 0.06
     },
     {
-     "t": "Babilônia,",
+     "t": "a",
      "i": 158.683,
      "d": 0.56
     },
     {
-     "t": "catorze",
+     "t": "Sadoque;",
      "i": 159.664,
      "d": 0.56
     },
     {
-     "t": "gerações;",
+     "t": "e",
      "i": 160.284,
      "d": 0.62
     },
     {
-     "t": "e",
+     "t": "Sadoque",
      "i": 161.465,
      "d": 0.02
     },
     {
-     "t": "desde",
+     "t": "gerou",
      "i": 161.565,
      "d": 0.34
     },
     {
-     "t": "o",
+     "t": "a",
      "i": 161.945,
      "d": 0.02
     },
     {
-     "t": "exílio",
+     "t": "Aquim;",
      "i": 162.005,
      "d": 0.4
     },
     {
-     "t": "na",
+     "t": "e",
      "i": 162.446,
      "d": 0.06
     },
     {
-     "t": "Babilônia",
+     "t": "Aquim",
      "i": 162.546,
      "d": 0.58
     },
     {
-     "t": "até",
+     "t": "gerou",
      "i": 163.426,
      "d": 0.16
     },
     {
-     "t": "Cristo,",
+     "t": "a",
      "i": 163.707,
      "d": 0.38
     },
     {
-     "t": "catorze",
+     "t": "Eliúde.",
      "i": 164.487,
      "d": 0.56
     },
     {
-     "t": "gerações.",
+     "t": "E",
      "i": 165.108,
      "d": 0.62
     }
@@ -3037,5 +3037,6 @@
     }
    ]
   }
- ]
+ ],
+ "_nota": "Fixture de teste. O texto falado foi trocado pelo da Biblia Livre (CC BY 3.0 BR) porque a gravacao original era da NAA, protegida. Os tempos sao os da gravacao antiga e servem so para exercitar o alinhador: contagem de palavras e limites de unidade preservados."
 }

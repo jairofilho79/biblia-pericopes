@@ -23,7 +23,11 @@ import { join } from 'node:path'
 export const PADROES: { re: RegExp; motivo: string; negavel?: boolean }[] = [
   { re: /\bbicho\b/gi, motivo: 'animal do texto reduzido a "bicho"' },
   { re: /\b(fulano|beltrano|ciclano|sicrano)\b/gi, motivo: 'nome próprio substituído por apelido genérico' },
-  { re: /\b(galera|treta|rolê|zoar|zoeira|na moral|tipo assim|sacou)\b/gi, motivo: 'gíria' },
+  { re: /\b(galera|treta|rolê|zoeira|na moral|tipo assim|sacou)\b/gi, motivo: 'gíria' },
+  // `zoar` sai da lista acima e ganha regra própria SEM o `i`: com ele, a
+  // cidade de **Zoar** — para onde Ló foge em Gn 19 — casava com a gíria.
+  // Achado por um subagente do conserto de registro.
+  { re: /\bzoar\b/g, motivo: 'gíria' },
   // "de boa" só é gíria quando fecha a oração. Sem isto, ele casava dentro de
   // "três medidas de boa farinha" (citação de Gn 18) e de "boa velhice" —
   // duas expressões do próprio texto bíblico.
@@ -93,11 +97,12 @@ const CAMPOS = [
 /**
  * Campos já lidos por um revisor e absolvidos: a marca é falso-positivo.
  *
- * Três causas, todas confirmadas caso a caso: `cara` no sentido de dispendiosa
+ * Quatro causas, todas confirmadas caso a caso: `cara` no sentido de dispendiosa
  * ("uma cor cara de conseguir", "a tropa mais cara"); `gente` como substantivo
  * ("é a gente daquele pátio", "a gente nova odiava Deus"); e `piada` usada para
  * DESCREVER o deboche de alguém do texto — os genros de Ló, os meninos de
- * Betel —, que é dizer a coisa certa.
+ * Betel —, que é dizer a coisa certa; e a guarda de negação que não alcança a
+ * frase inteira ("chamar a aflição de boa", Sl 119:71).
  *
  * A absolvição é do par perícope+campo, e vale enquanto o campo não for
  * reescrito: se ele mudar, a varredura volta a olhá-lo do zero. Sem esta lista
@@ -105,6 +110,7 @@ const CAMPOS = [
  * pendente ou trabalho já julgado.
  */
 export const ABSOLVIDAS = new Set<string>([
+  '21:topicos_pregar',
   '270:resenha',
   '280:topicos_pregar',
   '319:topicos_pregar',
@@ -123,6 +129,13 @@ export const ABSOLVIDAS = new Set<string>([
   '1994:topicos_pregar',
   '2004:topicos_pregar',
   '2347:resenha',
+  '2524:resenha',
+  '2524:topicos_pregar',
+  '2544:resenha',
+  '3006:resenha',
+  '3006:topicos_pregar',
+  '3046:resenha',
+  '3163:topicos_pregar',
 ])
 
 export function varrer(material: Record<string, unknown>): Suspeita[] {

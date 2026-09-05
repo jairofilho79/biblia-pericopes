@@ -33,7 +33,31 @@ de penas) e **não toca em 18:22–23**. Não é omissão por descuido: é uma e
 que precisa ser sua, porque qualquer tratamento explícito ali vira posição
 pública do app.
 
-## 3. `palavras_do_trecho` como campo próprio
+## 3. As passagens que igrejas honestas leem de formas opostas
+
+Levítico 18 e 20 (item 2) não são caso isolado. A rodada das cartas de Paulo
+trouxe um bloco inteiro do mesmo tipo, e o app é de **versão única**: qualquer
+coisa que eu escreva vira a posição dele.
+
+- **1Co 11:2-16** e **1Co 14:33-35** — véu e silêncio na igreja
+- **1Tm 2:9-15** — a mulher aprenda em silêncio; o mais afiado de todos
+- **Ef 5:22-33** e **Cl 3:18-25** — os códigos domésticos, inclusive o bloco
+  sobre senhores e escravos
+- **1Co 6:9-11** — a lista
+- **Filemom** — uma pessoa escravizada devolvida ao dono
+
+A instrução que dei aos subagents foi: contar o que está escrito com a força
+com que está escrito, dizer **explicitamente onde o texto para**, e não escolher
+escola. É o mais honesto que dá para fazer sem você decidir — mas repare que
+"não escolher" também é uma escolha, e ela aparece na tela.
+
+**A pergunta:** você quer que o app mantenha essa neutralidade descritiva, ou
+prefere que ele assuma a leitura de alguma tradição? Se for a segunda, qual.
+
+Vou marcar essas perícopes como `aguardando_decisao_do_dono` assim que os
+lotes chegarem, para que a Sessão 4 não narre nenhuma antes de você responder.
+
+## 4. `palavras_do_trecho` como campo próprio
 
 Hoje a lista de palavras é o quarto parágrafo da resenha, separada por
 convenção (linhas começando em `- `). Funciona, e o app já a renderiza como

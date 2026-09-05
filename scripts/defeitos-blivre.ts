@@ -155,6 +155,44 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'LUK 7:2', 'LUK 11:9', 'LUK 14:5', 'LUK 18:29', 'LUK 22:67', 'LUK 23:49', 'LUK 23:50',
     ],
   },
+  {
+    classe: 'erro de digitação (João 8—21)',
+    refs: [
+      'JHN 8:41', 'JHN 8:57', 'JHN 9:16', 'JHN 9:18',
+      'JHN 9:32', 'JHN 9:38', 'JHN 9:39', 'JHN 10:35',
+      'JHN 11:2', 'JHN 12:36', 'JHN 13:4', 'JHN 13:29',
+      'JHN 14:27', 'JHN 15:2', 'JHN 17:19', 'JHN 18:1',
+      'JHN 20:17', 'JHN 20:24', 'JHN 20:30', 'JHN 21:16',
+      'JHN 21:18', 'JHN 21:25',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Atos)',
+    refs: [
+      'ACT 1:15', 'ACT 2:23', 'ACT 3:1', 'ACT 3:19',
+      'ACT 4:10', 'ACT 4:11', 'ACT 4:32', 'ACT 5:10',
+      'ACT 7:13', 'ACT 7:41', 'ACT 7:43', 'ACT 7:50',
+      'ACT 7:55', 'ACT 7:60', 'ACT 8:40', 'ACT 9:11',
+      'ACT 10:31', 'ACT 12:7', 'ACT 12:8', 'ACT 12:15',
+      'ACT 12:17', 'ACT 13:11', 'ACT 13:14', 'ACT 13:17',
+      'ACT 14:7', 'ACT 14:10', 'ACT 14:15', 'ACT 14:18',
+      'ACT 15:7', 'ACT 16:15', 'ACT 16:18', 'ACT 16:29',
+      'ACT 17:18', 'ACT 17:24', 'ACT 17:26', 'ACT 17:30',
+      'ACT 18:7', 'ACT 18:15', 'ACT 18:21', 'ACT 19:18',
+      'ACT 21:1', 'ACT 21:25', 'ACT 21:26', 'ACT 21:38',
+      'ACT 21:39', 'ACT 22:7', 'ACT 22:15', 'ACT 22:23',
+      'ACT 22:28', 'ACT 23:23', 'ACT 23:27', 'ACT 25:5',
+      'ACT 25:12', 'ACT 25:20', 'ACT 25:22', 'ACT 26:1',
+      'ACT 26:17', 'ACT 26:22', 'ACT 26:26', 'ACT 27:40',
+      'ACT 27:43', 'ACT 28:4', 'ACT 28:13', 'ACT 28:25',
+    ],
+  },
+  {
+    classe: 'erro de digitação (Romanos)',
+    refs: [
+      'ROM 4:3', 'ROM 7:2', 'ROM 8:36',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

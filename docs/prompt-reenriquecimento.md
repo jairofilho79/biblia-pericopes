@@ -250,6 +250,11 @@ Não é "quase". Não é a mesma ideia com o verbo em outra pessoa. Não é como
 lembra de outra versão. Se quiser citar mas a frase não bate exatamente, ou você
 copia exato, ou não usa aspas — parafraseie sem aspas.
 
+**Aspas duplas servem só para texto copiado da Bíblia Livre — nunca para
+ênfase.** Se você quer destacar uma palavra sua, use *itálico* ou nada. Aspas
+de ênfase viram aviso de citação suspeita no portão, e aviso que é ruído esconde
+o aviso que importa: o de Escritura inventada.
+
 Citar **outro** livro da Bíblia é legítimo e às vezes necessário (um eco, uma
 profecia). Nesse caso diga de onde é: *como Isaías 53 já dizia*. O que não pode
 é apresentar como sendo deste trecho o que não está nele.

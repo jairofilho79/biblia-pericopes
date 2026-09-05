@@ -1,7 +1,23 @@
 import { describe, it, expect } from 'vitest'
 import { converterVpl, MAPA_LIVROS } from './blivre-fonte.ts'
+import { CORRECOES, OMISSOES } from './blivre-correcoes.ts'
 
 const vpl = (...linhas: string[]) => linhas.join('\n') + '\n'
+
+/**
+ * Versículo de enchimento para os testes que precisam CHEGAR num capítulo.
+ *
+ * `corrigirVersiculo` estoura de propósito quando a receita não acha o trecho —
+ * é assim que ele avisa que a fonte mudou. Num VPL inventado isso vira colisão:
+ * `PSA 9:1 verso de encher` não contém o que a receita de Sl 9:1 procura. Em vez
+ * de escolher a dedo referências sem receita (que envelhece a cada leva nova), o
+ * enchimento carrega os próprios trechos que as receitas daquele versículo
+ * esperam encontrar.
+ */
+const encher = (ref: string) => {
+  const trechos = [...CORRECOES, ...OMISSOES].filter((c) => c.ref === ref).map((c) => c.de)
+  return trechos.length ? trechos.join(' ') : 'verso de encher'
+}
 
 describe('converterVpl', () => {
   it('monta livro, capítulo e versículo a partir do VPL', () => {
@@ -24,7 +40,7 @@ describe('converterVpl', () => {
 
   it('separa o sobrescrito do salmo e guarda em `e`', () => {
     // O VPL é denso: para chegar no Salmo 23 é preciso passar pelos 22 antes.
-    const ate22 = Array.from({ length: 22 }, (_, i) => `PSA ${i + 1}:1 verso de encher`)
+    const ate22 = Array.from({ length: 22 }, (_, i) => `PSA ${i + 1}:1 ${encher(`PSA ${i + 1}:1`)}`)
     const livros = converterVpl(vpl(...ate22, 'PSA 23:1 Salmo de Davi:O SENHOR é meu pastor.'))
     expect(livros[0].chapters[22][0]).toEqual({ t: 'O SENHOR é meu pastor.', e: 'Salmo de Davi' })
   })

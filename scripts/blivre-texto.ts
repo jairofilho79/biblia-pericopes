@@ -39,22 +39,24 @@ const ESPACO_ANTES_DE_PONTUACAO = /\s+([,;.!?:])/g
 const PARENTESE_FOLGADO = /\(\s+|\s+\)/g
 /**
  * Pontuação colada na palavra seguinte, que a fonte produz junto com o espaço
- * errado. Fora os dois-pontos: eles separam o sobrescrito do versículo e quem
+ * errado. O parêntese que fecha entra na lista pelos dois `(Selá)Porque` de
+ * Sl 55:19 e Sl 57:3, os únicos do arquivo. Fora os dois-pontos: eles separam o sobrescrito do versículo e quem
  * cuida disso é `blivre-epigrafes`, que roda ANTES desta função.
  */
-const PONTUACAO_SEM_ESPACO = /([,;!?])(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g
+const PONTUACAO_SEM_ESPACO = /([,;!?)])(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g
 
 /**
  * Ponto final colado na frase seguinte: `salvá-las.E foram para outra aldeia`.
  *
  * São 66 no corpus, e o padrão é seguro: exige minúscula antes e MAIÚSCULA
- * depois. A forma arriscada — ponto entre minúsculas, que quebraria
+ * depois — ou um parêntese que abre, que é o mesmo caso em Sl 3:2
+ * (`em Deus.(Selá)`) e Hc 3:19, os dois únicos do arquivo. A forma arriscada — ponto entre minúsculas, que quebraria
  * abreviatura — não ocorre nenhuma vez, então não há o que preservar.
  *
  * Fica fora do `PONTUACAO_SEM_ESPACO` de propósito: aquele aceita qualquer
  * letra depois, e aplicar isso ao ponto separaria o que não deve.
  */
-const PONTO_SEM_ESPACO = /(\p{Ll})\.(?=\p{Lu})/gu
+const PONTO_SEM_ESPACO = /(\p{Ll})\.(?=\p{Lu}|\()/gu
 
 /**
  * Tira os colchetes editoriais mantendo as palavras, e arruma o espaçamento que

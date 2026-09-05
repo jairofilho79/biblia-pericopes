@@ -225,3 +225,29 @@ describe('hífen solto e hífen com espaço na mesma linha', () => {
     )
   })
 })
+
+describe('ponto colado no parêntese', () => {
+  it('separa o Selá do fim do salmo', () => {
+    expect(removerColchetes('para ele em Deus.(Selá)')).toBe('para ele em Deus. (Selá)')
+  })
+
+  it('não abre espaço em parêntese que já vem depois de espaço', () => {
+    expect(removerColchetes('o profeta (a quem Deus enviou) falou')).toBe(
+      'o profeta (a quem Deus enviou) falou',
+    )
+  })
+})
+
+describe('parêntese que fecha colado na palavra seguinte', () => {
+  it('abre o espaço depois do Selá', () => {
+    expect(removerColchetes('dos tempos. (Selá)Porque eles')).toBe(
+      'dos tempos. (Selá) Porque eles',
+    )
+  })
+
+  it('não mexe no parêntese seguido de espaço', () => {
+    expect(removerColchetes('a lei (de Moisés) e os profetas')).toBe(
+      'a lei (de Moisés) e os profetas',
+    )
+  })
+})

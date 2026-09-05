@@ -308,6 +308,20 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'NUM 31:34',
+    de: 'E setenta e um mil asnos',
+    para: 'E sessenta e um mil asnos',
+    motivo:
+      'O primeiro defeito NUMÉRICO do catálogo, e ele tem três testemunhas. A KJV traz "threescore and one thousand asses" (61.000). A aritmética do próprio capítulo prova o mesmo: os versículos 39 e 45 dividem o rebanho em duas metades de "trinta mil e quinhentos", o que exige 61.000 e não 71.000. Achado por um subagent que conferiu a conta em vez de recitar a lista.',
+  },
+  {
+    ref: '2SA 16:9',
+    de: 'Por que almadiçoa este cão morto',
+    para: 'Por que amaldiçoa este cão morto',
+    motivo:
+      'Letras trocadas. A própria fonte grafa "amaldiçoa" 9 vezes; "almadiçoa" só aparece aqui e no versículo seguinte.',
+  },
+  {
     ref: 'PSA 37:21',
     de: 'O perverso toma emprestado, e paga de volta',
     para: 'O perverso toma emprestado, e não paga de volta',

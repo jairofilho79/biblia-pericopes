@@ -331,6 +331,24 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'PSA 73:18', 'PSA 74:5',
     ],
   },
+  {
+    classe: 'erro de digitação (2 Samuel, Jó e Provérbios)',
+    refs: [
+      '2SA 15:7', '2SA 16:2', '2SA 16:9', '2SA 16:10', '2SA 18:2', '2SA 19:11',
+      'JOB 28:22', 'JOB 29:10', 'JOB 31:9',
+      'PRO 29:8', 'PRO 29:25', 'PRO 29:27',
+    ],
+  },
+  {
+    // NUM 31:34 é o único defeito numérico do catálogo: 71.000 onde a KJV e a
+    // aritmética do próprio capítulo pedem 61.000.
+    classe: 'erro de digitação e de número (Números 31 e Jeremias 4—8)',
+    refs: [
+      'NUM 31:34',
+      'JER 4:6', 'JER 4:14', 'JER 5:5', 'JER 6:11', 'JER 6:18',
+      'JER 6:20', 'JER 7:34', 'JER 8:5', 'JER 8:19',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

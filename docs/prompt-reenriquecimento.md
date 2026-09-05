@@ -169,8 +169,38 @@ seu raciocínio ser algo que não seja esta perícope.
 
 ## Os campos, um a um
 
-**1. `titulo_pericope_pt`** — curto, natural, específico deste trecho. Não é
+**1. `titulo_pericope_pt`** — curto, natural, e **identificável**. Não é
 tradução do `titulo_provisorio`.
+
+Identificável quer dizer: quem lê o título numa lista de 2.823 sabe QUE TRECHO É
+antes de abrir. A primeira versão desta instrução dizia só "específico deste
+trecho", e isso foi lido como "um achado específico" em vez de "identifica este
+trecho". O resultado foram 941 títulos que não usam uma palavra sequer do próprio
+texto, 15 títulos idênticos e 794 pares parecidos — porque um título que nomeia
+um ACHADO serve para vários trechos, e por isso colide.
+
+**A regra da âncora.** O título carrega pelo menos uma coisa que está no texto e
+que se pode apontar com o dedo: um nome próprio, ou duas palavras de conteúdo que
+a perícope usa. A leitura fica — ela passa a montar EM CIMA da âncora, e não no
+lugar dela.
+
+| solto | ancorado |
+| --- | --- |
+| Enviados de dentro do esconderijo | **Portas trancadas, e Jesus no meio** |
+| Duas causas no caminho do deserto | **Ziba traz mantimentos, Simei atira pedras** |
+| A corrente que começa no aperto | **Justificados pela fé: da tribulação à esperança** |
+| A explicação que continua enigma | **O anjo explica a besta de sete cabeças** |
+| Perto do fogo, longe da sala | **Pedro à porta, e a primeira negação** |
+
+**Não é para secar o título.** "Jesus aparece aos discípulos" identifica e não
+diz nada. O alvo é fazer as duas coisas na mesma linha.
+
+**Teste de bolso:** se o título serviria para outra perícope, ele não é título —
+é tema. `npx tsx scripts/titulos-ancorados.ts` mede isso, e
+`scripts/titulos-colididos.ts` acha os que se repetem.
+
+`Deus`, `Senhor`, `Jesus` e `Israel` NÃO ancoram: aparecem em quase toda
+perícope e por isso não distinguem nenhuma.
 
 **2. `contexto_historico_literario`** — lido **antes** da passagem. É a chave de
 entrada: o mínimo para chegar preparado, com 1 insight que prepara a leitura.

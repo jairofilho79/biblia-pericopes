@@ -145,6 +145,20 @@ imperfeito, que é o de Almeida e o dos verbos vizinhos no próprio versículo
 que eu te **saro**" —, e ali é o verbo *sarar*, conjugado certo. Só a primeira
 ocorrência é defeito.
 
+## 9. Erro de digitação e concordância em Oseias (4 versículos)
+
+Todos achados por leitura, e todos únicos no corpus.
+
+| ref | BLIVRE | Almeida 1911 | KJV | correção |
+|---|---|---|---|---|
+| Os 1:2 | "a terra se prostitui **munto**" | — | — | **muito** |
+| Os 3:3 | "**nem e eu** [esperarei] por ti" | "e também eu ficarei para ti" | "so will I also be for thee" | **e eu** esperarei |
+| Os 10:14 | "ali **a mãe foram despedaçada** com [seus] filhos" | — | "the **mother was** dashed in pieces upon her children" | **a mãe foi despedaçada** |
+| Os 11:12 | "e **era é fiel** ao Santo" | "e com os sanctos **está fiel**" | "and **is faithful** with the saints" | **e é fiel** |
+
+Em Os 3:3 o "nem" contradiz as duas testemunhas: elas põem a promessa do próprio
+profeta em paralelo com a exigência feita a ela, e não como mais uma proibição.
+
 ## Achados que NÃO são defeitos
 
 **1Sm 13:1** — "Havia já Saul reinado um ano; e reinado que houve dois anos
@@ -180,7 +194,7 @@ reescrever no escuro.
 
 ## Placar
 
-**45 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**49 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

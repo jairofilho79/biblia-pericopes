@@ -56,3 +56,6 @@ data/novas-pericopes.jsonl
 data/bliv-tr_vpl.txt
 data/BLIVRE.json
 data/raw-pericopes-brutas.jsonl
+
+# Área de trabalho do reenriquecimento (Sessão 3) — entrada derivável, saída vai para data/enriched/
+data/reenriquecimento/

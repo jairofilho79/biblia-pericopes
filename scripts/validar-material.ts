@@ -21,7 +21,7 @@ const CAMPOS = [
   'topicos_pregar',
 ] as const
 
-type Material = {
+export type Material = {
   ordem: number
   titulo_pericope_pt: string
   contexto_historico_literario: string
@@ -79,6 +79,70 @@ function palavrasDoTexto(texto: string): Set<string> {
   )
 }
 
+/**
+ * O portão de qualidade, numa função só, para o CLI e a fila do
+ * reenriquecimento (`scripts/reenriquecimento.ts`) julgarem pelo mesmo critério.
+ *
+ * `problemas` reprova; `avisos` só chama atenção — citar outro livro da Bíblia
+ * é legítimo e comum, e transformar isso em erro reprovaria material bom.
+ */
+export function validarMaterial(
+  entrada: { texto: string; titulo_provisorio?: string; livro?: string },
+  m: Material,
+  bruto: string,
+): { problemas: string[]; avisos: string[] } {
+  const p: string[] = []
+  const avisos: string[] = []
+
+  for (const c of CAMPOS) if (!(c in m)) p.push(`falta ${c}`)
+  if (!Array.isArray(m.perguntas_reflexao) || m.perguntas_reflexao.length !== 2) {
+    p.push(`perguntas = ${m.perguntas_reflexao?.length}`)
+  }
+  if (/```/.test(bruto)) p.push('cerca de código no JSON')
+
+  const t = m.topicos_pregar ?? ''
+  if (!t.includes('Linha de raciocínio') || !t.includes('Mensagens a levar')) {
+    p.push('tópicos sem as duas seções')
+  } else {
+    const lr = bullets(t, 'raciocinio')
+    const mg = bullets(t, 'mensagens')
+    if (lr < 5 || lr > 7) p.push(`linha de raciocínio = ${lr} bullets`)
+    if (mg < 4 || mg > 6) p.push(`mensagens = ${mg} bullets`)
+    if (!t.includes('**')) p.push('tópicos sem negrito')
+  }
+
+  // Resenha que virou passeio versículo a versículo é o modo de falha do prompt.
+  const refs = (m.resenha ?? '').match(/\bv\.?\s?\d+|\bversículo \d+/gi)?.length ?? 0
+  if (refs >= 5) p.push(`resenha cita ${refs} versículos — virou tour`)
+
+  // O material tem de falar DESTE trecho: pelo menos algumas palavras de
+  // conteúdo em comum com o texto bíblico.
+  const doTexto = palavrasDoTexto(entrada.texto)
+  const doMaterial = palavrasDoTexto(`${m.contexto_historico_literario} ${m.resenha}`)
+  const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
+  if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
+
+  // Citação que o material apresenta como do texto tem de estar NO texto.
+  // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura
+  // inventada, e é a falha mais grave possível aqui.
+  const alvo = normalizar(entrada.texto)
+  const suspeitas = [
+    ...citacoes(m.contexto_historico_literario ?? ''),
+    ...citacoes(m.resenha ?? ''),
+    ...citacoes(m.topicos_pregar ?? ''),
+  ].filter((c) => !alvo.includes(normalizar(c)))
+  for (const c of suspeitas) avisos.push(`citação fora do texto — "${c.slice(0, 60)}"`)
+
+  for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
+    const v = m[campo] ?? ''
+    if (v.length < 200) p.push(`${campo} curto demais (${v.length})`)
+    if (v.length > 3000) p.push(`${campo} longo demais (${v.length})`)
+  }
+  if (!m.titulo_pericope_pt?.trim()) p.push('sem título')
+
+  return { problemas: p, avisos }
+}
+
 function main() {
   const [dirEntrada, dirSaida] = process.argv.slice(2)
   if (!dirEntrada || !dirSaida) {
@@ -102,8 +166,8 @@ function main() {
       faltando++
       continue
     }
-    let m: Material
     const bruto = readFileSync(f, 'utf8')
+    let m: Material
     try {
       m = JSON.parse(bruto) as Material
     } catch (e) {
@@ -115,57 +179,10 @@ function main() {
       titulo_provisorio: string
       livro: string
     }
-    const p: string[] = []
-
-    for (const c of CAMPOS) if (!(c in m)) p.push(`falta ${c}`)
-    if (m.ordem !== ordem) p.push(`ordem ${m.ordem} != ${ordem}`)
-    if (!Array.isArray(m.perguntas_reflexao) || m.perguntas_reflexao.length !== 2) {
-      p.push(`perguntas = ${m.perguntas_reflexao?.length}`)
-    }
-    if (/```/.test(bruto)) p.push('cerca de código no JSON')
-
-    const t = m.topicos_pregar ?? ''
-    if (!t.includes('Linha de raciocínio') || !t.includes('Mensagens a levar')) {
-      p.push('tópicos sem as duas seções')
-    } else {
-      const lr = bullets(t, 'raciocinio')
-      const mg = bullets(t, 'mensagens')
-      if (lr < 5 || lr > 7) p.push(`linha de raciocínio = ${lr} bullets`)
-      if (mg < 4 || mg > 6) p.push(`mensagens = ${mg} bullets`)
-      if (!t.includes('**')) p.push('tópicos sem negrito')
-    }
-
-    // Resenha que virou passeio versículo a versículo é o modo de falha do prompt.
-    const refs = (m.resenha ?? '').match(/\bv\.?\s?\d+|\bversículo \d+/gi)?.length ?? 0
-    if (refs >= 5) p.push(`resenha cita ${refs} versículos — virou tour`)
-
-    // O material tem de falar DESTE trecho: pelo menos algumas palavras de
-    // conteúdo em comum com o texto bíblico.
-    const doTexto = palavrasDoTexto(entrada.texto)
-    const doMaterial = palavrasDoTexto(`${m.contexto_historico_literario} ${m.resenha}`)
-    const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
-    if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
-
-    // Citação que o material apresenta como do texto tem de estar NO texto.
-    // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura
-    // inventada, e é a falha mais grave possível aqui. Fica como AVISO e não
-    // erro porque citar outro livro da Bíblia é legítimo e comum.
-    const alvo = normalizar(entrada.texto)
-    const suspeitas = [
-      ...citacoes(m.contexto_historico_literario ?? ''),
-      ...citacoes(m.resenha ?? ''),
-      ...citacoes(m.topicos_pregar ?? ''),
-    ].filter((c) => !alvo.includes(normalizar(c)))
-    for (const c of suspeitas) avisos.push(`${ordem}: citação fora do texto — "${c.slice(0, 60)}"`)
-
-    for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
-      const v = m[campo] ?? ''
-      if (v.length < 200) p.push(`${campo} curto demais (${v.length})`)
-      if (v.length > 3000) p.push(`${campo} longo demais (${v.length})`)
-    }
-    if (!m.titulo_pericope_pt?.trim()) p.push('sem título')
-
-    if (p.length) problemas.push(`${ordem} (${entrada.livro}): ${p.join(' | ')}`)
+    const r = validarMaterial(entrada, m, bruto)
+    if (m.ordem !== ordem) r.problemas.unshift(`ordem ${m.ordem} != ${ordem}`)
+    for (const a of r.avisos) avisos.push(`${ordem}: ${a}`)
+    if (r.problemas.length) problemas.push(`${ordem} (${entrada.livro}): ${r.problemas.join(' | ')}`)
     else ok++
   }
 
@@ -186,4 +203,5 @@ function main() {
   }
 }
 
-main()
+// Guardado: o módulo também é importado pela fila do reenriquecimento.
+if (process.argv[1]?.endsWith('validar-material.ts')) main()

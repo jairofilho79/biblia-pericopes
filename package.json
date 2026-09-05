@@ -24,7 +24,12 @@
     "enrich:all": "tsx scripts/enrich-pericopes.ts --openrouter --concurrency=5 --commit-every=100",
     "preach:sample": "tsx scripts/enrich-preach.ts --compare --limit=5 --model=google/gemini-3.7-flash",
     "preach:all": "tsx scripts/enrich-preach.ts --concurrency=5 --commit-every=100",
-    "pipeline": "npm run etl && npm run enrich"
+    "pipeline": "npm run etl && npm run enrich",
+    "reenrich:preparar": "tsx scripts/reenriquecimento.ts preparar",
+    "reenrich:status": "tsx scripts/reenriquecimento.ts status",
+    "reenrich:claim": "tsx scripts/reenriquecimento.ts claim",
+    "reenrich:aplicar": "tsx scripts/reenriquecimento.ts aplicar",
+    "reenrich:soltar-travas": "tsx scripts/reenriquecimento.ts soltar-travas"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",

@@ -58,7 +58,7 @@ import { inserirNoCursor, substituirTrecho } from '../lib/ditado'
 import type { Anotacao, DestaqueCor, Pericope, Progresso, ProgressoStatus } from '../lib/types'
 import { useSyncRefresh } from '../lib/use-sync-refresh'
 
-type NotesTab = 'anotacoes' | 'topicos' | 'contexto'
+type NotesTab = 'anotacoes' | 'topicos'
 type Vizinha = { ordem: number; titulo: string }
 
 /**
@@ -1031,12 +1031,11 @@ export default function Leitura() {
       </section>
 
       <section className="block notes" id="notas">
-        <div className="notes-tabs" role="tablist" aria-label="Anotações, tópicos e contexto">
+        <div className="notes-tabs" role="tablist" aria-label="Anotações e tópicos">
           {(
             [
               ['anotacoes', 'Anotações'],
               ['topicos', 'Tópicos'],
-              ['contexto', 'Contexto'],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -1142,14 +1141,23 @@ export default function Leitura() {
             <p className="muted">Ainda não gerado.</p>
           ))}
 
-        {tab === 'contexto' && (
-          <div className="contexto-ia">
-            <button type="button" className="ghost copy-btn" onClick={copyContexto}>
-              {copied ? 'Copiado' : 'Copiar'}
-            </button>
-            <pre className="contexto-ia-text">{promptConversa(p)}</pre>
-          </div>
-        )}
+        {/* A porta para a IA era a terceira aba deste bloco, chamada
+            "Contexto" — o mesmo nome da seção histórico-literária lá em cima,
+            significando outra coisa, e as duas na tela ao mesmo tempo. Num app
+            chamado aiPericopes ela não mora no porão.
+
+            Mora AQUI e não no topo porque conversar é o que se faz depois de
+            ler: no alto competiria com a leitura. */}
+        <div className="conversar-bloco">
+          <p className="muted">
+            Leve este trecho para uma conversa com IA: o texto abaixo já vem pronto para
+            colar.
+          </p>
+          <pre className="contexto-ia-text">{promptConversa(p)}</pre>
+          <button type="button" className="ghost copy-btn" onClick={copyContexto}>
+            {copied ? 'Copiado' : 'Copiar'}
+          </button>
+        </div>
 
         <div className="actions">
           {status !== 'concluido' ? (

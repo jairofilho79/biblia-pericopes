@@ -114,7 +114,7 @@ export default function Home() {
           <h1>Continue de onde parou</h1>
           {streak.atual > 0 && (
             <p className="streak">
-              <span aria-hidden>🔥</span>{' '}
+              <span className="streak-chama" aria-hidden />{' '}
               <strong>
                 {streak.atual === 1 ? '1 dia seguido' : `${streak.atual} dias seguidos`}
               </strong>
@@ -159,7 +159,7 @@ export default function Home() {
           </p>
           {streak.atual > 0 && (
             <p className="streak">
-              <span aria-hidden>🔥</span>{' '}
+              <span className="streak-chama" aria-hidden />{' '}
               <strong>
                 {streak.atual === 1 ? '1 dia seguido' : `${streak.atual} dias seguidos`}
               </strong>

@@ -157,7 +157,8 @@ export default function Ajustes() {
             </strong>
           </p>
           <p className="muted">
-            Os ✓ somem e as barras por livro voltam a zero. Seu 🔥 streak e seu recorde continuam.
+            Os ✓ somem e as barras por livro voltam a zero. Seu{' '}
+            <span className="streak-chama" aria-hidden /> streak e seu recorde continuam.
             Não dá para desfazer.
           </p>
           <div className="ajustes-confirma-acoes">

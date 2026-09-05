@@ -51,6 +51,8 @@
   /* gravando: o vermelho do microfone aberto. */
   --rec: #c0392b;
   --radius: 12px;
+  /* a chama da marca, para máscara CSS: mesma silhueta nos dois temas. */
+  --chama-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 24'%3E%3Cpath d='M10 0C10 6 4 7.5 4 14a6 6 0 0 0 12 0c0-3-1.5-5-3-6.5 0 2-1 3-2 3s-1.5-1-1.5-2.5C9.5 5 10 3 10 0z'/%3E%3C/svg%3E");
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Source Serif 4 Variable', Georgia, serif;
   --font-ui: 'DM Sans Variable', system-ui, sans-serif;
@@ -352,6 +354,18 @@ h2 {
 
 .streak-recorde {
   color: var(--muted);
+}
+
+/* Era um emoji 🔥: o único elemento não-desenhado da Home, e renderizava
+   diferente em cada sistema. Agora é a chama da marca, na cor da marca. */
+.streak-chama {
+  display: inline-block;
+  width: 0.85em;
+  height: 1em;
+  vertical-align: -0.12em;
+  background: var(--flame);
+  -webkit-mask: var(--chama-svg) center / contain no-repeat;
+  mask: var(--chama-svg) center / contain no-repeat;
 }
 
 /* esqueletos: a silhueta da página enquanto o JSON grande não chega */
@@ -984,18 +998,6 @@ button.ghost {
   }
 }
 
-/* Celular: "Texto Bíblico" não cabe num quarto de 375px (~73px) em fonte
-   legível, então só esse chip pode quebrar — vira "Texto" / "Bíblico", em
-   duas linhas que cabem na altura de 2.25rem (0.78rem × 1.15 × 2 ≈ 1.8rem).
-   A coluna é minmax(0, 1fr): a quebra acontece dentro dela, nada alarga. Os
-   outros três chips continuam em nowrap. */
-@media (max-width: 639.98px) {
-  .section-chip-texto {
-    white-space: normal;
-    text-align: center;
-  }
-}
-
 .texto-biblico,
 .prose,
 .perguntas {
@@ -1006,8 +1008,17 @@ button.ghost {
   text-shadow: var(--read-shadow);
 }
 
+/* Âmbar é a voz do app; a Escritura é a exceção, e se marca pela AUSÊNCIA da
+   marca. A exceção vai por token e NÃO por `color` no #texto de propósito:
+   #texto é id (1,0,0) e atropelaria `.leitura h2.heading-speaking` (0,2,1),
+   matando o realce da narração justamente neste cabeçalho. */
 .leitura > .block-plain > h2 {
+  color: var(--cabecalho, var(--accent));
   text-shadow: var(--read-shadow);
+}
+
+#texto {
+  --cabecalho: var(--read-ink);
 }
 
 .collapse-h {
@@ -2322,7 +2333,9 @@ button.ghost {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--accent);
+  /* o progresso é a chama subindo: --flame, não --accent. Não carrega texto,
+     então os 3:1 bastam. */
+  background: var(--flame);
 }
 
 .book-progress-label {

@@ -1069,6 +1069,8 @@ Vindo de `docs/kickoff-dominio-e-email.md`, e **deliberadamente fora deste plano
 - **`APP_URL` continua no `workers.dev`.** Ela alimenta o `baseURL` do better-auth, os `trustedOrigins` e o link dentro do e-mail de login. Trocar exige que o Worker atenda no domínio novo primeiro (custom domain ou route na Cloudflare) — senão o botão "Entrar" do e-mail passa a apontar para o vazio. É a última peça, não a primeira.
 - **Não renomear** o Worker (`biblia-pericopes`), o D1 nem o bucket R2: são identidade de infraestrutura, ninguém os vê, e renomear significa recriar recurso e migrar as chaves de áudio que custaram caro.
 
+**Para quem for gerar a narração nova (Sessão 5):** o cabeçalho falado da seção do texto era `"Texto Bíblico."` nos manifestos antigos, e a tela agora diz **"Texto"**. Os manifestos velhos vão ser todos descartados, então não há nada a consertar — mas a regravação tem de falar **"Texto."**, senão a voz diz uma coisa e a tela mostra outra. Nome de seção é interface.
+
 Backlog registrado no spec:
 
 - **Perguntar no versículo**, no instante da dúvida — `VerseActions.tsx` já existe. É feature nova, não rebranding.

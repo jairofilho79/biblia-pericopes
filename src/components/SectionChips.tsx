@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
  * mais de uma seção cruza a faixa de leitura ao mesmo tempo. */
 const SECTIONS: { id: string; label: string }[] = [
   { id: 'contexto', label: 'Contexto' },
-  { id: 'texto', label: 'Texto Bíblico' },
+  { id: 'texto', label: 'Texto' },
   { id: 'resenha', label: 'Resenha' },
   { id: 'reflexao', label: 'Reflexões' },
 ]

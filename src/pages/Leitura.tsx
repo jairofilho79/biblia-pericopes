@@ -911,7 +911,7 @@ export default function Leitura() {
 
       <section className="block block-plain" id="texto" tabIndex={-1}>
         <h2 className={tituloClass('', 'cabecalho-texto') || undefined} data-fala-id="cabecalho-texto">
-          Texto (Bíblia Livre)
+          Texto
         </h2>
         {p.sobrescrito && (
           /*

@@ -102,29 +102,37 @@ export function ancorar(titulo: string, texto: string): Veredito {
  * dois-pontos com oração do outro lado, a série é premissa e não é inventário —
  * "Mirra, canela e cássia: o azeite da santa unção" está certo.
  */
-/** Numeral por extenso, para juntar "vinte e oito" num item só. */
+/**
+ * Segmento que COMEÇA por numeral por extenso, para juntar "vinte e oito" e
+ * "quatrocentos e trinta anos da promessa" num item só. A primeira versão exigia
+ * que o segmento inteiro fosse o numeral, e por isso só funcionava quando a
+ * segunda metade era curta — apontado por um agente em Gl 3:15-25.
+ */
 const NUMERAL =
-  /^(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzentos|trezentos|quatrocentos|quinhentos|seiscentos|setecentos|oitocentos|novecentos|mil|milhares)(\s+\p{L}+)?$/iu
+  /^(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|treze|catorze|quatorze|quinze|dezesseis|dezessete|dezoito|dezenove|vinte|trinta|quarenta|cinquenta|sessenta|setenta|oitenta|noventa|cem|cento|duzentos|trezentos|quatrocentos|quinhentos|seiscentos|setecentos|oitocentos|novecentos|mil|milhares)(?!\p{L})/iu
 
 const FUNCIONAL = /(?<!\p{L})(de|do|da|dos|das|que|em|no|na|nos|nas|para|com|onde|sobre|ao|aos)(?!\p{L})/iu
 
 export function inventario(titulo: string): boolean {
   if (titulo.split(':')[1]?.trim()) return false
-  const bruto = titulo.split(/,| e /).map((x) => x.trim()).filter(Boolean)
-  // "vinte e oito anos" não é série de dois: é UM número. Sem esta junção, o
-  // medidor acusava de inventário títulos com numeral composto — apontado por
-  // um subagente que teve de contornar a regra em 2Rs 15.
+  // Guarda o separador: só se junta numeral ligado por " e ", nunca por vírgula.
+  // "quatrocentos e trinta anos" é UM número; "mil, cem, cinquenta e dez" é uma
+  // lista de quatro, e a diferença entre as duas está na vírgula.
+  const pedacos = titulo.split(/(,| e )/).filter((x) => x.trim())
   const itens: string[] = []
-  for (const item of bruto) {
+  let ligadoPorE = false
+  for (const pedaco of pedacos) {
+    if (pedaco === ',' || pedaco.trim() === ',') { ligadoPorE = false; continue }
+    if (/^\s+e\s+$/.test(pedaco)) { ligadoPorE = true; continue }
+    const item = pedaco.trim()
     const anterior = itens.at(-1)
-    if (anterior && NUMERAL.test(anterior) && NUMERAL.test(item)) itens[itens.length - 1] = `${anterior} e ${item}`
-    else itens.push(item)
+    if (ligadoPorE && anterior && NUMERAL.test(anterior) && NUMERAL.test(item)) {
+      itens[itens.length - 1] = `${anterior} e ${item}`
+    } else {
+      itens.push(item)
+    }
+    ligadoPorE = false
   }
-  // Série fechada por aposto não é lista: "Bezer, Ramote e Golã, cidades do
-  // homicida" tem três topônimos e uma oração que diz o que eles são. Foi um
-  // subagente que apontou o caso, depois de a regra o ter obrigado a trocar os
-  // três nomes — que eram a âncora mais forte que o trecho oferecia — por uma
-  // paráfrase. A marca do aposto é a palavra funcional no ÚLTIMO segmento.
   if (itens.length > 1 && FUNCIONAL.test(itens.at(-1)!)) return false
   return itens.length >= 3
 }

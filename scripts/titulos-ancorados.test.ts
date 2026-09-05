@@ -97,3 +97,15 @@ describe('inventario — numeral composto', () => {
     expect(inventario('A mesa, os pratos e as colheres')).toBe(true)
   })
 })
+
+describe('inventario — a vírgula separa o que o "e" junta', () => {
+  it('junta o numeral composto ligado por "e"', () => {
+    expect(inventario('A Lei veio quatrocentos e trinta anos depois da promessa')).toBe(false)
+  })
+
+  // A regressão que este par pegou: quando a junção passou a valer também
+  // através da vírgula, uma lista de quatro números virava um número só.
+  it('não junta a série de numerais separada por vírgula', () => {
+    expect(inventario('Jetro propõe chefes de mil, cem, cinquenta e dez')).toBe(true)
+  })
+})

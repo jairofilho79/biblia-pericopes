@@ -167,6 +167,42 @@ perícope se fecha em si mesma justamente para que um eco em Isaías ou em Gêne
 possa ser trazido quando ilumina o trecho. O que a regra proíbe é a *fonte* do
 seu raciocínio ser algo que não seja esta perícope.
 
+## A regra da perícope inteira
+
+O dono formulou assim, e ela vale para os cinco campos:
+
+> "Se explica X e não combina com a perícope inteira, então está errado. Teria
+> que refazer para abranger tudo, não só um pedaço. Se não, não existiria o
+> versículo, certo?"
+
+O caso que a revelou foi **Lv 18**. O material lia o capítulo como proteção da
+casa — "mãe, irmã, nora, tia, a mulher do irmão" — e é uma leitura boa e
+verdadeira. Só que a lista do capítulo tem mais coisa do que parentesco, e o que
+sobrava do lado de fora da tese ficava sem uma palavra. **O áudio lê o versículo
+e o material passa por ele em silêncio.** Isso não é neutralidade: é uma escolha
+que ninguém tomou conscientemente.
+
+**A tese não pode ser mais estreita que o trecho.** Se você escolheu um fio para
+puxar e parte da perícope não cabe nele, o fio está errado — troque o fio, não
+apague o trecho. Uma tese que só funciona ignorando cinco versículos é uma tese
+sobre outra perícope.
+
+Isso **não** é passeio versículo a versículo, que continua proibido. Não é
+preciso mencionar cada verso; é preciso que **nenhum assunto do trecho fique
+sem nenhuma palavra em nenhum dos cinco campos**. A diferença:
+
+- ❌ "O versículo 22 proíbe X, o 23 proíbe Y, o 24 diz Z" — passeio.
+- ✅ Uma tese larga o bastante para que 22, 23 e 24 caibam nela sem forçar.
+
+**Onde resumir é o certo**: genealogia, censo, lista de topônimos, coleção de
+provérbios sem fio narrativo. Ali a substância É a lista, e tratá-la como um
+todo não deixa nada de fora. A regra pega o trecho DISCURSIVO cuja tese exclui
+parte do que está escrito.
+
+`npx tsx scripts/cobertura-material.ts` faz a triagem: acha blocos de versículos
+seguidos sobre os quais o material não diz nada. É triagem e não veredito — quem
+decide se o bloco devia ter sido tratado é quem lê.
+
 ## Os campos, um a um
 
 **1. `titulo_pericope_pt`** — curto, natural, e **identificável**. Não é

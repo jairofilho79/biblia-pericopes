@@ -287,6 +287,41 @@ o versículo continuava parecendo texto. Só apareceu porque um subagent leu Age
 2 e estranhou. **Fica registrado aqui como lembrete de que a minha própria
 extração também precisa de duas testemunhas.**
 
+## Outro defeito que era MEU: colchete com pedaço de palavra
+
+Achado varrendo o corpus atrás de outra coisa, e vinha sendo servido ao leitor.
+
+A Bíblia Livre marca entre colchetes o que o tradutor supriu, e o app remove os
+delimitadores. Em quase todos os casos o colchete traz uma **palavra** e o
+espaço em volta está certo: `Deus [é] nosso refúgio` vira `Deus é nosso
+refúgio`. Mas em dez lugares ele traz um **pedaço** de palavra, e aí o espaço
+que a fonte põe é destrutivo:
+
+| referência | o app servia | deveria servir |
+|---|---|---|
+| At 25:5 | `desçam com igo` | `desçam comigo` |
+| At 18:15 | `a questão é de palavra s` | `de palavras` |
+| At 13:14 | `na sinagoga n um dia de sábado` | `num dia de sábado` |
+| At 21:8, 21:18, 21:1, 23:11 | `E n o dia seguinte` | `E no dia seguinte` |
+| Sl 102:3 | `como n um forno` | `como num forno` |
+| Sl 146:4 | `O espírito dele s sai` | `O espírito deles sai` |
+| Jo 6:34 | `dá-nos sempre d este pão` | `sempre deste pão` |
+
+**Por que não dava para ver pelo espaçamento.** A fonte põe espaço antes de
+5.990 dos 6.030 colchetes — inclusive nestes. O que separa os dois casos é o
+conteúdo: entre os colchetes de uma letra só, `e` (403×), `é` (120×), `o`
+(103×), `a` (47×) e `ó` (3×) são palavras de verdade; os únicos pedaços são
+`n` (6×), `s` (2×) e `d` (1×), mais `igo` (1×). E colam para lados **opostos**:
+`dele [s]` fecha a palavra anterior, `[n] um` abre a seguinte.
+
+É o segundo defeito meu da mesma família — o primeiro foi `conseguiam[apenas]`
+virando `conseguiamapenas`. A lição que fica: **toda regra de espaçamento em
+volta do colchete precisa ser conferida contra o corpus inteiro, não contra os
+exemplos que eu tinha na frente.**
+
+Corrigido em `scripts/blivre-texto.ts`. Não precisa de correção na fonte: entra
+sozinho quando a ETL rodar de novo, junto com as outras correções.
+
 ## Achados que NÃO são defeitos
 
 **1Sm 13:1** — "Havia já Saul reinado um ano; e reinado que houve dois anos

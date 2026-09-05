@@ -83,3 +83,30 @@ describe('removerColchetes — colchete colado numa palavra', () => {
     expect(removerColchetes('havia [vasos] mas')).toBe('havia vasos mas')
   })
 })
+
+describe('colchete com pedaço de palavra, não com palavra', () => {
+  // Achados varrendo o corpus: o app estava servindo "com igo", "palavra s" e
+  // "n um dia de sábado" — texto quebrado na tela e na narração.
+  it('fecha a palavra anterior quando o pedaço é o fim dela', () => {
+    expect(removerColchetes('desçam com [igo] , e se houver')).toBe('desçam comigo, e se houver')
+    expect(removerColchetes('a questão é de palavra [s] , e de nomes')).toBe(
+      'a questão é de palavras, e de nomes',
+    )
+    expect(removerColchetes('do interior dele [s] sai')).toBe('do interior deles sai')
+  })
+
+  it('abre a palavra seguinte quando o pedaço é o começo dela', () => {
+    expect(removerColchetes('ao entrarem na sinagoga [n] um dia de sábado')).toBe(
+      'ao entrarem na sinagoga num dia de sábado',
+    )
+    expect(removerColchetes('e [n] o [dia] seguinte a Rodes')).toBe('e no dia seguinte a Rodes')
+    expect(removerColchetes('dá-nos sempre [d] este pão')).toBe('dá-nos sempre deste pão')
+  })
+
+  it('não mexe no colchete que traz palavra de verdade — são 673 no corpus', () => {
+    expect(removerColchetes('Deus [é] nosso refúgio')).toBe('Deus é nosso refúgio')
+    expect(removerColchetes('e [o] porei sobre eles')).toBe('e o porei sobre eles')
+    expect(removerColchetes('não [a] leves sozinho')).toBe('não a leves sozinho')
+    expect(removerColchetes('obras, [ó] Senhor')).toBe('obras, ó Senhor')
+  })
+})

@@ -41,9 +41,29 @@ const PONTUACAO_SEM_ESPACO = /([,;!?])(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g
  */
 const COLCHETE_COLADO = /(\p{L})\[(?=\p{L})/gu
 
+/**
+ * Colchete que contém um PEDAÇO de palavra, e não uma palavra.
+ *
+ * A fonte escreve `desçam com [igo]`, `palavra [s]` e `sinagoga [n] um dia`.
+ * Tirando só os delimitadores sobra `com igo`, `palavra s` e `n um dia` — e
+ * era isso que o app estava servindo. O espaço em volta do colchete não
+ * distingue os dois casos: a fonte põe espaço em 5.990 dos 6.030 colchetes,
+ * inclusive nestes.
+ *
+ * A lista vem de varredura do corpus inteiro, não de palpite: entre os
+ * colchetes de uma letra só, `e`, `é`, `o`, `a` e `ó` são palavras de verdade
+ * (673 ocorrências, e o espaço delas está certo); os únicos pedaços são `n`
+ * (×6), `s` (×2) e `d` (×1), mais `igo` (×1). E eles colam para lados
+ * OPOSTOS: `dele [s]` fecha a palavra anterior, `[n] um` abre a seguinte.
+ */
+const PEDACO_QUE_FECHA = /(\p{L})\s\[(s|igo)\]/gu
+const PEDACO_QUE_ABRE = /\[(n|d)\]\s(?=\p{L})/gu
+
 export function removerColchetes(texto: string): string {
   return texto
     .replace(COLCHETE_COLADO, '$1 [')
+    .replace(PEDACO_QUE_FECHA, '$1$2')
+    .replace(PEDACO_QUE_ABRE, '$1')
     .replace(HIFEN_SOLTO, '-')
     .replace(/[[\]]/g, '')
     .replace(ESPACO_ANTES_DE_PONTUACAO, '$1')

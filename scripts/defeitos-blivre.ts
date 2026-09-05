@@ -119,6 +119,36 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
     classe: 'palavra duplicada ou trocada (João)',
     refs: ['JHN 2:17', 'JHN 2:20', 'JHN 3:26', 'JHN 4:9', 'JHN 6:1', 'JHN 7:22', 'JHN 7:23'],
   },
+  // Achados por `scripts/palavras-suspeitas.ts`, não por leitura: palavra que
+  // aparece uma vez só no corpus e está a uma letra de uma palavra comum.
+  // Oito destes estão em livros que nenhum subagent leu ainda, e todos os dez
+  // foram confirmados contra a KJV e a Almeida 1911 antes de entrar.
+  {
+    classe: 'letra trocada, achada por máquina',
+    refs: [
+      // "Jesus Cirsto" (Almeida: "Jesus Christo")
+      'PHM 1:25',
+      // "esta dourina" (KJV "this doctrine")
+      'REV 2:24',
+      // "o Coreiro abriu um dos selos" — o CORDEIRO, figura central do livro,
+      // errado na primeira aparição do capítulo (KJV "the Lamb").
+      'REV 6:1',
+      // "abriu o terceiro celo" — SELO, e o próprio versículo 1 escreve certo.
+      'REV 6:5',
+      // "e os rigos" (KJV "the rich men")
+      'REV 6:15',
+      // "conversas profanas e inútes" — inúteis (KJV "vain babblings")
+      '2TI 2:16',
+      // "tonaram-se fortes na batalha" — tornaram-se
+      'HEB 11:34',
+      // "deixará oseu pai" — o seu, palavras coladas
+      'EPH 5:31',
+      // "meu povo Isarael" (KJV "my people of Israel")
+      'AMO 9:14',
+      // "nos dias de Joeroboão" — Jeroboão
+      'HOS 1:1',
+    ],
+  },
   {
     classe: 'pontuação ou construção quebrada (Lucas)',
     refs: [

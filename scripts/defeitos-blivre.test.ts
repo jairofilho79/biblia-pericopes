@@ -1,0 +1,56 @@
+import { describe, it, expect } from 'vitest'
+import { pericopesAfetadas, TODAS_AS_REFS, DEFEITOS, CODIGOS_VPL, type Faixa } from './defeitos-blivre.ts'
+
+const mapa = new Map([['EXO', 'Êx'], ['GEN', 'Gn']])
+const faixa = (ordem: number, abbrev: string, ci: number, vi: number, cf: number, vf: number): Faixa => ({
+  ordem, abbrev, capitulo_inicio: ci, versiculo_inicio: vi, capitulo_fim: cf, versiculo_fim: vf,
+})
+
+describe('DEFEITOS', () => {
+  it('toda referência está no formato do VPL e usa código conhecido', () => {
+    for (const ref of TODAS_AS_REFS) {
+      const m = /^(\S+) (\d+):(\d+)$/.exec(ref)
+      expect(m, `malformada: ${ref}`).not.toBeNull()
+      expect(CODIGOS_VPL as readonly string[]).toContain(m![1])
+    }
+  })
+
+  it('nenhuma referência aparece em duas classes — seria correção dupla', () => {
+    expect(new Set(TODAS_AS_REFS).size).toBe(TODAS_AS_REFS.length)
+  })
+
+  it('as classes batem com o que o doc registra', () => {
+    expect(DEFEITOS.map((d) => d.refs.length).reduce((a, b) => a + b)).toBe(45)
+  })
+})
+
+describe('pericopesAfetadas', () => {
+  it('acha a perícope que contém o versículo defeituoso', () => {
+    // Êx 19:4 — "asas de águas" — dentro de uma perícope que abre em 19:1.
+    const r = pericopesAfetadas([faixa(118, 'Êx', 19, 1, 19, 25)], mapa, ['EXO 19:4'])
+    expect([...r]).toEqual([118])
+  })
+
+  it('não acha quando o versículo cai fora da faixa, mesmo no mesmo livro', () => {
+    expect(pericopesAfetadas([faixa(119, 'Êx', 20, 1, 20, 17)], mapa, ['EXO 19:4']).size).toBe(0)
+  })
+
+  it('respeita a fronteira exata, nos dois extremos', () => {
+    expect(pericopesAfetadas([faixa(1, 'Êx', 19, 4, 19, 9)], mapa, ['EXO 19:4']).size).toBe(1)
+    expect(pericopesAfetadas([faixa(1, 'Êx', 19, 5, 19, 9)], mapa, ['EXO 19:4']).size).toBe(0)
+    expect(pericopesAfetadas([faixa(1, 'Êx', 18, 1, 19, 4)], mapa, ['EXO 19:4']).size).toBe(1)
+    expect(pericopesAfetadas([faixa(1, 'Êx', 18, 1, 19, 3)], mapa, ['EXO 19:4']).size).toBe(0)
+  })
+
+  it('funciona em perícope que atravessa capítulos', () => {
+    expect(pericopesAfetadas([faixa(7, 'Êx', 18, 1, 20, 26)], mapa, ['EXO 19:4']).size).toBe(1)
+  })
+
+  it('lança quando o código VPL é desconhecido — dataset mudou, não ignore', () => {
+    expect(() => pericopesAfetadas([], mapa, ['XXX 1:1'])).toThrow(/desconhecido/)
+  })
+
+  it('lança quando a referência está malformada', () => {
+    expect(() => pericopesAfetadas([], mapa, ['EXO 19'])).toThrow(/malformada/)
+  })
+})

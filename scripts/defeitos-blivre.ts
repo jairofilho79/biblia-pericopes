@@ -32,6 +32,10 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
     ],
   },
   { classe: 'corrupção de palavra', refs: ['MAR 12:37', 'ACT 9:4', 'LAM 3:6'] },
+  // Achado pelo PORTÃO, e não por leitura: um subagente que reescrevia o
+  // contexto de Gn 2 citou `mãe de todos os viventes` de Gn 3:20, a forma
+  // certa, e a conferência byte a byte da citação denunciou a fonte.
+  { classe: 'concordância achada pela citação', refs: ['GEN 3:20'] },
   {
     classe: 'concordância (no arca → na arca)',
     refs: ['EXO 25:16', 'EXO 25:21', '1SA 6:19', '2KI 12:10', '2CH 24:10'],

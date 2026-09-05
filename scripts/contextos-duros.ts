@@ -24,9 +24,23 @@ import { join } from 'node:path'
 export const APONTA =
   /\b(repare|reparem|preste atenção|prestem atenção|guarde (isso|essa|este|isto)|vale (acompanhar|reparar|notar|marcar|observar|seguir)|leia prestando|observe|acompanhe|leve a pergunta|note (que|como))\b/i
 
-/** Promessa sem conteúdo: anuncia que existe algo e não diz o que é. */
-export const PROMESSA =
-  /\b(uma coisa|duas coisas|três coisas|um detalhe|dois detalhes|o que vem a seguir|ela surpreende|isso surpreende)\b/i
+/**
+ * Promessa sem conteúdo: anuncia que existe algo e não diz o que é.
+ *
+ * O `PAGA` existe porque a primeira versão punia a escrita CERTA. Um agente
+ * escreveu "as duas coisas que se rompem no versículo 11 — as fontes do abismo
+ * e as comportas dos céus — são as águas que o segundo dia separou", que nomeia
+ * as duas na mesma respiração, e foi reprovado; trocou por "o que se rompe no
+ * versículo 11", que é MAIS vago. A regra o obrigou a piorar a frase.
+ *
+ * Promessa paga no mesmo período — por dois-pontos, travessão ou enumeração —
+ * não é promessa: é anúncio de uma lista que vem em seguida.
+ */
+const ANUNCIO =
+  /(uma coisa|duas coisas|três coisas|um detalhe|dois detalhes|o que vem a seguir|ela surpreende|isso surpreende)/i
+const PAGA = /^[^.!?]*[:—–]|^[^.!?]*\b(a saber|isto é|ou seja)\b/i
+
+export const PROMESSA = ANUNCIO
 
 /**
  * Dado duro: o que alguém poderia conferir. Nome próprio que não seja
@@ -58,7 +72,10 @@ export function diagnosticar(contexto: string): Diagnostico {
   const ultimo = paragrafos.at(-1) ?? ''
   const aponta = APONTA.test(contexto)
   const fechaApontando = paragrafos.length > 1 && APONTA.test(ultimo)
-  const promessaVaga = PROMESSA.test(contexto)
+  // Promessa só conta quando NÃO é paga no mesmo período.
+  const promessaVaga = contexto
+    .split(/(?<=[.!?])\s+/)
+    .some((periodo) => ANUNCIO.test(periodo) && !PAGA.test(periodo.slice(periodo.search(ANUNCIO))))
   const semDadoDuro = !DADO_DURO.test(contexto) && !temNomeProprio(contexto)
   return {
     aponta,

@@ -1630,6 +1630,9 @@ export const CORRECOES: Correcao[] = [
   { ref: 'PSA 119:71', de: 'Foi bom pra mim',
     para: 'Foi bom para mim',
     motivo: 'Eu tinha guardado este como decisão do dono, achando que podia ser registro escolhido. Não é: a própria fonte escreve `para` 6.985 vezes e `pra` UMA, aqui. Almeida 1911: "Foi-me bom ter sido afflicto"; KJV: "It is good for me that I have been afflicted". É lapso de digitação, e o versículo era o último que travava perícope por texto.' },
+  { ref: 'GEN 3:20', de: 'mãe de todos o viventes',
+    para: 'mãe de todos os viventes',
+    motivo: 'Artigo no singular com substantivo no plural. KJV: "because she was the mother of all living"; Almeida 1911: "porquanto ella era a mãe de todos os viventes". Achado pelo PORTÃO e não por leitura: um subagente que reescrevia o contexto de Gn 2 citou a forma correta, e a conferência byte a byte da citação denunciou a fonte.' },
 ]
 
 

@@ -396,24 +396,22 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)
 
 /**
- * As únicas referências cujo texto ainda pode mudar — e por isso as únicas que
- * congelam perícope.
+ * A única referência cujo texto ainda pode mudar — e por isso a única que
+ * congela perícope por causa do texto.
  *
- * Todas as outras 480 já estão servidas na forma final: ou com receita, ou
- * limpas pela ETL, ou conferidas e absolvidas. Estas quatro dependem de uma
- * decisão do dono, e a prosa de cada uma está em
- * `docs/decisoes-do-dono-sessao-3.md` e em
- * `docs/defeitos-blivre-achados-na-producao.md`:
+ * Eram quatro. Em 05/09/2026 o dono resolveu três de uma vez, ao dizer que KJV
+ * e Almeida são AUTORIDADE e não só veto: onde as duas apontam claramente, a
+ * palavra entra, mesmo que isso signifique ACRESCENTAR. Jr 4:14 recebeu o
+ * `vãos` que as duas trazem; Sl 36:2 teve a gramática consertada sem trocar a
+ * leitura, porque ali as testemunhas leem diferente e a escolha da Bíblia Livre
+ * é defensável; e Sl 48:4 entrou em `PONTO_FINAL_PERDIDO`, junto com os outros
+ * 22 versículos cuja frase acaba sem ponto.
  *
- * - `JER 4:14` — `os teus meus pensamentos`: as três saídas dizem coisas
- *   diferentes, e duas violam uma regra da casa cada.
- * - `PSA 36:2` — `que não achar nem odiar sua própria maldade`: quebrado sem
- *   testemunha que diga como consertar.
- * - `PSA 119:71` — `Foi bom pra mim`: registro, e talvez de propósito.
- * - `PSA 48:4` — termina sem pontuação, um dos trinta que não dá para resolver
- *   por regra porque em alguns a frase continua no versículo seguinte.
+ * Sobra Sl 119:71 — `Foi bom pra mim ter sido afligido`. Não é defeito: é
+ * registro, e da mesma família do `"a gente"` de ~80 perícopes. Sai daqui
+ * quando o dono responder a decisão nº 1 de `docs/decisoes-do-dono-sessao-3.md`.
  */
-export const AINDA_PODEM_MUDAR: RefDefeito[] = ['JER 4:14', 'PSA 36:2', 'PSA 119:71', 'PSA 48:4']
+export const AINDA_PODEM_MUDAR: RefDefeito[] = ['PSA 119:71']
 
 /**
  * Códigos VPL na ordem canônica — a mesma ordem dos livros no catálogo.

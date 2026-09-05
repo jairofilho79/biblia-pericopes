@@ -104,6 +104,30 @@ export const PARENTESES_ORFAOS: string[] = [
   'REV 17:14',
 ]
 
+/**
+ * Versículos que terminam sem pontuação nenhuma e cuja frase ACABA ali.
+ *
+ * São 30 no arquivo, e a tentação era pôr ponto nos trinta. Sete não podem
+ * levar: a frase continua no versículo seguinte — Gl 1:15 (`se agradou` /
+ * `de revelar o seu Filho em mim`), Jó 31:17, Sl 49:8, Jr 33:10, Jo 4:1,
+ * Rm 9:10 e Ef 5:8. Nesses o ponto seria erro meu, não conserto, e eles ficam
+ * como estão: a leitura corre para o versículo seguinte porque a frase corre.
+ *
+ * Os 23 daqui foram decididos um a um olhando o começo do versículo seguinte —
+ * `E foi o dilúvio`, `Porém agora não o absolverás`, `Eles, quando a viram` —
+ * e conferidos contra as duas testemunhas, que pontuam o fim da frase nos 23.
+ * Sem o ponto a narração emenda duas frases numa só.
+ */
+export const PONTO_FINAL_PERDIDO: string[] = [
+  'GEN 7:16', 'NUM 8:14', 'DEU 5:14', 'JOS 6:13', 'JDG 18:17', '1KI 2:8',
+  '1KI 12:32', '1CH 25:1', '2CH 8:14', '2CH 28:9', 'PSA 48:4', 'ECC 7:1',
+  'JER 2:8', 'JER 39:9', 'EZE 3:26', 'EZE 21:7', 'DAN 3:11', 'DAN 9:24',
+  'ZEC 8:17', 'ZEC 13:4', 'ROM 9:31', '2CO 1:6', '2CO 6:2',
+]
+
+/** Fim de versículo que já tem pontuação — aspa e parêntese contam. */
+const JA_PONTUADO = /[.!?;:,”)\]’]\s*$/
+
 export type Correcao = {
   ref: string
   /** Trecho exato a encontrar. Guard: se não casar, a fonte mudou. */
@@ -1595,6 +1619,14 @@ export const CORRECOES: Correcao[] = [
   { ref: 'PSA 119:10', de: 'Eu te busco como todo o meu coração',
     para: 'Eu te busco com todo o meu coração',
     motivo: 'Uma letra troca a preposição por uma comparação. KJV: "With my whole heart have I sought thee"; Almeida: "Com todo o meu coração te busquei".' },
+
+  // --- As duas que o dono decidiu (05/09/2026) ---
+  { ref: 'JER 4:14', de: 'os teus meus pensamentos',
+    para: 'os teus vãos pensamentos',
+    motivo: '`teus meus` não é português, e a palavra que volta vem das duas testemunhas, não de mim: KJV "thy vain thoughts", Almeida 1911 "os pensamentos da tua vaidade". O dono decidiu em 05/09/2026 que KJV e Almeida são AUTORIDADE e não só veto — quando as duas apontam claramente, a palavra entra, mesmo acrescentando.' },
+  { ref: 'PSA 36:2', de: '[que não] achar [nem] odiar',
+    para: '[que não] acha [nem] odeia',
+    motivo: 'Dois infinitivos onde a oração pede indicativo. Aqui as testemunhas leem DIFERENTE da Bíblia Livre — KJV "until his iniquity be found to be hateful", Almeida 1911 "até que a sua iniquidade se descubra ser detestavel" —, e a leitura dela (o orgulhoso não chega a enxergar nem a odiar a própria maldade) é defensável e é a das versões modernas. Então conserta-se a gramática quebrada, não se troca a tradução.' },
 ]
 
 
@@ -1807,11 +1839,15 @@ export const OMISSOES: Correcao[] = [
 // `manuais` é lista, e não um só: há versículo com dois defeitos — Lc 4:40 traz
 // `troxeram` e `varias` na mesma linha. Enquanto isto era um campo único, a
 // segunda receita apagava a primeira sem dizer nada, e o defeito seguia servido.
-const porRef = new Map<string, { dup?: string; paren?: boolean; sub?: boolean; manuais: Correcao[] }>()
+const porRef = new Map<
+  string,
+  { dup?: string; paren?: boolean; sub?: boolean; ponto?: boolean; manuais: Correcao[] }
+>()
 const entrada = (ref: string) => porRef.get(ref) ?? { manuais: [] }
 for (const [ref, palavra] of DUPLICADAS) porRef.set(ref, { ...entrada(ref), dup: palavra })
 for (const ref of PARENTESES_ORFAOS) porRef.set(ref, { ...entrada(ref), paren: true })
 for (const ref of SUBSCRICOES) porRef.set(ref, { ...entrada(ref), sub: true })
+for (const ref of PONTO_FINAL_PERDIDO) porRef.set(ref, { ...entrada(ref), ponto: true })
 for (const c of [...CORRECOES, ...OMISSOES]) {
   const e = entrada(c.ref)
   porRef.set(c.ref, { ...e, manuais: [...e.manuais, c] })
@@ -1869,6 +1905,17 @@ export function corrigirVersiculo(
       )
     }
     saida = saida.replace(m.de, m.para)
+  }
+
+  // Por último: o ponto entra depois de as outras receitas terem mexido no fim
+  // do versículo, senão a subscrição removida deixaria o ponto no lugar errado.
+  if (alvo.ponto) {
+    if (JA_PONTUADO.test(saida)) {
+      throw new Error(
+        `Ponto final em ${ref} não era necessário — o versículo já termina pontuado. A fonte mudou.`,
+      )
+    }
+    saida = `${saida}.`
   }
 
   return saida

@@ -65,28 +65,31 @@ seção própria com título falado. Virar campo de verdade no JSON deixaria o
 contrato explícito, mas obriga a remexer nas 2.823 perícopes e no manifesto.
 Vale a pena? Decisão adiada para o fim da corrida.
 
-## 5. Jr 4:14 — a única correção que eu não sei fazer sozinho
+## 5. Jr 4:14 — RESOLVIDO em 05/09/2026
 
-A Bíblia Livre traz:
+O dono decidiu, e a decisão vale muito além deste versículo:
 
-> Lava teu coração da maldade para que sejas salva; ó Jerusalém! Até quando
-> deixarás os **teus meus** pensamentos permanecerem em meio a ti?
+> "A autoridade tem que ser KJV e Almeida. Elas apontam claramente para a
+> segunda opção. Logo, siga com eles. Sem medo. Sei que isso pode soar
+> (adicionar coisa), mas na verdade, faz parte do trabalho editorial que estamos
+> fazendo e usar essas duas versões como fonte confiável."
 
-`teus meus` não é português, e não há dúvida de que está errado. A dúvida é
-qual palavra estava ali, e as três saídas dizem coisas diferentes:
+Jr 4:14 recebeu `os teus **vãos** pensamentos` — KJV *"thy vain thoughts"*,
+Almeida *"os pensamentos da tua vaidade"*.
 
-1. **`teus maus pensamentos`** — uma letra de distância, e a própria fonte
-   escreve `maus pensamentos` quatro vezes. Mas *maus* não é o que as duas
-   testemunhas dizem.
-2. **`teus vãos pensamentos`** — é o que as testemunhas dizem (KJV *"thy vain
-   thoughts"*, Almeida *"os pensamentos da tua vaidade"*), e a fonte nunca usa
-   a expressão. A palavra entraria por minha conta.
-3. **`os teus pensamentos`**, sem qualificativo — não afirma nada falso, lê bem,
-   e perde o adjetivo que as duas testemunhas trazem.
+**A regra que sai daqui:** as duas testemunhas são autoridade, e não só veto.
+Onde elas apontam claramente, a palavra entra, ainda que isso signifique
+acrescentar o que a Bíblia Livre não traz. O limite "não colocar coisas que não
+existem" vale contra a MINHA invenção, não contra o que as testemunhas trazem.
 
-A regra da casa manda não colocar o que não existe, o que derruba a 2; e manda
-não mudar o sentido, o que derruba a 1. Sobra a 3, que é subtração — e
-subtração também é decisão sua.
+Ela resolveu mais duas na hora:
 
-**Enquanto você não decide, o versículo fica como está** e a perícope de Jr 4
-não é liberada para narração.
+- **Sl 36:2** (`que não achar nem odiar`) — aqui as testemunhas leem DIFERENTE
+  da Bíblia Livre, e a leitura dela é a das versões modernas. Então conserta-se
+  a gramática (`acha`, `odeia`) e não se troca a tradução.
+- **Sl 48:4** e mais 22 versículos que terminam sem pontuação — ganharam ponto
+  final, decididos um a um olhando o começo do versículo seguinte. Sete ficaram
+  sem, porque neles a frase continua (Gl 1:15 é o exemplo).
+
+Sobra **Sl 119:71** (`Foi bom pra mim`), que não é defeito e sim registro — vai
+junto com a decisão nº 1 deste documento.

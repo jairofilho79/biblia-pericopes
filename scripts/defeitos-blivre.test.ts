@@ -8,7 +8,7 @@ import {
   CODIGOS_VPL,
   type Faixa,
 } from './defeitos-blivre.ts'
-import { CORRECOES, OMISSOES } from './blivre-correcoes.ts'
+import { CORRECOES, OMISSOES, PONTO_FINAL_PERDIDO } from './blivre-correcoes.ts'
 
 const mapa = new Map([['EXO', 'Êx'], ['GEN', 'Gn']])
 const faixa = (ordem: number, abbrev: string, ci: number, vi: number, cf: number, vf: number): Faixa => ({
@@ -101,7 +101,10 @@ describe('AINDA_PODEM_MUDAR', () => {
   // Se uma delas ganhar receita, ela deixa de poder mudar e sai daqui — senão o
   // congelamento segura perícope à toa e a Sessão 4 paga por isso em atraso.
   it('nenhuma delas já tem receita', () => {
-    const refs = new Set([...CORRECOES, ...OMISSOES].map((c) => c.ref))
+    const refs = new Set([
+      ...[...CORRECOES, ...OMISSOES].map((c) => c.ref),
+      ...PONTO_FINAL_PERDIDO,
+    ])
     const jaFeitas = AINDA_PODEM_MUDAR.filter((r) => refs.has(r))
     expect(jaFeitas, `já têm receita e deviam sair da lista: ${jaFeitas.join(', ')}`).toEqual([])
   })

@@ -7,6 +7,7 @@ import {
   CORRECOES,
   SUBSCRICOES,
   OMISSOES,
+  PONTO_FINAL_PERDIDO,
 } from './blivre-correcoes.ts'
 
 describe('corrigirVersiculo — palavra duplicada', () => {
@@ -188,9 +189,10 @@ describe('as tabelas', () => {
   it('o tamanho das tabelas está travado', () => {
     expect(DUPLICADAS).toHaveLength(49)
     expect(PARENTESES_ORFAOS).toHaveLength(11)
-    expect(CORRECOES).toHaveLength(420)
+    expect(CORRECOES).toHaveLength(422)
     expect(SUBSCRICOES).toHaveLength(14)
     expect(OMISSOES).toHaveLength(51)
+    expect(PONTO_FINAL_PERDIDO).toHaveLength(23)
   })
 
   it('toda omissão restaurada diz de onde veio a frase', () => {
@@ -262,5 +264,31 @@ describe('dois defeitos no mesmo versículo', () => {
     const saida = corrigirVersiculo('LUK', 4, 40, bruto)
     expect(saida).toContain('trouxeram-lhe')
     expect(saida).toContain('várias doenças')
+  })
+})
+
+describe('ponto final perdido', () => {
+  it('põe o ponto onde a frase acaba', () => {
+    expect(corrigirVersiculo('PSA', 48, 4, 'e eles juntamente passaram')).toBe(
+      'e eles juntamente passaram.',
+    )
+  })
+
+  it('estoura se o versículo já veio pontuado — sinal de que a fonte mudou', () => {
+    expect(() => corrigirVersiculo('PSA', 48, 4, 'e eles juntamente passaram.')).toThrow(
+      /já termina pontuado/,
+    )
+  })
+
+  // Os sete cuja frase continua no versículo seguinte NÃO entram na tabela.
+  it('não toca em Gl 1:15, cuja frase continua no versículo seguinte', () => {
+    const bruto = 'Mas quando Deus ( que me separou ) se agradou'
+    expect(corrigirVersiculo('GAL', 1, 15, bruto)).toBe(bruto)
+  })
+
+  it('a tabela e as outras não se sobrepõem', () => {
+    const outras = new Set([...DUPLICADAS.map(([r]) => r), ...PARENTESES_ORFAOS, ...SUBSCRICOES])
+    const dobradas = PONTO_FINAL_PERDIDO.filter((r) => outras.has(r))
+    expect(dobradas, `em duas tabelas: ${dobradas.join(', ')}`).toEqual([])
   })
 })

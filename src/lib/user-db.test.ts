@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto'
 import { describe, expect, it } from 'vitest'
+import type { DestaqueCor } from './types'
 import {
   applyRemoteAnotacoes,
   applyRemoteDestaques,
@@ -236,17 +237,29 @@ describe('user-db v2 (outbox/meta)', () => {
 })
 
 describe('user-db v3 (destaques)', () => {
+  it('destaque amarelo legado é lido como verde, e não some da tela', async () => {
+    // 'verde' saiu da paleta no rebranding, mas está gravado no IndexedDB e
+    // no D1 de quem já grifou. Sem normalizar, a classe verse-hl-amarelo fica
+    // sem regra no CSS e o grifo desaparece sem ninguém ter apagado nada.
+    //
+    // O cast existe porque o tipo já não aceita 'verde' — e é exatamente o
+    // ponto: o valor vem do banco, não do código, e TypeScript não guarda o
+    // que foi gravado ontem.
+    await setDestaque(9200, '1:1', 'amarelo' as unknown as DestaqueCor)
+    expect((await listDestaques(9200)).map((x) => x.cor)).toEqual(['verde'])
+  })
+
   it('setDestaque grava o destaque e enfileira o outbox na mesma transação', async () => {
-    const d = await setDestaque(9101, '1:3', 'amarelo')
+    const d = await setDestaque(9101, '1:3', 'verde')
     expect(d?.id).toBe('9101:1:3')
-    expect((await listDestaques(9101)).map((x) => x.cor)).toEqual(['amarelo'])
+    expect((await listDestaques(9101)).map((x) => x.cor)).toEqual(['verde'])
 
     const outbox = await listOutbox()
     const item = outbox.find((i) => i.kind === 'destaque' && i.destaque.id === '9101:1:3')
     expect(item).toBeDefined()
     if (item?.kind === 'destaque') {
       expect(item.apagadoEm).toBeNull()
-      expect(item.destaque.cor).toBe('amarelo')
+      expect(item.destaque.cor).toBe('verde')
     }
   })
 
@@ -279,7 +292,7 @@ describe('user-db v3 (destaques)', () => {
   it('setDestaque com verseId inválido não escreve nada (nem linha, nem outbox)', async () => {
     const outboxAntes = await listOutbox()
 
-    const resultado = await setDestaque(1, 'x:1', 'amarelo')
+    const resultado = await setDestaque(1, 'x:1', 'verde')
 
     expect(resultado).toBeNull()
     expect(await listDestaques(1)).toEqual([])
@@ -288,10 +301,10 @@ describe('user-db v3 (destaques)', () => {
   })
 
   it('applyRemoteDestaques: mais velho é ignorado, mais novo vence, lápide apaga', async () => {
-    const local = await setDestaque(9104, '1:2', 'amarelo')
+    const local = await setDestaque(9104, '1:2', 'verde')
 
     await applyRemoteDestaques([{ ...local!, cor: 'verde', atualizadoEm: PAST, apagadoEm: null }])
-    expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['amarelo'])
+    expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['verde'])
 
     await applyRemoteDestaques([{ ...local!, cor: 'azul', atualizadoEm: FUTURE, apagadoEm: null }])
     expect((await listDestaques(9104)).map((x) => x.cor)).toEqual(['azul'])
@@ -540,12 +553,12 @@ describe('applyRemote* — contagem de linhas aplicadas', () => {
   })
 
   it('destaques: mesma regra da lápide reentregue', async () => {
-    await setDestaque(9105, '1:1', 'amarelo')
+    await setDestaque(9105, '1:1', 'verde')
     const lapide = {
       id: '9105:1:1',
       pericopeOrdem: 9105,
       verseId: '1:1',
-      cor: 'amarelo' as const,
+      cor: 'verde' as const,
       criadoEm: PAST,
       atualizadoEm: FUTURE,
       apagadoEm: FUTURE,

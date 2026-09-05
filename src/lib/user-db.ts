@@ -382,8 +382,23 @@ export function destaqueId(pericopeOrdem: number, verseId: string): string {
 /** "capitulo:versiculo" — mesmo formato aceito pelo Worker em VERSE_ID. */
 const VERSE_ID_RE = /^\d+:\d+$/
 
+/**
+ * O grifo amarelo saiu da paleta no rebranding para aiPericopes: era o único
+ * âmbar PERMANENTE sobre a Escritura, e a regra da marca é que só o âmbar
+ * transitório — a narração passando — a toca.
+ *
+ * Mas a cor é dado persistido e sincronizado: quem já grifou de amarelo tem
+ * registros no IndexedDB e no D1. Sem este mapa, a classe `verse-hl-amarelo`
+ * fica sem regra no CSS e o grifo some da tela sem ninguém apagar nada. O
+ * registro não é reescrito — regrifar sobrescreve sozinho.
+ */
+function corVigente(cor: DestaqueCor | 'amarelo'): DestaqueCor {
+  return cor === 'amarelo' ? 'verde' : cor
+}
+
 export async function listDestaques(ordem: number): Promise<Destaque[]> {
-  return (await db()).getAllFromIndex('destaques', 'by-pericope', ordem)
+  const linhas = await (await db()).getAllFromIndex('destaques', 'by-pericope', ordem)
+  return linhas.map((d) => ({ ...d, cor: corVigente(d.cor) }))
 }
 
 export async function setDestaque(

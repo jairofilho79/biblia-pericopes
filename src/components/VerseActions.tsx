@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import type { DestaqueCor } from '../lib/types'
 
 const CORES: { id: DestaqueCor; label: string }[] = [
-  { id: 'amarelo', label: 'Amarelo' },
   { id: 'verde', label: 'Verde' },
   { id: 'azul', label: 'Azul' },
   { id: 'rosa', label: 'Rosa' },

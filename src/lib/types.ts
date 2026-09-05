@@ -75,7 +75,8 @@ export type Anotacao = {
   atualizadoEm: string
 }
 
-export type DestaqueCor = 'amarelo' | 'verde' | 'azul' | 'rosa'
+/** 'amarelo' saiu no rebranding; ver corVigente() em user-db.ts para o legado. */
+export type DestaqueCor = 'verde' | 'azul' | 'rosa'
 
 /** `id` determinístico `${pericopeOrdem}:${verseId}`: um destaque por versículo
  * por usuário, então destacar de novo é um upsert e o LWW resolve sozinho. */

@@ -490,7 +490,7 @@ describe('syncNow — destaques', () => {
     vi.mocked(authClient.getSession).mockResolvedValue(FAKE_SESSION as never)
 
     // mesmo versículo destacado duas vezes: só a última cor sobe
-    await setDestaque(70001, '1:3', 'amarelo')
+    await setDestaque(70001, '1:3', 'verde')
     await setDestaque(70001, '1:3', 'verde')
 
     const posts: { destaques: unknown[] }[] = []

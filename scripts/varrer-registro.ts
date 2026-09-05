@@ -48,6 +48,9 @@ export const PADROES: { re: RegExp; motivo: string }[] = [
   { re: /\bfala do bolso\b/gi, motivo: 'metáfora coloquial' },
   { re: /\bsem graça\b/gi, motivo: '"sem graça" — informalidade' },
   { re: /\bfalh(ado|ou) feio\b/gi, motivo: 'informalidade' },
+  // Rodada 4: mais duas, também trocadas por um subagent depois do portão.
+  { re: /\ba gente\b/gi, motivo: '"a gente" no lugar de "nós"' },
+  { re: /\btem (essa|aquela) cara\b/gi, motivo: 'construção coloquial' },
 ]
 
 export type Suspeita = { ordem: number; campo: string; trecho: string; motivo: string }

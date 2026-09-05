@@ -67,6 +67,11 @@ describe('varrer', () => {
     }
   })
 
+  it('e as duas que a rodada 4 revelou', () => {
+    expect(varrer(material({ resenha: 'É assim que a gente lê o capítulo hoje.' })).length).toBe(1)
+    expect(varrer(material({ resenha: 'O trecho tem essa cara de lista, mas não é.' })).length).toBe(1)
+  })
+
   it('acha mais de uma suspeita no mesmo campo', () => {
     expect(varrer(material({ resenha: 'A galera fez uma treta e ninguém deu um jeito.' })).length).toBeGreaterThanOrEqual(2)
   })

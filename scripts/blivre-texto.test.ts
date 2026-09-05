@@ -57,3 +57,29 @@ describe('removerColchetes', () => {
     )
   })
 })
+
+describe('removerColchetes — colchete colado numa palavra', () => {
+  it('abre espaço quando o colchete gruda duas palavras', () => {
+    // Ag 2:16 no fonte: "conseguiam[apenas] dez".
+    expect(removerColchetes('conseguiam[apenas] dez')).toBe('conseguiam apenas dez')
+    expect(removerColchetes('holocaustos[conforme] o número')).toBe('holocaustos conforme o número')
+    expect(removerColchetes('pois[o SENHOR] estende')).toBe('pois o SENHOR estende')
+    expect(removerColchetes('E no[dia] seguinte')).toBe('E no dia seguinte')
+  })
+
+  it('NÃO abre espaço antes de próclise: "mataram[-no]" é "mataram-no"', () => {
+    expect(removerColchetes('pegando dele, mataram[-no] , e lançaram[-no] fora')).toBe(
+      'pegando dele, mataram-no, e lançaram-no fora',
+    )
+    expect(removerColchetes('ouviram[-lhe] dizer')).toBe('ouviram-lhe dizer')
+  })
+
+  it('não duplica o espaço quando o fonte já traz um dentro do colchete', () => {
+    expect(removerColchetes('tudo quanto ele[ antes] possuía.')).toBe('tudo quanto ele antes possuía.')
+    expect(removerColchetes('não haverá[mais ] lembrança')).toBe('não haverá mais lembrança')
+  })
+
+  it('o caso comum, com o colchete solto, continua igual', () => {
+    expect(removerColchetes('havia [vasos] mas')).toBe('havia vasos mas')
+  })
+})

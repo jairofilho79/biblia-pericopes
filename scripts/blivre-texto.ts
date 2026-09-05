@@ -29,8 +29,21 @@ const PONTUACAO_SEM_ESPACO = /([,;!?])(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g
  * Tira os colchetes editoriais mantendo as palavras, e arruma o espaçamento que
  * a remoção deixa torto. Versículo sem colchete volta sem nenhuma alteração.
  */
+/**
+ * Colchete de abertura colado na palavra anterior — `conseguiam[apenas]`.
+ *
+ * Tirar os colchetes sem mais nada gruda as duas palavras
+ * (`conseguiamapenas`), e o defeito é mudo: o versículo continua parecendo
+ * texto. São 19 ocorrências no corpus, e elas se dividem em dois casos que
+ * pedem tratamento OPOSTO — por isso a condição olha o que vem depois do
+ * colchete. `mataram[-no]` tem de virar `mataram-no`, colado; só se abre
+ * espaço quando o colchete começa em letra.
+ */
+const COLCHETE_COLADO = /(\p{L})\[(?=\p{L})/gu
+
 export function removerColchetes(texto: string): string {
   return texto
+    .replace(COLCHETE_COLADO, '$1 [')
     .replace(HIFEN_SOLTO, '-')
     .replace(/[[\]]/g, '')
     .replace(ESPACO_ANTES_DE_PONTUACAO, '$1')

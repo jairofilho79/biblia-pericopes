@@ -159,6 +159,31 @@ Todos achados por leitura, e todos únicos no corpus.
 Em Os 3:3 o "nem" contradiz as duas testemunhas: elas põem a promessa do próprio
 profeta em paralelo com a exigência feita a ela, e não como mais uma proibição.
 
+## 10. Espaço perdido ou sobrando (4 versículos)
+
+| ref | BLIVRE | KJV | correção |
+|---|---|---|---|
+| Zc 7:1 | "veio a Zacarias **noquarto** [dia]" | "in the fourth year… came unto Zechariah" | **no quarto** |
+| Zc 7:13 | "assim **tamb em** quando eles clamaram" | "so they cried" | **também** |
+| Mc 14:16 | "**seusdiscípulos**" | "his **disciples**" | **seus discípulos** |
+| Lc 6:1 | "no segundo **sábadodepois** do primeiro" | "on the second **sabbath after** the first" | **sábado depois** |
+
+## Um defeito que era MEU, não da Bíblia Livre
+
+`conseguiamapenas` e `haviasomente`, em Ag 2:16, **não eram da fonte**. O VPL
+traz `conseguiam[apenas]` e `havia[somente]`, com o colchete colado na palavra
+anterior, e a minha `removerColchetes` tirava os colchetes sem abrir espaço.
+
+São 19 ocorrências desse formato no corpus, e elas se dividem em dois casos que
+pedem tratamento **oposto**: `mataram[-no]` tem de virar `mataram-no`, colado,
+enquanto `conseguiam[apenas]` precisa do espaço. A correção olha o que vem
+depois do colchete e só abre espaço quando começa em letra.
+
+O defeito estava no texto que o app serve desde o ETL da Sessão 2, e era mudo —
+o versículo continuava parecendo texto. Só apareceu porque um subagent leu Ageu
+2 e estranhou. **Fica registrado aqui como lembrete de que a minha própria
+extração também precisa de duas testemunhas.**
+
 ## Achados que NÃO são defeitos
 
 **1Sm 13:1** — "Havia já Saul reinado um ano; e reinado que houve dois anos
@@ -194,7 +219,7 @@ reescrever no escuro.
 
 ## Placar
 
-**49 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**53 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

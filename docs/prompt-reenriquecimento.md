@@ -107,6 +107,11 @@ ensina numa mesa com pessoas que ele respeita.
 - Densidade alta, extensão baixa: cada frase traz insight ou dado útil.
 - **Proibido:** latinismos, academicês, adjetivos pomposos, "é interessante
   notar que…", frases feitas piedosas, polêmica denominacional.
+- **Não anuncie a própria honestidade.** "O texto não suaviza", "sem enfeitar
+  nada", "não adianta suavizá-lo", "sem maquiagem": cada uma funciona sozinha,
+  e juntas viram tique — 21 perícopes já usam alguma delas. Em voz alta, o
+  ouvinte percebe o narrador avisando que não vai suavizar em vez de
+  simplesmente não suavizar. **Não suavize, e siga.**
 - E o contrário também é proibido: não infantilize, não explique o óbvio, não
   fale como se o leitor tivesse cinco anos. Ele é inteligente; só não estudou
   teologia.
@@ -249,6 +254,14 @@ Mensagens a levar
 Não é "quase". Não é a mesma ideia com o verbo em outra pessoa. Não é como você
 lembra de outra versão. Se quiser citar mas a frase não bate exatamente, ou você
 copia exato, ou não usa aspas — parafraseie sem aspas.
+
+**Não deixe o trecho difícil de fora.** Se a passagem trata de algo duro —
+violência, sexo, castigo —, o material fala daquilo, com o registro digno de
+sempre. Subir um nível de abstração e comentar a *estrutura* do capítulo (a
+gradação das penas, o arranjo da lista) enquanto o leitor tem o conteúdo na
+tela é deixá-lo sozinho justamente onde ele mais precisa de companhia. Dizer o
+que o texto diz, sem crueza e sem eufemismo, vale para a lei tanto quanto para
+a narrativa.
 
 **Aspas duplas servem só para texto copiado da Bíblia Livre — nunca para
 ênfase.** Se você quer destacar uma palavra sua, use *itálico* ou nada. Aspas

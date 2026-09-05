@@ -32,7 +32,17 @@ export function paragraphize(
   if (/\n\s*\n/.test(trimmed)) {
     return trimmed
       .split(/\n\s*\n+/)
-      .map((p) => p.replace(/\s+/g, ' ').trim())
+      // Colapsa só espaço HORIZONTAL: a quebra de linha simples dentro de um
+      // parágrafo é significativa — é ela que separa os itens da lista de
+      // palavras no fim da resenha. Colapsá-la junto virava tudo uma frase só.
+      .map((p) =>
+        p
+          .replace(/[^\S\n]+/g, ' ')
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean)
+          .join('\n'),
+      )
       .filter(Boolean)
       .slice(0, maxParas)
   }
@@ -69,4 +79,40 @@ function splitSentences(text: string): string[] {
   const tail = text.slice(start).trim()
   if (tail) out.push(tail)
   return out.length ? out : [text]
+}
+
+export type BlocoResenha = {
+  /** `palavra` é um item da lista de palavras do trecho; `prosa` é o resto. */
+  tipo: 'prosa' | 'palavra'
+  /**
+   * O texto como ele é LIDO — em voz alta e na tela. O marcador de lista já
+   * saiu daqui, porque este mesmo texto é o alvo de alinhamento da narração:
+   * um traço sobrando viraria "hífen" na voz e quebraria o realce.
+   */
+  texto: string
+}
+
+const ITEM_DE_LISTA = /^[-–—•]\s+/
+
+/**
+ * A resenha, pronta para renderizar e para narrar.
+ *
+ * O último parágrafo é reservado às palavras do trecho, e o dono pediu que
+ * viessem em tópicos: emendadas por ponto-e-vírgula elas ficavam difíceis de
+ * ler. Só o último parágrafo é aberto — um travessão no meio da prosa é
+ * pontuação, não item de lista.
+ */
+export function blocosDaResenha(resenha: string): BlocoResenha[] {
+  const paras = paragraphize(resenha, { maxParas: MAX_PARAGRAFOS.resenha })
+  if (!paras.length) return []
+
+  const ultimo = paras[paras.length - 1]
+  const linhas = ultimo.split('\n')
+  const ehLista = linhas.length > 0 && linhas.every((l) => ITEM_DE_LISTA.test(l))
+  if (!ehLista) return paras.map((texto) => ({ tipo: 'prosa' as const, texto }))
+
+  return [
+    ...paras.slice(0, -1).map((texto) => ({ tipo: 'prosa' as const, texto })),
+    ...linhas.map((l) => ({ tipo: 'palavra' as const, texto: l.replace(ITEM_DE_LISTA, '') })),
+  ]
 }

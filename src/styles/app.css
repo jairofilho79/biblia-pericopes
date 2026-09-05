@@ -2911,3 +2911,34 @@ fieldset.jornada-campo {
   font-size: 0.85rem;
   line-height: 1.5;
 }
+
+/* As palavras do trecho — a lista que fecha a resenha.
+   O dono pediu tópicos em vez de tudo emendado por ponto-e-vírgula, e a cor
+   sai de `--accent`, que já é verde no claro, verde claro no escuro e âmbar
+   no sépia. Uma variável resolve os três temas. */
+.palavras-do-trecho {
+  margin: 1.15rem 0 0;
+  padding: 0.85rem 0 0.15rem 0;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  list-style: none;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.palavras-do-trecho > li {
+  position: relative;
+  padding-left: 1.05rem;
+}
+
+/* O marcador é um traço curto na cor do tema — some para o leitor de tela,
+   que já recebe a lista pela semântica do <ul>. */
+.palavras-do-trecho > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 0.5rem;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}

@@ -18,7 +18,7 @@ import {
   proximaNoTestamento,
   refLabel,
 } from '../lib/content'
-import { paragraphize, MAX_PARAGRAFOS } from '../lib/paragraphize'
+import { paragraphize, blocosDaResenha, MAX_PARAGRAFOS } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
 import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTexto, type VerseBlock } from '../lib/parse-texto'
@@ -197,10 +197,10 @@ export default function Leitura() {
     () => (p ? paragraphize(p.contexto_historico_literario, { maxParas: MAX_PARAGRAFOS.contexto }) : []),
     [p],
   )
-  const parasResenha = useMemo(
-    () => (p ? paragraphize(p.resenha, { maxParas: MAX_PARAGRAFOS.resenha }) : []),
-    [p],
-  )
+  // A resenha vira blocos, não parágrafos: o último parágrafo é a lista de
+  // palavras do trecho, e cada item dela é uma unidade própria — de leitura,
+  // de narração e de realce.
+  const blocosResenha = useMemo(() => (p ? blocosDaResenha(p.resenha) : []), [p])
   // Os mesmos arrays que a página renderiza viram os alvos do alinhamento —
   // é isso que garante que o realce valide o que o olho vê.
   const secoesNarracao = useMemo<SecaoAlvos[]>(
@@ -212,13 +212,16 @@ export default function Leitura() {
           .filter((b): b is VerseBlock => b.kind === 'verse')
           .map((b) => ({ id: b.id, texto: b.text })),
       },
-      { secao: 'resenha', alvos: parasResenha.map((t, i) => ({ id: `resenha-${i}`, texto: t })) },
+      {
+        secao: 'resenha',
+        alvos: blocosResenha.map((b, i) => ({ id: `resenha-${i}`, texto: b.texto })),
+      },
       {
         secao: 'reflexoes',
         alvos: (p?.perguntas_reflexao ?? []).map((q, i) => ({ id: `reflexao-${i}`, texto: q })),
       },
     ],
-    [parasContexto, blocks, parasResenha, p],
+    [parasContexto, blocks, blocosResenha, p],
   )
 
   async function refreshNotes() {
@@ -987,11 +990,24 @@ export default function Leitura() {
         <h2 className={tituloClass('', 'cabecalho-resenha') || undefined} data-fala-id="cabecalho-resenha">
           Resenha
         </h2>
-        {parasResenha.map((para, i) => (
-          <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
-            <TextoFalado texto={para} ativo={falando === `resenha-${i}`} />
-          </p>
-        ))}
+        {blocosResenha.map((bloco, i) =>
+          bloco.tipo === 'prosa' ? (
+            <p key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
+              <TextoFalado texto={bloco.texto} ativo={falando === `resenha-${i}`} />
+            </p>
+          ) : null,
+        )}
+        {blocosResenha.some((b) => b.tipo === 'palavra') && (
+          <ul className="palavras-do-trecho">
+            {blocosResenha.map((bloco, i) =>
+              bloco.tipo === 'palavra' ? (
+                <li key={i} className={falaClass('prose', `resenha-${i}`)} data-verse-id={`resenha-${i}`}>
+                  <TextoFalado texto={bloco.texto} ativo={falando === `resenha-${i}`} />
+                </li>
+              ) : null,
+            )}
+          </ul>
+        )}
       </section>
 
       <section className="block block-plain" id="reflexao" tabIndex={-1}>

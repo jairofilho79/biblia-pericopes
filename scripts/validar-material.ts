@@ -11,7 +11,7 @@
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { MAX_PARAGRAFOS } from '../src/lib/paragraphize.ts'
+import { MAX_PARAGRAFOS, blocosDaResenha } from '../src/lib/paragraphize.ts'
 
 const CAMPOS = [
   'ordem',
@@ -191,6 +191,24 @@ export function validarMaterial(
   const repetido = maiorTrechoRepetido(m.contexto_historico_literario, m.resenha)
   if (repetido > MAX_REPETICAO) {
     p.push(`resenha repete o contexto em ${repetido} palavras seguidas`)
+  }
+
+  // A resenha fecha com a lista de palavras do trecho, em tópicos — prosa
+  // emendada por ponto-e-vírgula é difícil de ler, e foi o que o dono pediu
+  // para mudar. Cada item é uma FRASE inteira, não um verbete: é o mesmo texto
+  // que a narração lê em voz alta, e "Abismo: massa de água" soa como
+  // dicionário.
+  const palavras = blocosDaResenha(m.resenha ?? '').filter((b) => b.tipo === 'palavra')
+  if (!palavras.length) {
+    p.push('resenha não fecha com a lista de palavras do trecho')
+  } else {
+    if (palavras.length < 2 || palavras.length > 4) {
+      p.push(`lista de palavras com ${palavras.length} ${palavras.length === 1 ? 'item' : 'itens'} (2 a 4)`)
+    }
+    const truncos = palavras.filter((b) => !/[.!?]$/.test(b.texto.trim()))
+    if (truncos.length) {
+      p.push(`${truncos.length} item(ns) da lista não termina em frase: "${truncos[0].texto.slice(0, 45)}"`)
+    }
   }
 
   for (const campo of ['contexto_historico_literario', 'resenha'] as const) {

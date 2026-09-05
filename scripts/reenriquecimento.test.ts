@@ -19,6 +19,12 @@ import {
   type Bruta,
 } from './reenriquecimento.ts'
 
+/** Lista válida de palavras do trecho — toda resenha tem de fechar com uma. */
+const LISTA_OK = [
+  '- Abismo, aqui, é a massa de água sem fundo que cobria tudo antes da luz.',
+  '- Desordenada e vazia descreve terreno sem forma e sem ninguém morando nele.',
+].join('\n')
+
 const bruta = (o: Partial<Bruta> = {}): Bruta => ({
   ordem: 1,
   livro: 'Gênesis',
@@ -164,7 +170,10 @@ describe('portão de qualidade', () => {
     titulo_pericope_pt: 'A criação',
     contexto_historico_literario:
       'O princípio criou abismo trevas desordenada vazia. '.repeat(6),
-    resenha: 'A terra estava desordenada e vazia, e as trevas cobriam o abismo. '.repeat(6),
+    resenha:
+      'A terra estava desordenada e vazia, e as trevas cobriam o abismo. '.repeat(6) +
+      '\n\n' +
+      LISTA_OK,
     perguntas_reflexao: ['p1', 'p2'],
     topicos_pregar:
       'Linha de raciocínio\n- um **a**\n- dois **b**\n- três **c**\n- quatro **d**\n- cinco **e**\n\nMensagens a levar\n- seis **f**\n- sete **g**\n- oito **h**\n- nove **i**',
@@ -208,12 +217,20 @@ describe('portão de qualidade', () => {
   })
 
   it('avisa quando a citação não está no texto — é aqui que a NAA sobrevivente aparece', () => {
-    const v = julgar(material({ resenha: material().resenha + ' Ele disse: "Haja luz, e houve luz agora".' }))
+    const v = julgar(
+      material({
+        resenha: 'Ele disse: "Haja luz, e houve luz agora". ' + material().resenha,
+      }),
+    )
     expect(v.avisos.join(' ')).toMatch(/citação fora do texto/)
   })
 
   it('não avisa quando a citação está mesmo no texto', () => {
-    const v = julgar(material({ resenha: material().resenha + ' O texto diz "criou Deus os céus e a terra".' }))
+    const v = julgar(
+      material({
+        resenha: 'O texto diz "criou Deus os céus e a terra". ' + material().resenha,
+      }),
+    )
     expect(v.avisos).toEqual([])
   })
 
@@ -274,7 +291,10 @@ describe('portão — o sobrescrito é texto bíblico', () => {
         ordem: 1,
         titulo_pericope_pt: 'Dormir no meio do golpe',
         contexto_historico_literario: ctx,
-        resenha: 'Adversários que se multiplicam contra Davi enquanto ele foge de Absalão. '.repeat(5),
+        resenha:
+          'Adversários que se multiplicam contra Davi enquanto ele foge de Absalão. '.repeat(5) +
+          '\n\n- Selá é uma marca musical antiga cujo sentido exato se perdeu.' +
+          '\n- Escudo, aqui, é a proteção que cobre o corpo inteiro em combate.',
         perguntas_reflexao: ['p1', 'p2'],
         topicos_pregar:
           'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
@@ -324,16 +344,16 @@ describe('portão — parágrafo que a leitura descartaria em silêncio', () => 
   }
 
   it('aceita a resenha com o quarto parágrafo — o das palavras do trecho', () => {
-    expect(julgar([C, C].join('\n\n'), [R, R, R, R].join('\n\n')).problemas).toEqual([])
+    expect(julgar([C, C].join('\n\n'), [R, R, R, LISTA_OK].join('\n\n')).problemas).toEqual([])
   })
 
   it('reprova o quinto parágrafo da resenha, que nunca chegaria à tela nem ao áudio', () => {
-    const v = julgar([C, C].join('\n\n'), [R, R, R, R, R].join('\n\n'))
+    const v = julgar([C, C].join('\n\n'), [R, R, R, R, LISTA_OK].join('\n\n'))
     expect(v.problemas.join(' ')).toMatch(/resenha com 5 parágrafos/)
   })
 
   it('reprova o terceiro parágrafo do contexto pelo mesmo motivo', () => {
-    const v = julgar([C, C, C].join('\n\n'), [R, R].join('\n\n'))
+    const v = julgar([C, C, C].join('\n\n'), [R, R, LISTA_OK].join('\n\n'))
     expect(v.problemas.join(' ')).toMatch(/contexto com 3 parágrafos/)
   })
 })
@@ -376,7 +396,10 @@ describe('portão — repetição entre campos da cadeia', () => {
   it('reprova quando a resenha repete uma frase inteira do contexto', () => {
     const frase =
       'Absalão era o filho de Davi que tomou o trono do pai e o obrigou a fugir de Jerusalém a pé.'
-    const v = julgar(frase + ' ' + ENCHE_C.repeat(3), ENCHE_R.repeat(3) + ' ' + frase + ' ' + ENCHE_R.repeat(2))
+    const v = julgar(
+      frase + ' ' + ENCHE_C.repeat(3),
+      ENCHE_R.repeat(3) + ' ' + frase + ' ' + ENCHE_R.repeat(2) + '\n\n' + LISTA_OK,
+    )
     expect(v.ok).toBe(false)
     expect(v.problemas.join(' ')).toMatch(/resenha repete o contexto/)
   })
@@ -385,7 +408,7 @@ describe('portão — repetição entre campos da cadeia', () => {
     const citacao = '"Muitos dizem de minha alma: Não há salvação para ele em Deus"'
     const v = julgar(
       ENCHE_C.repeat(3) + ' O salmo abre assim: ' + citacao + '.',
-      ENCHE_R.repeat(3) + ' A acusação volta: ' + citacao + '. ' + ENCHE_R.repeat(2),
+      ENCHE_R.repeat(3) + ' A acusação volta: ' + citacao + '. ' + ENCHE_R.repeat(2) + '\n\n' + LISTA_OK,
     )
     expect(v.problemas).toEqual([])
   })
@@ -393,8 +416,79 @@ describe('portão — repetição entre campos da cadeia', () => {
   it('não reprova coincidência curta de vocabulário', () => {
     const v = julgar(
       'Davi foge de Jerusalém enquanto os adversários se multiplicam. ' + ENCHE_C.repeat(3),
-      'Os adversários se multiplicam, e o salmo conta como ele dormiu. ' + ENCHE_R.repeat(3),
+      'Os adversários se multiplicam, e o salmo conta como ele dormiu. ' +
+        ENCHE_R.repeat(3) +
+        '\n\n' +
+        LISTA_OK,
     )
     expect(v.problemas).toEqual([])
+  })
+})
+
+describe('portão — a lista de palavras que fecha a resenha', () => {
+  let base: string
+  let d: Dirs
+
+  const TEXTO =
+    'Capítulo 1\n1 No princípio criou Deus os céus e a terra.\n2 E a terra estava desordenada e vazia, e as trevas estavam sobre a face do abismo.'
+  const C = 'Princípio criou Deus céus terra desordenada abismo vazio. '.repeat(4)
+  const R = 'Trevas movia águas separou luz chamou tarde manhã dia. '.repeat(4)
+  const LISTA = [
+    '- Abismo, aqui, é a massa de água sem fundo que cobria tudo antes da luz.',
+    '- Desordenada e vazia traduz duas palavras que descrevem terreno sem forma e sem ninguém.',
+  ].join('\n')
+
+  const material = (resenha: string) => ({
+    ordem: 1,
+    titulo_pericope_pt: 'A criação',
+    contexto_historico_literario: C,
+    resenha,
+    perguntas_reflexao: ['p1', 'p2'],
+    topicos_pregar:
+      'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
+  })
+
+  beforeEach(() => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(
+      join(d.entrada, '1.json'),
+      JSON.stringify(montarEntrada(bruta({ ordem: 1, texto: TEXTO }))),
+    )
+  })
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  const julgar = (resenha: string) => {
+    writeFileSync(join(d.saida, '1.json'), JSON.stringify(material(resenha)))
+    return conferirSaidas(d, [1])[0]
+  }
+
+  it('aprova a resenha que fecha com a lista', () => {
+    expect(julgar([R, R, R, LISTA].join('\n\n')).problemas).toEqual([])
+  })
+
+  it('reprova quando as palavras vêm emendadas em prosa — era o pedido do dono', () => {
+    const emendado =
+      'Duas palavras do trecho: abismo é a massa de água sem fundo; desordenada e vazia descreve terreno sem forma.'
+    const v = julgar([R, R, R, emendado].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/resenha não fecha com a lista/)
+  })
+
+  it('reprova quando a lista tem um item só — não vale gastar um parágrafo com um', () => {
+    const v = julgar([R, R, R, '- Abismo é a massa de água sem fundo que cobria tudo.'].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/1 item/)
+  })
+
+  it('reprova mais de 4 itens', () => {
+    const cinco = Array.from({ length: 5 }, (_, i) => `- Palavra número ${i} explicada numa frase inteira.`).join('\n')
+    const v = julgar([R, R, R, cinco].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/5 itens/)
+  })
+
+  it('reprova item que é verbete e não frase — sem ponto final', () => {
+    const verbete = ['- Abismo: massa de água sem fundo', '- Trevas: escuridão total'].join('\n')
+    const v = julgar([R, R, R, verbete].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/não termina em frase/)
   })
 })

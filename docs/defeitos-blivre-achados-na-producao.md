@@ -45,6 +45,22 @@ mais-que-perfeito legítimo (`falara`, `chegara`, `achara`, `florescera`…); e
 
 Êx 25:16 · Êx 25:21 · 1Sm 6:19 · 2Rs 12:10 · 2Cr 24:10
 
+## 4. Marcador temporal corrompido (2 versículos)
+
+`Naquela muita` → `Naquele tempo`. São as **únicas duas ocorrências** da
+expressão no corpus inteiro, e as duas abrem narrativa:
+
+| ref | BLIVRE | Almeida 1911 | KJV |
+|---|---|---|---|
+| Lv 24:10 | "**Naquela muita** o filho de uma mulher israelita…" | "E saiu um filho d'uma mulher israelita…" | "And the son of an Israelitish woman…" |
+| 1Rs 3:16 | "**Naquela muita** vieram duas mulheres prostitutas ao rei" | "Então vieram duas mulheres prostitutas ao rei" | "Then came there two women…" |
+
+A própria BLIVRE escreve **"Naquele tempo" 28 vezes** — é o idioma dela, então a
+correção não inventa vocabulário. Nenhuma das duas testemunhas traz conteúdo
+que a frase corrompida carregue: em 1Rs 3:16 as duas trazem um marcador
+temporal ("Então"/"Then"), e em Lv 24:10 nenhuma traz marcador nenhum. Trocar
+por "Naquele tempo" preserva o sentido nos dois casos e não acrescenta nada.
+
 ## Achado que NÃO é defeito
 
 **`alambre`** (Êx 26:11, "colchetes de alambre") é palavra antiga para bronze —

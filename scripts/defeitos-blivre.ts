@@ -365,6 +365,25 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
       'PSA 111:4', 'PSA 111:6', 'PSA 111:10',
     ],
   },
+  {
+    classe: 'erro de digitação (Salmos 75—93)',
+    refs: [
+      'PSA 77:12', 'PSA 77:18', 'PSA 78:30', 'PSA 78:51',
+      'PSA 80:5', 'PSA 81:6', 'PSA 88:5', 'PSA 89:38',
+    ],
+  },
+  {
+    // Sl 119:71 é o único caso de REGISTRO, não de digitação: a fonte escreve
+    // "Foi bom pra mim ter sido afligido", com o "pra" coloquial no meio de um
+    // salmo inteiro em registro alto. Fica catalogado porque a perícope muda se
+    // for uniformizado, mas a decisão é do dono — a Bíblia Livre pode ter feito
+    // isso de propósito.
+    classe: 'erro de digitação (Salmos 113—131)',
+    refs: [
+      'PSA 113:7', 'PSA 115:6', 'PSA 118:24', 'PSA 119:10',
+      'PSA 119:71', 'PSA 119:83', 'PSA 122:9',
+    ],
+  },
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)

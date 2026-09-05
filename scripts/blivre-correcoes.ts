@@ -308,6 +308,13 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'PSA 89:38',
+    de: 'Porém tu te rebelaste, e [o] rejeitaste',
+    para: 'Porém tu o aborreceste, e [o] rejeitaste',
+    motivo:
+      'A fonte põe DEUS se rebelando, o que nenhuma testemunha sustenta: KJV "But thou hast cast off and abhorred"; Almeida 1911 "Porém tu rejeitaste e aborreceste". A palavra que entra é a da Almeida, não uma escolha minha — é a tradução ancestral da Bíblia Livre e domínio público, e trocar só o verbo errado mantém o resto do versículo intacto.',
+  },
+  {
     ref: 'PSA 109:12',
     de: 'Haja ninguém que tenha piedade dele, e haja ninguém',
     para: 'Não haja ninguém que tenha piedade dele, e não haja ninguém',

@@ -21,7 +21,7 @@ describe('DEFEITOS', () => {
   })
 
   it('as classes batem com o que o doc registra', () => {
-    expect(DEFEITOS.map((d) => d.refs.length).reduce((a, b) => a + b)).toBe(469)
+    expect(DEFEITOS.map((d) => d.refs.length).reduce((a, b) => a + b)).toBe(484)
   })
 })
 

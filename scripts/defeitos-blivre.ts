@@ -396,22 +396,25 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)
 
 /**
- * A única referência cujo texto ainda pode mudar — e por isso a única que
- * congela perícope por causa do texto.
+ * Referências cujo texto ainda pode mudar — e por isso as únicas que congelam
+ * perícope por causa do texto. **Está vazia, e isso é o ponto.**
  *
- * Eram quatro. Em 05/09/2026 o dono resolveu três de uma vez, ao dizer que KJV
- * e Almeida são AUTORIDADE e não só veto: onde as duas apontam claramente, a
+ * Eram quatro. Em 05/09/2026 o dono resolveu três de uma vez ao dizer que KJV e
+ * Almeida são AUTORIDADE e não só veto: onde as duas apontam claramente, a
  * palavra entra, mesmo que isso signifique ACRESCENTAR. Jr 4:14 recebeu o
  * `vãos` que as duas trazem; Sl 36:2 teve a gramática consertada sem trocar a
- * leitura, porque ali as testemunhas leem diferente e a escolha da Bíblia Livre
- * é defensável; e Sl 48:4 entrou em `PONTO_FINAL_PERDIDO`, junto com os outros
- * 22 versículos cuja frase acaba sem ponto.
+ * leitura; Sl 48:4 entrou em `PONTO_FINAL_PERDIDO`.
  *
- * Sobra Sl 119:71 — `Foi bom pra mim ter sido afligido`. Não é defeito: é
- * registro, e da mesma família do `"a gente"` de ~80 perícopes. Sai daqui
- * quando o dono responder a decisão nº 1 de `docs/decisoes-do-dono-sessao-3.md`.
+ * A quarta, Sl 119:71, eu tinha guardado como decisão do dono achando que `Foi
+ * bom pra mim` podia ser registro escolhido. Bastou contar: `para` 6.985 vezes
+ * na fonte, `pra` uma, aqui. Era lapso, não escolha — e a lição é a de sempre
+ * nesta fase: medir antes de perguntar.
+ *
+ * Deixar a lista vazia e não apagá-la é de propósito. O congelamento importa
+ * `AINDA_PODEM_MUDAR`, e o dia em que um defeito novo aparecer sem receita, é
+ * aqui que ele entra.
  */
-export const AINDA_PODEM_MUDAR: RefDefeito[] = ['PSA 119:71']
+export const AINDA_PODEM_MUDAR: RefDefeito[] = []
 
 /**
  * Códigos VPL na ordem canônica — a mesma ordem dos livros no catálogo.

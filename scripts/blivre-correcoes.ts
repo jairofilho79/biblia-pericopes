@@ -1627,6 +1627,9 @@ export const CORRECOES: Correcao[] = [
   { ref: 'PSA 36:2', de: '[que não] achar [nem] odiar',
     para: '[que não] acha [nem] odeia',
     motivo: 'Dois infinitivos onde a oração pede indicativo. Aqui as testemunhas leem DIFERENTE da Bíblia Livre — KJV "until his iniquity be found to be hateful", Almeida 1911 "até que a sua iniquidade se descubra ser detestavel" —, e a leitura dela (o orgulhoso não chega a enxergar nem a odiar a própria maldade) é defensável e é a das versões modernas. Então conserta-se a gramática quebrada, não se troca a tradução.' },
+  { ref: 'PSA 119:71', de: 'Foi bom pra mim',
+    para: 'Foi bom para mim',
+    motivo: 'Eu tinha guardado este como decisão do dono, achando que podia ser registro escolhido. Não é: a própria fonte escreve `para` 6.985 vezes e `pra` UMA, aqui. Almeida 1911: "Foi-me bom ter sido afflicto"; KJV: "It is good for me that I have been afflicted". É lapso de digitação, e o versículo era o último que travava perícope por texto.' },
 ]
 
 

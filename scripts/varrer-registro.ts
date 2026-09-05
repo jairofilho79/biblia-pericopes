@@ -42,6 +42,12 @@ export const PADROES: { re: RegExp; motivo: string }[] = [
   { re: /\b(maluc\w+|doid\w+|louquinho)\b/gi, motivo: 'informalidade' },
   { re: /\bpapo (furado|reto)\b/gi, motivo: 'gíria' },
   { re: /\bpuxar o tapete\b/gi, motivo: 'expressão coloquial' },
+  // Rodada 3: um subagent trocou estas quatro sozinho, depois do portão.
+  // A lista cresce com o que a produção revela — é o desenho, não remendo.
+  { re: /\bpass(ar|ou|a) batido\b/gi, motivo: 'expressão coloquial' },
+  { re: /\bfala do bolso\b/gi, motivo: 'metáfora coloquial' },
+  { re: /\bsem graça\b/gi, motivo: '"sem graça" — informalidade' },
+  { re: /\bfalh(ado|ou) feio\b/gi, motivo: 'informalidade' },
 ]
 
 export type Suspeita = { ordem: number; campo: string; trecho: string; motivo: string }

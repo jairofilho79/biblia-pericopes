@@ -56,6 +56,17 @@ describe('varrer', () => {
     expect(varrer(material({ resenha: 'Ele seguiu de boa, sem pensar duas vezes.' })).length).toBe(1)
   })
 
+  it('a lista cresce com a produção: as quatro que a rodada 3 revelou', () => {
+    for (const frase of [
+      'o detalhe passou batido para quem lê rápido',
+      'o texto fala do bolso antes de falar do coração',
+      'a cena termina sem graça, como quem desiste',
+      'ali ele falhou feio diante do povo',
+    ]) {
+      expect(varrer(material({ resenha: frase })).length).toBeGreaterThan(0)
+    }
+  })
+
   it('acha mais de uma suspeita no mesmo campo', () => {
     expect(varrer(material({ resenha: 'A galera fez uma treta e ninguém deu um jeito.' })).length).toBeGreaterThanOrEqual(2)
   })

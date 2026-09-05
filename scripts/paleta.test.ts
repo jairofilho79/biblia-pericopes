@@ -23,8 +23,17 @@ function tokensDoBloco(cabecalho: string): Record<string, string> {
   if (i < 0) throw new Error(`bloco não encontrado no app.css: ${cabecalho}`)
   const corpo = css.slice(i, css.indexOf('}', i))
   const tokens: Record<string, string> = {}
-  for (const [, nome, valor] of corpo.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6})\s*;/g)) {
-    tokens[nome] = valor.toLowerCase()
+  const apelidos: Record<string, string> = {}
+  for (const [, nome, valor] of corpo.matchAll(/--([\w-]+):\s*(#[0-9a-fA-F]{6}|var\(--[\w-]+\))\s*;/g)) {
+    const ref = valor.match(/^var\(--([\w-]+)\)$/)
+    if (ref) apelidos[nome] = ref[1]
+    else tokens[nome] = valor.toLowerCase()
+  }
+  // Uma volta de indireção basta, e é a que o CSS usa: `--cta-bg: var(--accent)`
+  // e `--candle: var(--accent)` dizem a INTENÇÃO ("no escuro a superfície cheia
+  // é o próprio acento") melhor do que o hex repetido diria.
+  for (const [nome, alvo] of Object.entries(apelidos)) {
+    if (tokens[alvo]) tokens[nome] = tokens[alvo]
   }
   return tokens
 }
@@ -59,7 +68,10 @@ const TEXTO = [
   ['accent', 'bg'],
   ['accent', 'paper'],
   ['accent', 'accent-soft'],
-  ['cta-ink', 'accent'],
+  // A superfície cheia da marca: no claro --cta-bg é âmbar VIVO e a letra é
+  // escura; no escuro --cta-bg é o próprio --accent. Os dois temas usam a
+  // mesma receita, e é este par que garante que ela seja legível.
+  ['cta-ink', 'cta-bg'],
   ['erro', 'bg'],
   ['erro', 'paper'],
 ] as const
@@ -80,6 +92,7 @@ const OBRIGATORIOS = [
   'accent-soft',
   'flame',
   'erro',
+  'cta-bg',
   'cta-ink',
 ]
 

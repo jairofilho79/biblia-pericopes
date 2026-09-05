@@ -73,6 +73,42 @@ tanto quanto o achado: `persa` (Ne 12:22, Dn 6:28) é "Dario, o **persa**", e n�
 "presa"; `preto` (Mt 5:36, Ap 6:5, Ap 6:12) é a **cor**, e não "perto". Trocar
 qualquer um dos dois estragaria o versículo.
 
+## 6. `água` onde é `águia` (8 versículos) — o mais grave até aqui
+
+Achado por leitura em Dt 32:11 ("Como a **água** desperta sua ninhada"), e
+confirmado por varredura cruzada: versículos em que a KJV diz *eagle* e a
+BLIVRE não diz *águia*.
+
+| ref | BLIVRE | KJV |
+|---|---|---|
+| **Êx 19:4** | "vos tomei sobre asas de **águas**" | "I bore you on **eagles**' wings" |
+| Lv 11:13 | "a **água**, o quebra-ossos, o esmerilhão" | "the **eagle**, the ossifrage" |
+| Dt 14:12 | "a **água**, e o quebra-ossos" | "the **eagle**, and the ossifrage" |
+| Dt 28:49 | "nação… que voe como **água**" | "as swift as the **eagle** flieth" |
+| Dt 32:11 | "Como a **água** desperta sua ninhada" | "As an **eagle** stirreth up her nest" |
+| 2Sm 1:23 | "Mais ligeiros que **águas**" | "swifter than **eagles**" |
+| Jó 39:27 | "a **água** voa alto e põe seu ninho na altura" | "the **eagle** mount up… make her nest on high" |
+| Ap 12:14 | "duas asas de grande **água**" | "two wings of a great **eagle**" |
+
+**Por que este é o mais grave.** Não é acento nem grafia: é uma palavra real
+trocada por outra palavra real. Nenhum corretor ortográfico acusa, nenhuma
+varredura de acento acha, e a frase continua gramatical. Só a leitura pega —
+água não tem asas nem ninho. E cai em Êxodo 19:4, um dos versículos mais
+citados da Bíblia inteira. A BLIVRE escreve `águia` corretamente em 22
+versículos, então é corrupção pontual, não escolha de tradução.
+
+**Não são defeitos, na mesma varredura:** `galinha-d'água` (Lv 11:18) e
+`gavião-pescador` (Dt 14:17) são nomes de aves, escolha legítima para
+*gier-eagle*; e `abutres` em Mt 24:28, Lc 17:37 e Pv 30:17 é tradução
+defensável de ἀετοί.
+
+### O método que achou isto, e que serve para caçar mais
+
+Cruzar uma palavra da KJV contra o que a BLIVRE traz naquele mesmo versículo.
+É mais forte do que varrer a BLIVRE sozinha, porque acha **troca entre palavras
+que existem** — a classe que escapa de tudo. Vale repetir no fim da fila com
+outros substantivos concretos (animais, metais, medidas, números).
+
 ## Achado que NÃO é defeito
 
 **`alambre`** (Êx 26:11, "colchetes de alambre") é palavra antiga para bronze —
@@ -101,7 +137,7 @@ reescrever no escuro.
 
 ## Placar
 
-**32 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**40 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

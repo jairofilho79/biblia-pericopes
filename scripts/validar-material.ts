@@ -11,6 +11,7 @@
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { MAX_PARAGRAFOS } from '../src/lib/paragraphize.ts'
 
 const CAMPOS = [
   'ordem',
@@ -134,6 +135,21 @@ export function validarMaterial(
     ...citacoes(m.topicos_pregar ?? ''),
   ].filter((c) => !alvo.includes(normalizar(c)))
   for (const c of suspeitas) avisos.push(`citação fora do texto — "${c.slice(0, 60)}"`)
+
+  // A leitura descarta o que passa do teto — e some da tela, do áudio e do
+  // realce sem erro nenhum. Material escrito no vazio é reprovado aqui, não
+  // descoberto meses depois por um leitor que sentiu falta do fim da resenha.
+  const paragrafos = (t: string) =>
+    (t ?? '')
+      .replace(/\r\n/g, '\n')
+      .trim()
+      .split(/\n\s*\n+/)
+      .map((x) => x.trim())
+      .filter(Boolean).length
+  const nCtx = paragrafos(m.contexto_historico_literario)
+  const nRes = paragrafos(m.resenha)
+  if (nCtx > MAX_PARAGRAFOS.contexto) p.push(`contexto com ${nCtx} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.contexto})`)
+  if (nRes > MAX_PARAGRAFOS.resenha) p.push(`resenha com ${nRes} parágrafos (a leitura mostra ${MAX_PARAGRAFOS.resenha})`)
 
   for (const campo of ['contexto_historico_literario', 'resenha'] as const) {
     const v = m[campo] ?? ''

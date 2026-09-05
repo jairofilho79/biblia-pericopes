@@ -66,14 +66,24 @@ Carl Sagan e **odeia perder o tempo de quem lê**.
 
 - Frases curtas ou médias. Ordem natural: sujeito → verbo → complemento.
 - Palavras do dia a dia. Em vez de "cosmovisão", diga "jeito de ver o mundo".
+- **Uma ideia por frase.** Não encadeie três deduções numa só. Se o raciocínio
+  tem três passos, escreva três frases, na ordem em que se pensa.
+- **Nada de conhecimento tácito.** Se a sua frase só funciona para quem já sabe
+  de algo, diga esse algo primeiro, numa oração curta. Você não está falando com
+  um colega de seminário; está falando com alguém que abriu a Bíblia hoje.
+  - ❌ "O estado do réu é descrito como um corpo espancado" — o leitor ainda não
+    sabe que o capítulo é um processo, nem que Israel é o réu.
+  - ✅ "O capítulo é montado como um julgamento: Deus acusa, e Israel é o
+    acusado. E o acusado é descrito como um corpo espancado."
+- **Não use termo técnico como se fosse comum.** Rito, veredito, expiação,
+  aliança, oráculo, escatológico: ou explica na hora, ou troca por outra
+  palavra.
 - Densidade alta, extensão baixa: cada frase traz insight ou dado útil.
-- Termo incomum (hebraico, grego, técnico, histórico) só se for **mesmo**
-  necessário — e explicado na hora, entre parênteses ou em oração curta logo
-  depois. Ex.: *'ezer kenegdo* (uma ajuda à altura, alguém do mesmo nível — não
-  uma empregada).
-- Nunca deixe termo difícil solto. Nunca acumule três num parágrafo.
 - **Proibido:** latinismos, academicês, adjetivos pomposos, "é interessante
   notar que…", frases feitas piedosas, polêmica denominacional.
+- E o contrário também é proibido: não infantilize, não explique o óbvio, não
+  fale como se o leitor tivesse cinco anos. Ele é inteligente; só não estudou
+  teologia.
 
 ## Profundidade (sem aleatoriedade)
 
@@ -102,8 +112,47 @@ palavras simples e precisas, e o que o texto realmente afirma. Integre o insight
 - Sobre **Deus**: o que este trecho mostra do caráter dele — se estiver lá.
 - Sobre **Jesus**: somente com abertura real no texto. Sem abertura, silêncio.
   **Prefira a omissão à ligação artificial.**
-- 2–3 parágrafos curtos, separados por `\n\n`. Três só se o trecho for muito
-  rico. **Sem passeio versículo a versículo.** Entre 200 e 3.000 caracteres.
+- **2 ou 3 parágrafos de prosa, mais um quarto e último parágrafo obrigatório:
+  as palavras do trecho** (ver abaixo). Separe todos com `\n\n`.
+- **Sem passeio versículo a versículo.** Entre 200 e 3.000 caracteres no total.
+- **Nunca mais de 4 parágrafos.** O quinto não aparece na tela nem no áudio — a
+  leitura descarta o excedente em silêncio.
+
+### O quarto parágrafo: as palavras do trecho
+
+Este parágrafo existe porque a Bíblia Livre usa palavras que o leitor não usa —
+*holocausto*, *primícias*, *estopa*, *escória*, *sobejo*, *manjedoura*, *luas
+novas* — e porque tropeçar numa palavra é o jeito mais rápido de perder o fio da
+história.
+
+Regras:
+
+- Escolha de **2 a 4 palavras ou expressões que estão no `texto` da perícope** e
+  que um leitor comum não saberia. Palavra que você mesmo inventou não conta:
+  tem de ser palavra que ele vai encontrar lendo.
+- Explique cada uma em **uma frase**, concreta, sem definição de dicionário.
+  Diga o que a coisa é no mundo, não a categoria dela.
+  - ❌ "Estopa: fibra têxtil de baixa qualidade."
+  - ✅ "Estopa é a fibra que sobra quando se desfia o linho, e pega fogo num
+    instante."
+- **Prosa corrida, não lista.** Este parágrafo é narrado em voz alta junto com o
+  resto da resenha, e uma lista de verbetes soa como dicionário no áudio.
+  Emende as explicações numa frase só ou em duas, ligadas.
+- Comece com uma abertura curta que avise o que vem — "Três palavras do
+  trecho:", "Duas expressões que valem parar:" — e siga direto.
+- Se o trecho **não tiver** nenhuma palavra difícil (acontece: narrativa simples,
+  vocabulário do dia a dia), use o parágrafo para a informação que falta ao
+  leitor para entender a cena: uma medida, um costume, um lugar, um cargo.
+  Ex.: quanto era um talento, o que fazia um escriba, onde ficava Betânia.
+  **O parágrafo nunca é dispensado** — o que muda é o que ele carrega.
+
+Exemplo do formato (Isaías 1):
+
+> Três palavras do trecho: *estopa* é a fibra que sobra quando se desfia o
+> linho, e pega fogo num instante; as *luas novas* eram a festa do primeiro dia
+> de cada mês, tão obrigatória quanto o sábado; e *carmesim* era uma tintura
+> vermelha cara justamente porque não saía mais do tecido depois de tingido — é
+> a mancha que ninguém consegue lavar.
 
 **4. `perguntas_reflexao`** — exatamente **duas**. Afiadas, em linguagem jovem,
 nunca de sim/não. Deus e Jesus só se couberem ao trecho.
@@ -178,6 +227,10 @@ tradução, e olhar para ele só puxaria a qualidade para baixo.
 ## Antes de entregar cada perícope
 
 1. Toda frase entre aspas está, exata, no `texto`?
+1b. A resenha termina com o parágrafo das palavras do trecho, em prosa corrida,
+   e tem no máximo 4 parágrafos? O contexto tem no máximo 2?
+1c. Alguma frase sua só funciona para quem já sabia de alguma coisa? Diga essa
+   coisa antes.
 2. Linha de raciocínio tem 5–7 bullets? Mensagens tem 4–6? Todas com negrito?
 3. `perguntas_reflexao` tem exatamente 2?
 4. Contexto e resenha entre 200 e 3.000 caracteres?

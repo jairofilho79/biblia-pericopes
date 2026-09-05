@@ -3,6 +3,22 @@ const ABBREV_END =
   /(?:^|[\s(])(?:ex|p\.?\s?ex|etc|cf|dr|dra|sr|sra|prof|a\.C|d\.C|n|v|vs|vv|cap)\.$/i
 
 /**
+ * Teto de parágrafos por seção em prosa, e a ÚNICA fonte dele.
+ *
+ * `paragraphize` descarta o que passa do teto — em silêncio. A tela e os alvos
+ * de alinhamento da narração saem do mesmo array, então um parágrafo a mais no
+ * material não é "um pouco cortado": ele não é exibido, não é narrado e não é
+ * realçado, sem erro em lugar nenhum. Por isso o número mora aqui e é lido
+ * tanto pela leitura (`src/pages/Leitura.tsx`) quanto pelo portão do material
+ * (`scripts/validar-material.ts`), que reprova quem escreveria no vazio.
+ *
+ * A resenha aceita 4 porque o último parágrafo dela é reservado às palavras do
+ * trecho que o leitor não conhece — e esse parágrafo é narrado junto, que é
+ * justamente onde ele vale mais: quem ouve não tem como consultar nada.
+ */
+export const MAX_PARAGRAFOS = { contexto: 2, resenha: 4 } as const
+
+/**
  * Quebra texto longo em parágrafos legíveis.
  * Prefer `\n\n` existentes; senão agrupa ~N frases por parágrafo.
  */

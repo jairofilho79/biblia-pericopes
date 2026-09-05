@@ -288,3 +288,52 @@ describe('portão — o sobrescrito é texto bíblico', () => {
     expect(v.avisos).toEqual([])
   })
 })
+
+describe('portão — parágrafo que a leitura descartaria em silêncio', () => {
+  let base: string
+  let d: Dirs
+
+  const TEXTO =
+    'Capítulo 1\n1 No princípio criou Deus os céus e a terra.\n2 E a terra estava desordenada e vazia, e as trevas estavam sobre a face do abismo.'
+  const P = 'Princípio criou Deus céus terra desordenada vazia trevas abismo movia águas. '.repeat(3)
+
+  const material = (contexto: string, resenha: string) => ({
+    ordem: 1,
+    titulo_pericope_pt: 'A criação',
+    contexto_historico_literario: contexto,
+    resenha,
+    perguntas_reflexao: ['p1', 'p2'],
+    topicos_pregar:
+      'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
+  })
+
+  beforeEach(() => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(
+      join(d.entrada, '1.json'),
+      JSON.stringify(montarEntrada(bruta({ ordem: 1, texto: TEXTO }))),
+    )
+  })
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  const julgar = (c: string, r: string) => {
+    writeFileSync(join(d.saida, '1.json'), JSON.stringify(material(c, r)))
+    return conferirSaidas(d, [1])[0]
+  }
+
+  it('aceita a resenha com o quarto parágrafo — o das palavras do trecho', () => {
+    expect(julgar([P, P].join('\n\n'), [P, P, P, P].join('\n\n')).problemas).toEqual([])
+  })
+
+  it('reprova o quinto parágrafo da resenha, que nunca chegaria à tela nem ao áudio', () => {
+    const v = julgar([P, P].join('\n\n'), [P, P, P, P, P].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/resenha com 5 parágrafos/)
+  })
+
+  it('reprova o terceiro parágrafo do contexto pelo mesmo motivo', () => {
+    const v = julgar([P, P, P].join('\n\n'), [P, P].join('\n\n'))
+    expect(v.problemas.join(' ')).toMatch(/contexto com 3 parágrafos/)
+  })
+})

@@ -18,7 +18,7 @@ import {
   proximaNoTestamento,
   refLabel,
 } from '../lib/content'
-import { paragraphize } from '../lib/paragraphize'
+import { paragraphize, MAX_PARAGRAFOS } from '../lib/paragraphize'
 import { readingMinutes } from '../lib/reading-time'
 import { useWakeLock } from '../lib/use-wake-lock'
 import { groupCorrido, parseTexto, type VerseBlock } from '../lib/parse-texto'
@@ -194,10 +194,13 @@ export default function Leitura() {
   // limites) alimentam os alvos de alinhamento da narração das seções em
   // prosa.
   const parasContexto = useMemo(
-    () => (p ? paragraphize(p.contexto_historico_literario, { maxParas: 2 }) : []),
+    () => (p ? paragraphize(p.contexto_historico_literario, { maxParas: MAX_PARAGRAFOS.contexto }) : []),
     [p],
   )
-  const parasResenha = useMemo(() => (p ? paragraphize(p.resenha, { maxParas: 3 }) : []), [p])
+  const parasResenha = useMemo(
+    () => (p ? paragraphize(p.resenha, { maxParas: MAX_PARAGRAFOS.resenha }) : []),
+    [p],
+  )
   // Os mesmos arrays que a página renderiza viram os alvos do alinhamento —
   // é isso que garante que o realce valide o que o olho vê.
   const secoesNarracao = useMemo<SecaoAlvos[]>(

@@ -79,7 +79,18 @@ function main() {
   const porRegistro = new Set(mats.flatMap((m) => varrer(m)).map((s) => s.ordem))
   const porTitulo = new Set(
     colisoes(mats.map((m) => ({ ordem: m.ordem, titulo: m.titulo_pericope_pt })))
-      .filter((c) => c.forca >= 0.5)
+      // 0,7 e não 0,5. O corte de 0,5 foi posto quando 15 títulos eram
+      // IDÊNTICOS e o acervo inteiro era vago: ali qualquer semelhança era
+      // suspeita. Depois de os 2.823 títulos ganharem âncora, ele passou a
+      // segurar 567 perícopes por pares como "Jeoacaz reina três meses, filho
+      // de Hamutal" × "Joaquim reina três meses, filho de Neusta" — que é
+      // exatamente o que a regra da âncora produziu de melhor, dois reis
+      // distintos pela mãe. Ninguém confunde os dois.
+      //
+      // 0,7 é o ponto onde os pares deixavam de ser distinguíveis, e os oito
+      // que estavam acima dele foram desempatados à mão. Hoje o corte não pega
+      // nenhum: ele fica de guarda para o que vier.
+      .filter((c) => c.forca >= 0.7)
       .flatMap((c) => [c.a.ordem, c.b.ordem]),
   )
 

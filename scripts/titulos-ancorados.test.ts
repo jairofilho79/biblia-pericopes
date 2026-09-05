@@ -58,8 +58,9 @@ describe.skipIf(!existsSync(CATALOGO))('contra o catálogo de verdade', () => {
       texto: string
     }[]
     const soltos = d.filter((p) => !ancorar(p.titulo_pericope_pt, p.texto).ancorado).length
-    // Trava para baixo: a reescrita dos títulos só pode diminuir este número.
-    expect(soltos).toBeLessThanOrEqual(39)
+    // Chegou a zero em 05/09/2026, depois de 1.263 títulos reescritos. Deixa de
+    // ser trava para baixo e passa a ser trava seca: título novo nasce ancorado.
+    expect(soltos).toBe(0)
   })
 })
 

@@ -6,8 +6,15 @@
 > Esses aparecem quando alguém **lê** o texto, e é o que os subagents estão
 > fazendo, uma perícope por vez.
 >
-> Nada aqui foi aplicado ainda. Ver "Como aplicar" no fim: corrigir o texto
-> depois do material escrito tem custo, e ele é gerenciável, mas não é zero.
+> **Aplicado em 2026-09-05.** As 484 referências fecharam: 421 viraram receita
+> em `scripts/blivre-correcoes.ts`, 52 eram erro de normalização e a ETL as
+> desfaz, 7 foram absolvidas pela conferência e 4 esperam decisão do dono. O
+> veredito de cada uma das 63 sem receita está na seção do fim.
+>
+> O custo que a seção "Como aplicar" temia foi medido e é pequeno: das 436
+> perícopes cujo texto mudou, **cinco** citavam justamente o trecho corrigido, e
+> as cinco se resolveram trocando a citação. O congelamento passou de 1.714 para
+> 1.982 perícopes liberadas para narração.
 
 ## 1. Acento perdido (18 versículos) — resquício da ortografia de 1911
 

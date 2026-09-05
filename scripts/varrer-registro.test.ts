@@ -78,3 +78,53 @@ describe('varrer', () => {
     expect(varrer(material({ resenha: 'A galera fez uma treta e ninguém deu um jeito.' })).length).toBeGreaterThanOrEqual(2)
   })
 })
+
+describe('o que a varredura NÃO pode marcar', () => {
+  // Terceira vez que a varredura marca Escritura como gíria: "de boa vontade"
+  // (Mc 12:37), "três medidas de boa farinha" (Gn 18) e agora "Estás doido"
+  // (Ec 2:2). O conserto por caso não escala — a citação inteira sai da varredura.
+  it('não marca nada dentro de aspas, porque ali é o texto bíblico falando', () => {
+    for (const frase of [
+      'Ele descarta rápido: "Eu disse ao riso: Estás doido".',
+      'A multidão o ouvia “de boa vontade”, diz o texto.',
+      'A visita traz "três medidas de boa farinha" para os hóspedes.',
+    ]) {
+      expect(varrer(material({ resenha: frase }))).toEqual([])
+    }
+  })
+
+  it('não marca "a gente" quando gente é substantivo, e marca quando é "nós"', () => {
+    for (const noun of [
+      'a mensagem chega a gente que jamais entraria numa reunião cristã',
+      'a gente de lá falava com um sotaque diferente',
+      'o povo da terra é a gente comum de Judá, fora do palácio',
+      'se a cidade tem gente boa dentro, a gente boa segura a sentença',
+    ]) {
+      expect(varrer(material({ resenha: noun }))).toEqual([])
+    }
+    for (const pronome of [
+      'termina onde a gente para de falar',
+      'as passagens que a gente toma quando quer encurtar',
+    ]) {
+      expect(varrer(material({ resenha: pronome })).map((s) => s.motivo)).toContain(
+        '"a gente" no lugar de "nós"',
+      )
+    }
+  })
+
+  it('não marca "piada" quando o material está justamente negando o humor', () => {
+    for (const frase of [
+      'Zombador, aqui, não é quem faz piada: é quem já decidiu que nada tem valor.',
+      'O texto o descreve com respeito, sem piada e sem desespero.',
+      'Ciúme aparece aqui com peso, e não como piada.',
+    ]) {
+      expect(varrer(material({ resenha: frase }))).toEqual([])
+    }
+    expect(varrer(material({ resenha: 'A agressão vem primeiro e a piada vem depois.' }))).toHaveLength(1)
+  })
+
+  it('não marca "de boa" depois de verbo de nomear', () => {
+    expect(varrer(material({ resenha: 'É a morte que um israelita chamaria de boa.' }))).toEqual([])
+    expect(varrer(material({ resenha: 'O profeta ficou de boa.' }))).toHaveLength(1)
+  })
+})

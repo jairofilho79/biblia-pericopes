@@ -20,14 +20,14 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /** Cada padrão vem com o motivo, porque suspeita sem motivo ninguém julga. */
-export const PADROES: { re: RegExp; motivo: string }[] = [
+export const PADROES: { re: RegExp; motivo: string; negavel?: boolean }[] = [
   { re: /\bbicho\b/gi, motivo: 'animal do texto reduzido a "bicho"' },
   { re: /\b(fulano|beltrano|ciclano|sicrano)\b/gi, motivo: 'nome próprio substituído por apelido genérico' },
   { re: /\b(galera|treta|rolê|zoar|zoeira|na moral|tipo assim|sacou)\b/gi, motivo: 'gíria' },
   // "de boa" só é gíria quando fecha a oração. Sem isto, ele casava dentro de
   // "três medidas de boa farinha" (citação de Gn 18) e de "boa velhice" —
   // duas expressões do próprio texto bíblico.
-  { re: /\bde boa(?=\s*[,.;:!?]|\s*$)/gi, motivo: 'gíria' },
+  { re: /(?<!\bcham\w{0,6}\s)\bde boa(?=\s*[,.;:!?]|\s*$)/gi, motivo: 'gíria' },
   { re: /\b(encrenca|bagunça|confusão armada|barraco)\b/gi, motivo: 'informalidade' },
   { re: /\bcalar a boca\b/gi, motivo: 'expressão grosseira' },
   { re: /\bcara de\b/gi, motivo: '"cara de" — construção coloquial' },
@@ -36,7 +36,9 @@ export const PADROES: { re: RegExp; motivo: string }[] = [
   { re: /\bdescont(ou|ar|ava) a mão\b/gi, motivo: 'expressão de briga de rua' },
   { re: /\bse safou\b/gi, motivo: 'informalidade sobre pessoa do texto' },
   { re: /\b(dar|deu|deram|dando|dá) um jeito\b/gi, motivo: 'informalidade' },
-  { re: /\bpiada\b/gi, motivo: 'tom de humor onde não cabe' },
+  // Marcar "não é piada" é marcar o material por dizer exatamente a coisa
+  // certa. A guarda olha a oração anterior, não a frase inteira.
+  { re: /\bpiada\b/gi, motivo: 'tom de humor onde não cabe', negavel: true },
   { re: /\b(enjoad[oa]|de saco cheio|puto|irritadinho)\b/gi, motivo: 'familiaridade com Deus ou com o texto' },
   { re: /\bDeus (surta|pira|perde a cabeça|se estressa)\b/gi, motivo: 'familiaridade com Deus' },
   { re: /\b(maluc\w+|doid\w+|louquinho)\b/gi, motivo: 'informalidade' },
@@ -49,11 +51,33 @@ export const PADROES: { re: RegExp; motivo: string }[] = [
   { re: /\bsem graça\b/gi, motivo: '"sem graça" — informalidade' },
   { re: /\bfalh(ado|ou) feio\b/gi, motivo: 'informalidade' },
   // Rodada 4: mais duas, também trocadas por um subagent depois do portão.
-  { re: /\ba gente\b/gi, motivo: '"a gente" no lugar de "nós"' },
+  // "a gente de lá", "chega a gente que…" — aí gente é substantivo e a frase
+  // está correta. O coloquialismo é o "a gente" que faz as vezes de "nós",
+  // e esse vem colado num verbo.
+  { re: /\ba gente\b(?!\s+(?:que|de|do|da|dos|das|com|sem|em|no|na|comum|bo[ma]s?|simples|humilde|pobre|ric[ao])\b)/gi, motivo: '"a gente" no lugar de "nós"' },
   { re: /\btem (essa|aquela) cara\b/gi, motivo: 'construção coloquial' },
 ]
 
 export type Suspeita = { ordem: number; campo: string; trecho: string; motivo: string }
+
+/**
+ * Dentro de aspas é Escritura, e Escritura não tem registro a corrigir.
+ *
+ * Esta guarda existe porque a varredura já marcou o texto bíblico três vezes:
+ * "de boa vontade" (Mc 12:37), "três medidas de boa farinha" (Gn 18) e
+ * "Estás doido" (Ec 2:2). Consertar caso a caso não escala — o que escala é a
+ * citação inteira ficar fora do alcance da lista.
+ */
+export function dentroDeAspas(texto: string, i: number): boolean {
+  const antes = texto.slice(0, i)
+  if (antes.lastIndexOf('\u201c') > antes.lastIndexOf('\u201d')) return true
+  return ((antes.match(/"/g) ?? []).length % 2) === 1
+}
+
+/** "não é piada", "sem piada": o material está negando o registro, não o usando. */
+export function negadoAntes(texto: string, i: number): boolean {
+  return /\b(n\u00e3o|nem|sem)\b[^.!?;]{0,40}$/i.test(texto.slice(Math.max(0, i - 60), i))
+}
 
 const CAMPOS = [
   'titulo_pericope_pt',
@@ -70,9 +94,11 @@ export function varrer(material: Record<string, unknown>): Suspeita[] {
     ['perguntas_reflexao', (material.perguntas_reflexao as string[] | undefined)?.join(' ') ?? ''],
   ]
   for (const [campo, texto] of alvos) {
-    for (const { re, motivo } of PADROES) {
+    for (const { re, motivo, negavel } of PADROES) {
       for (const m of texto.matchAll(new RegExp(re.source, re.flags))) {
         const i = m.index ?? 0
+        if (dentroDeAspas(texto, i)) continue
+        if (negavel && negadoAntes(texto, i)) continue
         achadas.push({
           ordem,
           campo,

@@ -64,3 +64,29 @@ convenção (linhas começando em `- `). Funciona, e o app já a renderiza como
 seção própria com título falado. Virar campo de verdade no JSON deixaria o
 contrato explícito, mas obriga a remexer nas 2.823 perícopes e no manifesto.
 Vale a pena? Decisão adiada para o fim da corrida.
+
+## 5. Jr 4:14 — a única correção que eu não sei fazer sozinho
+
+A Bíblia Livre traz:
+
+> Lava teu coração da maldade para que sejas salva; ó Jerusalém! Até quando
+> deixarás os **teus meus** pensamentos permanecerem em meio a ti?
+
+`teus meus` não é português, e não há dúvida de que está errado. A dúvida é
+qual palavra estava ali, e as três saídas dizem coisas diferentes:
+
+1. **`teus maus pensamentos`** — uma letra de distância, e a própria fonte
+   escreve `maus pensamentos` quatro vezes. Mas *maus* não é o que as duas
+   testemunhas dizem.
+2. **`teus vãos pensamentos`** — é o que as testemunhas dizem (KJV *"thy vain
+   thoughts"*, Almeida *"os pensamentos da tua vaidade"*), e a fonte nunca usa
+   a expressão. A palavra entraria por minha conta.
+3. **`os teus pensamentos`**, sem qualificativo — não afirma nada falso, lê bem,
+   e perde o adjetivo que as duas testemunhas trazem.
+
+A regra da casa manda não colocar o que não existe, o que derruba a 2; e manda
+não mudar o sentido, o que derruba a 1. Sobra a 3, que é subtração — e
+subtração também é decisão sua.
+
+**Enquanto você não decide, o versículo fica como está** e a perícope de Jr 4
+não é liberada para narração.

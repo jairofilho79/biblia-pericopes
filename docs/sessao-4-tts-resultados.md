@@ -245,7 +245,109 @@ Duas ressalvas honestas:
 Para referência, não como proposta: alugar uma RTX 4090 faria as mesmas ~174 h em
 ~2,2 dias por **US$ 18**. O dono foi explícito em preferir não gastar.
 
-## 6. Cotações reais de GPU (RunPod, 2026-09-04)
+## 6. Como pedir uma voz grave ao VoxCPM2 (medido, não adivinhado)
+
+O dono ouviu a rodada 14 e notou que **só uma das cinco** saiu realmente grave —
+as outras deram o mesmo timbre, e uma soou "falando triste, cabisbaixo". Em vez
+de continuar caçando no ouvido, dá para medir: **"grave" é frequência
+fundamental**, e F0 se mede com `tts-spike/mede_timbre.py` (librosa/pyin).
+
+O resultado explica tudo de uma vez:
+
+| receita | F0 mediana |
+|---|---|
+| `ash` — **a régua em produção** | **111 Hz** |
+| g3 "low bass register, dark timbre" | 112,6 Hz ✅ |
+| g1 "very deep bass-baritone" | 193,8 Hz ❌ |
+| g4 "a receita boa + grave marcado" | 218,8 Hz ❌ |
+| g2 "veteran radio announcer, deep and grave" | 221,4 Hz ❌ |
+
+As quatro receitas reprovadas estavam **quase uma oitava acima** da aprovada.
+
+### A regra que saiu disso
+
+1. **Vocabulário de registro percebido funciona**: *"low bass register"*,
+   *"dark timbre"*, *"thick low end"*, microfone de estúdio de diafragma grande.
+2. **Vocabulário de intensidade não funciona**: *"deep"*, *"bass-baritone"*,
+   *"veteran radio announcer"* não moveram um Hz.
+3. **Vocabulário técnico é o pior de todos**: *"low fundamental frequency"* deu
+   **215,7 Hz** — o modelo entende descrição perceptual, não medida física.
+4. ⚠️ **"grave", "weighty" e "solemn" em inglês são PESO EMOCIONAL, não altura.**
+   Foi o que produziu a leitura triste e cabisbaixa: o modelo obedeceu a
+   instrução certa com o sentido errado. **Nunca usar essas palavras para pedir
+   voz grave** — só termos de registro.
+5. **A semente ainda sorteia ±60 Hz** com a receita certa (a mesma g3 deu 102,
+   124 e 161 Hz em três sementes). A receita move a distribuição para baixo; o
+   sorteio decide onde dentro dela.
+
+### O garimpo virou filtro — e mostrou que filtrar não basta
+
+`tts-spike/garimpa_grave.py` varreu **16 sementes** (8 por receita) medindo a F0
+de cada uma. Resultado cru: **só 2 ficaram abaixo dos 111 Hz da régua**, e as
+duas são a mesma semente 42 — as outras 14 espalharam entre 123 e 213 Hz.
+
+Isso obriga a corrigir o item 5 acima: **a semente pesa mais que a receita.**
+Dentro de uma mesma semente a redação faz diferença enorme (102 Hz do g3/h4
+contra 194–221 Hz do g1/g2/g4), mas varrer sementes com a receita boa ainda é
+loteria de ~12% de acerto. Caçar mais fundo é desperdício.
+
+A saída é **congelar**: pegar a voz de 102,7 Hz que já existe e cloná-la. O
+VoxCPM2 clona a partir de um wav de referência e — diferente do clone stateless
+do Fish, que achatou a prosódia e foi reprovado duas vezes neste projeto — a
+clonagem dele **aceita direção de estilo** ("controllable cloning"). Se isso se
+confirmar, resolve os dois problemas de uma vez: timbre estável e direção por
+seção. Testado em `tts-spike/gera_vox18_clone.py`.
+
+### ✅ A clonagem congelou o timbre — e a direção sobreviveu
+
+`tts-spike/gera_vox18_clone.py`, clonando de `vox17_g3_s42.wav` (102,7 Hz):
+
+| take | F0 | nível | verbatim |
+|---|---|---|---|
+| clone + direção "reflexões" | **101,5 Hz** | −16,4 dB | 1,000 ✅ |
+| clone **sem** direção (controle) | 107,5 Hz | −18,8 dB | 1,000 ✅ |
+| clone + direção "texto bíblico" (genealogia) | 104,5 Hz | −15,5 dB | 0,957 ⚠️ |
+| clone modo `prompt` (wav + transcrição) | 101,5 Hz | −19,4 dB | **0,240 ❌** |
+
+**Os quatro ficaram abaixo dos 111 Hz da régua** — contra 2 em 16 no sorteio de
+sementes. O timbre está resolvido: congela-se a referência e acabou a loteria.
+
+E a direção continua pegando: o take dirigido saiu **17% mais longo** que o seco
+(14,4 s contra 12,3 s), a mesma assinatura de "direção alonga" já vista no
+Algieba e na rodada 12. Diferente do clone stateless do Fish, que ignorava.
+
+Três armadilhas achadas de graça, todas pelo teste automático:
+
+1. 🚨 **O modo `prompt_wav_path` + `prompt_text` NÃO consome a direção — ele LÊ a
+   direção em voz alta, traduzida.** O take saiu dizendo "perguntando com
+   curiosidade genuína, verdadeiramente inquisitiva…". **Usar só
+   `reference_wav_path`.** (Aqui o difflib pegou com folga: 0,240. É o tipo de
+   desastre para o qual o limiar de 0,90 foi feito.)
+2. ⚠️ **Genealogia é o caso duro**: "Isaque" saiu "Isaac" e alguns "e" caíram
+   (0,957). Passa no limiar, mas confirma que a seção de texto bíblico precisa do
+   guarda de alinhamento.
+3. ⚠️ **O clone dirigido sobe o nível**: −16 dB contra os −24,5 dB do `ash`, quase
+   9 dB mais quente. Se for só nível, normaliza-se no pós (`loudnorm`); se for
+   esforço vocal, não. Pende do ouvido do dono.
+
+#### Como o filtro fica útil, mesmo assim
+
+Como (a) a F0 se mede e (b) a geração é determinística por semente, não é preciso
+julgar no escuro: `tts-spike/garimpa_grave.py` varre N sementes da receita boa,
+mede cada uma e **só leva ao ouvido do dono as que ficam abaixo dos 111 Hz da
+régua**. A voz escolhida fica congelada pela semente e sai idêntica na produção
+inteira, sem custo nenhum.
+
+Também aprovado nesta rodada: o **termo "interpretativo"** no A/B da rodada 14
+("interpretando junto com o ouvinte, sentindo o sentido enquanto lê") — entra na
+receita definitiva. E `ts=10` fica mantido.
+
+Contra a "gritada" que o dono notou na voz grave: o nível medido ajuda a
+enxergar. O `ash` roda a −24,5 dB RMS; o g3 a −20,6 dB, quase 4 dB mais quente. A
+redação de microfone de estúdio (`h4`) desce para −22,1 dB mantendo os mesmos
+102 Hz — é a candidata que junta grave e contido.
+
+## 7. Cotações reais de GPU (RunPod, 2026-09-04)
 
 Conferidas na página do provedor, como manda o passo 4 do protocolo:
 
@@ -256,7 +358,7 @@ Conferidas na página do provedor, como manda o passo 4 do protocolo:
 | **RTX 4090 24GB** | **US$ 0,34/h** | US$ 0,74/h |
 | L40S 48GB | US$ 0,79/h | US$ 0,99/h |
 
-## 7. A conta do caminho aberto, com os números de hoje
+## 8. A conta do caminho aberto, com os números de hoje
 
 Base: o acervo dá **~200 h de áudio** por voz (8,87M chars no ritmo medido de
 11–13 chars/s de fala). Preço de GPU: RTX 4090 no RunPod Community, US$ 0,34/h.
@@ -282,7 +384,43 @@ o mesmo** em vez de outros US$ 48. A economia na primeira voz é magra, como o
 kickoff já avisava. Ela só fica interessante em dois cenários: quando o
 OpenRouter corrigir a tabela, ou quando o dono quiser 3–4 vozes.
 
-## 8. Estado das decisões
+## 9. Veredito final da Sessão 4
+
+**Fica o `ash`.** O dono vai carregar créditos e narrar o acervo inteiro em
+`openai/gpt-audio-mini` voz `ash`, por ~US$ 47.
+
+O VoxCPM2 chegou perto — **"nota 7,5: dá para aceitar, mas não enche os olhos"** —
+e o diagnóstico é que **o teto é da categoria, não do modelo**. Um TTS com
+condicionamento de estilo *pinta* um estilo sobre a leitura; um modelo de chat com
+áudio *atua* o texto, porque entende o que está lendo. É por isso que o `ash`
+responde a "faça uma pergunta genuinamente indagadora" de um jeito que um TTS não
+responde: ele sabe o que é uma pergunta.
+
+E há evidência de que isso é padrão, não acaso: **é a segunda vez que este projeto
+bate na mesma parede.** O clone M-L no Fish caiu com a queixa quase idêntica
+("ficou pobre de interpretação… faz total diferença ter um narrador sentindo a
+leitura junto com você"). Dois modelos abertos independentes, o mesmo limite.
+
+### O que a sessão entrega
+
+| entrega | valor |
+|---|---|
+| **Número-seguro medido** | acervo US$ 47 hoje → **US$ 269** se o OpenRouter corrigir (fator 5,68×), e a metadata mostra que o erro está isolado no mini — o `gpt-audio` grande, mesma modality, é cobrado certo |
+| **Catálogo aberto mapeado** | VoxCPM2 é o único de licença livre e chega a 7,5; Higgs TTS 3 e Fish S2-Pro seguem não testados (precisam de GPU, ~US$ 10–30 pelo acervo, licença não-comercial) |
+| **Método de voz por medição** | F0, nível e verbatim viraram números — ver seção 6 |
+| **Um defeito achado no lote em produção** | o limiar de verbatim 0,90 não pega omissão fina (o take reprovado marcou 0,992) — vale endurecer |
+| **Gasto da sessão** | **US$ 0** |
+
+### Pendências que saem daqui
+
+1. **Endurecer a checagem de verbatim do lote do `ash`**: exigir que números e
+   contagem de palavras batam, não só a similaridade global. Território da outra
+   sessão, mas o defeito é real e está medido na seção 4.
+2. **Trilha sonora** → [`kickoff-sessao-5-trilhas.md`](kickoff-sessao-5-trilhas.md).
+3. **Higgs TTS 3** fica registrado como a única pedra não virada, caso o preço do
+   `ash` mude ou o dono queira 3+ vozes.
+
+## 9. Estado das decisões
 
 | eixo | situação |
 |---|---|
@@ -295,7 +433,7 @@ OpenRouter corrigir a tabela, ou quando o dono quiser 3–4 vozes.
 
 **Nada foi gasto nesta sessão.**
 
-## 9. Próximo passo proposto
+## 10. Próximo passo proposto
 
 Alugar **uma hora de RTX 4090 (US$ 0,34)** e, nela, rodar a Reflexão 1 e depois a
 perícope 1600 nos três candidatos que aceitam direção — **VoxCPM2**, **Fish

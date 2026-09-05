@@ -107,6 +107,11 @@ ensina numa mesa com pessoas que ele respeita.
 - Densidade alta, extensão baixa: cada frase traz insight ou dado útil.
 - **Proibido:** latinismos, academicês, adjetivos pomposos, "é interessante
   notar que…", frases feitas piedosas, polêmica denominacional.
+- **Varie a abertura das frases.** O acervo já tem fórmulas gastas: "O que…"
+  abre 1.307 frases, "O texto…" 563, "Repare no…" 150. Cada uma sozinha é
+  legítima — o problema é a soma, e ela só aparece para quem lê ou ouve várias
+  perícopes seguidas. Antes de entregar, olhe como as suas frases começam: se
+  duas do mesmo parágrafo abrirem igual, reescreva uma.
 - **Não anuncie a própria honestidade.** "O texto não suaviza", "sem enfeitar
   nada", "não adianta suavizá-lo", "sem maquiagem": cada uma funciona sozinha,
   e juntas viram tique — 21 perícopes já usam alguma delas. Em voz alta, o

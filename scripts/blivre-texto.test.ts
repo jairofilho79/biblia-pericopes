@@ -196,3 +196,23 @@ describe('parêntese folgado', () => {
     )
   })
 })
+
+describe('hífen com espaço depois', () => {
+  it('junta a ênclise partida', () => {
+    expect(removerColchetes('e dize- lhes: Subo')).toBe('e dize-lhes: Subo')
+  })
+
+  it('junta a ênclise partida que ainda está entre colchetes', () => {
+    expect(removerColchetes('envolveu- [a] em si')).toBe('envolveu-a em si')
+  })
+
+  it('junta o composto', () => {
+    expect(removerColchetes('o Deus Todo- Poderoso')).toBe('o Deus Todo-Poderoso')
+  })
+
+  it('não toca no travessão, que leva espaço de propósito', () => {
+    expect(removerColchetes('a cidade — a que Davi tomou — caiu')).toBe(
+      'a cidade — a que Davi tomou — caiu',
+    )
+  })
+})

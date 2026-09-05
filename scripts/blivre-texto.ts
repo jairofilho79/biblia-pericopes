@@ -16,6 +16,17 @@
 
 /** Sufixo hifenizado entre colchetes: `Salva [-nos]` → `Salva-nos`. */
 const HIFEN_SOLTO = /\s*\[-/g
+
+/**
+ * Hífen com espaço depois: `dize- lhes`, `envolveu- [a]`, `meio- dia`. São 14
+ * no corpus, seis deles ênclises que a narração leria como duas palavras.
+ *
+ * Em português o hífen nunca leva espaço — o travessão com espaço é outro
+ * sinal, o `—`, que a fonte usa e este padrão não toca por exigir letra dos
+ * dois lados. Como o `[`, é espaço em branco, e por isso mora aqui e não numa
+ * receita a versículo.
+ */
+const HIFEN_COM_ESPACO = /(\p{L})-\s+(?=\p{L}|\[)/gu
 /** Espaço antes de pontuação, que sobra quando o colchete some. */
 const ESPACO_ANTES_DE_PONTUACAO = /\s+([,;.!?:])/g
 
@@ -112,6 +123,7 @@ export function removerColchetes(texto: string): string {
     .replace(LETRA_SOLTA_ANTES, '$1[')
     .replace(PEDACO_QUE_FECHA, '$1$2')
     .replace(PEDACO_QUE_ABRE, '$1')
+    .replace(HIFEN_COM_ESPACO, '$1-')
     .replace(HIFEN_SOLTO, '-')
     .replace(/[[\]]/g, '')
     .replace(PARENTESE_FOLGADO, (m) => (m.startsWith('(') ? '(' : ')'))

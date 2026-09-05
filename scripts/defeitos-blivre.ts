@@ -190,7 +190,7 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
   {
     classe: 'erro de digitação (Romanos)',
     refs: [
-      'ROM 4:3', 'ROM 7:2', 'ROM 8:36',
+      'ROM 4:3', 'ROM 7:2', 'ROM 8:36', 'ROM 15:19',
     ],
   },
 ]

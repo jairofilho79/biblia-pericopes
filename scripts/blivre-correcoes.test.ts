@@ -152,7 +152,7 @@ describe('as tabelas', () => {
   it('toda correção manual tem motivo escrito com a testemunha', () => {
     for (const c of CORRECOES) {
       expect(c.motivo.length, c.ref).toBeGreaterThan(50)
-      expect(c.motivo, c.ref).toMatch(/KJV|Almeida 1911|a própria fonte/)
+      expect(c.motivo, c.ref).toMatch(/KJV|Almeida 1911|a própria fonte/i)
     }
   })
 
@@ -168,7 +168,7 @@ describe('as tabelas', () => {
   it('o tamanho das tabelas está travado', () => {
     expect(DUPLICADAS).toHaveLength(48)
     expect(PARENTESES_ORFAOS).toHaveLength(11)
-    expect(CORRECOES).toHaveLength(22)
+    expect(CORRECOES).toHaveLength(31)
     expect(SUBSCRICOES).toHaveLength(14)
     expect(OMISSOES).toHaveLength(28)
   })

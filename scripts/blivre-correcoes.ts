@@ -248,6 +248,67 @@ export const CORRECOES: Correcao[] = [
     motivo:
       'Palavras coladas. KJV "shall a man leave his father"; Almeida 1911 "deixará o homem seu pae" — as duas separam o artigo.',
   },
+  // ── Não-palavras: a segunda testemunha aqui é a PRÓPRIA FONTE, que grafa a
+  // forma certa em outro lugar. Conferi as contagens no corpus antes de
+  // escrever cada uma. (`hava` também aparece em 2Rs 17:24, mas ali é o nome
+  // da cidade de Ava, que a KJV confirma — não entrou.)
+
+  {
+    ref: 'LUK 1:63',
+    de: 'todos se surpeenderam',
+    para: 'todos se surpreenderam',
+    motivo: 'Caiu o "r". A própria fonte grafa "surpreenderam" corretamente em outro versículo.',
+  },
+  {
+    ref: 'LUK 2:48',
+    de: 'ficarm surpresos',
+    para: 'ficaram surpresos',
+    motivo: 'Caiu o "a". A própria fonte grafa "ficaram" 65 vezes no corpus.',
+  },
+  {
+    ref: 'LUK 3:1',
+    de: 'Herodes tetraca da Galileia',
+    para: 'Herodes tetrarca da Galileia',
+    motivo:
+      'Caiu o "r". A própria fonte grafa "tetrarca" 6 vezes, duas delas neste mesmo versículo.',
+  },
+  {
+    ref: 'LUK 9:40',
+    de: 'que o exupulsassem',
+    para: 'que o expulsassem',
+    motivo: 'Letras a mais. A própria fonte grafa "expulsassem" corretamente em outro versículo.',
+  },
+  {
+    ref: 'LUK 21:15',
+    de: 'não posam',
+    para: 'não possam',
+    motivo: 'Caiu o "s". A própria fonte grafa "possam" 12 vezes no corpus.',
+  },
+  {
+    ref: 'LUK 12:28',
+    de: 'amanhá é lançada no forno',
+    para: 'amanhã é lançada no forno',
+    motivo: 'Acento no lugar do til. A própria fonte grafa "amanhã" 72 vezes no corpus.',
+  },
+  {
+    ref: 'LUK 9:33',
+    de: 'estavam saíndo da presença dele',
+    para: 'estavam saindo da presença dele',
+    motivo: 'Acento indevido. A própria fonte grafa "saindo" 42 vezes no corpus.',
+  },
+  {
+    ref: 'LUK 4:25',
+    de: 'hava muitas viúvas em Israel',
+    para: 'havia muitas viúvas em Israel',
+    motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
+  },
+  {
+    ref: 'ROM 15:19',
+    de: 'no poder do Espíritode Deus',
+    para: 'no poder do Espírito de Deus',
+    motivo:
+      'Palavras coladas. KJV "by the power of the Spirit of God"; Almeida 1911 "pelo poder do Espirito de Deus" — e a própria fonte separa as duas em todas as outras ocorrências.',
+  },
   { ref: 'AMO 9:14', de: 'meu povo Isarael', para: 'meu povo Israel', motivo: 'Letras trocadas no nome do povo. KJV "my people of Israel".' },
   {
     ref: 'HOS 1:1',

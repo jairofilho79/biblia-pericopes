@@ -87,7 +87,7 @@ function palavrasDoTexto(texto: string): Set<string> {
  * é legítimo e comum, e transformar isso em erro reprovaria material bom.
  */
 export function validarMaterial(
-  entrada: { texto: string; titulo_provisorio?: string; livro?: string },
+  entrada: { texto: string; sobrescrito?: string; titulo_provisorio?: string; livro?: string },
   m: Material,
   bruto: string,
 ): { problemas: string[]; avisos: string[] } {
@@ -117,7 +117,7 @@ export function validarMaterial(
 
   // O material tem de falar DESTE trecho: pelo menos algumas palavras de
   // conteúdo em comum com o texto bíblico.
-  const doTexto = palavrasDoTexto(entrada.texto)
+  const doTexto = palavrasDoTexto(`${entrada.texto} ${entrada.sobrescrito ?? ''}`)
   const doMaterial = palavrasDoTexto(`${m.contexto_historico_literario} ${m.resenha}`)
   const comuns = [...doMaterial].filter((w) => doTexto.has(w)).length
   if (comuns < 5) p.push(`só ${comuns} palavras em comum com o texto — material genérico?`)
@@ -125,7 +125,9 @@ export function validarMaterial(
   // Citação que o material apresenta como do texto tem de estar NO texto.
   // Uma citação derivada — conjugação trocada, palavra a mais — é Escritura
   // inventada, e é a falha mais grave possível aqui.
-  const alvo = normalizar(entrada.texto)
+  // O sobrescrito do salmo é texto bíblico — ele só não está DENTRO de `texto`
+  // porque a leitura o exibe como epígrafe. Citá-lo é legítimo.
+  const alvo = normalizar(`${entrada.texto} ${entrada.sobrescrito ?? ''}`)
   const suspeitas = [
     ...citacoes(m.contexto_historico_literario ?? ''),
     ...citacoes(m.resenha ?? ''),

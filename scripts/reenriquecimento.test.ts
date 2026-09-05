@@ -246,3 +246,45 @@ describe('portão de qualidade', () => {
     expect(existsSync(join(d.travas, '1'))).toBe(true)
   })
 })
+
+describe('portão — o sobrescrito é texto bíblico', () => {
+  let base: string
+  let d: Dirs
+
+  const TEXTO = 'Capítulo 3\n1 SENHOR, como se multiplicam os meus adversários!'
+  const SOBRESCRITO = 'Salmo de Davi, quando ele fugia da presença de seu filho Absalão'
+
+  beforeEach(() => {
+    base = mkdtempSync(join(tmpdir(), 'reenriq-'))
+    d = dirs(base)
+    criarDirs(d)
+    writeFileSync(
+      join(d.entrada, '1.json'),
+      JSON.stringify(
+        montarEntrada(bruta({ ordem: 1, abbrev: 'Sl', texto: TEXTO, sobrescrito: SOBRESCRITO })),
+      ),
+    )
+  })
+  afterEach(() => rmSync(base, { recursive: true, force: true }))
+
+  it('citar a epígrafe do salmo não é citação inventada — ela só é exibida à parte', () => {
+    const ctx =
+      `A inscrição diz "${SOBRESCRITO}". ` +
+      'Multiplicam adversários SENHOR Davi Absalão presença fugia filho. '.repeat(4)
+    writeFileSync(
+      join(d.saida, '1.json'),
+      JSON.stringify({
+        ordem: 1,
+        titulo_pericope_pt: 'Dormir no meio do golpe',
+        contexto_historico_literario: ctx,
+        resenha: 'Adversários que se multiplicam contra Davi enquanto ele foge de Absalão. '.repeat(5),
+        perguntas_reflexao: ['p1', 'p2'],
+        topicos_pregar:
+          'Linha de raciocínio\n- a **um**\n- b **dois**\n- c **três**\n- d **quatro**\n- e **cinco**\n\nMensagens a levar\n- f **seis**\n- g **sete**\n- h **oito**\n- i **nove**',
+      }),
+    )
+    const v = conferirSaidas(d, [1])[0]
+    expect(v.problemas).toEqual([])
+    expect(v.avisos).toEqual([])
+  })
+})

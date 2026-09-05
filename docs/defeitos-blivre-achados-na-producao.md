@@ -428,3 +428,55 @@ por comprimento não acha — e o que ela achou aqui é que **o resto do Novo
 Testamento precisa ser lido com a mesma lupa antes de publicar**. Atos, as
 cartas e o Apocalipse ainda não foram escritos nesta corrida; pela taxa de
 Lucas e João, é razoável esperar mais uma centena de defeitos ali.
+
+## O veredito das 63 que ficaram sem receita
+
+O catálogo tem 484 referências. Ao fim da fase de correção, 421 têm receita e 63
+não — e nenhuma das 63 é trabalho pendente. Elas se dividem em três grupos, e a
+distinção importa porque o congelamento lê o catálogo, não esta prosa.
+
+**52 são desfeitas pela ETL.** O que o leitor marcou era espaço, ponto colado,
+colchete meio aberto ou hífen partido — material de normalização, não da Bíblia
+Livre. `salvá-las.E foram`, `siga- me`, `d [a] Judeia`, `desçam com [igo]`,
+`(a nona [hora] )`, `de palavra [s] ,`: todos conferidos um a um rodando o
+versículo pela mesma sequência que serve a tela — receita, epígrafe, colchetes.
+
+Foi essa conferência que achou um erro meu de auditoria: o script rodava
+`corrigirVersiculo` e `removerColchetes` mas pulava `separarEpigrafe`, e por
+isso Sl 14:1 e Sl 53:1 apareciam com o dois-pontos do sobrescrito colado no
+texto. Eu quase escrevi receita para um defeito que não existe na tela.
+
+**7 foram derrubadas pela conferência.** O leitor marcou, a testemunha não
+confirmou, e não achar defeito também é resultado:
+
+- **At 4:11** `Este é a pedra` — parece erro de gênero, mas a Almeida traz
+  exatamente isso: o demonstrativo aponta para Jesus, não para a pedra.
+- **1Co 5:5** `De ao tal entregar a Satanás` — não é frase quebrada; é a
+  continuação de 1Co 5:3, "já julguei… de ao tal entregar".
+- **1Tm 6:15** `Essa nos seus tempos mostrará` — concorda com `a aparição` de
+  6:14, e a Almeida traz a mesma construção torta.
+- **Sl 49:14** `São como ovelhas levados` — a Almeida também põe o particípio no
+  masculino, porque quem é posto na sepultura são os homens.
+- **1Pe 3:6**, **1Pe 4:4**, **1Co 7:26** — lidos três vezes sem achar o que o
+  leitor viu.
+
+E uma quase-correção que a contagem impediu: `Porém a aqueles meus inimigos`
+(Lc 19:27) parecia crase perdida, mas a fonte escreve `a aqueles` sete vezes e
+`àqueles` cinco. É estilo da casa, não erro.
+
+**4 esperam o dono.** Jr 4:14 (`os teus meus pensamentos`, ver
+`decisoes-do-dono-sessao-3.md`), Sl 36:2 (`que não achar nem odiar sua própria
+maldade`, quebrado sem testemunha que diga como), Sl 119:71 (`Foi bom pra mim`,
+registro e não erro) e Sl 48:4, que cai na classe abaixo.
+
+## Trinta versículos sem pontuação final, e por que não têm receita
+
+Trinta versículos terminam sem `.`, `?` ou `!`. A tentação era pôr ponto nos
+trinta, e Gl 1:15 derruba a ideia:
+
+> Mas quando Deus (que me separou desde o ventre da minha mãe, e por sua graça
+> me chamou) se agradou
+
+Termina assim porque a frase **continua em Gl 1:16**. Ponto ali seria erro meu,
+não conserto. Decidir um a um é trabalho de leitura, não de regra, e fica para
+quando alguém o fizer com as duas testemunhas na mão. Sl 48:4 é um dos trinta.

@@ -19,6 +19,7 @@ import { readFileSync } from 'node:fs'
 import { DEFEITOS } from './defeitos-blivre.ts'
 import { corrigirVersiculo } from './blivre-correcoes.ts'
 import { removerColchetes } from './blivre-texto.ts'
+import { separarEpigrafe } from './blivre-epigrafes.ts'
 
 const LINHA_VPL = /^([1-3A-Z]{3})\s(\d+):(\d+)\s(.+)$/
 
@@ -50,10 +51,15 @@ export function auditar(vpl: string): Achado[] {
       const v = bruto.get(ref)
       if (!v) throw new Error(`${ref} não existe no VPL — o catálogo mente.`)
 
+      // A mesma ordem de `converterVpl`: receita, epígrafe, colchetes. Sem a
+      // epígrafe no meio, salmo com sobrescrito aparecia aqui com o dois-pontos
+      // colado — defeito que não existe na tela, e que eu quase fui consertar.
       const comReceita = corrigirVersiculo(v.cod, v.cap, v.ver, v.texto)
-      const servido = removerColchetes(comReceita)
+      const servido = removerColchetes(
+        separarEpigrafe(v.cod, v.cap, v.ver, comReceita).texto,
+      )
       const situacao: Situacao = comReceita !== v.texto ? 'receita' : 'aberto'
-      const etlMexeu = removerColchetes(v.texto) !== v.texto
+      const etlMexeu = removerColchetes(separarEpigrafe(v.cod, v.cap, v.ver, v.texto).texto) !== v.texto
 
       achados.push({ ref, classe, situacao, etlMexeu, bruto: v.texto, servido })
     }

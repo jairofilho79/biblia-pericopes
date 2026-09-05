@@ -61,6 +61,18 @@ que a frase corrompida carregue: em 1Rs 3:16 as duas trazem um marcador
 temporal ("Então"/"Then"), e em Lv 24:10 nenhuma traz marcador nenhum. Trocar
 por "Naquele tempo" preserva o sentido nos dois casos e não acrescenta nada.
 
+## 5. Grafia espanholada (4 versículos)
+
+`preguntar` → `perguntar`. "Preguntar" não existe em português; é o verbo
+espanhol. A BLIVRE escreve `perguntar` **91 vezes** e `preguntar` 4:
+
+Dt 13:14 · Dt 17:9 · 2Sm 11:3 · 2Cr 18:7
+
+**A varredura da mesma família trouxe dois falsos positivos**, e eles importam
+tanto quanto o achado: `persa` (Ne 12:22, Dn 6:28) é "Dario, o **persa**", e não
+"presa"; `preto` (Mt 5:36, Ap 6:5, Ap 6:12) é a **cor**, e não "perto". Trocar
+qualquer um dos dois estragaria o versículo.
+
 ## Achado que NÃO é defeito
 
 **`alambre`** (Êx 26:11, "colchetes de alambre") é palavra antiga para bronze —
@@ -86,3 +98,10 @@ O caminho, no fim da fila:
 
 Isso é preciso e barato. O que seria caro é corrigir de forma dispersa e
 reescrever no escuro.
+
+## Placar
+
+**32 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
+é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
+entra sem as duas testemunhas.

@@ -69,7 +69,9 @@ describe('varrer', () => {
 
   it('e as duas que a rodada 4 revelou', () => {
     expect(varrer(material({ resenha: 'É assim que a gente lê o capítulo hoje.' })).length).toBe(1)
-    expect(varrer(material({ resenha: 'O trecho tem essa cara de lista, mas não é.' })).length).toBe(1)
+    // Casa duas vezes de propósito: "tem essa cara" e "cara de" são padrões
+    // distintos, e a frase tem os dois.
+    expect(varrer(material({ resenha: 'O trecho tem essa cara de lista, mas não é.' })).length).toBe(2)
   })
 
   it('acha mais de uma suspeita no mesmo campo', () => {

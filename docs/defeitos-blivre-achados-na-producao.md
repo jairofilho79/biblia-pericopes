@@ -102,6 +102,17 @@ versículos, então é corrupção pontual, não escolha de tradução.
 *gier-eagle*; e `abutres` em Mt 24:28, Lc 17:37 e Pv 30:17 é tradução
 defensável de ἀετοί.
 
+### O mesmo tipo, em Isaías 7:15
+
+| ref | BLIVRE | Almeida 1911 | KJV | correção |
+|---|---|---|---|---|
+| Is 7:15 | "Manteiga e **mal** ele comerá, pois saberá como rejeitar o **mal** e escolher o bem" | "Manteiga e **mel** comerá, até que elle saiba rejeitar o mal" | "Butter and **honey** shall he eat, that he may know to refuse the **evil**" | **mel** |
+
+O agravante: **a palavra "mal" aparece duas vezes no mesmo versículo, uma errada
+e uma certa**. Frequência não denuncia (a BLIVRE escreve `mel` corretamente em
+62 versículos e `mal` centenas de vezes), comprimento não denuncia, ortografia
+não denuncia. Só denuncia quem lê e sabe que manteiga se come com mel.
+
 ### O método que achou isto, e que serve para caçar mais
 
 Cruzar uma palavra da KJV contra o que a BLIVRE traz naquele mesmo versículo.
@@ -169,7 +180,7 @@ reescrever no escuro.
 
 ## Placar
 
-**44 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**45 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

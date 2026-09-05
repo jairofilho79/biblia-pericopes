@@ -308,6 +308,13 @@ export const CORRECOES: Correcao[] = [
     motivo: 'Caiu o "i". A própria fonte grafa "havia" 1.324 vezes no corpus.',
   },
   {
+    ref: 'PSA 109:12',
+    de: 'Haja ninguém que tenha piedade dele, e haja ninguém',
+    para: 'Não haja ninguém que tenha piedade dele, e não haja ninguém',
+    motivo:
+      'Falta a negação nas duas metades, e "Haja ninguém" nem é português. KJV "Let there be none to extend mercy unto him"; Almeida 1911 "Não haja ninguem que se compadeça d\'elle".',
+  },
+  {
     ref: 'NUM 31:34',
     de: 'E setenta e um mil asnos',
     para: 'E sessenta e um mil asnos',

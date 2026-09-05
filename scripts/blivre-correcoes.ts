@@ -161,6 +161,101 @@ export const CORRECOES: Correcao[] = [
       '"Então se levantou David, e se foi; e Jonathan entrou na cidade." A frase aqui é ' +
       'essa da Almeida 1911 com a ortografia e os nomes atualizados — não é tradução minha.',
   },
+
+  // ── Achados LENDO o texto, perícope por perícope, e por varredura de palavra
+  // suspeita (`scripts/palavras-suspeitas.ts`). Os seis primeiros mudam o
+  // sentido; os dez seguintes são letra trocada, e oito deles estão em livros
+  // que nenhum leitor humano tinha aberto ainda.
+
+  {
+    ref: 'LUK 14:11',
+    de: 'Porque qualquer que exaltar a si mesmo, e aquele que humilhar a si mesmo, será exaltado.',
+    para: 'Porque qualquer que exaltar a si mesmo será humilhado, e aquele que humilhar a si mesmo será exaltado.',
+    motivo:
+      'A oração "será humilhado" caiu, e as duas metades da frase ficaram com o mesmo desfecho — o versículo afirma o contrário do que diz. KJV: "whosoever exalteth himself shall be abased"; Almeida 1911: "qualquer que a si mesmo se exaltar será humilhado". Esta é a ÚNICA correção do catálogo que acrescenta palavras, e a redação restaurada não é minha: é a que a própria Bíblia Livre usa nos dois paralelos, Lc 18:14 e Mt 23:12.',
+  },
+  {
+    ref: 'LUK 21:18',
+    de: 'cabeça parecerá',
+    para: 'cabeça perecerá',
+    motivo:
+      'Promessa de proteção virou frase sem pé, no meio de um trecho sobre perseguição. KJV "perish"; Almeida 1911 "não perecerá nem um cabello".',
+  },
+  {
+    ref: 'LUK 20:46',
+    de: 'querem andar roupas compridas',
+    para: 'querem andar com roupas compridas',
+    motivo: 'Falta a preposição. KJV "walk in long robes"; Almeida 1911 "andar com vestidos compridos".',
+  },
+  {
+    ref: 'ACT 4:32',
+    de: 'era de um só oração',
+    para: 'era de um só coração',
+    motivo:
+      'Caiu o "c". A própria concordância denuncia: "um só oração" não fecha. KJV "of one heart and of one soul"; Almeida 1911 "era um o coração e a alma".',
+  },
+  {
+    ref: 'ACT 17:24',
+    de: 'não habita em tempos feitos por mãos',
+    para: 'não habita em templos feitos por mãos',
+    motivo:
+      'O erro inverte o argumento do discurso no areópago, que é justamente sobre lugar. KJV "dwelleth not in temples made with hands"; Almeida 1911 "não habita em templos feitos por mãos" — e a própria fonte escreve "templos" certo em At 7:48, na mesma construção.',
+  },
+  {
+    ref: 'ACT 25:12',
+    de: 'Então Paulo, tendo conversado com o Conselho',
+    para: 'Então Festo, tendo conversado com o Conselho',
+    motivo:
+      'Do jeito que está, Paulo confere com o conselho e responde ao próprio apelo. KJV "Then Festus, when he had conferred with the council"; Almeida 1911 "Então Festo, tendo fallado com o conselho".',
+  },
+
+  {
+    ref: 'PHM 1:25',
+    de: 'Jesus Cirsto',
+    para: 'Jesus Cristo',
+    motivo:
+      'Letras trocadas no nome. KJV "the Lord Jesus Christ"; Almeida 1911 "nosso Senhor Jesus Christo". Este versículo acumula duas correções: a subscrição de escriba e este erro.',
+  },
+  { ref: 'REV 2:24', de: 'esta dourina', para: 'esta doutrina', motivo:
+      'Caiu o "t". KJV "as many as have not this doctrine"; Almeida 1911 "não teem esta doutrina".' },
+  {
+    ref: 'REV 6:1',
+    de: 'quando o Coreiro abriu',
+    para: 'quando o Cordeiro abriu',
+    motivo:
+      'Caiu o "d" no nome da figura central do Apocalipse, na primeira aparição dela no capítulo. KJV "the Lamb"; Almeida 1911 "o Cordeiro".',
+  },
+  {
+    ref: 'REV 6:5',
+    de: 'abriu o terceiro celo',
+    para: 'abriu o terceiro selo',
+    motivo: 'Caiu o "s". O versículo 1 do mesmo capítulo escreve "selos" certo. Almeida 1911 "o terceiro sello".',
+  },
+  { ref: 'REV 6:15', de: 'e os rigos', para: 'e os ricos', motivo: 'Letra trocada. KJV "the rich men"; Almeida 1911 "os ricos".' },
+  { ref: '2TI 2:16', de: 'inútes', para: 'inúteis', motivo:
+      'Caiu o "i". KJV "shun profane and vain babblings"; Almeida 1911 "clamores vãos e profanos" — as duas trazem o adjetivo, e "inútes" não existe.' },
+  {
+    ref: 'HEB 11:34',
+    de: 'tonaram-se fortes',
+    para: 'tornaram-se fortes',
+    motivo:
+      'Caiu o "r". KJV "waxed valiant in fight"; Almeida 1911 "na batalha se esforçaram" — as duas trazem o verbo, e "tonaram" não existe em português.',
+  },
+  {
+    ref: 'EPH 5:31',
+    de: 'deixará oseu pai',
+    para: 'deixará o seu pai',
+    motivo:
+      'Palavras coladas. KJV "shall a man leave his father"; Almeida 1911 "deixará o homem seu pae" — as duas separam o artigo.',
+  },
+  { ref: 'AMO 9:14', de: 'meu povo Isarael', para: 'meu povo Israel', motivo: 'Letras trocadas no nome do povo. KJV "my people of Israel".' },
+  {
+    ref: 'HOS 1:1',
+    de: 'nos dias de Joeroboão',
+    para: 'nos dias de Jeroboão',
+    motivo:
+      'Letra a mais no nome do rei. KJV "Jeroboam"; Almeida 1911 "Jeroboão" — e a própria fonte grafa "Jeroboão" certo nas dezenas de outras ocorrências.',
+  },
 ]
 
 

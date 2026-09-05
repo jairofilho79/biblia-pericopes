@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { existsSync, readFileSync } from 'node:fs'
 import {
   corrigirVersiculo,
   DUPLICADAS,
@@ -106,9 +107,17 @@ describe('corrigirVersiculo — subscrição de escriba', () => {
     expect(r).toBe('A graça convosco. Amém.')
   })
 
+  // O texto aqui é o de verdade, com o `Cirsto` que a fonte traz: Fm 1:25 tem
+  // subscrição E erro de digitação, e as duas correções se aplicam ao mesmo
+  // versículo. Um fixture idealizado escondia essa combinação.
   it('preserva os colchetes editoriais do corpo — quem os tira é removerColchetes', () => {
-    const r = corrigirVersiculo('PHM', 1, 25, 'A graça [seja] com vosso espírito. Amém! [Escrita em Roma para Filemom]')
-    expect(r).toBe('A graça [seja] com vosso espírito. Amém!')
+    const r = corrigirVersiculo(
+      'PHM',
+      1,
+      25,
+      'A graça de nosso Senhor Jesus Cirsto [seja] com vosso espírito. Amém! [Escrita em Roma para Filemom]',
+    )
+    expect(r).toBe('A graça de nosso Senhor Jesus Cristo [seja] com vosso espírito. Amém!')
   })
 
   it('lança se a subscrição não estiver mais lá', () => {
@@ -159,7 +168,7 @@ describe('as tabelas', () => {
   it('o tamanho das tabelas está travado', () => {
     expect(DUPLICADAS).toHaveLength(48)
     expect(PARENTESES_ORFAOS).toHaveLength(11)
-    expect(CORRECOES).toHaveLength(6)
+    expect(CORRECOES).toHaveLength(22)
     expect(SUBSCRICOES).toHaveLength(14)
     expect(OMISSOES).toHaveLength(28)
   })
@@ -169,5 +178,57 @@ describe('as tabelas', () => {
       expect(o.motivo.length, o.ref).toBeGreaterThan(30)
       expect(o.para.length, o.ref).toBeGreaterThan(o.de.length)
     }
+  })
+})
+
+describe('as correções achadas lendo e por varredura', () => {
+  // Cada `de` tem de casar com a fonte de verdade, senão `corrigirVersiculo`
+  // lança em produção. Este teste é o guarda disso: se a Bíblia Livre publicar
+  // uma revisão, ele quebra aqui e não no build.
+  const VPL = 'data/bliv-tr_vpl.txt'
+  const TEM_VPL = existsSync(VPL)
+  const porRef = new Map<string, string>()
+  if (TEM_VPL) {
+    for (const l of readFileSync(VPL, 'utf8').replace(/^﻿/, '').split(/\r?\n/)) {
+      const m = /^(\S+ \d+:\d+)\s+(.*)$/.exec(l)
+      if (m) porRef.set(m[1], m[2])
+    }
+  }
+
+  const NOVAS = [
+    'LUK 14:11', 'LUK 21:18', 'LUK 20:46', 'ACT 4:32', 'ACT 17:24', 'ACT 25:12',
+    'PHM 1:25', 'REV 2:24', 'REV 6:1', 'REV 6:5', 'REV 6:15', '2TI 2:16',
+    'HEB 11:34', 'EPH 5:31', 'AMO 9:14', 'HOS 1:1',
+  ]
+
+  it('estão todas registradas', () => {
+    const refs = new Set(CORRECOES.map((c) => c.ref))
+    for (const r of NOVAS) expect(refs, r).toContain(r)
+  })
+
+  it.skipIf(!TEM_VPL)('o trecho `de` de cada uma existe na fonte, palavra por palavra', () => {
+    for (const c of CORRECOES.filter((x) => NOVAS.includes(x.ref))) {
+      const texto = porRef.get(c.ref)
+      expect(texto, `versículo ausente: ${c.ref}`).toBeDefined()
+      expect(texto!.includes(c.de), `${c.ref}: não achei "${c.de}"`).toBe(true)
+    }
+  })
+
+  it.skipIf(!TEM_VPL)('aplicar deixa o versículo certo, e o defeito some', () => {
+    for (const c of CORRECOES.filter((x) => NOVAS.includes(x.ref))) {
+      const [cod, cv] = c.ref.split(' ')
+      const [cap, ver] = cv.split(':').map(Number)
+      const saida = corrigirVersiculo(cod, cap, ver, porRef.get(c.ref)!)
+      expect(saida, `${c.ref} não aplicou`).toContain(c.para)
+    }
+  })
+
+  // A única que acrescenta palavras. A frase restaurada não é invenção minha:
+  // é a redação da própria Bíblia Livre em Lc 18:14 e Mt 23:12.
+  it('Lc 14:11 volta a dar desfechos opostos às duas metades da frase', () => {
+    const c = CORRECOES.find((x) => x.ref === 'LUK 14:11')!
+    expect(c.de).not.toContain('será humilhado')
+    expect(c.para).toContain('exaltar a si mesmo será humilhado')
+    expect(c.para).toContain('humilhar a si mesmo será exaltado')
   })
 })

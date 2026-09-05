@@ -6,7 +6,7 @@ describe('livroSlug', () => {
     expect(livroSlug('Gênesis')).toBe('genesis')
     expect(livroSlug('Êxodo')).toBe('exodo')
     expect(livroSlug('1 Samuel')).toBe('1-samuel')
-    expect(livroSlug('Cântico dos Cânticos')).toBe('cantico-dos-canticos')
+    expect(livroSlug('1 Coríntios')).toBe('1-corintios')
   })
 
   // A razão de o slug vir do nome completo e não da abreviação: as abreviações

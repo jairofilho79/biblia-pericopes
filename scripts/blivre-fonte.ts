@@ -37,7 +37,11 @@ export const MAPA_LIVROS: Record<string, { name: string; abbrev: string }> = {
   PSA: { name: 'Salmos', abbrev: 'Sl' },
   PRO: { name: 'Provérbios', abbrev: 'Pv' },
   ECC: { name: 'Eclesiastes', abbrev: 'Ec' },
-  SOL: { name: 'Cânticos', abbrev: 'Ct' },
+  // 'Cantares', e não 'Cânticos': este nome vinha do campo `name` da NAA, a
+  // versão que saiu do projeto por direitos autorais. A BLIVRE é da linhagem
+  // Corrigida — a mesma da ARC e da ACF, que dizem *Cantares* —, então o nome
+  // antigo tinha ficado órfão da tradução que o justificava.
+  SOL: { name: 'Cantares', abbrev: 'Ct' },
   ISA: { name: 'Isaías', abbrev: 'Is' },
   JER: { name: 'Jeremias', abbrev: 'Jr' },
   LAM: { name: 'Lamentações', abbrev: 'Lm' },
@@ -144,7 +148,7 @@ export function converterVpl(bruto: string): LivroBlivre[] {
 
     // A ordem importa duas vezes: corrigir ANTES de separar a epígrafe (o Sl 125
     // recupera o sobrescrito e o Sl 80 conserta o dele), e separar a epígrafe
-    // ANTES de tirar os colchetes (o rótulo do Sl 119 e de Cânticos VEM entre
+    // ANTES de tirar os colchetes (o rótulo do Sl 119 e de Cantares VEM entre
     // colchetes).
     const corrigido = corrigirVersiculo(cod, capitulo, versiculo, corpo.trim())
     const { epigrafe, tipo, texto } = separarEpigrafe(cod, capitulo, versiculo, corrigido)

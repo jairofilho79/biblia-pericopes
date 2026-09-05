@@ -861,7 +861,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
     ]
   },
   {
-    "name": "Cânticos",
+    "name": "Cantares",
     "abbrev": "Ct",
     "testament": "vt",
     "section": "Poesia",

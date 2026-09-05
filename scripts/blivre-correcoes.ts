@@ -114,7 +114,7 @@ export const CORRECOES: Correcao[] = [
     de: 'Os que confiam no SENHOR',
     para: 'Cântico dos degraus:Os que confiam no SENHOR',
     motivo:
-      'É o único dos quinze Cânticos dos Degraus (Sl 120–134) sem o sobrescrito. ' +
+      'É o único dos quinze Cantares dos Degraus (Sl 120–134) sem o sobrescrito. ' +
       'A KJV traz "A Song of degrees." e a própria fonte escreve "Cântico dos degraus" ' +
       'nos outros catorze — a string vem dela, não de mim.',
   },

@@ -14,7 +14,7 @@
  *   no versículo que o traz) sai como campo `sobrescrito`, para a tela mostrar
  *   como epígrafe acima do texto e fora da numeração.
  * - **Rótulo estrutural** (a letra do acróstico no Sl 119, o marcador de
- *   locutor em Cânticos) fica SEMPRE na linha do versículo, como `Rótulo:
+ *   locutor em Cantares) fica SEMPRE na linha do versículo, como `Rótulo:
  *   texto` — que é como um narrador leria. Nunca sobe para o topo: "Álefe" não
  *   é o título do Salmo 119, é o par de "Bete" oito versículos adiante.
  * - Um sobrescrito que caia no MEIO da faixa (uma perícope que atravessa o

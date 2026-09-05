@@ -65,7 +65,7 @@ describe('separarEpigrafe — rótulos estruturais', () => {
     expect(r.texto).toBe('Com que um rapaz purificará o seu caminho?')
   })
 
-  it('separa o marcador de locutor em Cânticos', () => {
+  it('separa o marcador de locutor em Cantares', () => {
     const r = separarEpigrafe('SOL', 1, 2, '[Ela]  : Beije-me ele com os beijos de sua boca')
     expect(r.epigrafe).toBe('Ela')
     expect(r.tipo).toBe('rotulo')
@@ -80,7 +80,7 @@ describe('separarEpigrafe — rótulos estruturais', () => {
     expect(r.texto).toBe(t)
   })
 
-  it('NÃO trata colchete sem dois-pontos como rótulo, nem em Cânticos', () => {
+  it('NÃO trata colchete sem dois-pontos como rótulo, nem em Cantares', () => {
     // Ct 2:6 — "[Esteja] sua mão esquerda…" é palavra suprida.
     const t = '[Esteja] sua mão esquerda abaixo de minha cabeça'
     const r = separarEpigrafe('SOL', 2, 6, t)

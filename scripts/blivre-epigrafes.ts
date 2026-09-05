@@ -7,7 +7,7 @@
  *    salmo-a-salmo precisava e que a NAA não trazia (ver docs/licencas.md).
  * 2. **Letra do acróstico** no Salmo 119 — as 22 letras hebraicas, uma a cada
  *    oito versículos.
- * 3. **Marcador de locutor** em Cânticos — Ela, Ele, Moças, Outros, Irmãos dela.
+ * 3. **Marcador de locutor** em Cantares — Ela, Ele, Moças, Outros, Irmãos dela.
  *
  * A fonte cola tudo no versículo 1: `Salmo de Davi:O SENHOR é meu pastor`. O
  * separador é o **dois-pontos colado na palavra seguinte** — e é preciso ser
@@ -36,7 +36,7 @@ export const EXCECOES: Record<string, { epigrafe: string; comeca: string }> = {
 /**
  * Buracos conhecidos da fonte que este módulo NÃO resolve.
  *
- * Está vazio. O único que havia — o Salmo 125, o único dos quinze Cânticos dos
+ * Está vazio. O único que havia — o Salmo 125, o único dos quinze Cantares dos
  * Degraus sem "Cântico dos degraus" — foi devolvido em `blivre-correcoes.ts`,
  * depois de conferido contra a KJV ("A Song of degrees.") e contra os outros
  * catorze da própria fonte. A lista fica de pé como o lugar de registrar o
@@ -49,7 +49,7 @@ const ROTULO = /^\[([^\]]{1,30})\]\s*:\s*/
 /** Sobrescrito: até o primeiro ':' COLADO na palavra seguinte. */
 const SOBRESCRITO = /^(.{4,260}?):(?=\S)/
 
-/** Só o Salmo 119 (acrósticos) e Cânticos (locutores) têm rótulo estrutural. */
+/** Só o Salmo 119 (acrósticos) e Cantares (locutores) têm rótulo estrutural. */
 function temRotuloEstrutural(cod: string, capitulo: number): boolean {
   return (cod === 'PSA' && capitulo === 119) || cod === 'SOL'
 }

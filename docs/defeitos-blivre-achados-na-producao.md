@@ -119,7 +119,14 @@ foram achadas por leitura, não por varredura.
 | Js 13:5 | "desde Baal-Gade **o pdo** monte Hermom" | "desde Baal-gad, **ao pé do** monte Hermon" | "from Baal-gad **under** mount Hermon" | **ao pé do** |
 | Js 13:6 | "filhos de Israel**:;**somente repartirás" | "filhos de Israel**: tão sómente** faze" | "children of Israel**: only** divide thou" | **: somente** |
 
-## Achado que NÃO é defeito
+## Achados que NÃO são defeitos
+
+**1Sm 13:1** — "Havia já Saul reinado um ano; e reinado que houve dois anos
+sobre Israel". Parece corrompido, e não é: a KJV traz o mesmo ("Saul reigned one
+year; and when he had reigned two years over Israel"). É uma dificuldade do
+próprio hebraico, presente em todas as traduções. **Vale a regra fundadora da
+Sessão 2: se a KJV concorda com a BLIVRE, não é defeito.** O material da
+perícope 522 avisa o leitor a não se prender ao número, que é a saída certa.
 
 **`alambre`** (Êx 26:11, "colchetes de alambre") é palavra antiga para bronze —
 KJV traz "taches of brass". Está certa, só é desconhecida. **Não se corrige: se

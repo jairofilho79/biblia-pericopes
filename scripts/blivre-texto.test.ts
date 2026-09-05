@@ -131,3 +131,48 @@ describe('nota do tradutor entre colchetes', () => {
     expect(removerColchetes('e [o] porei sobre eles')).toBe('e o porei sobre eles')
   })
 })
+
+describe('letra solta antes do colchete', () => {
+  // O espelho do caso anterior: aqui o pedaço fica FORA e a palavra dentro.
+  // O app servia "d esta geração", "n esta visão", "D este tal". São dez.
+  it('junta a contração', () => {
+    expect(removerColchetes('aguentei com desgosto d [esta] geração')).toBe(
+      'aguentei com desgosto desta geração',
+    )
+    expect(removerColchetes('eu vi os cavalos n [esta] visão')).toBe('eu vi os cavalos nesta visão')
+    expect(removerColchetes('D [este] tal eu me orgulharei')).toBe('Deste tal eu me orgulharei')
+    expect(removerColchetes('aos mensageiros d [aquela] nação')).toBe('aos mensageiros daquela nação')
+  })
+
+  it('não junta as letras que são palavras de verdade', () => {
+    expect(removerColchetes('Deus [é] nosso refúgio')).toBe('Deus é nosso refúgio')
+    expect(removerColchetes('e [o] porei sobre eles')).toBe('e o porei sobre eles')
+    expect(removerColchetes('não [a] leves sozinho')).toBe('não a leves sozinho')
+  })
+
+  it('não estraga a letra que faz parte de uma palavra', () => {
+    expect(removerColchetes('a fé [que] salva')).toBe('a fé que salva')
+  })
+})
+
+describe('ponto final colado na frase seguinte', () => {
+  // São 66 no corpus, e vinham sendo servidas assim. Vários deles já estavam
+  // catalogados um a um como defeito da fonte; é uma regra só.
+  it('abre o espaço quando vem MAIÚSCULA depois', () => {
+    expect(removerColchetes('mas sim para salvá-las.E foram para outra aldeia.')).toBe(
+      'mas sim para salvá-las. E foram para outra aldeia.',
+    )
+    expect(removerColchetes('amarra as tuas sandálias.E ele fez assim.')).toBe(
+      'amarra as tuas sandálias. E ele fez assim.',
+    )
+  })
+
+  it('não mexe onde o ponto já tem espaço', () => {
+    expect(removerColchetes('primeira frase. Segunda frase.')).toBe('primeira frase. Segunda frase.')
+  })
+
+  // A forma perigosa não existe no corpus, e a regra não a inventa.
+  it('não separa ponto seguido de minúscula', () => {
+    expect(removerColchetes('etc.algo assim')).toBe('etc.algo assim')
+  })
+})

@@ -347,6 +347,26 @@ KJV traz "taches of brass". Está certa, só é desconhecida. **Não se corrige:
 explica**, e foi o que a perícope 136 fez, no parágrafo das palavras do trecho.
 É a mesma regra de `estopa` em Isaías 1.
 
+## Nem todo defeito precisa de correção na fonte
+
+Uma parte do catálogo se resolve sozinha quando a ETL roda, porque o defeito
+está na **normalização** e não no texto. Essas referências continuam no
+catálogo — a perícope muda, então o congelamento tem de liberá-la de qualquer
+jeito —, mas não precisam de par `de`/`para` em `blivre-correcoes.ts`.
+
+**Ponto final colado na frase seguinte (66 no corpus, 23 já catalogados).**
+`salvá-las.E foram para outra aldeia`. O padrão é seguro porque exige minúscula
+antes e MAIÚSCULA depois; a forma perigosa, ponto entre minúsculas, não ocorre
+nenhuma vez no corpus, então não há abreviatura a preservar. Uma regra em
+`blivre-texto.ts` resolve as 66, e depois dela não sobra nenhuma.
+
+**Colchete mal interpretado (22 no corpus).** As quatro variantes descritas
+acima — palavra colada, pedaço que fecha, pedaço que abre, nota do tradutor.
+
+O critério para decidir de que lado uma coisa cai é simples: se o texto que a
+Bíblia Livre publicou está certo e quem errou fui eu ao normalizar, é ETL. Se o
+que está publicado está errado, é correção com duas testemunhas.
+
 ## Como aplicar — e por que não agora
 
 Corrigir o texto **depois** do material escrito quebra as citações: a perícope

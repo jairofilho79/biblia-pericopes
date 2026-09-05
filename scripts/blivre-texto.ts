@@ -26,6 +26,18 @@ const ESPACO_ANTES_DE_PONTUACAO = /\s+([,;.!?:])/g
 const PONTUACAO_SEM_ESPACO = /([,;!?])(?=[A-Za-zÀ-ÖØ-öø-ÿ])/g
 
 /**
+ * Ponto final colado na frase seguinte: `salvá-las.E foram para outra aldeia`.
+ *
+ * São 66 no corpus, e o padrão é seguro: exige minúscula antes e MAIÚSCULA
+ * depois. A forma arriscada — ponto entre minúsculas, que quebraria
+ * abreviatura — não ocorre nenhuma vez, então não há o que preservar.
+ *
+ * Fica fora do `PONTUACAO_SEM_ESPACO` de propósito: aquele aceita qualquer
+ * letra depois, e aplicar isso ao ponto separaria o que não deve.
+ */
+const PONTO_SEM_ESPACO = /(\p{Ll})\.(?=\p{Lu})/gu
+
+/**
  * Tira os colchetes editoriais mantendo as palavras, e arruma o espaçamento que
  * a remoção deixa torto. Versículo sem colchete volta sem nenhuma alteração.
  */
@@ -67,19 +79,36 @@ const COLCHETE_COLADO = /(\p{L})\[(?=\p{L})/gu
  */
 const NOTA_DO_TRADUTOR = /\s*\[\s*(?:[Oo]u|[Ll]it|isto é|ou seja)\s*[:.][^\]]*\]/g
 
+/**
+ * Letra solta ANTES do colchete: `d [esta]`, `n [aquela]`, `D [este]`.
+ *
+ * O espelho de `PEDACO_QUE_ABRE`: aqui o pedaço está fora e a palavra dentro,
+ * e juntos formam a contração — `d`+`esta` é *desta*. O app servia
+ * `d esta geração`, `n esta visão` e `D este tal`. São dez no corpus.
+ *
+ * Só `d`, `n` e `s` entram: `e`, `o`, `a` e `é` são palavras de verdade, e
+ * juntá-las ao colchete seguinte estragaria 673 versículos corretos.
+ */
+const LETRA_SOLTA_ANTES = /(?<!\p{L})([dnsDNS])\s\[/gu
+
 const PEDACO_QUE_FECHA = /(\p{L})\s\[(s|igo)\]/gu
 const PEDACO_QUE_ABRE = /\[(n|d)\]\s(?=\p{L})/gu
 
 export function removerColchetes(texto: string): string {
   return texto
     .replace(NOTA_DO_TRADUTOR, '')
+    // COLCHETE_COLADO abre espaço antes do colchete; LETRA_SOLTA_ANTES fecha
+    // o espaço nos três casos em que a letra é pedaço de palavra. A ordem
+    // importa: invertida, o primeiro desfazia o trabalho do segundo.
     .replace(COLCHETE_COLADO, '$1 [')
+    .replace(LETRA_SOLTA_ANTES, '$1[')
     .replace(PEDACO_QUE_FECHA, '$1$2')
     .replace(PEDACO_QUE_ABRE, '$1')
     .replace(HIFEN_SOLTO, '-')
     .replace(/[[\]]/g, '')
     .replace(ESPACO_ANTES_DE_PONTUACAO, '$1')
     .replace(PONTUACAO_SEM_ESPACO, '$1 ')
+    .replace(PONTO_SEM_ESPACO, '$1. ')
     .replace(/\s{2,}/g, ' ')
     .trim()
 }

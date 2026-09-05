@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
-import { ancorar, conteudo, nomesProprios } from './titulos-ancorados.ts'
+import { ancorar, conteudo, inventario, nomesProprios } from './titulos-ancorados.ts'
 
 const TEXTO_JO_20 =
   'Capítulo 20 19 Vinda pois já a tarde, o primeiro dia da semana, e fechadas as portas ' +
@@ -60,5 +60,20 @@ describe.skipIf(!existsSync(CATALOGO))('contra o catálogo de verdade', () => {
     const soltos = d.filter((p) => !ancorar(p.titulo_pericope_pt, p.texto).ancorado).length
     // Trava para baixo: a reescrita dos títulos só pode diminuir este número.
     expect(soltos).toBeLessThanOrEqual(941)
+  })
+})
+
+describe('inventario', () => {
+  it('acusa a série de três sem nada depois', () => {
+    expect(inventario('A mesa de acácia, com pratos, colheres e tigelas')).toBe(true)
+  })
+
+  // A série vira premissa quando há oração do outro lado do dois-pontos.
+  it('absolve a série que serve de premissa a uma oração', () => {
+    expect(inventario('Mirra, canela e cássia: o azeite da santa unção')).toBe(false)
+  })
+
+  it('absolve o par', () => {
+    expect(inventario('Arão funde o bezerro, e Moisés quebra as tábuas')).toBe(false)
   })
 })

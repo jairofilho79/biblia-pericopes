@@ -91,6 +91,24 @@ export function ancorar(titulo: string, texto: string): Veredito {
   return { titulo, nomes: usados, ecos, ancorado: usados.length > 0 || ecos >= 2 }
 }
 
+/**
+ * O título é uma LISTA de materiais?
+ *
+ * Ancorar puxa para o concreto, e nos trechos descritivos — tabernáculo,
+ * ofertas, censos — isso vira inventário: "A mesa de acácia, com pratos,
+ * colheres e tigelas". A âncora está lá, mas o título não diz nada.
+ *
+ * A marca é uma série de três ou mais itens SEM nada depois dela. Quando há um
+ * dois-pontos com oração do outro lado, a série é premissa e não é inventário —
+ * "Mirra, canela e cássia: o azeite da santa unção" está certo.
+ */
+export function inventario(titulo: string): boolean {
+  const depoisDoDoisPontos = titulo.split(':')[1]?.trim()
+  if (depoisDoDoisPontos) return false
+  const itens = titulo.split(/,| e /).filter((x) => x.trim()).length
+  return itens >= 3
+}
+
 if (process.argv[1]?.endsWith('titulos-ancorados.ts')) {
   type P = {
     abbrev: string
@@ -106,7 +124,14 @@ if (process.argv[1]?.endsWith('titulos-ancorados.ts')) {
     if (!ancorar(p.titulo_pericope_pt, p.texto).ancorado) soltos.push(p)
   }
   const pct = (100 * soltos.length) / pericopes.length
+  const listas = pericopes.filter((p) => inventario(p.titulo_pericope_pt))
   console.log(`títulos: ${pericopes.length} · sem âncora: ${soltos.length} (${pct.toFixed(0)}%)`)
+  console.log(`  virando lista de materiais: ${listas.length}`)
+  if (process.argv.includes('--inventario')) {
+    for (const p of listas) {
+      console.log(`${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}\t${p.titulo_pericope_pt}`)
+    }
+  }
   if (process.argv.includes('--lista')) {
     for (const p of soltos) {
       console.log(`${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}\t${p.titulo_pericope_pt}`)

@@ -607,8 +607,9 @@ leitura, em listDestaques, e não reescreve o registro."
 - Modify: `index.html:9`, `index.html:11`, `index.html:12`
 - Modify: `vite.config.ts:108-112`
 - Modify: `src/App.tsx:48-56`
-- Modify: `worker/email.ts:12`, `worker/email.ts:15`, `worker/email.ts:36`
+- Modify: `worker/email.ts:12`, `worker/email.ts:15`, `worker/email.ts:16`, `worker/email.ts:36`
 - Modify: `worker/auth.test.ts:14`
+- Modify: `wrangler.jsonc` (`vars.EMAIL_FROM`) — ver `docs/kickoff-dominio-e-email.md`
 - Modify: `README.md:1-3`
 
 **Interfaces:**
@@ -695,7 +696,9 @@ linguagem, narração por voz de IA e anotações locais.
 
 - [ ] **Step 5: Verificar**
 
-Run: `grep -rn "Perícopes" src worker index.html vite.config.ts README.md`
+Run: `grep -rn "Perícopes" src worker index.html vite.config.ts wrangler.jsonc README.md`
+
+**`wrangler.jsonc` estava faltando nesta lista** e o kickoff do domínio pegou: sem ele o grep passa verde enquanto `EMAIL_FROM` ainda diz "Perícopes" — o nome do remetente na caixa de entrada de quem pede o código, ou seja, o lugar mais visível de todos.
 Expected: nenhuma ocorrência da MARCA. (Ocorrências da palavra comum — "por perícopes", "as perícopes" — são corretas e ficam.)
 
 Run: `npm test && npm run lint && npm run typecheck:worker && npm run build`
@@ -1060,6 +1063,11 @@ continua de pé."
 Bloqueado na logo que o dono vai gerar fora:
 
 - Rasterizar `favicon.png` (64), `apple-touch-icon.png` (180), `pwa-192.png`, `pwa-512.png`, `pwa-512-maskable.png` (com margem de 20%), `favicon.ico`, `brand/logo.png` e `brand/logo-master.png`.
+
+Vindo de `docs/kickoff-dominio-e-email.md`, e **deliberadamente fora deste plano**:
+
+- **`APP_URL` continua no `workers.dev`.** Ela alimenta o `baseURL` do better-auth, os `trustedOrigins` e o link dentro do e-mail de login. Trocar exige que o Worker atenda no domínio novo primeiro (custom domain ou route na Cloudflare) — senão o botão "Entrar" do e-mail passa a apontar para o vazio. É a última peça, não a primeira.
+- **Não renomear** o Worker (`biblia-pericopes`), o D1 nem o bucket R2: são identidade de infraestrutura, ninguém os vê, e renomear significa recriar recurso e migrar as chaves de áudio que custaram caro.
 
 Backlog registrado no spec:
 

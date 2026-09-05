@@ -1,6 +1,8 @@
-# Perícopes — estudo bíblico NAA (PWA offline)
+# aiPericopes — estudo bíblico por perícopes (PWA offline)
 
-App de leitura por **perícopes** (unidades narrativas), com texto NAA, contexto, narrador e anotações locais.
+App de leitura por **perícopes** (unidades narrativas), com texto da **Bíblia
+Livre** (CC BY 3.0 BR), contexto e material de estudo escritos por modelo de
+linguagem, narração por voz de IA e anotações locais.
 
 ## Desenvolvimento
 

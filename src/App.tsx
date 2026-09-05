@@ -52,7 +52,11 @@ function Shell() {
             width={32}
             height={32}
           />
-          <span>Perícopes</span>
+          {/* O wordmark executa a tese sozinho: a máquina é a cor, o texto é a
+              tinta. Um <span> por parte porque só o "ai" recebe o âmbar. */}
+          <span className="brand-wordmark">
+            <span className="brand-ai">ai</span>Pericopes
+          </span>
         </NavLink>
         {/* "Hoje" saiu: a marca à esquerda já é o mesmo <NavLink to="/">. */}
         <nav>

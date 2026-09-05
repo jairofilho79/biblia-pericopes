@@ -237,6 +237,18 @@ a {
   display: block;
 }
 
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* "ai" é a única parte da marca que a máquina assina: a cor faz a divisão
+   que o nome já faz, sem precisar explicar. */
+.brand-ai {
+  color: var(--accent);
+}
+
 .top nav {
   grid-column: 1 / -1;
   display: flex;

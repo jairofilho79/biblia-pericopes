@@ -105,11 +105,12 @@ export default defineConfig(({ command }) => {
           'data/index.json',
         ],
         manifest: {
-          name: 'Perícopes — Estudo Bíblico',
-          short_name: 'Perícopes',
-          description: 'Estudo diário da Bíblia NAA por perícopes',
-          theme_color: '#2f5d50',
-          background_color: '#f3efe6',
+          name: 'aiPericopes — Estudo Bíblico',
+          short_name: 'aiPericopes',
+          description:
+            'Estudo bíblico por perícopes. O texto é a Bíblia Livre; o material e a narração são de IA, e isso está dito.',
+          theme_color: '#92500a',
+          background_color: '#f5f1e8',
           display: 'standalone',
           lang: 'pt-BR',
           start_url: '/',

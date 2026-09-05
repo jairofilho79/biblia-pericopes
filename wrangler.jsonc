@@ -28,6 +28,6 @@
   },
   "vars": {
     "APP_URL": "https://biblia-pericopes.jairofilho79.workers.dev",
-    "EMAIL_FROM": "Perícopes <acesso@send.aipericopes.com>"
+    "EMAIL_FROM": "aiPericopes <acesso@send.aipericopes.com>"
   }
 }

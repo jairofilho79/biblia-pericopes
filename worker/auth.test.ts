@@ -11,7 +11,7 @@ function fakeEnv(overrides: Partial<Env> = {}): Env {
     AI: {} as Env['AI'],
     BETTER_AUTH_SECRET: 'test-secret',
     APP_URL: 'http://localhost:8787',
-    EMAIL_FROM: 'Perícopes <onboarding@resend.dev>',
+    EMAIL_FROM: 'aiPericopes <onboarding@resend.dev>',
     ...overrides,
   }
 }

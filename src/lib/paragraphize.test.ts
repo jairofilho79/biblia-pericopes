@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { paragraphize, blocosDaResenha, MAX_PARAGRAFOS } from './paragraphize'
+import { paragraphize, blocosDaResenha, alvosDaResenha, MAX_PARAGRAFOS } from './paragraphize'
 
 describe('paragraphize', () => {
   it('respeita os parágrafos que já existem', () => {
@@ -82,5 +82,37 @@ describe('blocosDaResenha', () => {
 
   it('resenha vazia não quebra', () => {
     expect(blocosDaResenha('')).toEqual([])
+  })
+})
+
+describe('alvosDaResenha', () => {
+  const prosa = (n: number) => `Parágrafo de prosa número ${n}, com o que a passagem diz.`
+
+  it('separa a prosa das palavras, e cada uma recebe o id da sua seção', () => {
+    const r = alvosDaResenha(
+      [prosa(1), prosa(2), '- Estopa é a fibra que sobra do linho.\n- Selá é uma marca musical.'].join(
+        '\n\n',
+      ),
+    )
+    expect(r.prosa).toEqual([
+      { id: 'resenha-0', texto: prosa(1) },
+      { id: 'resenha-1', texto: prosa(2) },
+    ])
+    expect(r.palavras).toEqual([
+      { id: 'palavra-0', texto: 'Estopa é a fibra que sobra do linho.' },
+      { id: 'palavra-1', texto: 'Selá é uma marca musical.' },
+    ])
+  })
+
+  it('os índices são independentes: a primeira palavra é palavra-0, não palavra-2', () => {
+    const r = alvosDaResenha([prosa(1), prosa(2), prosa(3), '- Um item.\n- Outro item.'].join('\n\n'))
+    expect(r.prosa.map((a) => a.id)).toEqual(['resenha-0', 'resenha-1', 'resenha-2'])
+    expect(r.palavras[0].id).toBe('palavra-0')
+  })
+
+  it('resenha sem lista devolve palavras vazio, e a prosa intacta', () => {
+    const r = alvosDaResenha([prosa(1), prosa(2)].join('\n\n'))
+    expect(r.palavras).toEqual([])
+    expect(r.prosa).toHaveLength(2)
   })
 })

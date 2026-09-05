@@ -111,3 +111,20 @@ describe('carregarManifesto', () => {
     expect((f.mock.calls as unknown[][])[0][0]).toBe(`/api/audio/${VOZ}/1600.json`)
   })
 })
+
+describe('manifestoValido — a seção das palavras do trecho', () => {
+  const unidade = (secao: string) => ({ i: 0, secao, texto: 'oi', inicio: 0, dur: 1 })
+
+  it('aceita `palavras`: a narração lê a lista como seção própria, com cabeçalho falado', () => {
+    expect(manifestoValido({ ordem: 1, dur_total: 9, unidades: [unidade('palavras')] })).toBe(true)
+  })
+
+  it('uma unidade de seção desconhecida invalida o manifesto INTEIRO — é por isso que isto importa', () => {
+    const m = {
+      ordem: 1,
+      dur_total: 9,
+      unidades: [unidade('resenha'), unidade('secao-que-nao-existe')],
+    }
+    expect(manifestoValido(m)).toBe(false)
+  })
+})

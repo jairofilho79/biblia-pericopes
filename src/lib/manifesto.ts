@@ -3,7 +3,24 @@
  * pelo Worker). `inicio`/`dur` e `palavras[].i`/`.d` são segundos ABSOLUTOS
  * dentro do m4a costurado — é o eixo do `timeupdate`.
  */
-export type SecaoManifesto = 'titulo' | 'contexto' | 'texto' | 'resenha' | 'reflexoes'
+/**
+ * `palavras` é a lista que fecha a resenha. Ela é seção PRÓPRIA no áudio, e não
+ * um pedaço da resenha, porque na tela ela se distingue pela cor e pelo rótulo
+ * — e no áudio não há cor. Sem um cabeçalho falado, o ouvinte ouviria a prosa
+ * terminar e um verbete começar sem aviso.
+ *
+ * Uma unidade de seção desconhecida invalida o manifesto INTEIRO (ver
+ * `manifestoValido`), e manifesto inválido vira `null`, que é o app inteiro sem
+ * realce e sem erro em lugar nenhum. Por isso este vocabulário e o do gerador
+ * de narração precisam andar juntos.
+ */
+export type SecaoManifesto =
+  | 'titulo'
+  | 'contexto'
+  | 'texto'
+  | 'resenha'
+  | 'palavras'
+  | 'reflexoes'
 
 export type PalavraManifesto = { t: string; i: number; d: number }
 
@@ -23,7 +40,14 @@ export type Manifesto = {
   unidades: UnidadeManifesto[]
 }
 
-const SECOES: readonly string[] = ['titulo', 'contexto', 'texto', 'resenha', 'reflexoes']
+const SECOES: readonly string[] = [
+  'titulo',
+  'contexto',
+  'texto',
+  'resenha',
+  'palavras',
+  'reflexoes',
+]
 
 function num(v: unknown): v is number {
   return typeof v === 'number' && Number.isFinite(v)

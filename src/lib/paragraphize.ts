@@ -116,3 +116,28 @@ export function blocosDaResenha(resenha: string): BlocoResenha[] {
     ...linhas.map((l) => ({ tipo: 'palavra' as const, texto: l.replace(ITEM_DE_LISTA, '') })),
   ]
 }
+
+export type AlvoResenha = { id: string; texto: string }
+
+/**
+ * A resenha repartida nos dois alvos de alinhamento que ela alimenta: a prosa,
+ * que é a seção `resenha` do manifesto, e as palavras do trecho, que são a
+ * seção `palavras`.
+ *
+ * Os índices são independentes de propósito — a primeira palavra é `palavra-0`
+ * mesmo vindo depois de três parágrafos de prosa —, porque cada seção do
+ * manifesto casa as suas unidades com os seus alvos NA ORDEM, começando do
+ * zero. Ver `alinhar` em `alinhar-narracao.ts`.
+ */
+export function alvosDaResenha(resenha: string): {
+  prosa: AlvoResenha[]
+  palavras: AlvoResenha[]
+} {
+  const blocos = blocosDaResenha(resenha)
+  const prosa = blocos.filter((b) => b.tipo === 'prosa')
+  const palavras = blocos.filter((b) => b.tipo === 'palavra')
+  return {
+    prosa: prosa.map((b, i) => ({ id: `resenha-${i}`, texto: b.texto })),
+    palavras: palavras.map((b, i) => ({ id: `palavra-${i}`, texto: b.texto })),
+  }
+}

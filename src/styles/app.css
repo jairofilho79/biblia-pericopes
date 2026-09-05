@@ -2912,14 +2912,24 @@ fieldset.jornada-campo {
   line-height: 1.5;
 }
 
+/* O cabeçalho da lista — o mesmo que a narração fala em voz alta ("Palavras
+   do trecho."), para que a tela e o áudio anunciem a mesma coisa. */
+.palavras-titulo {
+  margin: 1.3rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 /* As palavras do trecho — a lista que fecha a resenha.
    O dono pediu tópicos em vez de tudo emendado por ponto-e-vírgula, e a cor
    sai de `--accent`, que já é verde no claro, verde claro no escuro e âmbar
    no sépia. Uma variável resolve os três temas. */
 .palavras-do-trecho {
-  margin: 1.15rem 0 0;
-  padding: 0.85rem 0 0.15rem 0;
-  border-top: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+  margin: 0.55rem 0 0;
+  padding: 0 0 0.15rem 0;
   list-style: none;
   display: grid;
   gap: 0.7rem;

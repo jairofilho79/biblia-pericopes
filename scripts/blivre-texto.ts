@@ -123,8 +123,10 @@ export function removerColchetes(texto: string): string {
     .replace(LETRA_SOLTA_ANTES, '$1[')
     .replace(PEDACO_QUE_FECHA, '$1$2')
     .replace(PEDACO_QUE_ABRE, '$1')
-    .replace(HIFEN_COM_ESPACO, '$1-')
+    // HIFEN_SOLTO vem primeiro e HIFEN_COM_ESPACO depois: `trazei [- os]` só
+    // vira `trazei- os` DEPOIS do primeiro, e é o segundo que fecha o espaço.
     .replace(HIFEN_SOLTO, '-')
+    .replace(HIFEN_COM_ESPACO, '$1-')
     .replace(/[[\]]/g, '')
     .replace(PARENTESE_FOLGADO, (m) => (m.startsWith('(') ? '(' : ')'))
     .replace(ESPACO_ANTES_DE_PONTUACAO, '$1')

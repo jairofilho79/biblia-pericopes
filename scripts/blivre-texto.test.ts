@@ -216,3 +216,12 @@ describe('hífen com espaço depois', () => {
     )
   })
 })
+
+describe('hífen solto e hífen com espaço na mesma linha', () => {
+  it('junta a ênclise que o colchete abriu com espaço por dentro', () => {
+    // Lc 19:27 traz as duas formas lado a lado: `trazei [- os]` e `matai [-os]`.
+    expect(removerColchetes('trazei [- os] aqui, e matai [-os] diante de mim.')).toBe(
+      'trazei-os aqui, e matai-os diante de mim.',
+    )
+  })
+})

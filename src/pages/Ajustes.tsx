@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { listLivros, listPericopes, loadIndex, ordensDoTestamento } from '../lib/content'
 import { testamentLabel, type Testament } from '../lib/testament'
 import { countConcluidasNaSequencia, zerarProgresso } from '../lib/user-db'
@@ -175,29 +176,17 @@ export default function Ajustes() {
       </p>
 
       {/*
-        Crédito da tradução. Não é cortesia: a licença CC BY 3.0 Brasil da
-        Bíblia Livre exige a atribuição (§4b) e, quando há adaptação, exige que
-        a mudança seja indicada (§3b) — daí a frase sobre os colchetes.
-        Ver docs/licencas.md.
+        O crédito da Bíblia Livre e a nota da adaptação moraram aqui e mudaram
+        para a página Sobre, junto com a procedência do material de estudo e a
+        divulgação da voz de IA — as três no mesmo lugar. A atribuição é
+        exigência da licença CC BY 3.0 Brasil (§4b), então ela não pode ficar
+        sem casa: se a página Sobre sair, ela volta para cá. Ver docs/licencas.md.
       */}
       <h2>Sobre o texto bíblico</h2>
       <p className="muted ajustes-credito">
-        Todas as Escrituras em português citadas são da{' '}
-        <a href="https://sites.google.com/site/biblialivre/" target="_blank" rel="noreferrer">
-          Bíblia Livre (BLIVRE)
-        </a>
-        , Copyright © Diego Santos, Mario Sérgio e Marco Teles — fevereiro de 2018. Licença{' '}
-        <a href="https://creativecommons.org/licenses/by/3.0/br/" target="_blank" rel="noreferrer">
-          Creative Commons Atribuição 3.0 Brasil
-        </a>
-        .
-      </p>
-      <p className="muted ajustes-credito">
-        O texto foi adaptado neste app: a Bíblia Livre marca entre colchetes as
-        palavras que o tradutor supriu e o original não traz — as palavras foram
-        mantidas e os colchetes, removidos, para a leitura e a narração. Os
-        sobrescritos dos Salmos aparecem como epígrafe, acima do texto e fora da
-        numeração dos versículos.
+        O texto vem da Bíblia Livre, e este app adaptou algumas coisas nele. O crédito da
+        tradução, o que foi adaptado, quem escreveu o material de estudo e como a narração é
+        feita estão em <Link to="/sobre">Sobre</Link>.
       </p>
     </section>
   )

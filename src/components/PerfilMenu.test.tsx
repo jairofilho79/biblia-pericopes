@@ -97,6 +97,18 @@ describe('PerfilMenu — conteúdo', () => {
     expect(link?.getAttribute('href')).toBe('/ajustes')
   })
 
+  // A atribuição da Bíblia Livre e a divulgação da voz de IA só existem na
+  // página Sobre — nada disso aparece na tela de leitura, por decisão de
+  // produto. Este item é o caminho até lá; sem ele, a divulgação fica
+  // inalcançável pelo menu, que é o mesmo que não existir.
+  it('Sobre aparece deslogado — é o caminho até a divulgação', () => {
+    abrir()
+    const link = [...container.querySelectorAll('a.perfil-item')].find(
+      (a) => a.textContent?.trim() === 'Sobre',
+    )
+    expect(link?.getAttribute('href')).toBe('/sobre')
+  })
+
   it('fora da Leitura não mostra a seção de tipografia', () => {
     abrir()
     expect(container.querySelector('[aria-label="Tamanho do texto"]')).toBeNull()

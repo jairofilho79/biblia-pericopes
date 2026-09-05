@@ -6,6 +6,7 @@ import Jornada from './pages/Jornada'
 import Explorar from './pages/Explorar'
 import Entrar from './pages/Entrar'
 import Ajustes from './pages/Ajustes'
+import Sobre from './pages/Sobre'
 import { applyReadingPrefs, getReadingPrefs } from './lib/reading-prefs'
 import { getStoredTheme, resolveTheme } from './lib/theme'
 import { initSyncTriggers } from './lib/sync'
@@ -73,6 +74,7 @@ function Shell() {
           <Route path="/pesquisar" element={<Navigate to="/explorar" replace />} />
           <Route path="/entrar" element={<Entrar />} />
           <Route path="/ajustes" element={<Ajustes />} />
+          <Route path="/sobre" element={<Sobre />} />
         </Routes>
       </main>
     </div>

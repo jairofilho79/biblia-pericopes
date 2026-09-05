@@ -119,6 +119,15 @@ export default function PerfilMenu({ onOpenChange }: Props) {
             Ajustes
           </Link>
 
+          {/* A página Sobre guarda a atribuição da Bíblia Livre e a divulgação
+              de que a narração é voz de IA. Como nada disso aparece na tela de
+              leitura, este item é o caminho até lá — tirá-lo daqui esconde a
+              divulgação, não só um link. Fica ANTES de Entrar/Sair de
+              propósito: o teste do menu ancora esses dois no último item. */}
+          <Link className="perfil-item" to="/sobre" onClick={close}>
+            Sobre
+          </Link>
+
           {session ? (
             <>
               <button

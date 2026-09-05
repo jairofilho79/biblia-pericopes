@@ -19,7 +19,7 @@
  *
  * Usage: npx tsx scripts/congelar.ts
  */
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   AINDA_PODEM_MUDAR,
@@ -34,6 +34,15 @@ import { dirs, conferirSaidas } from './reenriquecimento.ts'
 import { varrer } from './varrer-registro.ts'
 
 const root = join(import.meta.dirname, '..')
+
+/**
+ * A lista sai em `data/`, e não na pasta da fila, porque ela é CONTRATO e não
+ * andaime: quem a consome é a Sessão 4, que roda noutra sessão e às vezes
+ * noutra máquina. Enquanto ela morou em `data/reenriquecimento/`, que é
+ * gitignorada, a sessão da narração não tinha como saber o que podia gravar —
+ * o cálculo era feito e ficava só neste disco.
+ */
+const SAIDA = join(root, 'data/congelamento.json')
 
 function main() {
   const raw = readFileSync(join(root, 'data/raw-pericopes.jsonl'), 'utf8')
@@ -76,7 +85,13 @@ function main() {
 
   const anterior = (() => {
     try {
-      return JSON.parse(readFileSync(join(root, 'data/reenriquecimento/congeladas.json'), 'utf8'))
+      // Fallback para o caminho antigo: quando a lista mudou de lugar, o estado
+      // que só existe aqui — `aguardando_decisao_do_dono` e a nota — teria se
+      // perdido em silêncio, e Lv 18 e Lv 20 voltariam a ficar liberados para
+      // narração sem ninguém decidir nada.
+      const antigo = join(root, 'data/reenriquecimento/congeladas.json')
+      const caminho = existsSync(SAIDA) ? SAIDA : antigo
+      return JSON.parse(readFileSync(caminho, 'utf8'))
     } catch {
       return null
     }
@@ -97,7 +112,7 @@ function main() {
   const descongeladas = congeladasAntes.filter((o) => !congeladas.includes(o))
 
   writeFileSync(
-    join(root, 'data/reenriquecimento/congeladas.json'),
+    SAIDA,
     JSON.stringify(
       {
         gerado: new Date().toISOString(),

@@ -109,6 +109,16 @@ Cruzar uma palavra da KJV contra o que a BLIVRE traz naquele mesmo versículo.
 que existem** — a classe que escapa de tudo. Vale repetir no fim da fila com
 outros substantivos concretos (animais, metais, medidas, números).
 
+## 7. Corruptelas pontuais em Josué 13 (2 versículos)
+
+As duas são **únicas no corpus inteiro** — uma ocorrência cada — e as duas
+foram achadas por leitura, não por varredura.
+
+| ref | BLIVRE | Almeida 1911 | KJV | correção |
+|---|---|---|---|---|
+| Js 13:5 | "desde Baal-Gade **o pdo** monte Hermom" | "desde Baal-gad, **ao pé do** monte Hermon" | "from Baal-gad **under** mount Hermon" | **ao pé do** |
+| Js 13:6 | "filhos de Israel**:;**somente repartirás" | "filhos de Israel**: tão sómente** faze" | "children of Israel**: only** divide thou" | **: somente** |
+
 ## Achado que NÃO é defeito
 
 **`alambre`** (Êx 26:11, "colchetes de alambre") é palavra antiga para bronze —
@@ -137,7 +147,7 @@ reescrever no escuro.
 
 ## Placar
 
-**40 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
+**42 versículos** para corrigir, em 31.102. E o padrão que se repete a cada
 achado: a varredura mecânica levanta o candidato, e **a maioria dos candidatos
 é falso positivo** — 21 nos acentos, 2 na grafia espanholada. Nenhuma correção
 entra sem as duas testemunhas.

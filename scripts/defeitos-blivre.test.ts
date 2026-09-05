@@ -1,6 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
-import { pericopesAfetadas, TODAS_AS_REFS, DEFEITOS, CODIGOS_VPL, type Faixa } from './defeitos-blivre.ts'
+import {
+  AINDA_PODEM_MUDAR,
+  pericopesAfetadas,
+  TODAS_AS_REFS,
+  DEFEITOS,
+  CODIGOS_VPL,
+  type Faixa,
+} from './defeitos-blivre.ts'
+import { CORRECOES, OMISSOES } from './blivre-correcoes.ts'
 
 const mapa = new Map([['EXO', 'Êx'], ['GEN', 'Gn']])
 const faixa = (ordem: number, abbrev: string, ci: number, vi: number, cf: number, vf: number): Faixa => ({
@@ -81,5 +89,20 @@ describe('as referências existem na fonte', () => {
   it.skipIf(!TEM_VPL)('CODIGOS_VPL usa as siglas do arquivo, não as de outro padrão', () => {
     const doArquivo = new Set([...refs].map((r) => r.split(' ')[0]))
     for (const c of CODIGOS_VPL) expect(doArquivo, c).toContain(c)
+  })
+})
+
+describe('AINDA_PODEM_MUDAR', () => {
+  it('só lista referências que estão no catálogo', () => {
+    const fora = AINDA_PODEM_MUDAR.filter((r) => !TODAS_AS_REFS.includes(r))
+    expect(fora, `não estão no catálogo: ${fora.join(', ')}`).toEqual([])
+  })
+
+  // Se uma delas ganhar receita, ela deixa de poder mudar e sai daqui — senão o
+  // congelamento segura perícope à toa e a Sessão 4 paga por isso em atraso.
+  it('nenhuma delas já tem receita', () => {
+    const refs = new Set([...CORRECOES, ...OMISSOES].map((c) => c.ref))
+    const jaFeitas = AINDA_PODEM_MUDAR.filter((r) => refs.has(r))
+    expect(jaFeitas, `já têm receita e deviam sair da lista: ${jaFeitas.join(', ')}`).toEqual([])
   })
 })

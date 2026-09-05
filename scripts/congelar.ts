@@ -21,7 +21,14 @@
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { CODIGOS_VPL, DEFEITOS, TODAS_AS_REFS, pericopesAfetadas, type Faixa } from './defeitos-blivre.ts'
+import {
+  AINDA_PODEM_MUDAR,
+  CODIGOS_VPL,
+  DEFEITOS,
+  TODAS_AS_REFS,
+  pericopesAfetadas,
+  type Faixa,
+} from './defeitos-blivre.ts'
 import { colisoes } from './titulos-colididos.ts'
 import { dirs, conferirSaidas } from './reenriquecimento.ts'
 import { varrer } from './varrer-registro.ts'
@@ -56,7 +63,10 @@ function main() {
       .map((v) => v.ordem),
   )
 
-  const porTexto = pericopesAfetadas(raw, abbrevPorCodigo)
+  // Não são mais as 484: as correções foram aplicadas e o material passou de
+  // novo pelo portão contra o texto novo. O que ainda pode mudar são as quatro
+  // que esperam o dono.
+  const porTexto = pericopesAfetadas(raw, abbrevPorCodigo, AINDA_PODEM_MUDAR)
   const porRegistro = new Set(mats.flatMap((m) => varrer(m)).map((s) => s.ordem))
   const porTitulo = new Set(
     colisoes(mats.map((m) => ({ ordem: m.ordem, titulo: m.titulo_pericope_pt })))

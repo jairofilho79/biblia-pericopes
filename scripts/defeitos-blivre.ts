@@ -8,8 +8,15 @@
  * que impede a Sessão 4 de narrar perícope cujo texto ainda vai mudar, e a
  * aplicação futura em `scripts/blivre-correcoes.ts`.
  *
- * **Nada aqui foi aplicado ao texto ainda.** Enquanto não for, toda perícope que
- * contém uma destas referências é material que vai ser reescrito.
+ * **As 484 já foram aplicadas.** 421 viraram receita em `blivre-correcoes.ts`,
+ * 52 eram erro meu de normalização e a ETL as desfaz, 7 foram derrubadas pela
+ * conferência — não eram defeito. O catálogo continua aqui inteiro porque é o
+ * registro do que foi lido e por quê, e porque `auditar-correcoes.ts` cruza os
+ * dois arquivos para provar que nenhuma referência ficou órfã.
+ *
+ * Para o congelamento o que importa agora é `AINDA_PODEM_MUDAR`, e não esta
+ * lista: perícope cujo texto JÁ mudou e cujo material JÁ passou de novo pelo
+ * portão não precisa esperar ninguém.
  */
 
 /** Referência no formato do VPL: `COD C:V`. */
@@ -387,6 +394,26 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
 ]
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)
+
+/**
+ * As únicas referências cujo texto ainda pode mudar — e por isso as únicas que
+ * congelam perícope.
+ *
+ * Todas as outras 480 já estão servidas na forma final: ou com receita, ou
+ * limpas pela ETL, ou conferidas e absolvidas. Estas quatro dependem de uma
+ * decisão do dono, e a prosa de cada uma está em
+ * `docs/decisoes-do-dono-sessao-3.md` e em
+ * `docs/defeitos-blivre-achados-na-producao.md`:
+ *
+ * - `JER 4:14` — `os teus meus pensamentos`: as três saídas dizem coisas
+ *   diferentes, e duas violam uma regra da casa cada.
+ * - `PSA 36:2` — `que não achar nem odiar sua própria maldade`: quebrado sem
+ *   testemunha que diga como consertar.
+ * - `PSA 119:71` — `Foi bom pra mim`: registro, e talvez de propósito.
+ * - `PSA 48:4` — termina sem pontuação, um dos trinta que não dá para resolver
+ *   por regra porque em alguns a frase continua no versículo seguinte.
+ */
+export const AINDA_PODEM_MUDAR: RefDefeito[] = ['JER 4:14', 'PSA 36:2', 'PSA 119:71', 'PSA 48:4']
 
 /**
  * Códigos VPL na ordem canônica — a mesma ordem dos livros no catálogo.

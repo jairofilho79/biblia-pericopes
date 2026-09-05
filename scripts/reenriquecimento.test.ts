@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync, utimesSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
@@ -115,8 +115,26 @@ describe('fila em disco', () => {
     travar(d, 1)
     travar(d, 2)
     writeFileSync(join(d.saida, '2.json'), '{}')
-    expect(soltarTravasOrfas(d)).toEqual([1])
+    expect(soltarTravasOrfas(d, 0)).toEqual([1])
     expect(existsSync(join(d.travas, '2'))).toBe(true)
+    expect(pendentes(d)).toEqual([1])
+  })
+
+  it('trava recente NÃO é órfã: é subagent vivo, e soltá-la faz dois escreverem a mesma perícope', () => {
+    semear(1)
+    travar(d, 1)
+    // Com o padrão de 30 min, uma trava criada agora não é tocada.
+    expect(soltarTravasOrfas(d)).toEqual([])
+    expect(existsSync(join(d.travas, '1'))).toBe(true)
+    expect(pendentes(d)).toEqual([])
+  })
+
+  it('trava velha o bastante é solta', () => {
+    semear(1)
+    travar(d, 1)
+    const antiga = new Date(Date.now() - 60 * 60 * 1000)
+    utimesSync(join(d.travas, '1'), antiga, antiga)
+    expect(soltarTravasOrfas(d)).toEqual([1])
     expect(pendentes(d)).toEqual([1])
   })
 

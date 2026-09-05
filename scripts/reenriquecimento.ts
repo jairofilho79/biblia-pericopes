@@ -23,6 +23,7 @@
  */
 import {
   mkdirSync,
+  statSync,
   readdirSync,
   readFileSync,
   writeFileSync,
@@ -156,10 +157,38 @@ export function destravar(d: Dirs, ordem: number): void {
   rmSync(join(d.travas, String(ordem)), { recursive: true, force: true })
 }
 
-/** Trava sem saída é trava órfã: processo morto não devolve mkdir. */
-export function soltarTravasOrfas(d: Dirs): number[] {
+/**
+ * Idade mínima de uma trava para ela ser considerada órfã. Um lote leva ~10
+ * min; 30 min é folga suficiente para o subagent mais lento.
+ */
+export const IDADE_TRAVA_ORFA_MS = 30 * 60 * 1000
+
+/**
+ * Trava sem saída é trava órfã: processo morto não devolve mkdir.
+ *
+ * **Mas trava recente não é órfã — é trabalho em curso.** Soltar a trava de um
+ * subagent vivo faz a perícope ser reivindicada por outro, e os dois escrevem o
+ * mesmo arquivo. Aconteceu uma vez: dei uma rodada por encerrada com 9 de 10
+ * lotes reportados, soltei as travas, e a perícope 490 foi escrita duas vezes.
+ * Por isso a idade da trava é a guarda, e não a minha contagem de lotes.
+ */
+export function soltarTravasOrfas(d: Dirs, idadeMinimaMs = IDADE_TRAVA_ORFA_MS): number[] {
   const feitas = new Set(ordens(d.saida))
-  const orfas = [...travadas(d)].filter((o) => !feitas.has(o)).sort((a, b) => a - b)
+  const agora = Date.now()
+  const orfas = [...travadas(d)]
+    .filter((o) => !feitas.has(o))
+    .filter((o) => {
+      // Idade zero significa "solte tudo", e é o que o teste usa. Comparar a
+      // subtração com 0 não serve: o mtime do arquivo tem resolução mais fina
+      // que `Date.now()`, então a diferença pode sair negativa por uma fração.
+      if (idadeMinimaMs <= 0) return true
+      try {
+        return agora - statSync(join(d.travas, String(o))).mtimeMs >= idadeMinimaMs
+      } catch {
+        return false
+      }
+    })
+    .sort((a, b) => a - b)
   for (const o of orfas) destravar(d, o)
   return orfas
 }

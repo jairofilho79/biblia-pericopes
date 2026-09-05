@@ -21,10 +21,10 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
     refs: [
       'PRO 1:7', 'REV 22:13', 'ACT 13:2', 'MAT 7:17', 'PSA 72:19', 'JDG 3:19',
       '1SA 23:13', 'ISA 43:7', 'REV 20:8', 'JER 52:4', 'JER 25:36', '2TI 3:3',
-      '2CH 36:21', 'EZK 31:12', '1CO 15:52', 'LUK 4:40', 'GAL 3:24', 'DEU 4:42',
+      '2CH 36:21', 'EZE 31:12', '1CO 15:52', 'LUK 4:40', 'GAL 3:24', 'DEU 4:42',
     ],
   },
-  { classe: 'corrupção de palavra', refs: ['MRK 12:37', 'ACT 9:4', 'LAM 3:6'] },
+  { classe: 'corrupção de palavra', refs: ['MAR 12:37', 'ACT 9:4', 'LAM 3:6'] },
   {
     classe: 'concordância (no arca → na arca)',
     refs: ['EXO 25:16', 'EXO 25:21', '1SA 6:19', '2KI 12:10', '2CH 24:10'],
@@ -50,7 +50,7 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
   },
   {
     classe: 'espaço perdido ou sobrando',
-    refs: ['ZEC 7:1', 'ZEC 7:13', 'MRK 14:16', 'LUK 6:1'],
+    refs: ['ZEC 7:1', 'ZEC 7:13', 'MAR 14:16', 'LUK 6:1'],
   },
   // Lucas — 44 defeitos achados numa rodada só, mais do que todo o Antigo
   // Testamento junto. O livro entrou na Bíblia Livre bem mais sujo que os
@@ -105,19 +105,19 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
   // seguinte inteiro dentro da citação.
   {
     classe: 'aspa que não fecha (Marcos)',
-    refs: ['MRK 14:58', 'MRK 14:70'],
+    refs: ['MAR 14:58', 'MAR 14:70'],
   },
   {
     classe: 'palavra colada, faltando ou duplicada (Marcos 14—16)',
-    refs: ['MRK 15:24', 'MRK 15:44', 'MRK 15:46', 'MRK 16:4', 'MRK 16:7', 'MRK 16:14'],
+    refs: ['MAR 15:24', 'MAR 15:44', 'MAR 15:46', 'MAR 16:4', 'MAR 16:7', 'MAR 16:14'],
   },
   {
     classe: 'palavra partida ou colada (João)',
-    refs: ['JHN 2:7', 'JHN 4:54', 'JHN 6:34', 'JHN 6:64'],
+    refs: ['JOH 2:7', 'JOH 4:54', 'JOH 6:34', 'JOH 6:64'],
   },
   {
     classe: 'palavra duplicada ou trocada (João)',
-    refs: ['JHN 2:17', 'JHN 2:20', 'JHN 3:26', 'JHN 4:9', 'JHN 6:1', 'JHN 7:22', 'JHN 7:23'],
+    refs: ['JOH 2:17', 'JOH 2:20', 'JOH 3:26', 'JOH 4:9', 'JOH 6:1', 'JOH 7:22', 'JOH 7:23'],
   },
   // Achados por `scripts/palavras-suspeitas.ts`, não por leitura: palavra que
   // aparece uma vez só no corpus e está a uma letra de uma palavra comum.
@@ -158,12 +158,12 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
   {
     classe: 'erro de digitação (João 8—21)',
     refs: [
-      'JHN 8:41', 'JHN 8:57', 'JHN 9:16', 'JHN 9:18',
-      'JHN 9:32', 'JHN 9:38', 'JHN 9:39', 'JHN 10:35',
-      'JHN 11:2', 'JHN 12:36', 'JHN 13:4', 'JHN 13:29',
-      'JHN 14:27', 'JHN 15:2', 'JHN 17:19', 'JHN 18:1',
-      'JHN 20:17', 'JHN 20:24', 'JHN 20:30', 'JHN 21:16',
-      'JHN 21:18', 'JHN 21:25',
+      'JOH 8:41', 'JOH 8:57', 'JOH 9:16', 'JOH 9:18',
+      'JOH 9:32', 'JOH 9:38', 'JOH 9:39', 'JOH 10:35',
+      'JOH 11:2', 'JOH 12:36', 'JOH 13:4', 'JOH 13:29',
+      'JOH 14:27', 'JOH 15:2', 'JOH 17:19', 'JOH 18:1',
+      'JOH 20:17', 'JOH 20:24', 'JOH 20:30', 'JOH 21:16',
+      'JOH 21:18', 'JOH 21:25',
     ],
   },
   {
@@ -197,13 +197,24 @@ export const DEFEITOS: { classe: string; refs: RefDefeito[] }[] = [
 
 export const TODAS_AS_REFS: RefDefeito[] = DEFEITOS.flatMap((d) => d.refs)
 
-/** Códigos VPL na ordem canônica — a mesma ordem dos livros no catálogo. */
+/**
+ * Códigos VPL na ordem canônica — a mesma ordem dos livros no catálogo.
+ *
+ * São os códigos que o ARQUIVO usa, não os de nenhum padrão externo. Onze
+ * livros divergem das siglas mais comuns (`MAR` e não MRK, `JOH` e não JHN,
+ * `EZE` e não EZK, `SOL`, `JOE`, `NAH`, `PHI`, `JAM`, `1JO`, `2JO`, `3JO`), e
+ * o catálogo já nasceu com as siglas erradas em 44 referências. Como o
+ * congelamento traduz código→abreviação por esta mesma lista, ele funcionava
+ * mesmo assim; mas uma correção registrada com a sigla errada em
+ * `blivre-correcoes.ts` NUNCA dispararia, porque lá o código vem da leitura do
+ * arquivo. O teste `casam com um versículo de verdade` guarda isso.
+ */
 export const CODIGOS_VPL = [
   'GEN','EXO','LEV','NUM','DEU','JOS','JDG','RUT','1SA','2SA','1KI','2KI','1CH','2CH',
-  'EZR','NEH','EST','JOB','PSA','PRO','ECC','SNG','ISA','JER','LAM','EZK','DAN','HOS',
-  'JOL','AMO','OBA','JON','MIC','NAM','HAB','ZEP','HAG','ZEC','MAL','MAT','MRK','LUK',
-  'JHN','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT',
-  'PHM','HEB','JAS','1PE','2PE','1JN','2JN','3JN','JUD','REV',
+  'EZR','NEH','EST','JOB','PSA','PRO','ECC','SOL','ISA','JER','LAM','EZE','DAN','HOS',
+  'JOE','AMO','OBA','JON','MIC','NAH','HAB','ZEP','HAG','ZEC','MAL','MAT','MAR','LUK',
+  'JOH','ACT','ROM','1CO','2CO','GAL','EPH','PHI','COL','1TH','2TH','1TI','2TI','TIT',
+  'PHM','HEB','JAM','1PE','2PE','1JO','2JO','3JO','JUD','REV',
 ] as const
 
 export type Faixa = {

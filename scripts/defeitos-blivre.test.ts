@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { existsSync, readFileSync } from 'node:fs'
 import { pericopesAfetadas, TODAS_AS_REFS, DEFEITOS, CODIGOS_VPL, type Faixa } from './defeitos-blivre.ts'
 
 const mapa = new Map([['EXO', 'Êx'], ['GEN', 'Gn']])
@@ -52,5 +53,33 @@ describe('pericopesAfetadas', () => {
 
   it('lança quando a referência está malformada', () => {
     expect(() => pericopesAfetadas([], mapa, ['EXO 19'])).toThrow(/malformada/)
+  })
+})
+
+describe('as referências existem na fonte', () => {
+  // 44 referências do catálogo apontavam para o vazio: o arquivo usa MAR, JOH
+  // e EZE, e elas diziam MRK, JHN e EZK. O congelamento não percebia, porque
+  // traduz código→abreviação pela mesma lista errada; mas uma correção
+  // registrada com a sigla errada morreria em silêncio.
+  const VPL = 'data/bliv-tr_vpl.txt'
+  const TEM_VPL = existsSync(VPL)
+  const refs = TEM_VPL
+    ? new Set(
+        readFileSync(VPL, 'utf8')
+          .replace(/^﻿/, '')
+          .split(/\r?\n/)
+          .map((l) => /^(\S+ \d+:\d+)\s/.exec(l)?.[1])
+          .filter((r): r is string => Boolean(r)),
+      )
+    : new Set<string>()
+
+  it.skipIf(!TEM_VPL)('toda referência do catálogo casa com um versículo de verdade', () => {
+    const orfas = TODAS_AS_REFS.filter((r) => !refs.has(r))
+    expect(orfas, `sem versículo correspondente: ${orfas.join(', ')}`).toEqual([])
+  })
+
+  it.skipIf(!TEM_VPL)('CODIGOS_VPL usa as siglas do arquivo, não as de outro padrão', () => {
+    const doArquivo = new Set([...refs].map((r) => r.split(' ')[0]))
+    for (const c of CODIGOS_VPL) expect(doArquivo, c).toContain(c)
   })
 })

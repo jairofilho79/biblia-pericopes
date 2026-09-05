@@ -59,7 +59,7 @@ describe.skipIf(!existsSync(CATALOGO))('contra o catálogo de verdade', () => {
     }[]
     const soltos = d.filter((p) => !ancorar(p.titulo_pericope_pt, p.texto).ancorado).length
     // Trava para baixo: a reescrita dos títulos só pode diminuir este número.
-    expect(soltos).toBeLessThanOrEqual(355)
+    expect(soltos).toBeLessThanOrEqual(284)
   })
 })
 

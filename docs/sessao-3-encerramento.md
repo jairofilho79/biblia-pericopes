@@ -56,6 +56,36 @@ pendurada: a resposta que entrou no `contexto` era o fato que a `resenha` já
 entregava. Em 71 das 75 quem cedeu foi o contexto, e a proporção diz por quê —
 o contexto tinha antecipado o achado, que é o motivo de a resenha existir.
 
+## A leitura por amostra — e o número que fica
+
+Com todas as réguas verdes, sorteei **62 perícopes** (amostra estratificada
+pelas seis seções) e mandei quatro leitores lerem como quem quer entender o
+trecho e vai OUVIR aquilo narrado.
+
+**40 limpas. 31 achados em 22 perícopes.** Todos conferidos byte a byte e
+consertados. Três famílias:
+
+- **9 afirmavam o que o texto não sustenta**, sempre do mesmo jeito: uma causa
+  inventada para um fato verdadeiro. O carmesim era caro *"porque a cor não
+  saía na lavagem"*; a acusação a Jesus aconteceu *"numa sala"*.
+- **7 eram o contexto entregando o achado da resenha**, em paráfrase — abaixo
+  das oito palavras que o portão mede.
+- **11 mandavam o ouvinte para outro lugar**, das quais 4 prometiam um
+  pagamento fora da perícope (*"quem seguir lendo vai encontrar o preço no
+  capítulo seguinte"*).
+
+**O número que fica é este: 22 de 62, ou 35%.** Extrapolado, seriam ~1.000
+perícopes com pelo menos um defeito que um leitor nota e nenhuma régua pega.
+Nenhum deles é mentira — a auditoria de invenção fechou em zero — e nenhum
+impede a narração. São desgaste: causa inventada, ideia repetida, promessa não
+paga.
+
+**A decisão de rodar a leitura no acervo inteiro é do dono**, e o custo medido
+é este: 62 perícopes custaram ~480 mil tokens com quatro agentes em paralelo.
+As 2.823 dariam da ordem de **22 milhões de tokens** e algumas horas de
+parede. A narração custa ~US$ 50 uma vez; o material lido errado custa toda
+vez que alguém ouve.
+
 ## O que NÃO foi feito, e por quê
 
 **O enriquecimento dos ~1.297 contextos restantes.** O dono adiou para uma

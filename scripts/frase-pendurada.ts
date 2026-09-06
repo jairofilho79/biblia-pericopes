@@ -110,12 +110,31 @@ export function pendurada(contexto: string): string | null {
 
 export type Veredito = {
   ordem: number
-  /** `entrega` mantém; `corta` remove a frase; `responde` troca por `novo`. */
-  veredito: 'entrega' | 'corta' | 'responde'
+  /**
+   * `entrega` mantém; `corta` remove a frase; `responde` troca por `novo`;
+   * `corta_e_nomeia` remove a frase E troca o pronome que abre a frase seguinte
+   * pelo `sujeito`, resolvendo a órfã sem inventar uma frase de rubrica.
+   */
+  veredito: 'entrega' | 'corta' | 'responde' | 'corta_e_nomeia'
   novo?: string
+  sujeito?: string
 }
 
 /** Devolve o contexto novo, ou lança se a frase não estiver mais lá. */
+/**
+ * A limpeza importa porque na resenha o corte é no MEIO do parágrafo: tirar a
+ * frase deixa dois espaços entre as vizinhas, e um parágrafo que era só ela
+ * deixa três quebras de linha. Nenhum dos dois quebra o sentido, mas os dois
+ * vão para a tela e para o áudio.
+ */
+const limpar = (t: string) =>
+  t
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+
 export function aplicarVeredito(contexto: string, frase: string, v: Veredito): string {
   if (v.veredito === 'entrega') return contexto
   if (!contexto.includes(frase))
@@ -125,6 +144,20 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
     throw new Error(
       `${v.ordem}: é cabeçalho de lista, não frase pendurada — o texto enumera logo abaixo ("${seguinte.slice(0, 45)}…"); marque entrega`,
     )
+  if (v.veredito === 'corta_e_nomeia') {
+    // O caminho certo quando a frase seguinte JÁ paga o que o ponteiro
+    // prometia. Responder ali só cabia inventando uma rubrica — "O foco volta
+    // para Jó." —, que é o mesmo defeito com outra roupa. Tirar o ponteiro e
+    // nomear o sujeito deixa o texto menor, mais claro e sem nada acrescentado.
+    if (!v.sujeito?.trim()) throw new Error(`${v.ordem}: "corta_e_nomeia" sem sujeito`)
+    const m = seguinte.match(/^(Ela|Ele|Elas|Eles)\b/)
+    if (!m)
+      throw new Error(
+        `${v.ordem}: a frase seguinte não começa por pronome — "${seguinte.slice(0, 45)}…"`,
+      )
+    const trocada = seguinte.replace(m[1], v.sujeito.trim())
+    return limpar(contexto.slice(0, contexto.indexOf(frase)) + trocada)
+  }
   if (v.veredito === 'responde') {
     if (!v.novo?.trim()) throw new Error(`${v.ordem}: veredito "responde" sem frase nova`)
     if (penduradaSemPagar(v.novo.trim()))
@@ -136,7 +169,7 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
       throw new Error(`${v.ordem}: a frase nova anuncia e não paga — "${v.novo.slice(0, 50)}…"`)
     return contexto.replace(frase, v.novo)
   }
-  if (ANAFORA.test(seguinte))
+  if (v.veredito === 'corta' && ANAFORA.test(seguinte))
     // Achado num lote da resenha: cortar "Guarde essa palavra, tremendo." deixa
     // a frase seguinte — "Ela explica o que Saul vai fazer" — sem antecedente.
     // O texto continua gramatical e fica sem sentido, que é o pior dos dois.
@@ -147,13 +180,7 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
   // frase deixa dois espaços entre as vizinhas, e um parágrafo que era só ela
   // deixa três quebras de linha. Nenhum dos dois quebra o sentido, mas os dois
   // vão para a tela e para o áudio.
-  return contexto
-    .replace(frase, '')
-    .replace(/[ \t]{2,}/g, ' ')
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n[ \t]+/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  return limpar(contexto.replace(frase, ''))
 }
 
 function main() {
@@ -235,7 +262,7 @@ function main() {
       unknown
     >[]
     const porOrdem = new Map(arr.map((p) => [p.ordem as number, p]))
-    const conta = { entrega: 0, corta: 0, responde: 0 }
+    const conta: Record<string, number> = { entrega: 0, corta: 0, responde: 0, corta_e_nomeia: 0 }
     const erros: string[] = []
     const feitos: string[] = []
     for (const f of readdirSync(d.saida).filter((x) => x.endsWith('.json'))) {
@@ -271,7 +298,9 @@ function main() {
     const aplicados = join(d.base, 'aplicados')
     mkdirSync(aplicados, { recursive: true })
     for (const f of feitos) renameSync(join(d.saida, f), join(aplicados, f))
-    console.log(`entrega ${conta.entrega} · responde ${conta.responde} · corta ${conta.corta}`)
+    console.log(
+      `entrega ${conta.entrega} · responde ${conta.responde} · corta ${conta.corta} · corta_e_nomeia ${conta.corta_e_nomeia}`,
+    )
     return
   }
 

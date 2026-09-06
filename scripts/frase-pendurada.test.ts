@@ -173,3 +173,37 @@ describe('o cabeçalho de lista', () => {
     expect(aplicarVeredito(ctx, frase, { ordem: 1037, veredito: 'entrega' })).toBe(ctx)
   })
 })
+
+describe('corta_e_nomeia', () => {
+  // Jó 1:13: o "Ele" seguinte podia grudar em "o SENHOR", que fecha a citação
+  // logo antes. Responder ali só cabia inventando "O foco volta para Jó." —
+  // rubrica de teatro, que é o defeito com outra roupa.
+  const ctx = 'bendito seja o nome do SENHOR". Repare no que Jó não faz. Ele não culpa os sabeus.'
+  const frase = 'Repare no que Jó não faz.'
+
+  it('tira o ponteiro e troca o pronome pelo nome', () => {
+    expect(aplicarVeredito(ctx, frase, { ordem: 1058, veredito: 'corta_e_nomeia', sujeito: 'Jó' })).toBe(
+      'bendito seja o nome do SENHOR". Jó não culpa os sabeus.',
+    )
+  })
+
+  it('troca só o pronome que abre, e não o do meio da frase', () => {
+    const t = 'A cena vira. Repare nisso. Ele não culpa ninguém, e ele repete o nome.'
+    expect(aplicarVeredito(t, 'Repare nisso.', { ordem: 1, veredito: 'corta_e_nomeia', sujeito: 'Jó' })).toBe(
+      'A cena vira. Jó não culpa ninguém, e ele repete o nome.',
+    )
+  })
+
+  it('recusa quando a frase seguinte não começa por pronome', () => {
+    const t = 'A cena vira. Repare nisso. O narrador confirma o veredito.'
+    expect(() =>
+      aplicarVeredito(t, 'Repare nisso.', { ordem: 1, veredito: 'corta_e_nomeia', sujeito: 'Jó' }),
+    ).toThrow(/não começa por pronome/)
+  })
+
+  it('recusa sem sujeito', () => {
+    expect(() => aplicarVeredito(ctx, frase, { ordem: 1058, veredito: 'corta_e_nomeia' })).toThrow(
+      /sem sujeito/,
+    )
+  })
+})

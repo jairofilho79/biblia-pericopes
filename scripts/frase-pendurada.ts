@@ -29,7 +29,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
-import { criarDirs, dirs, montarLote, pendentes } from './reenriquecimento.ts'
+import { criarDirs, dirs, montarLote } from './reenriquecimento.ts'
 
 const root = join(import.meta.dirname, '..')
 export const BASE = join(root, 'data/pendurada')
@@ -102,6 +102,28 @@ export const ENUMERACAO =
 /** Tem a forma do tique E não paga. É isto que não pode entrar como frase nova. */
 export function penduradaSemPagar(frase: string): boolean {
   return Boolean(pendurada(frase)) && !ENTREGA.test(frase)
+}
+
+/**
+ * `pendentes` de `reenriquecimento.ts` não conhece `aplicados/`, que só existe
+ * nesta fila — sem isto, perícope já aplicada volta a contar como pendente e a
+ * conta mente para sempre.
+ */
+function pendentesAqui(d: { entrada: string; saida: string; travas: string; base: string }) {
+  const feitas = new Set(
+    [
+      ...readdirSync(d.saida),
+      ...(existsSync(join(d.base, 'aplicados')) ? readdirSync(join(d.base, 'aplicados')) : []),
+    ]
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => Number(f.slice(0, -5))),
+  )
+  const travadas = new Set(readdirSync(d.travas).map(Number))
+  return readdirSync(d.entrada)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => Number(f.slice(0, -5)))
+    .filter((o) => !feitas.has(o) && !travadas.has(o))
+    .sort((a, b) => a - b)
 }
 
 export function pendurada(contexto: string): string | null {
@@ -230,6 +252,7 @@ function main() {
         const antes = JSON.parse(readFileSync(alvo, 'utf8')) as { frase: string }
         if (antes.frase === frase) continue
         rmSync(join(d.saida, `${p.ordem}.json`), { force: true })
+        rmSync(join(d.base, 'aplicados', `${p.ordem}.json`), { force: true })
         rmSync(join(d.travas, String(p.ordem)), { force: true, recursive: true })
         reabertas++
       }
@@ -263,7 +286,7 @@ function main() {
       process.argv.find((a) => a.startsWith('--tamanho='))?.split('=')[1] ?? 40,
     )
     const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
-    const lote = montarLote(d, pendentes(d).slice(0, tamanho), id)
+    const lote = montarLote(d, pendentesAqui(d).slice(0, tamanho), id)
     if (!lote) return console.log('nada pendente')
     console.log(lote.arquivo)
     console.log(`lote ${lote.id}: ${lote.ordens.length}`)
@@ -352,7 +375,7 @@ function main() {
   if (cmd === 'status') {
     criarDirs(d)
     console.log(
-      `entrada ${readdirSync(d.entrada).length} · saída ${readdirSync(d.saida).length} · pendentes ${pendentes(d).length}`,
+      `entrada ${readdirSync(d.entrada).length} · saída ${readdirSync(d.saida).length} · aplicados ${existsSync(join(d.base, 'aplicados')) ? readdirSync(join(d.base, 'aplicados')).length : 0} · pendentes ${pendentesAqui(d).length}`,
     )
     return
   }

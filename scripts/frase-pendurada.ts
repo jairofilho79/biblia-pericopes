@@ -19,7 +19,15 @@
  *   npx tsx scripts/frase-pendurada.ts aplicar
  *   npx tsx scripts/frase-pendurada.ts status
  */
-import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import { criarDirs, dirs, montarLote, pendentes } from './reenriquecimento.ts'
 
@@ -229,6 +237,7 @@ function main() {
     const porOrdem = new Map(arr.map((p) => [p.ordem as number, p]))
     const conta = { entrega: 0, corta: 0, responde: 0 }
     const erros: string[] = []
+    const feitos: string[] = []
     for (const f of readdirSync(d.saida).filter((x) => x.endsWith('.json'))) {
       const v = JSON.parse(readFileSync(join(d.saida, f), 'utf8')) as Veredito
       const entrada = JSON.parse(readFileSync(join(d.entrada, `${v.ordem}.json`), 'utf8'))
@@ -244,6 +253,7 @@ function main() {
           v,
         )
         conta[v.veredito]++
+        feitos.push(f)
       } catch (e) {
         erros.push((e as Error).message)
       }
@@ -254,6 +264,13 @@ function main() {
       process.exit(1)
     }
     writeFileSync(join(root, 'data/pericopes.json'), JSON.stringify(arr, null, 2))
+    // A saída é CONSUMIDA depois de aplicada: sem isso, a rodada seguinte tenta
+    // aplicar de novo e é recusada porque a frase já saiu do campo — 323 de uma
+    // vez, na primeira vez que rodei duas ondas. Movida em vez de apagada
+    // porque é o registro do que mudou e por quê.
+    const aplicados = join(d.base, 'aplicados')
+    mkdirSync(aplicados, { recursive: true })
+    for (const f of feitos) renameSync(join(d.saida, f), join(aplicados, f))
     console.log(`entrega ${conta.entrega} · responde ${conta.responde} · corta ${conta.corta}`)
     return
   }

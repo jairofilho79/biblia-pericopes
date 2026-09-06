@@ -1,5 +1,5 @@
 {
-  "gerado": "2026-09-05T22:41:58.008Z",
+  "gerado": "2026-09-06T00:01:02.360Z",
   "total_prontas": 2823,
   "congeladas": [
     0,
@@ -202,8 +202,10 @@
     200,
     201,
     202,
+    203,
     204,
     205,
+    206,
     207,
     208,
     209,
@@ -2826,10 +2828,6 @@
   ],
   "reescrita_certa": [],
   "so_titulo_pode_mudar": [],
-  "aguardando_decisao_do_dono": [
-    203,
-    206
-  ],
-  "nota_aguardando": "Lv 18 e Lv 20:10-21. O material lê os dois capítulos pela estrutura (a casa como lugar seguro; a gradação das penas) e nunca toca nos versículos 22 e 23. Não é erro e não tem conserto óbvio: é decisão editorial do dono sobre o que o app aborda. NÃO NARRAR até ele decidir.",
+  "aguardando_decisao_do_dono": [],
   "descongeladas_nesta_rodada": []
 }

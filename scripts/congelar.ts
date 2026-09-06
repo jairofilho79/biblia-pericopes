@@ -17,7 +17,7 @@
  * pode cair numa perícope já congelada, e é por isso que este script roda de
  * novo a cada rodada em vez de a lista ser mantida à mão.
  *
- * Usage: npx tsx scripts/congelar.ts
+ * Usage: npx tsx scripts/congelar.ts [--soltar=203,206]
  */
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -108,7 +108,20 @@ function main() {
     }
   })()
   const congeladasAntes: number[] = anterior?.congeladas ?? []
-  const aguardando: number[] = anterior?.aguardando_decisao_do_dono ?? []
+  const esperavam: number[] = anterior?.aguardando_decisao_do_dono ?? []
+
+  // `--soltar=203,206`: a espera sai por aqui, e nunca editando o JSON à mão.
+  // O arquivo é CONTRATO da Sessão 4; uma edição manual solta a perícope para
+  // narração sem deixar rastro de quem soltou nem contra o quê. Passando pelo
+  // script, o motivo aparece no log e a nota morre junto com a lista.
+  const pedidas = new Set(
+    (process.argv.find((a) => a.startsWith('--soltar='))?.split('=')[1] ?? '')
+      .split(',')
+      .map((x) => Number(x.trim()))
+      .filter((n) => Number.isInteger(n) && n > 0),
+  )
+  const aguardando = esperavam.filter((o) => !pedidas.has(o))
+  const soltas = esperavam.filter((o) => pedidas.has(o))
 
   const risco = (o: number) =>
     porTexto.has(o) || porRegistro.has(o) || reprovadasPeloPortao.has(o) || aguardando.includes(o)
@@ -132,7 +145,8 @@ function main() {
         reescrita_certa: reescrita,
         so_titulo_pode_mudar: soTitulo,
         aguardando_decisao_do_dono: aguardando,
-        nota_aguardando: anterior?.nota_aguardando,
+        // A nota descreve a espera. Sem espera ela é lixo que confunde a leitura.
+        nota_aguardando: aguardando.length ? anterior?.nota_aguardando : undefined,
         descongeladas_nesta_rodada: descongeladas,
       },
       null,
@@ -147,6 +161,7 @@ function main() {
   )
   console.log(`  só título pode mudar  ${soTitulo.length}`)
   console.log(`  aguardando o dono     ${aguardando.length}`)
+  if (soltas.length) console.log(`  soltas nesta rodada   ${soltas.join(', ')}`)
   console.log(`\ndefeitos catalogados: ${TODAS_AS_REFS.length} em ${DEFEITOS.length} classes`)
   if (descongeladas.length) {
     // Não é item de ação por rodada. O dono decidiu esperar a corrida acabar

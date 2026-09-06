@@ -70,6 +70,36 @@ mesma definição que o material usou.
 auditou — você leu. Auditar custa idas ao texto, e é isso que você está aqui
 para gastar.
 
+## A sexta forma: o pedaço que ninguém tratou
+
+Depois de auditar as cinco, faça uma pergunta a mais, e ela é barata porque você
+já leu tudo: **sobrou versículo que o material não trata em campo nenhum?**
+
+Extraia a tese em uma frase (título mais primeira frase da resenha) e veja se
+ela alcança a perícope inteira. Duas viradas produzem quase todos os casos:
+
+- **Muda o assunto.** Levítico 19 é lido como ética social — colheita, salário,
+  balança — e não diz uma palavra sobre o prazo do sacrifício, a serva
+  desposada, o fruto das árvores, adivinhação, barba, cortes na carne.
+- **Muda o interlocutor.** Jeremias 22 é lido como "três reis", e os versículos
+  20 a 23 não falam com rei nenhum: falam com a cidade.
+
+Um sinal barato: **veja de onde vêm as citações entre aspas do material.** Se
+todas saem de uma faixa e o resto da perícope não tem nenhuma, o buraco está ali.
+
+Isso NÃO é invenção — é omissão — então vai em lista separada:
+
+```json
+"sobrou": [
+  { "versiculos": "19:26-31", "assunto": "adivinhação, barba, cortes na carne e marca no corpo",
+    "porque": "a tese é ética social e não alcança a lei de culto" }
+]
+```
+
+**Resumir não é omitir.** Coleção de ditos sem fio narrativo — Provérbios,
+listas de leis, genealogias — é resumida de propósito, e apontar buraco ali é
+erro seu. `sobrou: []` é a resposta comum.
+
 ## Como confirmar antes de acusar
 
 A Bíblia inteira está no repositório e você pode conferir cada versículo:
@@ -111,5 +141,5 @@ Não conserte nada. Você aponta; quem reescreve é outro.
 }
 ```
 
-`invencoes` pode ser lista vazia, e frequentemente será. Grave o arquivo assim
+`invencoes` e `sobrou` podem ser listas vazias, e frequentemente será. Grave o arquivo assim
 mesmo — é como a fila sabe que a perícope foi auditada.

@@ -53,7 +53,7 @@ function pericope(extra: Partial<Pericope> = {}): Pericope {
     capitulo_fim: 1,
     versiculo_fim: 17,
     titulo_pericope_pt: 'A genealogia de Jesus',
-    texto_naa: 'Capítulo 1\n1 Livro da genealogia de Jesus Cristo.\n2 Abraão gerou Isaque.',
+    texto: 'Capítulo 1\n1 Livro da geração de Jesus Cristo.\n2 Abraão gerou a Isaque.',
     contexto_historico_literario: 'Parágrafo um do contexto.',
     resenha: 'Parágrafo um da resenha.',
     perguntas_reflexao: ['Primeira pergunta?', 'Segunda pergunta?'],
@@ -93,8 +93,8 @@ describe('unidadesDeFala', () => {
   it('capítulo emenda no primeiro versículo e nunca fica sozinho', () => {
     const s = unidadesDeFala(pericope())
     expect(s.texto[0]).toEqual({ id: null, texto: 'Texto Bíblico.' })
-    expect(s.texto[1]).toEqual({ id: '1:1', texto: 'Capítulo 1. Livro da genealogia de Jesus Cristo.' })
-    expect(s.texto[2]).toEqual({ id: '1:2', texto: 'Abraão gerou Isaque.' })
+    expect(s.texto[1]).toEqual({ id: '1:1', texto: 'Capítulo 1. Livro da geração de Jesus Cristo.' })
+    expect(s.texto[2]).toEqual({ id: '1:2', texto: 'Abraão gerou a Isaque.' })
   })
   it('prosa ganha cabeçalho falado e ids do app', () => {
     const s = unidadesDeFala(pericope())

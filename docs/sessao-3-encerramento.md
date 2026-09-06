@@ -80,11 +80,53 @@ Nenhum deles é mentira — a auditoria de invenção fechou em zero — e nenhu
 impede a narração. São desgaste: causa inventada, ideia repetida, promessa não
 paga.
 
-**A decisão de rodar a leitura no acervo inteiro é do dono**, e o custo medido
-é este: 62 perícopes custaram ~480 mil tokens com quatro agentes em paralelo.
-As 2.823 dariam da ordem de **22 milhões de tokens** e algumas horas de
-parede. A narração custa ~US$ 50 uma vez; o material lido errado custa toda
-vez que alguém ouve.
+## A leitura completa — as 2.823
+
+A amostra virou campanha. Oito ondas, cerca de cem leitores, **2.823 perícopes
+lidas uma a uma** do lugar de quem vai ouvir. **1.542 achados propostos**, cada
+um com a frase citada byte a byte e passando por um portão antes de entrar.
+
+| defeito | quantos |
+|---|---|
+| `nao-sustenta` | 1.235 |
+| `repeticao` | 131 |
+| `so-na-tela` | 98 |
+| `liga-pericope` | 57 |
+| `enrolacao` | 19 |
+| `nao-explica` | 2 |
+
+**Oitenta por cento de tudo é uma coisa só, e ela tem nome: o superlativo de
+fechamento de parágrafo.** "A frase mais dura do trecho", "a carne mais barata
+do mercado", "o homem mais poderoso do mundo conhecido", "a construção mais
+impressionante do mundo conhecido", "a mais disputada da Bíblia". Não é erro de
+leitura da Escritura, e não é mentira no sentido da auditoria de invenção: é o
+material buscando força onde o texto já tinha. Sai sem deixar buraco, e é por
+isso que quase todos os consertos ENCOLHEM o campo.
+
+A taxa de perícope limpa variou com o gênero, e a variação diz o que provoca o
+defeito:
+
+| trecho | limpas |
+|---|---|
+| Lei ritual (Levítico, Números) | ~52% |
+| Históricos (Samuel, Reis) | ~71% |
+| Profetas (Isaías a Malaquias) | ~65% |
+| Evangelhos (Mateus, Marcos) | ~80% |
+| Epístolas (Romanos, Coríntios) | ~90% |
+
+**Quanto mais o texto narra, menos o material inventa.** A lei ritual e a
+poesia profética são onde o material mais precisa dizer o que a coisa
+SIGNIFICA, e é dizendo isso que ele escorrega.
+
+Erros de fato que a auditoria de invenção não pegou e a leitura pegou: em Êx 7
+era Arão, não Moisés, quem levava o cajado; em Mt 17 o material dizia que
+Moisés e Elias eram "homens que já morreram", e Elias não morreu; em Sl 52 o
+contexto dizia que Doegue não ergueu espada, e 1Sm 22:18 diz que foi ele quem
+matou os sacerdotes; em Lc 19, que os discípulos "ouviram tudo em português
+claro"; em Gn 4 uma genealogia de "sete nomes" que tem seis.
+
+O custo medido: as 62 da amostra deram ~480 mil tokens; as 2.823 deram da
+ordem de 20 milhões e sete horas de parede.
 
 ## O que NÃO foi feito, e por quê
 

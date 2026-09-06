@@ -38,6 +38,38 @@ falso é pior que a afirmação solta, porque leva o leitor junto.
 
 **5. Costume antigo sem fonte.** "Naquela cultura era comum…" sem nada atrás.
 
+## A regra do "vá olhar"
+
+**Invenção não se acha lendo. Acha-se procurando.** A primeira versão desta
+skill passou num teste com nota 2 de 5, e as três que escaparam tinham a mesma
+cara: só apareciam se alguém fosse buscar um versículo em OUTRO livro. As duas
+que ela pegou estavam à vista — uma contradição entre dois campos da mesma tela
+e um versículo do capítulo anterior.
+
+Então a busca não é opcional. Três gatilhos, e cada um obriga:
+
+**1. O material diz que o texto não diz.** "O texto não explica que fogo era
+esse", "a Bíblia não conta o que aconteceu com ela", "não se sabe por quê".
+**Procure.** Quase sempre a Escritura conta, noutro lugar — as ursas de 2 Reis 2
+estão em Levítico 26:22, e o fogo de Números 3 está em Levítico 10:1-2. Um
+silêncio falso é pior que uma afirmação solta, porque o material costuma pendurar
+uma pergunta de reflexão nele e levar o leitor junto.
+
+**2. O material define uma palavra ou uma instituição.** "Juiz é quem…",
+"o holocausto é o sacrifício em que…", "primogenitura significa…". **Procure a
+palavra em outro lugar e veja se a definição sobrevive.** Foi assim que caiu
+"juiz não é quem decide processo em tribunal": Juízes 4:5 diz que subiam a
+Débora *"a juízo"*. E assim que caiu "no holocausto não sobra nada nem para o
+sacerdote": Levítico 7:8 dá o couro ao sacerdote.
+
+**3. Todo número, medida, contagem ou preço.** **Procure o número.** Os setenta
+de Êxodo 1 batem com Gênesis 46:26? Lá está escrito sessenta e seis, com a
+mesma definição que o material usou.
+
+**Calibração:** se você terminou uma perícope sem fazer nenhuma busca, você não
+auditou — você leu. Auditar custa idas ao texto, e é isso que você está aqui
+para gastar.
+
 ## Como confirmar antes de acusar
 
 A Bíblia inteira está no repositório e você pode conferir cada versículo:

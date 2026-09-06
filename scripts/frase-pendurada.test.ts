@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aplicarVeredito, pendurada, todasPenduradas } from './frase-pendurada.ts'
+import { aplicarVeredito, pendurada, penduradaSemPagar, todasPenduradas } from './frase-pendurada.ts'
 
 describe('pendurada', () => {
   it('acha a frase-molde no fim do campo', () => {
@@ -48,7 +48,7 @@ describe('aplicarVeredito', () => {
         veredito: 'responde',
         novo: 'Repare também em quem cala.',
       }),
-    ).toThrow(/também está pendurada/)
+    ).toThrow(/anuncia e não paga/)
   })
 
   it('recusa quando a frase não está mais no contexto', () => {
@@ -122,5 +122,26 @@ describe('a limpeza depois do corte', () => {
     expect(aplicarVeredito(t, 'Repare em quem fala.', { ordem: 1, veredito: 'corta' })).toBe(
       'Saul reinou.\n\nO povo se reuniu.',
     )
+  })
+})
+
+describe('penduradaSemPagar', () => {
+  it('deixa passar a frase que tem a forma do tique mas entrega', () => {
+    // Recusadas pela primeira versão do portão, e as duas estão certas.
+    expect(penduradaSemPagar('Guarde o nome de Nabote: é na propriedade dele que tudo acontece.')).toBe(false)
+    expect(penduradaSemPagar('Guarde isso ao ler: o pai tem só mais um filho daquela mulher.')).toBe(false)
+  })
+
+  it('barra a que anuncia e não paga', () => {
+    expect(penduradaSemPagar('Repare em quem fala primeiro.')).toBe(true)
+    expect(penduradaSemPagar('Duas coisas ajudam aqui.')).toBe(true)
+  })
+
+  it('não aceita dois-pontos com quase nada depois', () => {
+    expect(penduradaSemPagar('Repare nisto: é importante.')).toBe(true)
+  })
+
+  it('deixa passar frase que nem tem a forma do tique', () => {
+    expect(penduradaSemPagar('Davi escreve a ordem, e Urias a entrega.')).toBe(false)
   })
 })

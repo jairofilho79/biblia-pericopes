@@ -70,6 +70,19 @@ export function todasPenduradas(texto: string): string[] {
 const ANAFORA =
   /^(?:Ela|Ele|Elas|Eles|Essa|Esse|Essas|Esses|Esta|Este|Isso|Isto|Ambos|Ambas|Nela|Nele|Dela|Dele|A primeira|O primeiro|A segunda|O segundo|As duas|Os dois)\b/
 
+/**
+ * A marca de que a frase PAGA o que anuncia: dois-pontos ou travessão seguidos
+ * de conteúdo. "Guarde isso ao ler: o pai tem só mais um filho daquela mulher"
+ * tem a forma do tique e entrega o fato — é o caso que a campanha inteira
+ * existe para preservar.
+ */
+const ENTREGA = /[:—–-]\s+\S+(?:\s+\S+){2,}/
+
+/** Tem a forma do tique E não paga. É isto que não pode entrar como frase nova. */
+export function penduradaSemPagar(frase: string): boolean {
+  return Boolean(pendurada(frase)) && !ENTREGA.test(frase)
+}
+
 export function pendurada(contexto: string): string | null {
   return contexto.trim().match(MOLDE)?.[1] ?? null
 }
@@ -88,9 +101,13 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
     throw new Error(`${v.ordem}: a frase não está mais no contexto — "${frase.slice(0, 50)}…"`)
   if (v.veredito === 'responde') {
     if (!v.novo?.trim()) throw new Error(`${v.ordem}: veredito "responde" sem frase nova`)
-    if (pendurada(contexto.replace(frase, v.novo).trim()))
+    if (penduradaSemPagar(v.novo.trim()))
       // Trocar uma frase pendurada por outra é o modo de falha mais fácil aqui.
-      throw new Error(`${v.ordem}: a frase nova também está pendurada — "${v.novo.slice(0, 50)}…"`)
+      // Mas a checagem tem de ser sobre PAGAR, e não sobre a forma: a primeira
+      // versão recusou "Guarde o nome de Nabote: é na propriedade dele que…",
+      // que entrega. Usar o detector de forma para julgar conteúdo foi o mesmo
+      // erro que a campanha inteira existe para não cometer.
+      throw new Error(`${v.ordem}: a frase nova anuncia e não paga — "${v.novo.slice(0, 50)}…"`)
     return contexto.replace(frase, v.novo)
   }
   const depois = contexto.slice(contexto.indexOf(frase) + frase.length).trimStart()

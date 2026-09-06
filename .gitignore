@@ -63,3 +63,10 @@ data/reenriquecimento/
 data/titulos/
 data/registro/
 data/contextos/
+
+# Filas de auditoria (Sessão 3) — julgamento já aplicado em data/pericopes.json;
+# o que vale ficar está no material e no relatório, não na fila.
+data/pendurada/
+data/pendurada-resenha/
+data/leitura/
+data/invencao/

@@ -67,3 +67,8 @@ Material que conta só uma está incompleto, não inventando — e isso não é 
 seu aqui.
 
 Rascunho com nome único do lote — o scratchpad NÃO é isolado entre agentes.
+
+**Não se divida em subagentes para acelerar.** Um auditor tentou: abriu três
+forks, e os três auditaram o lote inteiro em vez de uma fatia cada, gravando por
+cima uns dos outros. O trabalho saiu certo e custou o triplo. A fila já é o
+paralelismo — cada lote é de um agente só, do começo ao fim.

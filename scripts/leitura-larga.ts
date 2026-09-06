@@ -90,31 +90,45 @@ export function aplicarLeitura(
   let cortes = 0
   let trocas = 0
 
+  // **Todo `throw` daqui para baixo desfaz.** A primeira versão só restaurava
+  // no bloco final, e um erro no terceiro achado deixava os dois primeiros
+  // aplicados — com o portão do material nunca rodando em cima do resultado.
+  // Aconteceu em nove perícopes: nenhuma quebrou, porque cada conserto é válido
+  // por si, mas o portão só sabia disso por sorte.
+  const desfazer = (msg: string): never => {
+    Object.assign(p, original)
+    throw new Error(msg)
+  }
+
   for (const a of v.achados ?? []) {
-    if (!TIPOS.includes(a.tipo)) throw new Error(`${v.ordem}: tipo inválido "${a.tipo}"`)
+    if (!TIPOS.includes(a.tipo)) desfazer(`${v.ordem}: tipo inválido "${a.tipo}"`)
     const campo = String(p[a.campo] ?? '')
     if (!campo.includes(a.frase))
-      throw new Error(`${v.ordem}: a frase não está em ${a.campo} — "${a.frase.slice(0, 55)}…"`)
+      desfazer(`${v.ordem}: a frase não está em ${a.campo} — "${a.frase.slice(0, 55)}…"`)
     if (a.veredito === 'corta') {
       p[a.campo] = limpar(campo.replace(a.frase, ''))
       cortes++
       continue
     }
     const novo = a.novo?.trim()
-    if (!novo) throw new Error(`${v.ordem}: "troca" sem texto novo`)
-    // Tirar é barato; acrescentar é caro. Só o que CRESCE precisa de apoio, e
-    // a citação do apoio é conferida contra o texto bíblico da perícope.
-    if (novo.length > a.frase.length) {
+    if (!novo) desfazer(`${v.ordem}: "troca" sem texto novo`)
+    // Tirar é barato; acrescentar é caro. Mas "crescer" não é qualquer byte a
+    // mais: trocar "sempre firmava" por "costumava firmar" cresce dois
+    // caracteres e não afirma nada de novo — a primeira versão do portão
+    // recusou seis consertos legítimos por 1, 2, 5, 7 e 11 caracteres, que é
+    // medir a coisa errada com precisão de régua. Uma AFIRMAÇÃO nova ocupa uma
+    // oração, e uma oração destas tem uns sessenta caracteres.
+    if (novo.length > a.frase.length + 60) {
       if (!a.apoio?.trim())
-        throw new Error(
+        desfazer(
           `${v.ordem}: a troca acrescenta ${novo.length - a.frase.length} caracteres e não declara apoio`,
         )
       const cits = [...a.apoio.matchAll(/[“"]([^”"]{10,})[”"]/g)].map((m) => m[1])
       if (!cits.length)
-        throw new Error(`${v.ordem}: o apoio não cita nada — ponha entre aspas o trecho do texto`)
+        desfazer(`${v.ordem}: o apoio não cita nada — ponha entre aspas o trecho do texto`)
       for (const c of cits)
         if (!chave(String(entrada.texto)).includes(chave(c)))
-          throw new Error(
+          desfazer(
             `${v.ordem}: o apoio cita "${c.slice(0, 45)}…", que não está no texto desta perícope`,
           )
     }
@@ -124,10 +138,6 @@ export function aplicarLeitura(
 
   if (cortes + trocas === 0) return { cortes, trocas }
 
-  const desfazer = (msg: string) => {
-    Object.assign(p, original)
-    throw new Error(msg)
-  }
   // Esvaziar o campo é a saída preguiçosa: o defeito some e a explicação vai
   // junto. Um conserto tira UMA coisa, não metade do campo.
   for (const [c, antes] of Object.entries(tamanhoAntes))

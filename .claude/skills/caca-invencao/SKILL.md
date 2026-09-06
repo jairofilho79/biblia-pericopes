@@ -48,7 +48,15 @@ e um versículo do capítulo anterior.
 
 Então a busca não é opcional. Três gatilhos, e cada um obriga:
 
-**1. O material diz que o texto não diz.** "O texto não explica que fogo era
+**1. O material diz que o texto não diz.** Aqui há uma distinção que decide
+entre acusar e não acusar: **"o texto", para o leitor, é a Bíblia — não o
+capítulo.** Que 2 Reis 15 não conte por que Uzias ficou leproso é verdade; que
+2 Crônicas 26 conte a cena inteira também é. Quem for conferir encontra, e
+conclui que fomos descuidados. Então marque, mas com a forma certa: se a
+Escritura responde noutro livro, é `silencio-falso` e o conserto é uma frase —
+"este trecho não diz; Crônicas conta". Se a Escritura cala em toda parte, o
+silêncio é real e não é achado seu. **A pergunta é sempre: quem for procurar
+vai encontrar?** "O texto não explica que fogo era
 esse", "a Bíblia não conta o que aconteceu com ela", "não se sabe por quê".
 **Procure.** Quase sempre a Escritura conta, noutro lugar — as ursas de 2 Reis 2
 estão em Levítico 26:22, e o fogo de Números 3 está em Levítico 10:1-2. Um

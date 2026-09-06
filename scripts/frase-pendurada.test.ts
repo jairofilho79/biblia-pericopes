@@ -89,3 +89,38 @@ describe('todasPenduradas', () => {
     expect(todasPenduradas('Davi sobe a Hebrom e é ungido rei sobre Judá.')).toEqual([])
   })
 })
+
+describe('o corte que quebra o texto', () => {
+  const ctx = 'Saul reinou. Guarde essa palavra, tremendo. Ela explica o que ele vai fazer.'
+  const frase = 'Guarde essa palavra, tremendo.'
+
+  it('recusa cortar quando a frase seguinte se apoia nesta', () => {
+    // 1Sm 13:1: cortada a marca, "Ela explica…" fica sem antecedente. O texto
+    // segue gramatical e vira sem sentido, que é pior que o defeito original.
+    expect(() => aplicarVeredito(ctx, frase, { ordem: 522, veredito: 'corta' })).toThrow(
+      /se apoia nesta/,
+    )
+  })
+
+  it('deixa responder no lugar, porque a frase nova vira o antecedente', () => {
+    const novo = 'A palavra é "rejeitou".'
+    expect(aplicarVeredito(ctx, frase, { ordem: 522, veredito: 'responde', novo })).toContain(novo)
+  })
+
+})
+
+describe('a limpeza depois do corte', () => {
+  it('não deixa dois espaços quando a frase sai do meio do parágrafo', () => {
+    const t = 'Saul reinou. Repare em quem fala. O povo se reuniu em Gilgal.'
+    expect(aplicarVeredito(t, 'Repare em quem fala.', { ordem: 1, veredito: 'corta' })).toBe(
+      'Saul reinou. O povo se reuniu em Gilgal.',
+    )
+  })
+
+  it('não deixa parágrafo vazio quando a frase era o parágrafo inteiro', () => {
+    const t = 'Saul reinou.\n\nRepare em quem fala.\n\nO povo se reuniu.'
+    expect(aplicarVeredito(t, 'Repare em quem fala.', { ordem: 1, veredito: 'corta' })).toBe(
+      'Saul reinou.\n\nO povo se reuniu.',
+    )
+  })
+})

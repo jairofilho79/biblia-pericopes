@@ -63,6 +63,13 @@ export function todasPenduradas(texto: string): string[] {
   return [...texto.matchAll(MOLDE_QUALQUER)].map((m) => m[1])
 }
 
+/**
+ * Começos que se apoiam na frase anterior. Cortar o antecedente deixa o texto
+ * gramatical e sem sentido — e ninguém relê para descobrir.
+ */
+const ANAFORA =
+  /^(?:Ela|Ele|Elas|Eles|Essa|Esse|Essas|Esses|Esta|Este|Isso|Isto|Ambos|Ambas|Nela|Nele|Dela|Dele|A primeira|O primeiro|A segunda|O segundo|As duas|Os dois)\b/
+
 export function pendurada(contexto: string): string | null {
   return contexto.trim().match(MOLDE)?.[1] ?? null
 }
@@ -86,7 +93,25 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
       throw new Error(`${v.ordem}: a frase nova também está pendurada — "${v.novo.slice(0, 50)}…"`)
     return contexto.replace(frase, v.novo)
   }
-  return contexto.replace(frase, '').replace(/[ \t]+\n/g, '\n').trimEnd()
+  const depois = contexto.slice(contexto.indexOf(frase) + frase.length).trimStart()
+  if (ANAFORA.test(depois))
+    // Achado num lote da resenha: cortar "Guarde essa palavra, tremendo." deixa
+    // a frase seguinte — "Ela explica o que Saul vai fazer" — sem antecedente.
+    // O texto continua gramatical e fica sem sentido, que é o pior dos dois.
+    throw new Error(
+      `${v.ordem}: a frase seguinte se apoia nesta — "${depois.slice(0, 55)}…"; responda em vez de cortar`,
+    )
+  // A limpeza importa porque na resenha o corte é no MEIO do parágrafo: tirar a
+  // frase deixa dois espaços entre as vizinhas, e um parágrafo que era só ela
+  // deixa três quebras de linha. Nenhum dos dois quebra o sentido, mas os dois
+  // vão para a tela e para o áudio.
+  return contexto
+    .replace(frase, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 function main() {

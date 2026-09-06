@@ -61,6 +61,10 @@ for (const a of achados) {
     else if (!f.ancora?.trim())
       recusas.push(`${a.ordem} faltou: sem âncora — "${(f.o_que ?? '').slice(0, 60)}…"`)
     else if (!f.o_que?.trim()) recusas.push(`${a.ordem} faltou: sem o quê`)
+    else if (!['divida', 'dívida', 'enriquecimento'].includes((f.forca ?? '').toLowerCase()))
+      // Sem separar as duas forças, tudo vira reescrita e material bom entra na
+      // fila junto com o defeituoso.
+      recusas.push(`${a.ordem} faltou: forca deve ser "divida" ou "enriquecimento" (veio "${f.forca ?? ''}")`)
     else dividasOk++
   }
 }

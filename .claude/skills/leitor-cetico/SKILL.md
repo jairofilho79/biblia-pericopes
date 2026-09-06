@@ -56,6 +56,24 @@ defeito é a paráfrase que **substitui** a explicação em vez de preparar uma.
 **O aviso vazio.** "Isso é importante", "vale guardar", "o assunto que vem a
 seguir será exatamente esse", "duas coisas para observar".
 
+### Antes das duas listas: a tese cabe na perícope inteira?
+
+Leia o título e a primeira frase da resenha, e tire dali a tese em uma frase. Ela
+tem de servir para **todos** os versículos, e não só para o pedaço mais fácil de
+resumir. Se sobra bloco que a tese não alcança, isso é dívida — e é a mais grave
+que existe, porque o leitor sai achando que entendeu a perícope inteira.
+
+Duas viradas produzem quase todos os casos, e nenhuma aparece numa contagem de
+palavras:
+
+- **Muda o assunto.** Uma lei social vira lei de culto no meio do capítulo.
+- **Muda o interlocutor.** A acusação para de falar com o rei e passa a falar com
+  a cidade — e a tese continua contando reis.
+
+Um sinal barato para achar isso: veja **de onde vêm as citações entre aspas** do
+material. Se todas saem de uma faixa e o resto da perícope não tem nenhuma, o
+buraco está ali, e você nem precisou medir nada.
+
 ### `faltou:` — o que você precisava saber e ninguém contou
 
 Conhecimento tácito é o que **todo leitor original sabia e nenhum leitor de hoje
@@ -67,6 +85,13 @@ sabe**. Sem ele o texto passa liso e o leitor nem percebe que perdeu alguma cois
 - Um costume: dormia-se na eira no tempo da colheita.
 - **Por que** aconteceu daquele jeito, quando o texto deixa a razão implícita.
 - **O que o texto não diz**, quando o silêncio é o ponto.
+
+Separe as duas forças, porque elas mandam em decisões diferentes. **Dívida** é
+o que, faltando, faz o leitor entender errado ou concluir que o material erra —
+quem for conferir o sobrescrito do Salmo 34 encontra Aquis em 1 Samuel 21 e não
+Abimeleque, e conclui que a Bíblia se contradiz; isso precisa entrar.
+**Enriquecimento** é o que deixa melhor sem consertar nada. Diga qual é qual: se
+tudo virar dívida, tudo vira reescrita, e material bom vai para a fila junto.
 
 **Toda coisa que você propõe precisa de âncora, e a melhor âncora é a própria
 Bíblia.** Que a porta da cidade é onde se julgava não é erudição: está em Rute 4,
@@ -103,6 +128,7 @@ corta:
     porque: <uma linha: o que se perde ao cortar — nada, e por quê>
 faltou:
   - campo: contexto_historico_literario
+    forca: divida | enriquecimento
     o_que: <o dado tácito, numa frase>
     ancora: <referência bíblica, ou nome da fonte de fora>
     porque: <uma linha: o que o leitor entende melhor com isso>

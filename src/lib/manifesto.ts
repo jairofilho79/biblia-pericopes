@@ -91,13 +91,30 @@ export function manifestoValido(v: unknown): v is Manifesto {
  * nome mentia. Achar o master certo custou meio dia. Se um dia trocar a voz,
  * troque o nome junto.
  *
- * `gam-ash1` é o mesmo áudio de `nt-ml`, reprocessado para o alvo de loudness
+ * `gam-ash1` era o mesmo áudio de `nt-ml`, reprocessado para o alvo de loudness
  * de streaming; a publicação original saiu do TTS em -24 LUFS e soava fraca ao
  * lado de qualquer outra mídia no mesmo aparelho. Os offsets do manifesto são
  * os mesmos: a receita não desloca amostras. Ver
  * `scripts/normalizar-narracao.sh`.
+ *
+ * ── POR QUE O SUFIXO VIROU 2 ──
+ *
+ * `gam-ash1` é a narração da NAA, e ela NÃO PODE ser encontrada por este app.
+ * O bucket ainda a guarda (6.155 objetos, 8,64 GB) e as chaves são por
+ * `ordem`, exatamente o que buscamos aqui — então apontar para `gam-ash1`
+ * faria o tocador aparecer e ler a NAA em voz alta por cima do texto da
+ * Bíblia Livre na tela, com o título antigo e o realce fora de sincronia.
+ * Três problemas de uma vez: direito autoral, conteúdo errado e interface
+ * quebrada.
+ *
+ * Mesma voz (`ash`) e mesmo motor: só a gravação muda, porque o texto mudou.
+ * O `1` é a era NAA; o `2` é a era Bíblia Livre. Enquanto a Sessão 4 não
+ * publicar nada em `gam-ash2/`, não há manifesto e o tocador não aparece —
+ * que é o comportamento certo.
+ *
+ * Há teste travando isto. Não volte para `gam-ash1`.
  */
-export const VOZ = 'gam-ash1'
+export const VOZ = 'gam-ash2'
 
 /**
  * Busca o manifesto da perícope. Qualquer falha — 404, rede, corpo estranho —

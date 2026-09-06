@@ -17,15 +17,19 @@ set -u
 
 REPO="${0:A:h:h}"
 CORPUS="${TTS_CORPUS:-/Volumes/SSD 2TB SD/dev/tts-corpus}"
-ORIGEM="${1:-$CORPUS/gam-ash1}"
+ORIGEM="${1:-$CORPUS/gam-ash2}"
 LISTA="${2:-$ORIGEM/ordens.txt}"
 
-PREFIXO="gam-ash1"                       # = VOZ em src/lib/manifesto.ts
+# `gam-ash2` = VOZ em src/lib/manifesto.ts, e tem de continuar batendo com ela.
+# O `1` era a era NAA e o acervo dele SEGUE NO BUCKET: publicar aqui com
+# prefixo `gam-ash1` misturaria a narração da Bíblia Livre com a da NAA nas
+# MESMAS chaves por `ordem`, e não haveria como separar depois.
+PREFIXO="${3:-gam-ash2}"
 BUCKET="biblia-pericopes-audio"
 API="${API_BASE:-https://biblia-pericopes.jairofilho79.workers.dev}"
 
 poe() {  # poe <chave> <arquivo> <content-type>
-  (cd "$REPO" && npx wrangler r2 object put "$BUCKET/$1" \
+  (cd "$REPO" && "$REPO/node_modules/.bin/wrangler" r2 object put "$BUCKET/$1" \
       --file="$2" --content-type="$3" --remote > /dev/null 2>&1)
 }
 

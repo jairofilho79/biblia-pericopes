@@ -39,7 +39,7 @@ done
 subiu=0; falhou=0
 for f in "$ORIGEM"/*.m4a; do
   nome="${f:t}"
-  (cd "$REPO" && npx wrangler r2 object put "$BUCKET/$PREFIXO/$nome" \
+  (cd "$REPO" && "$REPO/node_modules/.bin/wrangler" r2 object put "$BUCKET/$PREFIXO/$nome" \
       --file="$f" --content-type=audio/mp4 --remote > /dev/null 2>&1) \
     && ((subiu++)) || { echo "FALHA $nome"; ((falhou++)) }
 done

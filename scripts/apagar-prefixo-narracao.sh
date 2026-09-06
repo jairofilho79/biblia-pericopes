@@ -41,7 +41,7 @@ apagados=0; falhas=0
 while read -r chave; do
   [[ -n "$chave" ]] || continue
   [[ "$chave" == "$PREFIXO/"* ]] || { echo "IGNORADA (fora do prefixo): $chave"; continue }
-  if (cd "$REPO" && npx wrangler r2 object delete "$BUCKET/$chave" --remote > /dev/null 2>&1); then
+  if (cd "$REPO" && "$REPO/node_modules/.bin/wrangler" r2 object delete "$BUCKET/$chave" --remote > /dev/null 2>&1); then
     ((apagados++))
   else
     echo "FALHA ao apagar $chave"; ((falhas++))

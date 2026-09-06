@@ -128,3 +128,24 @@ describe('manifestoValido — a seção das palavras do trecho', () => {
     expect(manifestoValido(m)).toBe(false)
   })
 })
+
+describe('VOZ — a chave do acervo', () => {
+  /**
+   * `gam-ash1` é a narração da NAA, e ela continua no bucket. As chaves são
+   * por `ordem`, iguais às que este app busca — então voltar para essa voz
+   * faz o tocador ler a NAA em voz alta por cima do texto da Bíblia Livre.
+   *
+   * Este teste existe porque um comentário não impede ninguém de reverter uma
+   * linha, e a falha seria silenciosa: o app funcionaria, só estaria narrando
+   * uma tradução protegida com o texto errado na tela.
+   */
+  it('nunca aponta para o acervo da NAA', () => {
+    expect(VOZ).not.toBe('gam-ash1')
+    expect(VOZ).not.toBe('nt-ml')
+  })
+
+  it('é uma chave que o worker aceita', () => {
+    // chaveAudio() em worker/audio.ts exige /^[a-z][a-z0-9-]*$/ no segmento
+    expect(VOZ).toMatch(/^[a-z][a-z0-9-]*$/)
+  })
+})

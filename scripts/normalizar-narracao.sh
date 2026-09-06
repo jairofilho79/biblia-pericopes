@@ -39,7 +39,9 @@
 set -u
 
 CORPUS="${TTS_CORPUS:-/Volumes/SSD 2TB SD/dev/tts-corpus}"
-DESTINO="${1:-$CORPUS/gam-ash1}"
+# gam-ash2 = era Bíblia Livre. O `1` é a narração da NAA — ver o comentário
+# em src/lib/manifesto.ts antes de mexer.
+DESTINO="${1:-$CORPUS/gam-ash2}"
 # Masters: o acervo principal, e o resgate das que só existiam no R2.
 ARVORES=("$CORPUS/gam-ash" "$CORPUS/gam-ash-r2")
 

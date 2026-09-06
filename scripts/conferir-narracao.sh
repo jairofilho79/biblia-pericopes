@@ -12,8 +12,13 @@
 set -u
 
 CORPUS="${TTS_CORPUS:-/Volumes/SSD 2TB SD/dev/tts-corpus}"
-ORIGEM="${1:-$CORPUS/gam-ash1}"
-PREFIXO="${2:-gam-ash1}"
+# O padrão é `gam-ash2`, a era da Bíblia Livre. NÃO devolva para `gam-ash1`:
+# aquele é o acervo da NAA, que continua no bucket e é obra derivada de uma
+# tradução protegida. Rodar este script contra ele reintroduz o problema que
+# a troca de VOZ em src/lib/manifesto.ts fechou. Para conferir o acervo antigo
+# de propósito, passe o prefixo como argumento — explícito, nunca por padrão.
+ORIGEM="${1:-$CORPUS/gam-ash2}"
+PREFIXO="${2:-gam-ash2}"
 LISTA_ARG="${3:-}"
 API="${API_BASE:-https://biblia-pericopes.jairofilho79.workers.dev}"
 # Terceiro argumento permite conferir em esteiras paralelas: 5292 HEADs

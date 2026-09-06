@@ -5,7 +5,22 @@ de tom ou de doutrina que mudam material já aprovado. Nenhuma delas está
 bloqueando a corrida; todas estão fora do congelamento, então a Sessão 4 não
 narra nenhuma até você decidir.
 
-## 1. "a gente" no lugar de "nós" — ~80 perícopes
+## 1. "a gente" no lugar de "nós" — RESOLVIDO em 06/09/2026, sem decisão
+
+Este item nasceu morto e ficou 29 minutos vivo. O documento foi escrito às
+18:39 de 05/09; a campanha de registro (`fcb66e9`, 19:08 do mesmo dia) fechou
+em zero e levou junto os três exemplos citados abaixo. Conferido em 06/09:
+`varrer-registro` acusa **0 suspeitas**, e as 43 ocorrências de "a gente" que
+sobraram no acervo são todas o SUBSTANTIVO — "a gente de guerra" (Js 8),
+"dita a gente que via fogueiras de fardas queimando" (Is 9), "a gente comum
+de Judá" (Ez 12). Nenhuma é o pronome.
+
+Não há nada para você decidir aqui. O texto abaixo fica como registro da
+pergunta que chegou a existir.
+
+---
+
+### A pergunta, como ela era em 05/09
 
 A varredura de registro marca 83 usos de **"a gente"** como coloquialismo. Já
 tirei os falsos positivos (onde *gente* é substantivo: "a gente de lá falava",

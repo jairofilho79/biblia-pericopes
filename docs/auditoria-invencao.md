@@ -1,8 +1,8 @@
 # Auditoria de invenção — 2026-09-06
 
-**2823 perícopes auditadas** de 2823. 2743 sem nenhuma afirmação que a Escritura desminta (97%).
+**2823 perícopes auditadas** de 2823. 2742 sem nenhuma afirmação que a Escritura desminta (97%).
 
-Restam **91 acusações vivas** em 80 perícopes, e **26 sobras** (versículo que nenhum campo trata). Outras 28 já foram consertadas durante a varredura.
+Restam **93 acusações vivas** em 81 perícopes, e **26 sobras** (versículo que nenhum campo trata). Outras 29 já foram consertadas durante a varredura.
 
 ## Por forma
 
@@ -11,7 +11,7 @@ Restam **91 acusações vivas** em 80 perícopes, e **26 sobras** (versículo qu
 | contradiz-versiculo | 51 |
 | fato-inventado | 16 |
 | silencio-falso | 13 |
-| contradiz-campo | 6 |
+| contradiz-campo | 8 |
 | costume-sem-fonte | 5 |
 
 ## Por seção
@@ -19,7 +19,7 @@ Restam **91 acusações vivas** em 80 perícopes, e **26 sobras** (versículo qu
 | seção | invenções | sobras |
 |---|---|---|
 | Históricos | 48 | 5 |
-| Poéticos | 17 | 4 |
+| Poéticos | 19 | 4 |
 | Profetas | 5 | 2 |
 | Lei | 12 | 12 |
 | Evangelhos e Atos | 6 | 0 |
@@ -485,6 +485,20 @@ há pelo menos duas frases que o autor cita de si mesmo no salmo (v.6 e v.9), n�
 Desmentido por: 2 Samuel 24:25 — o próprio Davi edifica um altar e sacrifica holocaustos na eira de Araúna, fora da casa do SENHOR; e 1 Reis 18:30-38 — Elias reconstrói o altar do SENHOR no Carmelo e ali oferece sacrifício, com o templo já em pé em Jerusalém.
 
 a definição categórica ('o único lugar') é desmentida por sacrifícios legítimos oferecidos em outros altares em vários momentos da história de Israel
+
+**Sl 150:1** · `contradiz-campo` · campo `contexto_historico_literario`
+> São seis versos e treze ordens iguais: louvai.
+
+Desmentido por: Texto desta mesma perícope, Sl 150:1-5 — "louvai"/"louvai-o" aparece exatamente 10 vezes (duas por versículo); o v.6 usa "louve" (forma diferente), e as duas ocorrências de "Aleluia" na abertura e no fecho não são traduzidas como "louvai".
+
+A contagem de treze não bate com o campo texto da própria perícope, que só tem dez ocorrências iguais de 'louvai'.
+
+**Sl 150:1** · `contradiz-campo` · campo `topicos_pregar`
+> Seis versos, treze ordens, um único verbo: o salmo inteiro é a palavra **louvai**.
+
+Desmentido por: Texto desta mesma perícope, Sl 150:1-5 — "louvai"/"louvai-o" aparece exatamente 10 vezes (duas por versículo); o v.6 usa "louve", forma diferente, não "louvai".
+
+Repete a mesma contagem errada do contexto: dez ocorrências de 'louvai', não treze.
 
 ### Profetas
 

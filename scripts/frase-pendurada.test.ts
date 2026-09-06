@@ -61,3 +61,18 @@ describe('aplicarVeredito', () => {
     expect(() => aplicarVeredito(ctx, frase, { ordem: 1, veredito: 'responde' })).toThrow(/sem frase nova/)
   })
 })
+
+describe('o anúncio impessoal', () => {
+  it('pega "Duas coisas ajudam" no fim do campo', () => {
+    expect(pendurada('Jotão falou do monte. Duas coisas ajudam aqui.')).toBe(
+      'Duas coisas ajudam aqui.',
+    )
+  })
+
+  it('pega também quando o anúncio PAGA — quem separa é o julgamento', () => {
+    // Várias das 23 entregam de fato. Entram como candidatas do mesmo jeito;
+    // filtrar por regex aqui repetiria o erro de decidir sem ler.
+    const paga = 'Uma informação ajuda: a família do morto cobrava a morte, e cobrava rápido.'
+    expect(pendurada(`O contexto é a cidade de refúgio. ${paga}`)).toBe(paga)
+  })
+})

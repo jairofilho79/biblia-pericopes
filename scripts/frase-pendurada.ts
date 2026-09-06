@@ -19,7 +19,7 @@
  *   npx tsx scripts/frase-pendurada.ts aplicar
  *   npx tsx scripts/frase-pendurada.ts status
  */
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { criarDirs, dirs, montarLote, pendentes } from './reenriquecimento.ts'
 
@@ -34,8 +34,19 @@ export const BASE = join(root, 'data/pendurada')
  * estar amarrada ao que vem depois, e cortá-la perderia ligação. Foi o que os
  * leitores recusaram cortar em Dt 1, 2Sm 1 e 1Sm 1.
  */
-export const MOLDE =
-  /(?:^|[.!?]\s+)((?:Ao ler,?\s|Enquanto l[êe],?\s)?(?:Repare|Note|Observe|Acompanhe|Preste aten|Fique de olho|Leia reparando|Leia prestando|Guarde|Vale olhar|N[ãa]o pule)[^.!?]*[.!?])\s*$/i
+const IMPERATIVO =
+  '(?:Ao ler,?\\s|Enquanto l[êe],?\\s)?(?:Repare|Note|Observe|Acompanhe|Preste aten|Fique de olho|Leia reparando|Leia prestando|Guarde|Vale olhar|N[ãa]o pule)'
+/**
+ * O anúncio impessoal — "Duas coisas ajudam aqui", "Uma informação muda o
+ * tamanho do que vem". Não manda reparar em nada, e por isso escapou da
+ * primeira versão; promete e às vezes não paga. São 23, e várias PAGAM
+ * ("Uma informação ajuda a entender por que isso era urgente: naquele mundo, a
+ * família do morto tinha o dever de cobrar a morte"), então entram como
+ * candidatas e quem separa é o julgamento, como no resto.
+ */
+const ANUNCIO =
+  '(?:Duas|Tr[êe]s|Uma|Dois)\\s+(?:coisas?|informa[çc][õo]es?|informa[çc][ãa]o|detalhes?|dados?)'
+export const MOLDE = new RegExp(`(?:^|[.!?]\\s+)((?:${IMPERATIVO}|${ANUNCIO})[^.!?]*[.!?])\\s*$`, 'i')
 
 export function pendurada(contexto: string): string | null {
   return contexto.trim().match(MOLDE)?.[1] ?? null
@@ -74,12 +85,23 @@ function main() {
       unknown
     >[]
     let n = 0
+    let reabertas = 0
     for (const p of arr) {
       const contexto = String(p.contexto_historico_literario ?? '')
       const frase = pendurada(contexto)
       if (!frase) continue
       const alvo = join(d.entrada, `${p.ordem}.json`)
-      if (existsSync(alvo)) continue
+      // Um parágrafo pode ter DUAS penduradas seguidas, e o regex só vê a
+      // última — consertada ela, a de trás vira a nova última. Por isso
+      // `preparar` reabre a perícope quando a frase mudou, em vez de pular:
+      // a campanha roda até o ponto fixo, e não até a primeira passada.
+      if (existsSync(alvo)) {
+        const antes = JSON.parse(readFileSync(alvo, 'utf8')) as { frase: string }
+        if (antes.frase === frase) continue
+        rmSync(join(d.saida, `${p.ordem}.json`), { force: true })
+        rmSync(join(d.travas, String(p.ordem)), { force: true, recursive: true })
+        reabertas++
+      }
       writeFileSync(
         alvo,
         JSON.stringify(
@@ -98,7 +120,7 @@ function main() {
       )
       n++
     }
-    console.log(`entrada: ${n} candidatas`)
+    console.log(`entrada: ${n} candidatas${reabertas ? ` · ${reabertas} reabertas (a frase mudou)` : ''}`)
     return
   }
 

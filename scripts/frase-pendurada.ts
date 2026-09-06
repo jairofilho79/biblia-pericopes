@@ -67,7 +67,7 @@ export function todasPenduradas(texto: string): string[] {
  * Começos que se apoiam na frase anterior. Cortar o antecedente deixa o texto
  * gramatical e sem sentido — e ninguém relê para descobrir.
  */
-const ANAFORA =
+export const ANAFORA =
   /^(?:Ela|Ele|Elas|Eles|Essa|Esse|Essas|Esses|Esta|Este|Isso|Isto|Ambos|Ambas|Nela|Nele|Dela|Dele|A primeira|O primeiro|A segunda|O segundo|As duas|Os dois)\b/
 
 /**
@@ -77,6 +77,19 @@ const ANAFORA =
  * existe para preservar.
  */
 const ENTREGA = /[:—–-]\s+\S+(?:\s+\S+){2,}/
+
+/**
+ * Começos que DESDOBRAM o que a frase anterior anunciou. Quando o texto
+ * seguinte enumera, a frase de cima não é ponteiro pendurado: é cabeçalho de
+ * lista, e a enumeração é o pagamento dela. Aqui só cabe `entrega` — cortar
+ * deixa a lista sem abertura, e responder faz o texto dizer duas vezes:
+ *
+ *   nova:     "Duas informações são plantadas aqui: que Mardoqueu está sentado
+ *              à porta do rei, e que as virgens se ajuntaram outra vez."
+ *   seguinte: "A primeira é que Mardoqueu está sentado à porta do rei."
+ */
+export const ENUMERACAO =
+  /^(?:A primeira|O primeiro|A segunda|O segundo|Uma delas|Um deles|Uma é|A outra é|Primeiro,|Segundo,)\b/
 
 /** Tem a forma do tique E não paga. É isto que não pode entrar como frase nova. */
 export function penduradaSemPagar(frase: string): boolean {
@@ -99,6 +112,11 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
   if (v.veredito === 'entrega') return contexto
   if (!contexto.includes(frase))
     throw new Error(`${v.ordem}: a frase não está mais no contexto — "${frase.slice(0, 50)}…"`)
+  const seguinte = contexto.slice(contexto.indexOf(frase) + frase.length).trimStart()
+  if (ENUMERACAO.test(seguinte))
+    throw new Error(
+      `${v.ordem}: é cabeçalho de lista, não frase pendurada — o texto enumera logo abaixo ("${seguinte.slice(0, 45)}…"); marque entrega`,
+    )
   if (v.veredito === 'responde') {
     if (!v.novo?.trim()) throw new Error(`${v.ordem}: veredito "responde" sem frase nova`)
     if (penduradaSemPagar(v.novo.trim()))
@@ -110,13 +128,12 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
       throw new Error(`${v.ordem}: a frase nova anuncia e não paga — "${v.novo.slice(0, 50)}…"`)
     return contexto.replace(frase, v.novo)
   }
-  const depois = contexto.slice(contexto.indexOf(frase) + frase.length).trimStart()
-  if (ANAFORA.test(depois))
+  if (ANAFORA.test(seguinte))
     // Achado num lote da resenha: cortar "Guarde essa palavra, tremendo." deixa
     // a frase seguinte — "Ela explica o que Saul vai fazer" — sem antecedente.
     // O texto continua gramatical e fica sem sentido, que é o pior dos dois.
     throw new Error(
-      `${v.ordem}: a frase seguinte se apoia nesta — "${depois.slice(0, 55)}…"; responda em vez de cortar`,
+      `${v.ordem}: a frase seguinte se apoia nesta — "${seguinte.slice(0, 55)}…"; responda em vez de cortar`,
     )
   // A limpeza importa porque na resenha o corte é no MEIO do parágrafo: tirar a
   // frase deixa dois espaços entre as vizinhas, e um parágrafo que era só ela
@@ -241,6 +258,37 @@ function main() {
     return
   }
 
+  if (cmd === 'normalizar') {
+    // Os agentes reencontram os mesmos dois casos em todo lote, e eu estava
+    // consertando à mão a cada chegada. Um é DETERMINÍSTICO — cabeçalho de
+    // lista só pode ser `entrega` — e vira código. O outro precisa de
+    // julgamento (que fato entra na frase nova?), então volta para a fila em
+    // vez de ser adivinhado aqui.
+    let viraramEntrega = 0
+    const paraRefazer: number[] = []
+    for (const f of readdirSync(d.saida).filter((x) => x.endsWith('.json'))) {
+      const v = JSON.parse(readFileSync(join(d.saida, f), 'utf8')) as Veredito
+      if (v.veredito === 'entrega') continue
+      const e = JSON.parse(readFileSync(join(d.entrada, `${v.ordem}.json`), 'utf8'))
+      const seguinte = String(e.contexto)
+        .slice(String(e.contexto).indexOf(e.frase) + e.frase.length)
+        .trimStart()
+      if (ENUMERACAO.test(seguinte)) {
+        writeFileSync(join(d.saida, f), JSON.stringify({ ordem: v.ordem, veredito: 'entrega' }, null, 2))
+        viraramEntrega++
+      } else if (v.veredito === 'corta' && ANAFORA.test(seguinte)) {
+        rmSync(join(d.saida, f), { force: true })
+        rmSync(join(d.travas, String(v.ordem)), { force: true, recursive: true })
+        paraRefazer.push(v.ordem)
+      }
+    }
+    console.log(`cabeçalho de lista → entrega: ${viraramEntrega}`)
+    console.log(
+      `cortes que deixariam órfã, devolvidos à fila: ${paraRefazer.length}${paraRefazer.length ? ` · ${paraRefazer.sort((a, b) => a - b).join(', ')}` : ''}`,
+    )
+    return
+  }
+
   if (cmd === 'status') {
     criarDirs(d)
     console.log(
@@ -248,7 +296,7 @@ function main() {
     )
     return
   }
-  console.error('uso: frase-pendurada.ts preparar|claim|aplicar|status')
+  console.error('uso: frase-pendurada.ts preparar|claim|normalizar|aplicar|status')
   process.exit(1)
 }
 

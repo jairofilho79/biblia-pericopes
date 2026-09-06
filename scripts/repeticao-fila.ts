@@ -106,8 +106,16 @@ export function aplicarVeredito(p: Record<string, unknown>, v: Veredito, entrada
   // 3. O tique que a campanha anterior tirou não pode voltar pela janela: uma
   //    frase que manda reparar em algo e não diz no quê é o mesmo desrespeito
   //    com outra roupa.
+  //
+  //    Mas só o que este conserto INTRODUZ. A campanha julgou 948 destas uma a
+  //    uma e deixou 283 de pé porque a frase SEGUINTE paga o que elas anunciam,
+  //    e nenhuma régua enxerga isso. Cobrar as antigas aqui reprovava um
+  //    conserto certo por um defeito que não é defeito — foi o que segurou
+  //    "Não pule." em Jz 21 e "Duas informações ajudam a acompanhar." em 1Cr 11.
+  const jaHavia = new Set(todasPenduradas(antes).filter(penduradaSemPagar))
   for (const f of todasPenduradas(novo))
-    if (penduradaSemPagar(f)) throw new Error(`${v.ordem}: a nova frase anuncia e não paga — "${f}"`)
+    if (penduradaSemPagar(f) && !jaHavia.has(f))
+      throw new Error(`${v.ordem}: a nova frase anuncia e não paga — "${f}"`)
 
   const proposto = { ...p, [v.campo]: novo } as unknown as Material
   const r = validarMaterial(entrada, proposto, JSON.stringify(proposto))

@@ -72,6 +72,18 @@ export function aplicarConsertos(
   entrada: { texto: string },
 ): { trocadas: number; cortadas: number; recusadas: string[] } {
   const original = JSON.parse(JSON.stringify(p)) as Record<string, unknown>
+  // As penduradas que JÁ estavam aqui antes do conserto. A campanha julgou 948
+  // delas uma a uma e deixou 283 de pé porque a frase SEGUINTE paga o que elas
+  // anunciam — e nenhuma régua enxerga isso. Reprovar a perícope inteira por
+  // causa de uma dessas seguraria um conserto certo por um defeito que não é
+  // defeito e que a acusação nem menciona. O portão cobra só o que o conserto
+  // INTRODUZ.
+  const jaHavia = new Set(
+    [
+      ...todasPenduradas(String(p.contexto_historico_literario ?? '')),
+      ...todasPenduradas(String(p.resenha ?? '')),
+    ].filter(penduradaSemPagar),
+  )
   let trocadas = 0
   let cortadas = 0
   const recusadas: string[] = []
@@ -83,9 +95,18 @@ export function aplicarConsertos(
       recusadas.push(`${v.ordem} · "${c.afirma.slice(0, 60)}…" → ${c.motivo}`)
       continue
     }
-    const campo = ['titulo_pericope_pt', 'contexto_historico_literario', 'resenha'].find((k) =>
-      String(p[k] ?? '').includes(c.afirma),
-    )
+    // `topicos_pregar` entra na busca porque a acusação cai lá também: em
+    // 2Sm 4 a mesma invenção estava na resenha E no tópico, e sem este campo o
+    // conserto entrava pela metade — a frase errada seguia sendo narrada na
+    // seção seguinte. `perguntas_reflexao` é array e fica de fora de propósito:
+    // substituir dentro de lista pede outro desenho, e nenhuma acusação viva
+    // aponta para lá.
+    const campo = [
+      'titulo_pericope_pt',
+      'contexto_historico_literario',
+      'resenha',
+      'topicos_pregar',
+    ].find((k) => String(p[k] ?? '').includes(c.afirma))
     if (!campo)
       // Pode ser paráfrase, ou a frase já ter mudado por outro conserto do mesmo
       // lote. Nos dois casos aplicar às cegas erra o alvo.
@@ -119,7 +140,7 @@ export function aplicarConsertos(
   for (const f of todasPenduradas(String(p.contexto_historico_literario)).concat(
     todasPenduradas(String(p.resenha)),
   ))
-    if (penduradaSemPagar(f)) {
+    if (penduradaSemPagar(f) && !jaHavia.has(f)) {
       Object.assign(p, original)
       throw new Error(`${v.ordem}: o conserto deixou uma frase que anuncia e não paga — "${f}"`)
     }

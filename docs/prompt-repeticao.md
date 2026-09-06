@@ -71,7 +71,9 @@ O `aplicar` recusa e devolve. Você economiza uma rodada se já escrever certo:
   maiúsculas", "a palavra entre colchetes", "escrito assim". Diga o que a
   distinção SIGNIFICA.
 - **Só um campo muda.** O outro fica byte a byte como está.
-- Contexto: no máximo 2 parágrafos. Resenha: no máximo 5.
+- Contexto: no máximo 2 parágrafos. Resenha: no máximo 4, contando o parágrafo
+  final da lista de palavras. O que passa do teto some da tela e do áudio sem
+  erro nenhum — `MAX_PARAGRAFOS` em `src/lib/paragraphize.ts` é a fonte.
 
 ## O que você NÃO faz
 

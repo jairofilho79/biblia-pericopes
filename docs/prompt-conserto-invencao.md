@@ -87,7 +87,9 @@ Toda `troca` declara `apoio`: em que a frase nova se apoia.
   áudio** — não existe versão falada separada.
 - **Nada de apontar para a forma da letra.** Nada de "SENHOR em maiúsculas",
   "entre colchetes", "escrito assim". Diga o que a distinção SIGNIFICA.
-- Contexto: no máximo 2 parágrafos. Resenha: no máximo 5.
+- Contexto: no máximo 2 parágrafos. Resenha: no máximo 4, contando o parágrafo
+  final da lista de palavras. O que passa do teto some da tela e do áudio sem
+  erro nenhum — `MAX_PARAGRAFOS` em `src/lib/paragraphize.ts` é a fonte.
 
 Se qualquer conserto do arquivo reprovar, **a perícope inteira volta atrás** —
 nada fica pela metade.

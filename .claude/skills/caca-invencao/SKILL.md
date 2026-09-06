@@ -62,7 +62,14 @@ palavra em outro lugar e veja se a definição sobrevive.** Foi assim que caiu
 Débora *"a juízo"*. E assim que caiu "no holocausto não sobra nada nem para o
 sacerdote": Levítico 7:8 dá o couro ao sacerdote.
 
-**3. Todo número, medida, contagem ou preço.** **Procure o número.** Os setenta
+**3. Todo grau de parentesco.** "Neto", "bisneto", "filho de", "três gerações
+depois". **Conte os nomes.** É o erro que mais se repete no acervo, e as duas
+vezes a resposta estava na própria perícope, a poucas linhas: Corá foi chamado
+de "neto de Levi" e a lista dá Levi, Coate, Izar, Corá; Davi foi posto "três
+gerações depois de Obede" e Rute 4:22 dá Obede, Jessé, Davi. Ninguém precisa
+saber genealogia para pegar isso — precisa contar em vez de lembrar.
+
+**4. Todo número, medida, contagem ou preço.** **Procure o número.** Os setenta
 de Êxodo 1 batem com Gênesis 46:26? Lá está escrito sessenta e seis, com a
 mesma definição que o material usou.
 

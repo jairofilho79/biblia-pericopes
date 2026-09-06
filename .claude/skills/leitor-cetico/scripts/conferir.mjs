@@ -36,6 +36,7 @@ const texto = (p, campo) => {
 
 let cortesOk = 0
 let dividasOk = 0
+let enriqOk = 0
 const recusas = []
 
 for (const a of achados) {
@@ -65,13 +66,18 @@ for (const a of achados) {
       // Sem separar as duas forças, tudo vira reescrita e material bom entra na
       // fila junto com o defeituoso.
       recusas.push(`${a.ordem} faltou: forca deve ser "divida" ou "enriquecimento" (veio "${f.forca ?? ''}")`)
-    else dividasOk++
+    // Contadas SEPARADAS de propósito: somar as duas e imprimir "dívidas" faria
+    // enriquecimento entrar na fila de reescrita junto com defeito — que é a
+    // coisa exata que a separação existe para impedir.
+    else if (['divida', 'dívida'].includes(f.forca.toLowerCase().trim())) dividasOk++
+    else enriqOk++
   }
 }
 
 console.log(`perícopes lidas: ${achados.length}`)
 console.log(`cortes aceitos:  ${cortesOk}`)
 console.log(`dívidas aceitas: ${dividasOk}`)
+console.log(`enriquecimentos:  ${enriqOk}  (anotar, NÃO mandar para reescrita)`)
 console.log(`recusadas:       ${recusas.length}`)
 for (const r of recusas) console.log(`  ✗ ${r}`)
 process.exit(recusas.length ? 1 : 0)

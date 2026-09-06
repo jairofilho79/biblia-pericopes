@@ -232,16 +232,24 @@ function main() {
         erros.push(`${v.ordem}: não existe`)
         continue
       }
-      try {
-        const r = aplicarLeitura(p, v, JSON.parse(readFileSync(join(dEntrada, `${v.ordem}.json`), 'utf8')))
-        if (!(v.achados ?? []).length) limpas++
-        for (const a of v.achados ?? []) porTipo[a.tipo] = (porTipo[a.tipo] ?? 0) + 1
-        cortes += r.cortes
-        trocas += r.trocas
-        feitos.push(f)
-      } catch (e) {
-        erros.push((e as Error).message)
+      // **Um achado por vez, cada um com o portão inteiro.** A primeira versão
+      // aplicava a perícope como bloco: um conserto errado derrubava os outros
+      // quatro do mesmo arquivo, e 22 consertos bons foram perdidos assim numa
+      // rodada. O portão continua sendo o mesmo — só o que ele reprova é que
+      // ficou menor.
+      const entrada = JSON.parse(readFileSync(join(dEntrada, `${v.ordem}.json`), 'utf8'))
+      if (!(v.achados ?? []).length) limpas++
+      for (const a of v.achados ?? []) {
+        try {
+          const r = aplicarLeitura(p, { ordem: v.ordem, achados: [a] }, entrada)
+          porTipo[a.tipo] = (porTipo[a.tipo] ?? 0) + 1
+          cortes += r.cortes
+          trocas += r.trocas
+        } catch (e) {
+          erros.push((e as Error).message)
+        }
       }
+      feitos.push(f)
     }
     if (feitos.length)
       writeFileSync(join(root, 'data/pericopes.json'), `${JSON.stringify(lista, null, 2)}\n`)

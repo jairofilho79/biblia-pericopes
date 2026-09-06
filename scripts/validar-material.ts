@@ -114,6 +114,25 @@ const CONVENCOES: { re: RegExp; que: string }[] = [
   { re: /\b\p{Lu}\p{Ll}+\s+(I{1,3}|IV|VI{0,3}|IX|XI{0,3})\b/gu, que: 'algarismo romano' },
 ]
 
+/**
+ * Apontar para a FORMA da letra na tela. O leitor de ouvido não vê caixa alta,
+ * e o narrador não tem como dizê-la — a frase simplesmente não significa nada
+ * no áudio, e o mesmo campo serve aos dois. A saída nunca é apagar a distinção:
+ * é dizer o que ela SIGNIFICA. "SENHOR em maiúsculas marca o nome próprio"
+ * virou "SENHOR, aqui, não é o título de quem manda: é o nome próprio".
+ *
+ * O regex é estreito de propósito. Uma varredura larga por "colchetes",
+ * "parênteses" ou "na página" devolveu 63 achados e 55 eram legítimos: os
+ * colchetes de Êx 26 são ganchos de metal que prendem cortina, e o aparte
+ * entre parênteses do narrador em Mc 7 é conteúdo, não tipografia. Pegar só a
+ * forma da letra dá zero falso positivo no acervo.
+ *
+ * `na tela` entra por outro motivo: como metáfora de cinema ela é boa, mas
+ * este app TEM uma tela e o leitor está olhando para ela.
+ */
+const TIPOGRAFIA =
+  /\b(?:letras? (?:mai[úu]sculas?|min[úu]sculas?)|em (?:mai[úu]sculas|min[úu]sculas)|com letra (?:grande|pequena|mai[úu]scula|min[úu]scula)|(?:mai[úu]scula|min[úu]scula)s? (?:na|no) (?:texto|p[áa]gina|tela)|na tela)\b/gi
+
 /** Normaliza para comparar citação com o texto bíblico sem tropeçar em pontuação. */
 function normalizar(s: string): string {
   return s
@@ -225,7 +244,12 @@ export function validarMaterial(
         p.push(`${campo}: ${que} — "${achado}"; escreva por extenso`)
       }
     }
+    for (const achado of v.match(TIPOGRAFIA) ?? [])
+      p.push(`${campo}: aponta para a forma da letra — "${achado}"; diga o que a distinção significa`)
   }
+  // `topicos_pregar` também é narrado, e a mesma frase já apareceu lá (2Rs 3).
+  for (const achado of (m.topicos_pregar ?? '').match(TIPOGRAFIA) ?? [])
+    p.push(`topicos_pregar: aponta para a forma da letra — "${achado}"; diga o que a distinção significa`)
 
   // A cadeia: a resenha é escrita com o contexto na frente, então repetir uma
   // frase dele significa que os dois foram escritos do zero, em paralelo — e o

@@ -96,7 +96,12 @@ de "neto de Levi" e a lista dá Levi, Coate, Izar, Corá; Davi foi posto "três
 gerações depois de Obede" e Rute 4:22 dá Obede, Jessé, Davi. Ninguém precisa
 saber genealogia para pegar isso — precisa contar em vez de lembrar.
 
-**4. Todo número, medida, contagem ou preço.** **Procure o número.** Os setenta
+**4. Todo número, medida, contagem ou preço.** **Procure o número.** E junto
+com eles, **o superlativo contável**: "o nome que mais aparece neste livro", "a
+única vez em toda a Bíblia", "o mais longo que se guardava". São afirmações que
+qualquer busca resolve em segundos, e o material quase nunca contou antes de
+escrever. Em Jó, "Todo-Poderoso é o nome com que os personagens mais chamam a
+Deus" caiu numa contagem: "Deus" aparece cerca de 125 vezes contra 31. Os setenta
 de Êxodo 1 batem com Gênesis 46:26? Lá está escrito sessenta e seis, com a
 mesma definição que o material usou.
 

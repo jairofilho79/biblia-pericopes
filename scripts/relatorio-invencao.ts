@@ -11,7 +11,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { pendentes, type Pendente } from './invencoes-pendentes.ts'
+import { ABSOLVIDAS, absolvida, pendentes, type Pendente } from './invencoes-pendentes.ts'
 import type { Achado } from './invencao-fila.ts'
 
 const root = join(import.meta.dirname, '..')
@@ -27,22 +27,6 @@ const root = join(import.meta.dirname, '..')
  * duas (Lv 1 e Nm 28) já foram consertadas. Quatro auditores diferentes
  * acusaram a forma correta.
  */
-const ABSOLVIDAS: { ordem: number; trecho: string; porque: string }[] = [
-  { ordem: 3014, trecho: 'sem sobrar parte alguma para quem ofereceu', porque: 'nega o ofertante, não o sacerdote — está certo' },
-  { ordem: 3036, trecho: 'sem sobrar parte nenhuma para quem ofereceu', porque: 'nega o ofertante, não o sacerdote — está certo' },
-  { ordem: 3043, trecho: 'sem sobrar parte alguma para quem oferece', porque: 'nega o ofertante, não o sacerdote — está certo' },
-  { ordem: 2463, trecho: 'sem que sobrasse parte alguma para quem oferecia', porque: 'nega o ofertante, não o sacerdote — está certo' },
-  // A família do éfode: consertei as que DEFINIAM ("era a veste do sacerdote").
-  // Estas duas descrevem o uso — "a peça que o sacerdote vestia para consultar"
-  // — que é verdade e não reivindica exclusividade. É a mesma forma que dei às
-  // consertadas; refazê-las seria mexer no que já está certo.
-  { ordem: 481, trecho: 'que o sacerdote de Israel vestia para consultar', porque: 'descreve o uso, não reivindica exclusividade' },
-  { ordem: 483, trecho: 'que o sacerdote de Israel vestia para consultar', porque: 'descreve o uso, não reivindica exclusividade' },
-]
-
-const absolvida = (v: { ordem: number; afirma: string }) =>
-  ABSOLVIDAS.some((x) => x.ordem === v.ordem && v.afirma.includes(x.trecho))
-
 /** Testamento e seção, para agrupar o relatório do jeito que o leitor pensa. */
 const SECAO: [RegExp, string][] = [
   [/^(Gn|Êx|Lv|Nm|Dt)$/, 'Lei'],

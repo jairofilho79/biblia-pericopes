@@ -1,5 +1,5 @@
 {
-  "gerado": "2026-09-06T00:01:02.360Z",
+  "gerado": "2026-09-06T15:44:24.166Z",
   "total_prontas": 2823,
   "congeladas": [
     0,
@@ -2827,6 +2827,7 @@
     3194
   ],
   "reescrita_certa": [],
+  "por_invencao": [],
   "so_titulo_pode_mudar": [],
   "aguardando_decisao_do_dono": [],
   "descongeladas_nesta_rodada": []

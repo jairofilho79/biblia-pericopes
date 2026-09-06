@@ -37,6 +37,45 @@ export function assinatura(frase: string): string {
     .join(' ') ?? frase.toLowerCase()
 }
 
+/**
+ * As acusações que EU li e rejeitei. Elas moravam no gerador do relatório, e
+ * por isso o congelamento e o `pronto-para-narrar` continuavam contando as
+ * quatro do holocausto como pendência: cada consumidor tinha a sua ideia do
+ * que ainda valia. Aqui é o único lugar que responde "esta acusação procede".
+ *
+ * A absolvição é sempre por LEITURA, e o motivo fica escrito. Quatro auditores
+ * independentes acusaram a glosa do holocausto na forma CORRETA dela — a que
+ * nega o OFERTANTE — e um `sed` teria estragado 48 ocorrências boas.
+ */
+export const ABSOLVIDAS: { ordem: number; trecho: string; porque: string }[] = [
+  { ordem: 3014, trecho: 'sem sobrar parte alguma para quem ofereceu', porque: 'nega o ofertante, não o sacerdote — está certo' },
+  { ordem: 3036, trecho: 'sem sobrar parte nenhuma para quem ofereceu', porque: 'nega o ofertante, não o sacerdote — está certo' },
+  { ordem: 3043, trecho: 'sem sobrar parte alguma para quem oferece', porque: 'nega o ofertante, não o sacerdote — está certo' },
+  { ordem: 2463, trecho: 'sem que sobrasse parte alguma para quem oferecia', porque: 'nega o ofertante, não o sacerdote — está certo' },
+  // A família do éfode: consertei as que DEFINIAM ("era a veste do sacerdote").
+  // Estas duas descrevem o uso — "a peça que o sacerdote vestia para consultar"
+  // — que é verdade e não reivindica exclusividade. É a mesma forma que dei às
+  // consertadas; refazê-las seria mexer no que já está certo.
+  { ordem: 481, trecho: 'que o sacerdote de Israel vestia para consultar', porque: 'descreve o uso, não reivindica exclusividade' },
+  { ordem: 483, trecho: 'que o sacerdote de Israel vestia para consultar', porque: 'descreve o uso, não reivindica exclusividade' },
+  // As duas de 06/09, achadas pelos agentes do conserto e conferidas por mim.
+  // As duas caem na mesma regra: a perícope é a unidade, e o auditor foi buscar
+  // a resposta noutro trecho.
+  {
+    ordem: 1239,
+    trecho: 'O texto não explica quem fez aquilo nem por quê',
+    porque: 'é verdade dentro dos três versículos desta perícope; o auditor buscou a resposta em Is 53, que é outro trecho',
+  },
+  {
+    ordem: 714,
+    trecho: 'Este trecho é difícil de aceitar, e a Bíblia não o explica.',
+    porque: 'Lv 26:22 é maldição de pacto para desobediência prolongada da nação, não explicação deste episódio',
+  },
+]
+
+export const absolvida = (v: { ordem: number; afirma: string }) =>
+  ABSOLVIDAS.some((x) => x.ordem === v.ordem && v.afirma.includes(x.trecho))
+
 export function pendentes(
   arr: Record<string, unknown>[],
   achados: Achado[],
@@ -62,11 +101,17 @@ export function pendentes(
         jaConsertadas++
         continue
       }
-      vivas.push({
+      const viva = {
         ...i,
         ordem: a.ordem,
         ref: `${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}`,
-      })
+      }
+      // Absolvida é acusação lida e rejeitada: ela não é pendência de ninguém.
+      if (absolvida(viva)) {
+        jaConsertadas++
+        continue
+      }
+      vivas.push(viva)
     }
   }
   return { vivas, jaConsertadas, repetidas }

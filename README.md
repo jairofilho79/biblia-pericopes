@@ -38,8 +38,20 @@ via Cloudflare D1 (last-write-wins). Sem login, tudo funciona 100% local.
 
 ## Deploy
 
-Cloudflare Workers (static assets + API). Push na `main` roda lint, testes,
-typecheck do worker, build, migrations D1 e `wrangler deploy` via GitHub Actions.
+Cloudflare Workers (static assets + API). O deploy é **manual, da máquina**:
+
+```bash
+npm run deploy
+```
+
+Esse script é o portão inteiro, na ordem: lint → testes → typecheck do worker →
+build → `d1 migrations apply --remote` → `wrangler deploy`. **As migrations vêm
+antes do deploy de propósito**: publicar o worker com migration pendente faz o
+código novo procurar tabela que não existe.
+
+O workflow do GitHub Actions continua no repositório com a mesma receita, mas
+desligado do gatilho automático (só `workflow_dispatch`). Para religar, devolva
+o `push: branches: [main]` e grave o segredo `CLOUDFLARE_API_TOKEN`.
 
 ### Checklist do primeiro deploy
 

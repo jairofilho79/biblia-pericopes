@@ -42,6 +42,15 @@ regra, e o conserto quase sempre foi tirar a régua e deixar o caso. "O éfode d
 linho era a veste que identificava quem servia como sacerdote" — Davi e o menino
 Samuel o vestiram sem sê-lo.
 
+**As sobras — 25 perícopes.** Versículo que estava dentro da perícope e que
+nenhum campo tratava. Não era mentira, era silêncio: em Êx 3 o resumo saltava
+da revelação do nome direto para o saque final. Coube sem estourar o teto —
+as 25 já estavam no máximo (contexto 2 de 2, resenha 4 de 4) e o que passa do
+teto some da tela, do áudio e do realce sem erro nenhum. Cada conserto apertou
+o frouxo e abriu uma ou duas frases, entre 7% e 20% de crescimento. Foi a
+única fila em que se ACRESCENTOU material, e por isso a única em que citar o
+texto entre aspas era obrigatório.
+
 **A repetição — 75 perícopes.** Defeito criado pela própria campanha da frase
 pendurada: a resposta que entrou no `contexto` era o fato que a `resenha` já
 entregava. Em 71 das 75 quem cedeu foi o contexto, e a proporção diz por quê —
@@ -81,7 +90,15 @@ Está aqui porque é o padrão mais caro do projeto, e ele se repete.
 5. `pronto-para-narrar` na primeira versão reprovando as 493 candidatas do molde
    do ponteiro, das quais 283 foram julgadas e absolvidas uma a uma.
 
-**A régua mecânica acha o candidato. A leitura decide.**
+E um sexto que quase aconteceu: a varredura larga por apontamento tipográfico
+— colchetes, parênteses, "na página" — devolveu 63 achados e **55 eram
+legítimos**. Os colchetes de Êx 26 são ganchos de metal que prendem cortina. O
+portão que ficou pega só a forma da letra, e dá zero falso positivo.
+
+**A régua mecânica acha o candidato. A leitura decide.** Foi lendo três
+perícopes já aprovadas pelo portão que apareceu "A resposta vem em letras
+maiúsculas na Bíblia Livre" — a classe varrida no dia anterior, escapando por
+outra frase.
 
 ## Os comandos
 

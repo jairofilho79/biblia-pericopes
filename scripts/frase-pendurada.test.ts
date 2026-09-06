@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aplicarVeredito, pendurada } from './frase-pendurada.ts'
+import { aplicarVeredito, pendurada, todasPenduradas } from './frase-pendurada.ts'
 
 describe('pendurada', () => {
   it('acha a frase-molde no fim do campo', () => {
@@ -74,5 +74,18 @@ describe('o anúncio impessoal', () => {
     // filtrar por regex aqui repetiria o erro de decidir sem ler.
     const paga = 'Uma informação ajuda: a família do morto cobrava a morte, e cobrava rápido.'
     expect(pendurada(`O contexto é a cidade de refúgio. ${paga}`)).toBe(paga)
+  })
+})
+
+describe('todasPenduradas', () => {
+  it('acha as duas quando o parágrafo tem duas', () => {
+    // O caso de 2Sm 2:1 e Êx 14: consertada a última, a de trás vira a nova
+    // última e ninguém volta lá — por isso a resenha precisa da lista.
+    const t = 'Repare em quantas perguntas ele faz. Davi sobe a Hebrom. Note quem o unge.'
+    expect(todasPenduradas(t)).toEqual(['Repare em quantas perguntas ele faz.', 'Note quem o unge.'])
+  })
+
+  it('devolve vazio quando não há nenhuma', () => {
+    expect(todasPenduradas('Davi sobe a Hebrom e é ungido rei sobre Judá.')).toEqual([])
   })
 })

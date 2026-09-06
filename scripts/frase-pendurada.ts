@@ -25,6 +25,7 @@ import { criarDirs, dirs, montarLote, pendentes } from './reenriquecimento.ts'
 
 const root = join(import.meta.dirname, '..')
 export const BASE = join(root, 'data/pendurada')
+export const BASE_RESENHA = join(root, 'data/pendurada-resenha')
 
 /**
  * `\s+` e não `\s`: a quebra de parágrafo é DOIS `\n`, e com um só a frase que
@@ -47,6 +48,20 @@ const IMPERATIVO =
 const ANUNCIO =
   '(?:Duas|Tr[êe]s|Uma|Dois)\\s+(?:coisas?|informa[çc][õo]es?|informa[çc][ãa]o|detalhes?|dados?)'
 export const MOLDE = new RegExp(`(?:^|[.!?]\\s+)((?:${IMPERATIVO}|${ANUNCIO})[^.!?]*[.!?])\\s*$`, 'i')
+
+/**
+ * No `contexto` o tique mora no fim do campo; na `resenha` ele aparece no meio
+ * do parágrafo, e por isso precisa de uma versão sem âncora. São 281
+ * ocorrências em 276 perícopes, e o primeiro regex nem olhava para o campo.
+ */
+export const MOLDE_QUALQUER = new RegExp(
+  `(?:^|[.!?]\\s+)((?:${IMPERATIVO}|${ANUNCIO})[^.!?]*[.!?])`,
+  'gi',
+)
+
+export function todasPenduradas(texto: string): string[] {
+  return [...texto.matchAll(MOLDE_QUALQUER)].map((m) => m[1])
+}
 
 export function pendurada(contexto: string): string | null {
   return contexto.trim().match(MOLDE)?.[1] ?? null
@@ -75,7 +90,12 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
 }
 
 function main() {
-  const d = dirs(BASE)
+  // Duas filas, e não uma com um campo a mais: 672 contextos já estavam em voo
+  // quando a resenha apareceu, e mudar a forma da entrada no meio quebraria o
+  // que os agentes estão gravando agora.
+  const naResenha = process.argv.includes('--campo=resenha')
+  const campo = naResenha ? 'resenha' : 'contexto_historico_literario'
+  const d = dirs(naResenha ? BASE_RESENHA : BASE)
   const cmd = process.argv[2]
 
   if (cmd === 'preparar') {
@@ -87,8 +107,11 @@ function main() {
     let n = 0
     let reabertas = 0
     for (const p of arr) {
-      const contexto = String(p.contexto_historico_literario ?? '')
-      const frase = pendurada(contexto)
+      const contexto = String(p[campo] ?? '')
+      // Na resenha pode haver mais de uma; o agente julga a lista inteira, e a
+      // reabertura por mudança de frase cuida do resto na passada seguinte.
+      const achadas = naResenha ? todasPenduradas(contexto) : [pendurada(contexto)].filter(Boolean)
+      const frase = achadas[0] as string | undefined
       if (!frase) continue
       const alvo = join(d.entrada, `${p.ordem}.json`)
       // Um parágrafo pode ter DUAS penduradas seguidas, e o regex só vê a
@@ -109,7 +132,9 @@ function main() {
             ordem: p.ordem,
             abbrev: p.abbrev,
             ref: `${p.livro} ${p.capitulo_inicio}:${p.versiculo_inicio}`,
+            campo,
             frase,
+            outras: achadas.slice(1),
             contexto,
             resenha: p.resenha,
             texto: p.texto,
@@ -154,8 +179,8 @@ function main() {
         continue
       }
       try {
-        p.contexto_historico_literario = aplicarVeredito(
-          String(p.contexto_historico_literario),
+        p[entrada.campo ?? campo] = aplicarVeredito(
+          String(p[entrada.campo ?? campo]),
           entrada.frase,
           v,
         )

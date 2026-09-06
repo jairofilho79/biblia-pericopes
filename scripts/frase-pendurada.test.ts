@@ -145,3 +145,31 @@ describe('penduradaSemPagar', () => {
     expect(penduradaSemPagar('Davi escreve a ordem, e Urias a entrega.')).toBe(false)
   })
 })
+
+describe('o cabeçalho de lista', () => {
+  const ctx =
+    'O capítulo fecha. Duas informações são plantadas aqui. A primeira é que Mardoqueu está à porta.'
+  const frase = 'Duas informações são plantadas aqui.'
+
+  it('recusa responder, porque a enumeração já é o pagamento', () => {
+    // Responder faz o texto dizer a mesma coisa duas vezes seguidas — pior que
+    // o defeito original.
+    expect(() =>
+      aplicarVeredito(ctx, frase, {
+        ordem: 1037,
+        veredito: 'responde',
+        novo: 'Duas informações são plantadas aqui: que Mardoqueu está à porta.',
+      }),
+    ).toThrow(/cabeçalho de lista/)
+  })
+
+  it('recusa cortar, porque a lista ficaria sem abertura', () => {
+    expect(() => aplicarVeredito(ctx, frase, { ordem: 1037, veredito: 'corta' })).toThrow(
+      /cabeçalho de lista/,
+    )
+  })
+
+  it('deixa passar entrega', () => {
+    expect(aplicarVeredito(ctx, frase, { ordem: 1037, veredito: 'entrega' })).toBe(ctx)
+  })
+})

@@ -79,10 +79,11 @@ export const absolvida = (v: { ordem: number; afirma: string }) =>
 export function pendentes(
   arr: Record<string, unknown>[],
   achados: Achado[],
-): { vivas: Pendente[]; jaConsertadas: number; repetidas: number } {
+): { vivas: Pendente[]; absolvidas: Pendente[]; jaConsertadas: number; repetidas: number } {
   const porOrdem = new Map(arr.map((p) => [p.ordem as number, p]))
   const vistas = new Set<string>()
   const vivas: Pendente[] = []
+  const absolvidas: Pendente[] = []
   let jaConsertadas = 0
   let repetidas = 0
   for (const a of achados) {
@@ -106,15 +107,17 @@ export function pendentes(
         ordem: a.ordem,
         ref: `${p.abbrev} ${p.capitulo_inicio}:${p.versiculo_inicio}`,
       }
-      // Absolvida é acusação lida e rejeitada: ela não é pendência de ninguém.
+      // Absolvida é acusação lida e rejeitada: ela não é pendência de ninguém,
+      // mas continua sendo parte do que a varredura achou — some da conta de
+      // pendências, não da história.
       if (absolvida(viva)) {
-        jaConsertadas++
+        absolvidas.push(viva)
         continue
       }
       vivas.push(viva)
     }
   }
-  return { vivas, jaConsertadas, repetidas }
+  return { vivas, absolvidas, jaConsertadas, repetidas }
 }
 
 function main() {

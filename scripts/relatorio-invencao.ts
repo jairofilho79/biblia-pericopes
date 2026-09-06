@@ -11,7 +11,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { ABSOLVIDAS, absolvida, pendentes, type Pendente } from './invencoes-pendentes.ts'
+import { ABSOLVIDAS, pendentes, type Pendente } from './invencoes-pendentes.ts'
 import type { Achado } from './invencao-fila.ts'
 
 const root = join(import.meta.dirname, '..')
@@ -46,14 +46,24 @@ function main() {
   const dir = join(root, 'data/invencao/saida')
   const arquivos = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.json')) : []
   const achados = arquivos.map((f) => JSON.parse(readFileSync(join(dir, f), 'utf8')) as Achado)
-  const { vivas: todas, jaConsertadas } = pendentes(arr, achados)
-  const vivas = todas.filter((v) => !absolvida(v))
-  const absolvidas = todas.filter(absolvida)
+  const { vivas, absolvidas, jaConsertadas } = pendentes(arr, achados)
 
   const porOrdem = new Map(arr.map((p) => [p.ordem as number, p]))
-  const sobras = achados.flatMap((a) =>
-    (a.sobrou ?? []).map((s) => ({ ...s, ordem: a.ordem, p: porOrdem.get(a.ordem) })),
+  // A sobra sai da lista quando foi coberta, e "coberta" se lê do disco: cada
+  // arquivo em `data/sobra/aplicados/` é um conserto que passou pelo portão.
+  // Sem isto o relatório continuaria cobrando 26 sobras já fechadas — a mesma
+  // doença da lista de absolvidas que morava aqui dentro.
+  const cobertas = new Set(
+    (existsSync(join(root, 'data/sobra/aplicados'))
+      ? readdirSync(join(root, 'data/sobra/aplicados'))
+      : []
+    )
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => Number(f.slice(0, -5))),
   )
+  const sobras = achados
+    .flatMap((a) => (a.sobrou ?? []).map((s) => ({ ...s, ordem: a.ordem, p: porOrdem.get(a.ordem) })))
+    .filter((s) => !cobertas.has(s.ordem))
 
   const contar = <T>(xs: T[], chave: (x: T) => string) => {
     const m: Record<string, number> = {}
@@ -73,6 +83,37 @@ function main() {
       `**${sobras.length} sobras** (versículo que nenhum campo trata). ` +
       `Outras ${jaConsertadas} já foram consertadas durante a varredura.\n`,
   )
+
+  // Quando não sobra nada, as tabelas vazias e os títulos sem lista abaixo
+  // dizem menos que uma frase. O relatório fechado precisa contar o que FOI
+  // achado, senão ele apaga a própria auditoria ao ter sucesso.
+  if (!vivas.length && !sobras.length) {
+    console.log('## Fechada\n')
+    console.log(
+      `Todas as acusações desta varredura foram tratadas: ${jaConsertadas} consertadas, ` +
+        `${absolvidas.length} absolvidas por leitura, ${cobertas.size} sobras cobertas.\n`,
+    )
+    console.log(
+      'O erro dominante não era alucinação: era **generalização** — o material pegava um ' +
+        'caso e o transformava em regra. O conserto, quase sempre, foi tirar a régua e ' +
+        'deixar o caso.\n',
+    )
+    console.log(
+      'As formas de invenção que a varredura procurava, e o histórico completo das ' +
+        'acusações com a frase citada e o versículo que a derrubava, estão nas versões ' +
+        'anteriores deste arquivo no git, e a skill que as define em ' +
+        '`.claude/skills/caca-invencao/`.\n',
+    )
+    if (absolvidas.length) {
+      console.log('## Absolvidas — acusações que eu li e rejeitei\n')
+      for (const v of absolvidas.sort((a, b) => a.ordem - b.ordem)) {
+        const razao = ABSOLVIDAS.find((x) => x.ordem === v.ordem)?.porque
+        console.log(`- **${v.ref}** — "${v.afirma.slice(0, 80)}…" · ${razao}`)
+      }
+      console.log()
+    }
+    return
+  }
 
   console.log('## Por forma\n')
   console.log('| forma | quantas |\n|---|---|')

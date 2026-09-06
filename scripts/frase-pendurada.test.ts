@@ -207,3 +207,28 @@ describe('corta_e_nomeia', () => {
     )
   })
 })
+
+describe('a frase nova que repete a vizinha', () => {
+  it('recusa quando a nova repete seis palavras seguidas da frase seguinte', () => {
+    const ctx =
+      'O altar tem nome. Repare no nome. Ele não deu ao altar o nome da vitória nem o de Josué.'
+    expect(() =>
+      aplicarVeredito(ctx, 'Repare no nome.', {
+        ordem: 116,
+        veredito: 'responde',
+        novo: 'O nome não é o nome da vitória nem o de Josué, mas outro.',
+      }),
+    ).toThrow(/repete \d+ palavras/)
+  })
+
+  it('deixa passar quando só compartilha vocabulário solto', () => {
+    const ctx = 'O altar tem nome. Repare no nome. Ele não deu ao altar o nome da vitória.'
+    expect(
+      aplicarVeredito(ctx, 'Repare no nome.', {
+        ordem: 116,
+        veredito: 'responde',
+        novo: 'Moisés chamou o altar de "O SENHOR é minha bandeira".',
+      }),
+    ).toContain('minha bandeira')
+  })
+})

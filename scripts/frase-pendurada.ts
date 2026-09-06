@@ -160,6 +160,20 @@ export function aplicarVeredito(contexto: string, frase: string, v: Veredito): s
   }
   if (v.veredito === 'responde') {
     if (!v.novo?.trim()) throw new Error(`${v.ordem}: veredito "responde" sem frase nova`)
+    // A frase nova pode repetir a vizinha, e aí o texto diz a mesma coisa duas
+    // vezes seguidas — pior que o ponteiro que estava lá. Aconteceu em Êx 17,
+    // onde o nome do altar passou a aparecer três vezes em três frases, e em
+    // Ef 5, onde a enumeração seguinte repetia os itens sem dizer "a primeira".
+    // Seis palavras seguidas é o limiar: quatro ainda é vocabulário comum, e
+    // citação bíblica idêntica é legítima e curta.
+    const i = contexto.indexOf(frase)
+    const vizinhas =
+      contexto.slice(Math.max(0, i - 260), i) + ' ' + contexto.slice(i + frase.length, i + frase.length + 260)
+    const repetido = maiorTrechoRepetido(v.novo, vizinhas)
+    if (repetido >= 6)
+      throw new Error(
+        `${v.ordem}: a frase nova repete ${repetido} palavras de uma vizinha — "${v.novo.slice(0, 45)}…"`,
+      )
     if (penduradaSemPagar(v.novo.trim()))
       // Trocar uma frase pendurada por outra é o modo de falha mais fácil aqui.
       // Mas a checagem tem de ser sobre PAGAR, e não sobre a forma: a primeira

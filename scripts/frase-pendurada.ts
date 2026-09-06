@@ -30,6 +30,12 @@ import {
 } from 'node:fs'
 import { join } from 'node:path'
 import { criarDirs, dirs, montarLote } from './reenriquecimento.ts'
+// A mesma medida que o portão do material usa para reprovar resenha que
+// repete o contexto. Escrevê-la de novo aqui foi o que me fez perder o bug:
+// eu chamei a função sem notar que ela morava noutro módulo, e a versão que
+// eu teria escrito não ignora citação entre aspas — Escritura repetida é
+// legítima, e reprová-la seria inventar defeito.
+import { maiorTrechoRepetido } from './validar-material.ts'
 
 const root = join(import.meta.dirname, '..')
 export const BASE = join(root, 'data/pendurada')
@@ -156,44 +162,6 @@ const limpar = (t: string) =>
     .replace(/\n[ \t]+/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
-
-/**
- * O maior trecho de palavras SEGUIDAS que as duas cadeias compartilham.
- *
- * Existe por causa do portão do `responde`: a frase nova pode dizer, com as
- * mesmas palavras, o que a vizinha já dizia. Compara por palavra e não por
- * caractere porque o que incomoda o leitor é a frase repetida, não a sílaba;
- * e ignora acento, caixa e pontuação porque "vitória," e "vitória" são a
- * mesma palavra para quem ouve.
- */
-export function maiorTrechoRepetido(a: string, b: string): number {
-  const palavras = (t: string) =>
-    t
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-      .split(/\s+/)
-      .filter(Boolean)
-  const x = palavras(a)
-  const y = palavras(b)
-  if (!x.length || !y.length) return 0
-  // Substring comum mais longa, em janela de uma linha só: para cada par (i, j)
-  // basta saber quanto a diagonal anterior já valia.
-  let maior = 0
-  let anterior = new Array<number>(y.length + 1).fill(0)
-  for (let i = 1; i <= x.length; i++) {
-    const atual = new Array<number>(y.length + 1).fill(0)
-    for (let j = 1; j <= y.length; j++) {
-      if (x[i - 1] === y[j - 1]) {
-        atual[j] = anterior[j - 1] + 1
-        if (atual[j] > maior) maior = atual[j]
-      }
-    }
-    anterior = atual
-  }
-  return maior
-}
 
 export function aplicarVeredito(contexto: string, frase: string, v: Veredito): string {
   if (v.veredito === 'entrega') return contexto

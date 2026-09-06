@@ -129,9 +129,17 @@ const CONVENCOES: { re: RegExp; que: string }[] = [
  *
  * `na tela` entra por outro motivo: como metáfora de cinema ela é boa, mas
  * este app TEM uma tela e o leitor está olhando para ela.
+ *
+ * `travessão` entrou depois, achado por leitura em Pv 2 ("o texto marca três
+ * saídas com um travessão"). O resto da pontuação NÃO entrou, e de propósito:
+ * a varredura por "ponto final", "dois pontos", "entre aspas" e "ponto de
+ * interrogação" devolveu 16 achados e os 16 eram legítimos — "o que parece
+ * ponto final pode ser só o fim de uma página" é metáfora, "dois pontos na
+ * margem daquele mar" são dois lugares, e "entre aspas" em português falado
+ * quer dizer o-chamado. Só entra no portão o que não tem uso legítimo.
  */
 const TIPOGRAFIA =
-  /\b(?:letras? (?:mai[úu]sculas?|min[úu]sculas?)|em (?:mai[úu]sculas|min[úu]sculas)|com letra (?:grande|pequena|mai[úu]scula|min[úu]scula)|(?:mai[úu]scula|min[úu]scula)s? (?:na|no) (?:texto|p[áa]gina|tela)|na tela)\b/gi
+  /\b(?:letras? (?:mai[úu]sculas?|min[úu]sculas?)|em (?:mai[úu]sculas|min[úu]sculas)|com letra (?:grande|pequena|mai[úu]scula|min[úu]scula)|(?:mai[úu]scula|min[úu]scula)s? (?:na|no) (?:texto|p[áa]gina|tela)|na tela|travess[ãa]o|h[íi]fen)\b/gi
 
 /** Normaliza para comparar citação com o texto bíblico sem tropeçar em pontuação. */
 function normalizar(s: string): string {

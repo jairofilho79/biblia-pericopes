@@ -63,7 +63,26 @@ estão em Levítico 26:22, e o fogo de Números 3 está em Levítico 10:1-2. Um
 silêncio falso é pior que uma afirmação solta, porque o material costuma pendurar
 uma pergunta de reflexão nele e levar o leitor junto.
 
-**2. O material define uma palavra ou uma instituição.** "Juiz é quem…",
+**2. O material define uma palavra ou uma instituição.** É o gatilho que mais
+rende, e dentro dele há uma forma campeã: **a definição categórica.** "Sempre",
+"nunca", "exclusiva de", "só podia", "era coisa aceita". Basta UM contraexemplo
+na Escritura para derrubá-la, e quase sempre existe:
+
+- "o éfode de linho era veste exclusiva de sacerdote" — 2 Samuel 6:14 põe o
+  éfode em Davi, que é rei;
+- "consultar ao SENHOR era sempre por meio do sacerdote" — Gênesis 25:22 tem
+  Rebeca consultando sozinha;
+- "ungir era sempre diante de testemunhas" — 1 Samuel 10:1 unge Saul a sós;
+- "reinar em lugar de alguém significa sucessão pacífica" — 2 Reis 15:14 usa a
+  mesma fórmula para quem matou o antecessor.
+
+**Não confunda com o absoluto legítimo:** "estatuto é regra que vale sempre" é
+descrição correta de um estatuto. O que derruba é o contraexemplo, não a
+palavra "sempre" — vá procurar um antes de acusar.
+
+E quando achar uma definição errada, **procure a mesma glosa noutras
+perícopes**. Quando o gerador aprendeu errado, ele repetiu: a definição de
+"juiz" estava em duas, a de "ungir" em duas. "Juiz é quem…",
 "o holocausto é o sacrifício em que…", "primogenitura significa…". **Procure a
 palavra em outro lugar e veja se a definição sobrevive.** Foi assim que caiu
 "juiz não é quem decide processo em tribunal": Juízes 4:5 diz que subiam a
